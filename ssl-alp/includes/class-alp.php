@@ -88,6 +88,7 @@ class SSL_ALP {
 	 * Register global hooks related to core WordPress functionality
 	 */
 	 private function define_global_hooks() {
+		 $this->loader->add_action( 'get_header', $this, 'check_logged_in');
 		 $this->loader->add_action( 'init', $this, 'unregister_tags' );
 	 }
 
@@ -96,10 +97,44 @@ class SSL_ALP {
 	 * of the plugin.
 	 */
 	private function define_admin_hooks() {
+		global $pagenow;
+
 		$plugin_admin = new SSL_ALP_Admin( $this->get_plugin_name(), $this->get_version() );
+
+		// styles and scripts
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
+		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
+
+		// settings page
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_admin_menu' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'settings_api_init' );
+
+		/*
+		 * revision comments
+		 */
+
+		// add edit summary box to post and page edit screens
+		$this->loader->add_action( 'post_submitbox_misc_actions', $plugin_admin, 'add_edit_summary_textbox' );
+
+		// When restoring a revision, also restore that revisions's revisioned meta.
+		$this->loader->add_action( 'wp_restore_post_revision', $plugin_admin, 'restore_post_revision_meta', 10, 2 );
+		// When creating a revision, also save any revisioned meta.
+		$this->loader->add_action( '_wp_put_post_revision', $plugin_admin, 'save_revisioned_meta_fields' );
+
+		// When revisioned post meta has changed, trigger a revision save.
+		$this->loader->add_filter( 'wp_save_post_revision_post_has_changed', $plugin_admin, 'check_revisioned_meta_fields_have_changed', 10, 3 );
+
+		// save edit summary as custom meta data when post is updated (needs to
+		// have priority < 10 so the meta data is added before the revision
+		// copy is made
+		$this->loader->add_action( 'post_updated', $plugin_admin, 'save_post_edit_summary', 5, 2 );
+		//$this->loader->add_action( 'wp_restore_post_revision', $plugin_admin, 'restore_post_revision', 10, 2 );
+		//$this->loader->add_filter( 'wp_save_post_revision_post_has_changed', $plugin_admin, 'check_revisioned_meta_fields_have_changed', 10, 3 );
+
+		//if ($pagenow == 'revision.php') {
+		//	$this->loader->add_filter( '_wp_post_revision_fields', $this, 'post_revision_fields', 10, 1 );
+		//	$this->loader->add_filter( '_wp_post_revision_field_postmeta', $this, 'post_revision_field', 1, 2 );
+		//}
 	}
 
 	/**
@@ -118,9 +153,24 @@ class SSL_ALP {
 	public function unregister_tags() {
 		$disable_tags = (get_option('ssl_alp_disable_post_tags') ? get_option('ssl_alp_disable_post_tags') : false);
 
-		if ($disable_tags) {
-			unregister_taxonomy_for_object_type( 'post_tag', 'post' );
+		if ( !$disable_tags) {
+			return;
 		}
+
+		unregister_taxonomy_for_object_type( 'post_tag', 'post' );
+	}
+
+	/**
+	 * Check user is logged in
+	 */
+	public function check_logged_in() {
+		if ( !get_option( 'ssl_alp_require_login', true ) ) {
+			return;
+		}
+
+    	if ( !is_user_logged_in() ) {
+        	auth_redirect();
+    	}
 	}
 
 	/**

@@ -1,0 +1,17 @@
+#ssl_alp_revision_post_edit_summary_input {
+    margin-top: 5px;
+}
+
+div.ssl-alp-misc-pub-edit-summary:before {
+    /* copied from .misc-pub-post-status */
+    font: 400 20px/1 dashicons;
+    speak: none;
+    display: inline-block;
+    margin-left: -1px;
+    padding-right: 3px;
+    vertical-align: top;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #82878c;
+    content: "\f464"; /* pencil icon */
+}
