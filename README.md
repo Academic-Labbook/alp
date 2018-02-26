@@ -16,7 +16,10 @@ implemented so far...
    between network/individual site access)
 
 ...and here are features planned for the future:
- - Add wiki pages as a new post type (display contents)
+ - Setting: enable revisions list appearance in admin edit post page by default
+   for new users
+ - Remove trackbacks/pingbacks
+ - Add wiki pages as a new post type (display contents) (https://codex.wordpress.org/Post_Types#Custom_Post_Types)
  - Support wiki shortcodes (highlight red when page doesn't exist)
  - Multiple author support
  - LaTeX support
@@ -47,6 +50,7 @@ have been modified to fit into ALP (e.g. admin settings, class and setting
 namespaces, etc.):
  - Coauthors Plus
  - [WP-Post-Meta-Revisions](https://github.com/adamsilverstein/wp-post-meta-revisions)
+ - [Revision Notes](https://wordpress.org/plugins/revision-notes/)
 
 ## Goals
  - **Clean code**: there's an awful lot of terribly written code floating around

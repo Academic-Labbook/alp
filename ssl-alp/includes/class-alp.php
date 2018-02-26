@@ -113,8 +113,16 @@ class SSL_ALP {
 		 * revision comments
 		 */
 
+		 // register edit summary feature with posts and pages
+ 		$this->loader->add_action( 'init', $plugin_admin, 'add_edit_summary_support' );
+
 		// add edit summary box to post and page edit screens
 		$this->loader->add_action( 'post_submitbox_misc_actions', $plugin_admin, 'add_edit_summary_textbox' );
+
+		// add edit summary to revision history list under posts/pages/etc.
+		$this->loader->add_filter( 'wp_post_revision_title_expanded', $plugin_admin, 'add_revision_title_edit_summary', 10, 2 );
+		// modify revision screen data
+		$this->loader->add_filter( 'wp_prepare_revision_for_js', $plugin_admin, 'prepare_revision_for_js', 10, 2 );
 
 		// When restoring a revision, also restore that revisions's revisioned meta.
 		$this->loader->add_action( 'wp_restore_post_revision', $plugin_admin, 'restore_post_revision_meta', 10, 2 );
@@ -128,13 +136,6 @@ class SSL_ALP {
 		// have priority < 10 so the meta data is added before the revision
 		// copy is made
 		$this->loader->add_action( 'post_updated', $plugin_admin, 'save_post_edit_summary', 5, 2 );
-		//$this->loader->add_action( 'wp_restore_post_revision', $plugin_admin, 'restore_post_revision', 10, 2 );
-		//$this->loader->add_filter( 'wp_save_post_revision_post_has_changed', $plugin_admin, 'check_revisioned_meta_fields_have_changed', 10, 3 );
-
-		//if ($pagenow == 'revision.php') {
-		//	$this->loader->add_filter( '_wp_post_revision_fields', $this, 'post_revision_fields', 10, 1 );
-		//	$this->loader->add_filter( '_wp_post_revision_field_postmeta', $this, 'post_revision_field', 1, 2 );
-		//}
 	}
 
 	/**

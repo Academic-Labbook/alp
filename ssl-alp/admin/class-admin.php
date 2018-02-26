@@ -36,6 +36,15 @@ class SSL_ALP_Admin {
 
 	}
 
+	/**
+	 * Add edit summary support to certain post types, so they can have
+	 * relevant tools added to their edit pages.
+	 */
+	public function add_edit_summary_support() {
+		add_post_type_support( 'post', 'ssl-alp-edit-summaries' );
+		add_post_type_support( 'page', 'ssl-alp-edit-summaries' );
+	}
+
 	private function edit_summary_enabled( $post ) {
 		if ( $post->post_type == 'post' ) {
 			if ( !get_option( 'ssl_alp_post_edit_summaries', true) ) {
@@ -47,6 +56,10 @@ class SSL_ALP_Admin {
 				// disabled for pages
 				return false;
 			}
+		} elseif ( $post->post_type == 'revision' ) {
+			// this is a revision of another post type
+			// check the parent post
+			return $this->edit_summary_enabled( get_post( $post->post_parent ) );
 		} else {
 			// invalid post type
 			return false;
@@ -66,12 +79,92 @@ class SSL_ALP_Admin {
 				// no permission
 				return false;
 			}
+		} elseif ( $post->post_type == 'revision' ) {
+			// this is a revision of another post type
+			// check the parent post
+			return $this->edit_summary_permission( get_post( $post->post_parent ) );
 		} else {
 			// invalid post type
 			return false;
 		}
 
 		return true;
+	}
+
+	/*
+	 * Inject edit summary into revision author/date listings
+	 */
+	public function add_revision_title_edit_summary( $revision_date_author, $revision ) {
+		if ( !is_admin() ) {
+			return $revision_date_author;
+		}
+
+		$screen = get_current_screen();
+
+		if ( $screen->base !== 'post' ) {
+			return $text;
+		}
+
+		if ( !$this->edit_summary_enabled( $revision ) || !$this->edit_summary_permission( $revision ) ) {
+			// return as-is
+			return $revision_date_author;
+		}
+
+		// get the stored meta value from the revision
+		// (use get_metadata instead of get_post_meta so we get the *revision's* data, not the parent's)
+		$revision_meta = get_metadata( 'post', $revision->ID, 'edit_summary', true );
+
+		if ( empty( $revision_meta ) || !is_array( $revision_meta ) ) {
+			// empty or invalid
+			return $revision_date_author;
+		}
+
+		if ( $revision_meta["reverted"] !== 0 ) {
+			// this revision was a revert to previous revision
+			/* translators: %s: revision URL; %d: revision ID */
+			$revision_date_author .= __( ', reverted to <a href="%s">%d</a>', 'ssl-alp' );
+
+			// get reverted revision URL
+			$revision_url = get_edit_post_link( $revision_meta["reverted"] );
+
+			// add URL
+			$revision_date_author = sprintf( $revision_date_author, $revision_url, $revision_meta["reverted"] );
+		}
+
+		// add message
+		/* translators: %s: revision edit summary */
+		$revision_date_author .= " &mdash; " . sprintf( __( "<em>\"%s\"</em>", 'ssl-alp' ), esc_html( $revision_meta["message"] ) );
+
+		return $revision_date_author;
+	}
+
+	/**
+	 * Add edit summary to revision screen
+	 */
+	public function prepare_revision_for_js( $data, $revision ) {
+		// get revision edit summary
+		$revision_meta = get_metadata( 'post', $revision->ID, 'edit_summary', true );
+
+		if ( empty( $revision_meta ) || !is_array( $revision_meta ) ) {
+			// empty or invalid
+			return $data;
+		}
+
+		$edit_summary = esc_html( $revision_meta["message"] );
+
+		if ( $revision_meta["reverted"] !== 0 ) {
+			// this revision was a revert to previous revision
+			/* translators: %d: revision ID */
+			$data['timeAgo'] .= __( ', reverted to %d', 'ssl-alp' );
+
+			// add URL
+			$data['timeAgo'] = sprintf( $data['timeAgo'], $revision_meta["reverted"] );
+		}
+
+		/* translators: 1: time ago; 2: edit summary */
+		$data['timeAgo'] = sprintf( __( '%1$s — "%2$s"', 'ssl-alp' ), $data['timeAgo'], $edit_summary );
+
+		return $data;
 	}
 
 	/**
