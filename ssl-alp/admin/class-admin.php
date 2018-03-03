@@ -45,44 +45,28 @@ class SSL_ALP_Admin {
 		add_post_type_support( 'page', 'ssl-alp-edit-summaries' );
 	}
 
-	private function edit_summary_enabled( $post ) {
-		if ( $post->post_type == 'post' ) {
-			if ( !get_option( 'ssl_alp_post_edit_summaries', true) ) {
-				// disabled for posts
+	/*
+	 * Check if edit summaries are enabled for, and the user has permission to
+	 * view, the specified post.
+	 */
+	private function edit_summary_allowed( $post ) {
+		// get post as an object, if not already one
+		$post = get_post( $post );
+
+		if ( $post->post_type == 'revision' ) {
+			// this is a revision of another post type
+			// check the parent post
+			return $this->edit_summary_allowed( get_post( $post->post_parent ) );
+		} elseif ( $post->post_type == 'post' ) {
+			if ( !get_option( 'ssl_alp_post_edit_summaries', true) || !current_user_can( 'edit_post', $post->ID ) ) {
+				// disabled for posts, or user not allowed to view
 				return false;
 			}
 		} elseif ( $post->post_type == 'page') {
-			if ( !get_option( 'ssl_alp_page_edit_summaries', true ) ) {
-				// disabled for pages
+			if ( !get_option( 'ssl_alp_page_edit_summaries', true ) || !get_option( 'ssl_alp_page_edit_summaries', true ) ) {
+				// disabled for pages, or user not allowed to view
 				return false;
 			}
-		} elseif ( $post->post_type == 'revision' ) {
-			// this is a revision of another post type
-			// check the parent post
-			return $this->edit_summary_enabled( get_post( $post->post_parent ) );
-		} else {
-			// invalid post type
-			return false;
-		}
-
-		return true;
-	}
-
-	private function edit_summary_permission( $post ) {
-		if ( $post->post_type == 'post' ) {
-			if ( !current_user_can( 'edit_post', $post->ID ) ) {
-				// no permission
-				return false;
-			}
-		} elseif ( $post->post_type == 'page') {
-			if ( !current_user_can( 'edit_page', $post->ID ) ) {
-				// no permission
-				return false;
-			}
-		} elseif ( $post->post_type == 'revision' ) {
-			// this is a revision of another post type
-			// check the parent post
-			return $this->edit_summary_permission( get_post( $post->post_parent ) );
 		} else {
 			// invalid post type
 			return false;
@@ -105,7 +89,7 @@ class SSL_ALP_Admin {
 			return $text;
 		}
 
-		if ( !$this->edit_summary_enabled( $revision ) || !$this->edit_summary_permission( $revision ) ) {
+		if ( !$this->edit_summary_allowed( $revision ) ) {
 			// return as-is
 			return $revision_date_author;
 		}
@@ -171,7 +155,7 @@ class SSL_ALP_Admin {
 	 * Add edit summary textbox within the "Update" panel to posts and pages
 	 */
 	public function add_edit_summary_textbox($post) {
-		if ( !$this->edit_summary_enabled( $post ) || !$this->edit_summary_permission ( $post ) ) {
+		if ( !$this->edit_summary_allowed( $post ) ) {
 			return;
 		} elseif ( $post->post_status == 'auto-draft' ) {
 			// post is newly created, so don't show an edit summary box
@@ -244,7 +228,7 @@ class SSL_ALP_Admin {
 
 		$revision = get_post( $revision_id );
 
-		if ( !$this->edit_summary_enabled( $revision ) || !$this->edit_summary_permission ( $revision ) ) {
+		if ( !$this->edit_summary_allowed( $revision ) ) {
 			return;
 		}
 
@@ -307,7 +291,7 @@ class SSL_ALP_Admin {
 		// skip when autosaving, as custom post data is noted included in $_POST during autosaves (annoying)
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 			return;
-		} elseif ( !$this->edit_summary_enabled( $post ) || !$this->edit_summary_permission ( $post ) ) {
+		} elseif ( !$this->edit_summary_allowed( $post ) ) {
 			return;
 		} elseif ( !isset( $_POST['ssl_alp_edit_summary_nonce'] ) || !wp_verify_nonce( $_POST['ssl_alp_edit_summary_nonce'], 'ssl-alp-edit-summary' ) ) {
 			// no or invalid nonce
@@ -319,11 +303,11 @@ class SSL_ALP_Admin {
 		error_log("saving post edit summary");
 
 		// sanitise edit summary input
-		$edit_summary = sanitize_text_field( $_POST['ssl_alp_revision_post_edit_summary'] );
+		$message = sanitize_text_field( $_POST['ssl_alp_revision_post_edit_summary'] );
 		// limit length
 		$max = get_option( 'ssl_alp_edit_summary_max_length', 100 );
-		if ( strlen( $edit_summary ) > $max ) {
-			$edit_summary = substr( $edit_summary, 0, $max );
+		if ( strlen( $message ) > $max ) {
+			$message = substr( $message, 0, $max );
 		}
 
 		# construct meta data array
