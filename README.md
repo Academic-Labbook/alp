@@ -14,15 +14,19 @@ implemented so far...
  - Change logs for posts and pages (not yet publicly visible)
  - Force users to be logged in to view (but maybe later add ability to choose
    between network/individual site access)
+ - LaTeX support
 
 ...and here are features planned for the future:
+ - Disable RSS feeds (NOT disabled by forced login), images also can still be
+   accessed but this might require htaccess changes
  - Setting: enable revisions list appearance in admin edit post page by default
    for new users
- - Remove trackbacks/pingbacks
+ - Remove trackbacks/pingbacks (can disable via setting)
  - Add wiki pages as a new post type (display contents) (https://codex.wordpress.org/Post_Types#Custom_Post_Types)
  - Support wiki shortcodes (highlight red when page doesn't exist)
  - Multiple author support
- - LaTeX support
+ - LaTeX TinyMCE widget
+ - More MathJax configuration options
  - Author list widget
  - Recently edited posts widget
  - Change names and behaviours of user types:
@@ -41,6 +45,8 @@ implemented so far...
  - Remove some post formats (e.g. quote), add new ones, change name of "Aside"
    to "Note"
  - Offline download, e.g. [Simply Static](https://wordpress.org/plugins/simply-static/)
+ - arXiv shortcode
+ - DOI shortcode
  - LSC-specific extensions:
    - DCC shortcodes
 
@@ -52,7 +58,11 @@ namespaces, etc.):
  - [WP-Post-Meta-Revisions](https://github.com/adamsilverstein/wp-post-meta-revisions)
  - [Revision Notes](https://wordpress.org/plugins/revision-notes/)
 
-## Goals
+## Future ideas
+Some feature ideas not considered critical, but nice to have:
+ - Outreach pages: share some posts/pages publicly.
+
+## Design principles
  - **Clean code**: there's an awful lot of terribly written code floating around
    in the WordPress ecosystem. This plugin attempts to use coding standards, and
    to interfere minimally with the default WordPress behaviour. This will
