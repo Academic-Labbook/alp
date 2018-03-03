@@ -3,30 +3,12 @@
 /**
  * The admin-specific functionality of the plugin.
  */
-class SSL_ALP_Admin {
-	/**
-	 * The ID of this plugin.
-	 */
-	private $plugin_name;
-
-	/**
-	 * The version of this plugin.
-	 */
-	private $version;
-
-	/**
-	 * Initialize the class and set its properties.
-	 */
-	public function __construct( $plugin_name, $version ) {
-		$this->plugin_name = $plugin_name;
-		$this->version = $version;
-	}
-
+class SSL_ALP_Admin extends SSL_ALP_Base {
 	/**
 	 * Register the stylesheets for the admin area.
 	 */
 	public function enqueue_styles() {
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/admin.css', array(), $this->version, 'all' );
+		wp_enqueue_style( 'ssl-alp-admin-css', plugin_dir_url( __FILE__ ) . 'css/admin.css', array(), $this->version, 'all' );
 	}
 
 	/**
@@ -362,6 +344,13 @@ class SSL_ALP_Admin {
 			'ssl-alp-admin-options' // page
 		);
 
+		add_settings_section(
+			'ssl_alp_mathematics_settings_section', // id
+			__( 'Mathematics Settings', 'ssl-alp' ), // title
+			array( $this, 'mathematics_settings_section_callback' ), // callback
+			'ssl-alp-admin-options' // page
+		);
+
 		/**
 		 * Site settings fields
 		 */
@@ -396,80 +385,30 @@ class SSL_ALP_Admin {
 
 		add_settings_field(
 			'ssl_alp_edit_summary_settings',
-			__( 'Edit summaries' ),
+			__( 'Edit summaries', 'ssl-alp' ),
 			array( $this, 'edit_summary_settings_callback' ),
 			'ssl-alp-admin-options',
 			'ssl_alp_post_settings_section'
 		);
 
-		/**
-		 * Access settings
+		/*
+		 * Mathematics settings fields
 		 */
 
-		 register_setting(
- 			'ssl-alp-admin-options',
- 			'ssl_alp_require_login',
- 			array(
- 				'type'		=>	'boolean',
- 				'default'	=>	true
- 			)
- 		);
-
-		/**
-		 * Categories and tags settings
-		 */
-
-		register_setting(
+		add_settings_field(
+			'ssl_alp_enable_mathematics_settings',
+			__( 'Display', 'ssl-alp' ),
+			array( $this, 'enable_latex_settings_callback' ),
 			'ssl-alp-admin-options',
-			'ssl_alp_disable_post_tags',
-			array(
-				'type'		=>	'boolean',
-				'default'	=>	true
-			)
+			'ssl_alp_mathematics_settings_section'
 		);
 
-		/**
-		 * Authors settings
-		 */
-
-		register_setting(
+		add_settings_field(
+			'ssl_alp_mathjax_url_settings',
+			__( 'MathJax JavaScript URL', 'ssl-alp' ),
+			array( $this, 'mathjax_javascript_url_settings_callback' ),
 			'ssl-alp-admin-options',
-			'ssl_alp_multiple_authors',
-			array(
-				'type'		=>	'boolean',
-				'default'	=>	true
-			)
-		);
-
-		/**
-		 * Edit summary settings
-		 */
-
-		register_setting(
- 			'ssl-alp-admin-options',
- 			'ssl_alp_post_edit_summaries',
- 			array(
- 				'type'		=>	'boolean',
- 				'default'	=>	true
- 			)
- 		);
-
-		register_setting(
-			'ssl-alp-admin-options',
-			'ssl_alp_page_edit_summaries',
-			array(
-				'type'		=>	'boolean',
-				'default'	=>	true
-			)
-		);
-
-		register_setting(
-			'ssl-alp-admin-options',
-			'ssl_alp_edit_summary_max_length',
-			array(
-				'type'		=>	'integer',
-				'default'	=>	100
-			)
+			'ssl_alp_mathematics_settings_section'
 		);
 	}
 
@@ -506,5 +445,21 @@ class SSL_ALP_Admin {
 
 	public function edit_summary_settings_callback() {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/post/edit-summary-settings-display.php';
+	}
+
+	/*
+	 * Mathematics settings
+	 */
+
+	public function mathematics_settings_section_callback() {
+ 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/maths/mathematics-settings-section-display.php';
+ 	}
+
+	public function enable_latex_settings_callback() {
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/maths/enable-latex-settings-display.php';
+	}
+
+	public function mathjax_javascript_url_settings_callback() {
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/maths/mathjax-javascript-url-settings-display.php';
 	}
 }

@@ -7,7 +7,6 @@
  * the unique identifier of this plugin as well as the current version of the
  * plugin.
  */
-
 class SSL_ALP {
 	/**
 	 * Loader responsible for maintaining and registering all hooks that power
@@ -38,7 +37,8 @@ class SSL_ALP {
 		$this->plugin_name = 'Academic Labbook Plugin';
 		$this->load_dependencies();
 		$this->set_locale();
-		$this->define_global_hooks();
+		$this->register_settings();
+		$this->define_core_hooks();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
 	}
@@ -85,9 +85,107 @@ class SSL_ALP {
 	}
 
 	/**
+	 * Register plugin settings.
+	 */
+	private function register_settings() {
+		/**
+		 * Access settings
+		 */
+
+		 register_setting(
+ 			'ssl-alp-admin-options',
+ 			'ssl_alp_require_login',
+ 			array(
+ 				'type'		=>	'boolean',
+ 				'default'	=>	true
+ 			)
+ 		);
+
+		/**
+		 * Categories and tags settings
+		 */
+
+		register_setting(
+			'ssl-alp-admin-options',
+			'ssl_alp_disable_post_tags',
+			array(
+				'type'		=>	'boolean',
+				'default'	=>	true
+			)
+		);
+
+		/**
+		 * Authors settings
+		 */
+
+		register_setting(
+			'ssl-alp-admin-options',
+			'ssl_alp_multiple_authors',
+			array(
+				'type'		=>	'boolean',
+				'default'	=>	true
+			)
+		);
+
+		/**
+		 * Edit summary settings
+		 */
+
+		register_setting(
+ 			'ssl-alp-admin-options',
+ 			'ssl_alp_post_edit_summaries',
+ 			array(
+ 				'type'		=>	'boolean',
+ 				'default'	=>	true
+ 			)
+ 		);
+
+		register_setting(
+			'ssl-alp-admin-options',
+			'ssl_alp_page_edit_summaries',
+			array(
+				'type'		=>	'boolean',
+				'default'	=>	true
+			)
+		);
+
+		register_setting(
+			'ssl-alp-admin-options',
+			'ssl_alp_edit_summary_max_length',
+			array(
+				'type'		=>	'integer',
+				'default'	=>	100
+			)
+		);
+
+		/**
+		 * Mathematics settings
+		 */
+
+	    register_setting(
+			'ssl-alp-admin-options',
+			'ssl_alp_latex_enabled',
+			array(
+				'type'		=>	'boolean',
+				'default'	=>	true
+			)
+		);
+
+		register_setting(
+			'ssl-alp-admin-options',
+			'ssl_alp_mathjax_url',
+			array(
+				'type'				=>	'string',
+				'sanitize_callback'	=>	'esc_url_raw',
+				'default'			=>	SSL_ALP_DEFAULT_MATHJAX_URL
+			)
+		);
+	}
+
+	/**
 	 * Register global hooks related to core WordPress functionality
 	 */
-	 private function define_global_hooks() {
+	 private function define_core_hooks() {
 		 $this->loader->add_action( 'get_header', $this, 'check_logged_in');
 		 $this->loader->add_action( 'init', $this, 'unregister_tags' );
 	 }
@@ -146,15 +244,19 @@ class SSL_ALP {
 		$plugin_public = new SSL_ALP_Public( $this->get_plugin_name(), $this->get_version() );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+
+		// MathJax shortcodes
+		if ( get_option( 'ssl_alp_latex_enabled' ) ) {
+			$this->loader->add_action( 'init', $plugin_public, 'add_mathjax_shortcodes' );
+			$this->loader->add_action( 'wp_footer', $plugin_public, 'add_mathjax_script' );
+		}
 	}
 
 	/**
 	 * Disable tags on posts.
 	 */
 	public function unregister_tags() {
-		$disable_tags = (get_option('ssl_alp_disable_post_tags') ? get_option('ssl_alp_disable_post_tags') : false);
-
-		if ( !$disable_tags) {
+		if ( !get_option( 'ssl_alp_disable_post_tags' ) ) {
 			return;
 		}
 
@@ -202,4 +304,37 @@ class SSL_ALP {
 	public function get_version() {
 		return $this->version;
 	}
+}
+
+/**
+ * Abstract class to define shared functions.
+ */
+abstract class SSL_ALP_Base {
+	/**
+	 * The unique identifier of this plugin.
+	 */
+	protected $plugin_name;
+
+	/**
+	 * The current version of the plugin.
+	 */
+	protected $version;
+
+	/**
+	 * Constructor
+	 */
+	public function __construct($plugin_name, $version) {
+		$this->plugin_name = strval($plugin_name);
+		$this->version = strval($version);
+	}
+
+	/**
+	 * Enqueue styles in the page header
+	 */
+	abstract public function enqueue_styles();
+
+	/**
+	 * Enqueue scripts in the page header
+	 */
+	abstract public function enqueue_scripts();
 }

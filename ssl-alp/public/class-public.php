@@ -3,24 +3,11 @@
 /**
  * The public-facing functionality of the plugin.
  */
-class SSL_ALP_Public {
+class SSL_ALP_Public extends SSL_ALP_Base {
 	/**
-	 * The ID of this plugin.
+	 * Whether to add the MathJax script to the page
 	 */
-	private $plugin_name;
-
-	/**
-	 * The version of this plugin.
-	 */
-	private $version;
-
-	/**
-	 * Initialize the class and set its properties.
-	 */
-	public function __construct( $plugin_name, $version ) {
-		$this->plugin_name = $plugin_name;
-		$this->version = $version;
-	}
+	public $add_mathjax_script = false;
 
 	/**
 	 * Register the stylesheets for the public-facing side of the site.
@@ -29,7 +16,7 @@ class SSL_ALP_Public {
 		/**
 		 * Used by SSL_APL class
 		 */
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/public.css', array(), $this->version, 'all' );
+		wp_enqueue_style( 'ssl-alp-public-css', plugin_dir_url( __FILE__ ) . 'css/public.css', array(), $this->version, 'all' );
 	}
 
 	/**
@@ -39,6 +26,44 @@ class SSL_ALP_Public {
 		/**
 		 * Used by SSL_APL class
 		 */
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/public.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( 'ssl-alp-public-js', plugin_dir_url( __FILE__ ) . 'js/public.js', array( 'jquery' ), $this->version, false );
+	}
+
+	/**
+	 * Add MathJax shortcodes to editor
+	 */
+	public function add_mathjax_shortcodes() {
+		add_shortcode( 'latex', array( $this, 'latex_shortcode_hook' ) );
+	}
+
+	public static function latex_shortcode_hook( $atts, $content ) {
+		$this->add_mathjax_script = true;
+
+		// add optional "syntax" attribute, which defaults to "inline", but can also be "block"
+		$shortcode_atts = shortcode_atts(
+			array(
+				'display' => 'inline',
+			),
+			$atts
+		);
+
+		if ( $shortcode_atts['display'] === 'inline' ) {
+			return '\(' . $content . '\)';
+		} elseif ( $shortcode_atts['display'] === 'block' ) {
+			return '\[' . $content . '\]';
+		}
+	}
+
+	public function add_mathjax_script() {
+		if ( !$this->add_mathjax_script ) {
+			// don't load script
+			return;
+		}
+
+		// MathJax URL and SRI settings
+		$mathjax_url = get_option( 'ssl_alp_mathjax_url' );
+
+		// enqueue script in footer
+		wp_enqueue_script( 'ssl-alp-mathjax-script', $mathjax_url, array(), SSL_ALP_MATHJAX_VERSION, true );
 	}
 }
