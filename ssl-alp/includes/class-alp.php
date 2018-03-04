@@ -167,6 +167,15 @@ class SSL_ALP {
 			)
 		);
 
+		register_setting(
+			'ssl-alp-admin-options',
+			'ssl_alp_arxiv_shortcode',
+			array(
+				'type'		=>	'boolean',
+				'default'	=>	true
+			)
+		);
+
 		/**
 		 * Mathematics settings
 		 */
@@ -263,6 +272,11 @@ class SSL_ALP {
 		// DOI shortcode
 		if ( get_option( 'ssl_alp_doi_shortcode' ) ) {
 			$this->loader->add_action( 'init', $plugin_public, 'add_doi_shortcodes' );
+		}
+
+		// arXiv shortcode
+		if ( get_option( 'ssl_alp_arxiv_shortcode' ) ) {
+			$this->loader->add_action( 'init', $plugin_public, 'add_arxiv_shortcodes' );
 		}
 	}
 

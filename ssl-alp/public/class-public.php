@@ -67,6 +67,19 @@ class SSL_ALP_Public extends SSL_ALP_Base {
 		return '<a href="' . $url . '">doi:' . $content . '</a>';
 	}
 
+	public function add_arxiv_shortcodes() {
+		add_shortcode( 'arxiv', array( $this, 'arxiv_shortcode_hook' ) );
+	}
+
+	public function arxiv_shortcode_hook( $atts, $content ) {
+		$content = sanitize_text_field( $content );
+
+		// arXiv URL
+		$url = SSL_ALP_ARXIV_BASE_URL . $content;
+
+		return '<a href="' . $url . '">arXiv:' . $content . '</a>';
+	}
+
 	public function add_mathjax_script() {
 		if ( !$this->add_mathjax_script ) {
 			// don't load script

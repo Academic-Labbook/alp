@@ -15,7 +15,7 @@ implemented so far...
  - Force users to be logged in to view (but maybe later add ability to choose
    between network/individual site access)
  - LaTeX support
- - DOI persistent references
+ - DOI and arXiv persistent references, using shortcodes
 
 ...and here are features planned for the future:
  - Disable RSS feeds (NOT disabled by forced login), images also can still be
@@ -46,7 +46,6 @@ implemented so far...
  - Remove some post formats (e.g. quote), add new ones, change name of "Aside"
    to "Note"
  - Offline download, e.g. [Simply Static](https://wordpress.org/plugins/simply-static/)
- - arXiv shortcode
  - DOI shortcode validation (https://www.crossref.org/blog/dois-and-matching-regular-expressions/)
  - LSC-specific extensions:
    - DCC shortcodes
