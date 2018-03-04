@@ -158,6 +158,15 @@ class SSL_ALP {
 			)
 		);
 
+		register_setting(
+			'ssl-alp-admin-options',
+			'ssl_alp_doi_shortcode',
+			array(
+				'type'		=>	'boolean',
+				'default'	=>	true
+			)
+		);
+
 		/**
 		 * Mathematics settings
 		 */
@@ -249,6 +258,11 @@ class SSL_ALP {
 		if ( get_option( 'ssl_alp_latex_enabled' ) ) {
 			$this->loader->add_action( 'init', $plugin_public, 'add_mathjax_shortcodes' );
 			$this->loader->add_action( 'wp_footer', $plugin_public, 'add_mathjax_script' );
+		}
+
+		// DOI shortcode
+		if ( get_option( 'ssl_alp_doi_shortcode' ) ) {
+			$this->loader->add_action( 'init', $plugin_public, 'add_doi_shortcodes' );
 		}
 	}
 

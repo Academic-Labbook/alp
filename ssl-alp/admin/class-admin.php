@@ -391,6 +391,14 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 			'ssl_alp_post_settings_section'
 		);
 
+		add_settings_field(
+			'ssl_alp_journal_reference_settings',
+			__( 'Journal references', 'ssl-alp' ),
+			array( $this, 'journal_reference_settings_callback' ),
+			'ssl-alp-admin-options',
+			'ssl_alp_post_settings_section'
+		);
+
 		/*
 		 * Mathematics settings fields
 		 */
@@ -445,6 +453,10 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 
 	public function edit_summary_settings_callback() {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/post/edit-summary-settings-display.php';
+	}
+
+	public function journal_reference_settings_callback() {
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/post/journal-reference-settings-display.php';
 	}
 
 	/*

@@ -36,7 +36,7 @@ class SSL_ALP_Public extends SSL_ALP_Base {
 		add_shortcode( 'latex', array( $this, 'latex_shortcode_hook' ) );
 	}
 
-	public static function latex_shortcode_hook( $atts, $content ) {
+	public function latex_shortcode_hook( $atts, $content ) {
 		$this->add_mathjax_script = true;
 
 		// add optional "syntax" attribute, which defaults to "inline", but can also be "block"
@@ -52,6 +52,19 @@ class SSL_ALP_Public extends SSL_ALP_Base {
 		} elseif ( $shortcode_atts['display'] === 'block' ) {
 			return '\[' . $content . '\]';
 		}
+	}
+
+	public function add_doi_shortcodes() {
+		add_shortcode( 'doi', array( $this, 'doi_shortcode_hook' ) );
+	}
+
+	public function doi_shortcode_hook( $atts, $content ) {
+		$content = sanitize_text_field( $content );
+
+		// DOI URL
+		$url = SSL_ALP_DOI_BASE_URL . $content;
+
+		return '<a href="' . $url . '">doi:' . $content . '</a>';
 	}
 
 	public function add_mathjax_script() {

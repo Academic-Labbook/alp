@@ -15,6 +15,7 @@ implemented so far...
  - Force users to be logged in to view (but maybe later add ability to choose
    between network/individual site access)
  - LaTeX support
+ - DOI persistent references
 
 ...and here are features planned for the future:
  - Disable RSS feeds (NOT disabled by forced login), images also can still be
@@ -46,17 +47,18 @@ implemented so far...
    to "Note"
  - Offline download, e.g. [Simply Static](https://wordpress.org/plugins/simply-static/)
  - arXiv shortcode
- - DOI shortcode
+ - DOI shortcode validation (https://www.crossref.org/blog/dois-and-matching-regular-expressions/)
  - LSC-specific extensions:
    - DCC shortcodes
 
-ALP is a mixture of new code and code forked from other open source, GPLv3
-licenced plugins. The following list of plugins have been adopted in ALP. All
-have been modified to fit into ALP (e.g. admin settings, class and setting
-namespaces, etc.):
+ALP is a mixture of new code and code forked from other open source, GPL
+licenced plugins. The following list of plugins have been partly adapted into
+ALP. All have been modified in some way (e.g. admin settings, class and setting
+namespaces, etc.), some more so than others:
  - Coauthors Plus
  - [WP-Post-Meta-Revisions](https://github.com/adamsilverstein/wp-post-meta-revisions)
  - [Revision Notes](https://wordpress.org/plugins/revision-notes/)
+ - [MathJax-LaTeX](https://wordpress.org/plugins/mathjax-latex/)
 
 ## Future ideas
 Some feature ideas not considered critical, but nice to have:

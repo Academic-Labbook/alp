@@ -27,6 +27,7 @@ define( 'SSL_ALP_VERSION', '0.1.0' );
 
 define( 'SSL_ALP_MATHJAX_VERSION', '2.7.2' );
 define( 'SSL_ALP_DEFAULT_MATHJAX_URL', 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_SVG' );
+define( 'SSL_ALP_DOI_BASE_URL', 'https://doi.org/' );
 
 /**
  * Code to run on plugin activation and deactivation.
