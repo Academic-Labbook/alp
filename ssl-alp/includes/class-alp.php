@@ -232,6 +232,8 @@ class SSL_ALP {
 	 */
 	 private function define_core_hooks() {
 		 $this->loader->add_action( 'get_header', $this, 'check_logged_in');
+
+		 // post meta stuff
 		 $this->loader->add_action( 'init', $this, 'unregister_tags' );
 		 $this->loader->add_action( 'init', $this, 'disable_post_formats' );
 		 $this->loader->add_action( 'init', $this, 'disable_post_excerpts' );
@@ -282,6 +284,9 @@ class SSL_ALP {
 		// have priority < 10 so the meta data is added before the revision
 		// copy is made
 		$this->loader->add_action( 'post_updated', $plugin_admin, 'save_post_edit_summary', 5, 2 );
+
+		// show revisions screen in editor by default
+		$this->loader->add_filter( 'default_hidden_meta_boxes', $plugin_admin, 'unhide_revisions_meta_box', 10, 2 );
 	}
 
 	/**

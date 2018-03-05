@@ -8,21 +8,20 @@ to install additional plugins as you like.
 Currently, not much, because it's in alpha development. Here are the features
 implemented so far...
 
- - Disable tags (categories offer all that tags do, and more; tags are
-   apparently useful for [SEO](https://en.wikipedia.org/wiki/Search_engine_optimization),
-   but we don't care)
  - Change logs for posts and pages (not yet publicly visible)
+   - Unhides revisions meta box in editor by default
  - Force users to be logged in to view (but maybe later add ability to choose
    between network/individual site access)
  - LaTeX support
  - DOI and arXiv persistent references, using shortcodes
+ - Disable certain post meta fields mostly suited to commercial sites, like
+   excerpts, trackbacks, tags, etc.
 
 ...and here are features planned for the future:
  - Disable RSS feeds (NOT disabled by forced login), images also can still be
    accessed but this might require htaccess changes
  - Setting: enable revisions list appearance in admin edit post page by default
    for new users
- - Remove trackbacks/pingbacks (can disable via setting)
  - Add wiki pages as a new post type (display contents) (https://codex.wordpress.org/Post_Types#Custom_Post_Types)
  - Support wiki shortcodes (highlight red when page doesn't exist)
  - Multiple author support

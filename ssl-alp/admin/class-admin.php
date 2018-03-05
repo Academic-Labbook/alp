@@ -297,6 +297,20 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 		update_post_meta( $post_id, 'edit_summary', $edit_summary );
 	}
 
+	public function unhide_revisions_meta_box( $hidden, $screen ) {
+		if ( !post_type_supports( $screen->post_type, 'ssl-alp-edit-summaries' ) ) {
+			// return as-is
+			return $hidden;
+		}
+
+		// remove revisions from hidden list, if present
+		if ( ( $key = array_search( 'revisionsdiv', $hidden ) ) !== false ) {
+			unset( $hidden[$key] );
+		}
+
+		return $hidden;
+	}
+
 	/**
      * Register the settings page.
      */
