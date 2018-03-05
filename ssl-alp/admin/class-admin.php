@@ -48,9 +48,9 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 
 		// check if setting is enabled, and if user has permission
 		// 'edit_post' capability == 'edit_posts', 'edit_page' == 'edit_pages', etc. (see wp-includes/capabilities.php)
-		if ( !get_option( 'ssl_alp_{$post->post_type}_edit_summaries', true) || !current_user_can( 'edit_{$post->post_type}', $post->ID ) ) {
+		if ( !get_option( "ssl_alp_{$post->post_type}_edit_summaries" ) || !current_user_can( "edit_{$post->post_type}", $post->ID ) ) {
 			// disabled for posts, or user not allowed to view
-			error_log("can't");
+			error_log($post->post_type);
 			return false;
 		}
 
@@ -108,6 +108,11 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 	 * Add edit summary to revision screen
 	 */
 	public function prepare_revision_for_js( $data, $revision ) {
+		if ( !$this->edit_summary_allowed( $revision ) ) {
+			// return as-is
+			return $data;
+		}
+
 		// get revision edit summary
 		$revision_meta = get_metadata( 'post', $revision->ID, 'edit_summary', true );
 
