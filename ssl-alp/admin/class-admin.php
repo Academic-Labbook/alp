@@ -339,13 +339,6 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 			'ssl-alp-admin-options' // page
 		);
 
-		add_settings_section(
-			'ssl_alp_mathematics_settings_section', // id
-			__( 'Mathematics Settings', 'ssl-alp' ), // title
-			array( $this, 'mathematics_settings_section_callback' ), // callback
-			'ssl-alp-admin-options' // page
-		);
-
 		/**
 		 * Site settings fields
 		 */
@@ -364,8 +357,8 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 
 	 	add_settings_field(
 			'ssl_alp_category_settings', // id
-			__( 'Categories and tags', 'ssl-alp' ), // title
-			array( $this, 'category_settings_callback' ), // callback
+			__( 'Meta', 'ssl-alp' ), // title
+			array( $this, 'meta_settings_callback' ), // callback
 			'ssl-alp-admin-options', // page
 			'ssl_alp_post_settings_section' // section
 		);
@@ -394,16 +387,12 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 			'ssl_alp_post_settings_section'
 		);
 
-		/*
-		 * Mathematics settings fields
-		 */
-
 		add_settings_field(
 			'ssl_alp_enable_mathematics_settings',
-			__( 'Display', 'ssl-alp' ),
-			array( $this, 'enable_latex_settings_callback' ),
+			__( 'Mathematics display', 'ssl-alp' ),
+			array( $this, 'enable_tex_settings_callback' ),
 			'ssl-alp-admin-options',
-			'ssl_alp_mathematics_settings_section'
+			'ssl_alp_post_settings_section'
 		);
 
 		add_settings_field(
@@ -411,7 +400,7 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 			__( 'MathJax JavaScript URL', 'ssl-alp' ),
 			array( $this, 'mathjax_javascript_url_settings_callback' ),
 			'ssl-alp-admin-options',
-			'ssl_alp_mathematics_settings_section'
+			'ssl_alp_post_settings_section'
 		);
 	}
 
@@ -438,8 +427,8 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/post/post-settings-section-display.php';
 	}
 
-	public function category_settings_callback() {
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/post/category-settings-display.php';
+	public function meta_settings_callback() {
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/post/meta-settings-display.php';
 	}
 
 	public function author_settings_callback() {
@@ -454,19 +443,11 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/post/journal-reference-settings-display.php';
 	}
 
-	/*
-	 * Mathematics settings
-	 */
-
-	public function mathematics_settings_section_callback() {
- 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/maths/mathematics-settings-section-display.php';
- 	}
-
-	public function enable_latex_settings_callback() {
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/maths/enable-latex-settings-display.php';
+	public function enable_tex_settings_callback() {
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/post/enable-tex-settings-display.php';
 	}
 
 	public function mathjax_javascript_url_settings_callback() {
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/maths/mathjax-javascript-url-settings-display.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/post/mathjax-javascript-url-settings-display.php';
 	}
 }

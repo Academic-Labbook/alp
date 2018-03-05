@@ -33,10 +33,10 @@ class SSL_ALP_Public extends SSL_ALP_Base {
 	 * Add MathJax shortcodes to editor
 	 */
 	public function add_mathjax_shortcodes() {
-		add_shortcode( 'latex', array( $this, 'latex_shortcode_hook' ) );
+		add_shortcode( 'tex', array( $this, 'tex_shortcode_hook' ) );
 	}
 
-	public function latex_shortcode_hook( $atts, $content ) {
+	public function tex_shortcode_hook( $atts, $content ) {
 		$this->add_mathjax_script = true;
 
 		// add optional "syntax" attribute, which defaults to "inline", but can also be "block"

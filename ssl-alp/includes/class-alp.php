@@ -114,6 +114,33 @@ class SSL_ALP {
 			)
 		);
 
+		register_setting(
+			'ssl-alp-admin-options',
+			'ssl_alp_disable_post_formats',
+			array(
+				'type'		=>	'boolean',
+				'default'	=>	true
+			)
+		);
+
+		register_setting(
+			'ssl-alp-admin-options',
+			'ssl_alp_disable_post_excerpts',
+			array(
+				'type'		=>	'boolean',
+				'default'	=>	true
+			)
+		);
+
+		register_setting(
+			'ssl-alp-admin-options',
+			'ssl_alp_disable_post_trackbacks',
+			array(
+				'type'		=>	'boolean',
+				'default'	=>	true
+			)
+		);
+
 		/**
 		 * Authors settings
 		 */
@@ -182,7 +209,7 @@ class SSL_ALP {
 
 	    register_setting(
 			'ssl-alp-admin-options',
-			'ssl_alp_latex_enabled',
+			'ssl_alp_tex_enabled',
 			array(
 				'type'		=>	'boolean',
 				'default'	=>	true
@@ -206,6 +233,9 @@ class SSL_ALP {
 	 private function define_core_hooks() {
 		 $this->loader->add_action( 'get_header', $this, 'check_logged_in');
 		 $this->loader->add_action( 'init', $this, 'unregister_tags' );
+		 $this->loader->add_action( 'init', $this, 'disable_post_formats' );
+		 $this->loader->add_action( 'init', $this, 'disable_post_excerpts' );
+		 $this->loader->add_action( 'init', $this, 'disable_post_trackbacks' );
 	 }
 
 	/**
@@ -264,7 +294,7 @@ class SSL_ALP {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 
 		// MathJax shortcodes
-		if ( get_option( 'ssl_alp_latex_enabled' ) ) {
+		if ( get_option( 'ssl_alp_tex_enabled' ) ) {
 			$this->loader->add_action( 'init', $plugin_public, 'add_mathjax_shortcodes' );
 			$this->loader->add_action( 'wp_footer', $plugin_public, 'add_mathjax_script' );
 		}
@@ -289,6 +319,39 @@ class SSL_ALP {
 		}
 
 		unregister_taxonomy_for_object_type( 'post_tag', 'post' );
+	}
+
+	/**
+	 * Disable post formats
+	 */
+	public function disable_post_formats() {
+		if ( !get_option( 'ssl_alp_disable_post_formats' ) ) {
+			return;
+		}
+
+		remove_post_type_support( 'post', 'post-formats' );
+	}
+
+	/**
+	 * Disable post excerpts
+	 */
+	public function disable_post_excerpts() {
+		if ( !get_option( 'ssl_alp_disable_post_excerpts' ) ) {
+			return;
+		}
+
+		remove_post_type_support( 'post', 'excerpt' );
+	}
+
+	/**
+	 * Disable post trackbacks
+	 */
+	public function disable_post_trackbacks() {
+		if ( !get_option( 'ssl_alp_disable_post_trackbacks' ) ) {
+			return;
+		}
+
+		remove_post_type_support( 'post', 'trackbacks' );
 	}
 
 	/**

@@ -38,13 +38,13 @@ implemented so far...
      - can add new categories
    - administrator -> administrator
  - Disable private posts (useless with forced login)
+ - Widget under posts containing references to other posts that reference this one (store references as custom fields?)
  - Labbook theme (with default widgets enabled, like authors, edited posts,
    recent comments, etc., and support for displaying multiple authors)
  - Add links to previous post revisions under those posts (dropdown box?)
  - Optionally display institute logo (also on login page)
  - Shortcodes for linking to Git/SVN commits and other archives
- - Remove some post formats (e.g. quote), add new ones, change name of "Aside"
-   to "Note"
+ - Remove post formats (https://codex.wordpress.org/Function_Reference/remove_post_type_support)
  - Offline download, e.g. [Simply Static](https://wordpress.org/plugins/simply-static/)
  - DOI shortcode validation (https://www.crossref.org/blog/dois-and-matching-regular-expressions/)
  - LSC-specific extensions:
