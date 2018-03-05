@@ -39,18 +39,18 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 			// this is a revision of another post type
 			// check the parent post
 			return $this->edit_summary_allowed( get_post( $post->post_parent ) );
-		} elseif ( $post->post_type == 'post' ) {
-			if ( !get_option( 'ssl_alp_post_edit_summaries', true) || !current_user_can( 'edit_post', $post->ID ) ) {
-				// disabled for posts, or user not allowed to view
-				return false;
-			}
-		} elseif ( $post->post_type == 'page') {
-			if ( !get_option( 'ssl_alp_page_edit_summaries', true ) || !get_option( 'ssl_alp_page_edit_summaries', true ) ) {
-				// disabled for pages, or user not allowed to view
-				return false;
-			}
-		} else {
-			// invalid post type
+		}
+
+		if ( !post_type_supports( $post->post_type, 'ssl-alp-edit-summaries' ) ) {
+			// unsupported post type
+			return false;
+		}
+
+		// check if setting is enabled, and if user has permission
+		// 'edit_post' capability == 'edit_posts', 'edit_page' == 'edit_pages', etc. (see wp-includes/capabilities.php)
+		if ( !get_option( 'ssl_alp_{$post->post_type}_edit_summaries', true) || !current_user_can( 'edit_{$post->post_type}', $post->ID ) ) {
+			// disabled for posts, or user not allowed to view
+			error_log("can't");
 			return false;
 		}
 
@@ -136,11 +136,11 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 	/**
 	 * Add edit summary textbox within the "Update" panel to posts and pages
 	 */
-	public function add_edit_summary_textbox($post) {
-		if ( !$this->edit_summary_allowed( $post ) ) {
-			return;
-		} elseif ( $post->post_status == 'auto-draft' ) {
+	public function add_edit_summary_textbox( $post ) {
+		if ( $post->post_status == 'auto-draft' ) {
 			// post is newly created, so don't show an edit summary box
+			return;
+		} elseif ( !$this->edit_summary_allowed( $post ) ) {
 			return;
 		}
 
@@ -154,8 +154,6 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 	 * Restore the revision's meta values to the parent post.
 	 */
 	public function restore_post_revision_meta( $post_id, $revision_id ) {
-		error_log("restoring post " . $post_id . " revisioned meta fields from " . $revision_id);
-
 		// Clear any existing metas
 		delete_post_meta( $post_id, 'edit_summary' );
 
@@ -214,8 +212,6 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 			return;
 		}
 
-		error_log("saving revisioned meta fields");
-
 		$post_id  = $revision->post_parent;
 
 		// save revisioned meta field
@@ -241,8 +237,6 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 			return $post_has_changed;
 		}
-
-		error_log("checking if revisioned meta fields have changed");
 
 		// get parent post meta
 		$parent_meta = get_post_meta( $post->ID, 'edit_summary' );
@@ -279,10 +273,6 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 			// no or invalid nonce
 			return;
 		}
-
-		// skip when nonce is not set or invalid (as post edits can be made
-		// by other functions that don't create POST data)
-		error_log("saving post edit summary");
 
 		// sanitise edit summary input
 		$message = sanitize_text_field( $_POST['ssl_alp_revision_post_edit_summary'] );
