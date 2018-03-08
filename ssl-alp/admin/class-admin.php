@@ -365,6 +365,14 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 			'ssl_alp_site_settings_section' // section
 		);
 
+		add_settings_field(
+			'ssl_alp_display_settings',
+			__( 'Display', 'ssl-alp' ),
+			array( $this, 'display_settings_callback' ),
+			'ssl-alp-admin-options',
+			'ssl_alp_site_settings_section'
+		);
+
 		/**
 		 * Post settings fields
 		 */
@@ -432,6 +440,10 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 
 	public function access_settings_callback() {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/site/access-settings-display.php';
+	}
+
+	public function display_settings_callback() {
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/site/display-settings-display.php';
 	}
 
 	/*

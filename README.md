@@ -8,7 +8,7 @@ to install additional plugins as you like.
 Currently, not much, because it's in alpha development. Here are the features
 implemented so far...
 
- - Change logs for posts and pages (not yet publicly visible)
+ - Change logs for posts and pages
    - Unhides revisions meta box in editor by default
  - Force users to be logged in to view (but maybe later add ability to choose
    between network/individual site access)
@@ -20,9 +20,10 @@ implemented so far...
 ...and here are features planned for the future:
  - Disable RSS feeds (NOT disabled by forced login), images also can still be
    accessed but this might require htaccess changes
- - Setting: enable revisions list appearance in admin edit post page by default
-   for new users
- - Add wiki pages as a new post type (display contents) (https://codex.wordpress.org/Post_Types#Custom_Post_Types)
+ - Add wiki pages as a new post type (display contents)
+   - (https://codex.wordpress.org/Post_Types#Custom_Post_Types)
+   - Keep normal pages for e.g. webcams, "about" pages, etc.
+   - Show pages that link to this one?
  - Support wiki shortcodes (highlight red when page doesn't exist)
  - Multiple author support
  - LaTeX TinyMCE widget
@@ -38,12 +39,14 @@ implemented so far...
    - administrator -> administrator
  - Disable private posts (useless with forced login)
  - Widget under posts containing references to other posts that reference this one (store references as custom fields?)
- - Labbook theme (with default widgets enabled, like authors, edited posts,
-   recent comments, etc., and support for displaying multiple authors)
- - Add links to previous post revisions under those posts (dropdown box?)
+ - Search within PDFs etc.
+ - Labbook theme
+   - Enable authors, edited posts, recent comments widgets by default
+   - Multiple author display
+   - Revision history display
+   - Remove Bootstrap dependency, use CSS Grid instead (https://developers.google.com/web/updates/2017/01/css-grid)
  - Optionally display institute logo (also on login page)
  - Shortcodes for linking to Git/SVN commits and other archives
- - Remove post formats (https://codex.wordpress.org/Function_Reference/remove_post_type_support)
  - Offline download, e.g. [Simply Static](https://wordpress.org/plugins/simply-static/)
  - DOI shortcode validation (https://www.crossref.org/blog/dois-and-matching-regular-expressions/)
  - LSC-specific extensions:

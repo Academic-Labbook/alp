@@ -89,7 +89,7 @@ class SSL_ALP {
 	 */
 	private function register_settings() {
 		/**
-		 * Access settings
+		 * Site settings
 		 */
 
 		 register_setting(
@@ -101,8 +101,18 @@ class SSL_ALP {
  			)
  		);
 
+		register_setting(
+		   'ssl-alp-admin-options',
+		   'ssl_alp_copyright_text',
+		   array(
+			   'type'				=>	'text',
+			   'sanitize_callback'	=>	'sanitize_text_field',
+			   'default'			=>	'Institute'
+		   )
+	   );
+
 		/**
-		 * Categories and tags settings
+		 * Meta settings
 		 */
 
 		register_setting(
@@ -231,6 +241,7 @@ class SSL_ALP {
 	 * Register global hooks related to core WordPress functionality
 	 */
 	 private function define_core_hooks() {
+		 // private site
 		 $this->loader->add_action( 'get_header', $this, 'check_logged_in');
 
 		 // post meta stuff
