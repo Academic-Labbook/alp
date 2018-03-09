@@ -43,6 +43,12 @@ register_activation_hook( __FILE__, array('SSL_ALP_Activator', 'activate'));
 register_activation_hook( __FILE__, array('SSL_ALP_Deactivator', 'deactivate'));
 
 /**
+ * Add theme directory provided by this plugin
+ */
+
+register_theme_directory( realpath( dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'themes' ) );
+
+/**
  * Core plugin class used to define internationalisation, hooks, etc.
  */
 
