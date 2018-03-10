@@ -74,6 +74,7 @@ dfn, cite, em, i {
 }
 
 blockquote {
+	padding-left: 5px;
 	margin: 0 1.5em;
 	border-left: 3px solid #ccc;
 	font-size: 95%;

@@ -10,7 +10,12 @@ if ( ! function_exists( 'ssl_alp_get_the_post_date_html' ) ) :
 		// publication/modification time
 
 		// combined date and time formats
-		$datetime_fmt = sprintf( '%1$s %2$s', get_option( 'date_format' ), get_option( 'time_format' ) );
+		$datetime_fmt = sprintf(
+			/* translators: 1: date, 2: time; note that "\a\t" escapes "at" in PHP's date() function */
+			__( '%1$s \a\t %2$s', 'ssl-alp' ),
+			get_option( 'date_format' ),
+			get_option( 'time_format' )
+		);
 
 		// ISO 8601 formatted date
 		$date_iso = $modified ? get_the_modified_date( 'c', $post ) : get_the_date( 'c', $post );
@@ -105,6 +110,7 @@ if ( ! function_exists( 'ssl_alp_get_the_author' ) ) :
 		}
 
 		if ( $icon ) {
+			// use fa-users when more than one user is defined
 			$author_html = '<i class="fa fa-user" aria-hidden="true"></i> ' . $author_html;
 		}
 
@@ -216,12 +222,13 @@ if ( ! function_exists( 'ssl_alp_get_revision_description' ) ) :
 		}
 
 		$revision_time = ssl_alp_get_the_post_date_html( $revision, false, false, false );
+		$author_display_name = get_the_author_meta( 'display_name', $revision->post_author );
 
 		$description = sprintf(
 			/* translators: post revision title: 1: author avatar, 2: author name, 3: time ago, 4: date, 5: edit message */
 			__( '%1$s %2$s, %3$s ago (%4$s)%5$s', 'ssl-alp' ),
-			get_avatar( $revision->post_author, 24 ),
-			get_the_author_meta( 'display_name', $revision->post_author ),
+			get_avatar( $revision->post_author, 18, null, $author_display_name ),
+			$author_display_name,
 			human_time_diff( strtotime( $revision->post_modified ), current_time( 'timestamp' ) ),
 			$revision_time,
 			$message
