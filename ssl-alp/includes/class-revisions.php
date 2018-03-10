@@ -1,24 +1,111 @@
 <?php
 
 /**
- * The admin-specific functionality of the plugin.
+ * Revision summary functionality
  */
-class SSL_ALP_Admin extends SSL_ALP_Base {
+class SSL_ALP_Revisions extends SSL_ALP_Module {
 	/**
-	 * Register the stylesheets for the admin area.
+	 * Register the stylesheets.
 	 */
 	public function enqueue_styles() {
-		wp_enqueue_style( 'ssl-alp-admin-css', plugin_dir_url( __FILE__ ) . 'css/admin.css', array(), $this->version, 'all' );
+
 	}
 
 	/**
-	 * Register JavaScript for the admin area.
+	 * Register JavaScript.
 	 */
 	public function enqueue_scripts() {
 
 	}
 
 	/**
+	 * Register settings
+	 */
+	public function register_settings() {
+		register_setting(
+ 			'ssl-alp-admin-options',
+ 			'ssl_alp_post_edit_summaries',
+ 			array(
+ 				'type'		=>	'boolean',
+ 				'default'	=>	true
+ 			)
+ 		);
+
+		register_setting(
+			'ssl-alp-admin-options',
+			'ssl_alp_page_edit_summaries',
+			array(
+				'type'		=>	'boolean',
+				'default'	=>	true
+			)
+		);
+
+		register_setting(
+			'ssl-alp-admin-options',
+			'ssl_alp_edit_summary_max_length',
+			array(
+				'type'		=>	'integer',
+				'default'	=>	100
+			)
+		);
+	}
+
+    /**
+     * Register settings fields
+     */
+    public function register_settings_fields() {
+        /**
+		 * Post edit summary settings
+		 */
+
+        add_settings_field(
+			'ssl_alp_edit_summary_settings',
+			__( 'Edit summaries', 'ssl-alp' ),
+			array( $this, 'edit_summary_settings_callback' ),
+			'ssl-alp-admin-options',
+			'ssl_alp_post_settings_section'
+		);
+    }
+
+    public function edit_summary_settings_callback() {
+		require_once SSL_ALP_BASE_DIR . 'partials/admin/edit-summary-settings-display.php';
+	}
+
+	/**
+	 * Register hooks
+	 */
+	public function register_hooks() {
+		$loader = $this->get_loader();
+
+         // register edit summary feature with posts and pages
+        $loader->add_action( 'init', $this, 'add_edit_summary_support' );
+
+        // add edit summary box to post and page edit screens
+        $loader->add_action( 'post_submitbox_misc_actions', $this, 'add_edit_summary_textbox' );
+
+        // add edit summary to revision history list under posts/pages/etc.
+        $loader->add_filter( 'wp_post_revision_title_expanded', $this, 'add_revision_title_edit_summary', 10, 2 );
+        // modify revision screen data
+        $loader->add_filter( 'wp_prepare_revision_for_js', $this, 'prepare_revision_for_js', 10, 2 );
+
+        // When restoring a revision, also restore that revisions's revisioned meta.
+        $loader->add_action( 'wp_restore_post_revision', $this, 'restore_post_revision_meta', 10, 2 );
+        // When creating a revision, also save any revisioned meta.
+        $loader->add_action( '_wp_put_post_revision', $this, 'save_revisioned_meta_fields' );
+
+        // When revisioned post meta has changed, trigger a revision save.
+        $loader->add_filter( 'wp_save_post_revision_post_has_changed', $this, 'check_revisioned_meta_fields_have_changed', 10, 3 );
+
+        // save edit summary as custom meta data when post is updated (needs to
+        // have priority < 10 so the meta data is added before the revision
+        // copy is made
+        $loader->add_action( 'post_updated', $this, 'save_post_edit_summary', 5, 2 );
+
+        // show revisions screen in editor by default
+		$loader->add_filter( 'default_hidden_meta_boxes', $this, 'unhide_revisions_meta_box', 10, 2 );
+	}
+
+    /**
 	 * Add edit summary support to certain post types, so they can have
 	 * relevant tools added to their edit pages.
 	 */
@@ -27,7 +114,7 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 		add_post_type_support( 'page', 'ssl-alp-edit-summaries' );
 	}
 
-	/*
+    /*
 	 * Check if edit summaries are enabled for, and the user has permission to
 	 * view, the specified post.
 	 */
@@ -41,27 +128,43 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 			return $this->edit_summary_allowed( get_post( $post->post_parent ) );
 		}
 
-		if ( !post_type_supports( $post->post_type, 'ssl-alp-edit-summaries' ) ) {
+		if ( ! post_type_supports( $post->post_type, 'ssl-alp-edit-summaries' ) ) {
 			// unsupported post type
 			return false;
 		}
 
 		// check if setting is enabled, and if user has permission
 		// 'edit_post' capability == 'edit_posts', 'edit_page' == 'edit_pages', etc. (see wp-includes/capabilities.php)
-		if ( !get_option( "ssl_alp_{$post->post_type}_edit_summaries" ) || !current_user_can( "edit_{$post->post_type}", $post->ID ) ) {
+		if ( ! get_option( "ssl_alp_{$post->post_type}_edit_summaries" ) || ! current_user_can( "edit_{$post->post_type}", $post->ID ) ) {
 			// disabled for posts, or user not allowed to view
-			error_log($post->post_type);
 			return false;
 		}
 
 		return true;
 	}
 
-	/*
+    /**
+	 * Add edit summary textbox within the "Update" panel to posts and pages
+	 */
+	public function add_edit_summary_textbox( $post ) {
+		if ( $post->post_status == 'auto-draft' ) {
+			// post is newly created, so don't show an edit summary box
+			return;
+		} elseif ( ! $this->edit_summary_allowed( $post ) ) {
+			return;
+		}
+
+		// add a nonce to check later
+		wp_nonce_field( 'ssl-alp-edit-summary', 'ssl_alp_edit_summary_nonce' );
+
+		require_once SSL_ALP_BASE_DIR . 'partials/admin/post-edit-summary-display.php';
+	}
+
+    /*
 	 * Inject edit summary into revision author/date listings
 	 */
 	public function add_revision_title_edit_summary( $revision_date_author, $revision ) {
-		if ( !is_admin() ) {
+		if ( ! is_admin() ) {
 			return $revision_date_author;
 		}
 
@@ -71,7 +174,7 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 			return $text;
 		}
 
-		if ( !$this->edit_summary_allowed( $revision ) ) {
+		if ( ! $this->edit_summary_allowed( $revision ) ) {
 			// return as-is
 			return $revision_date_author;
 		}
@@ -80,7 +183,7 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 		// (use get_metadata instead of get_post_meta so we get the *revision's* data, not the parent's)
 		$revision_meta = get_metadata( 'post', $revision->ID, 'edit_summary', true );
 
-		if ( empty( $revision_meta ) || !is_array( $revision_meta ) ) {
+		if ( empty( $revision_meta ) || ! is_array( $revision_meta ) ) {
 			// empty or invalid
 			return $revision_date_author;
 		}
@@ -104,11 +207,11 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 		return $revision_date_author;
 	}
 
-	/**
+    /**
 	 * Add edit summary to revision screen
 	 */
 	public function prepare_revision_for_js( $data, $revision ) {
-		if ( !$this->edit_summary_allowed( $revision ) ) {
+		if ( ! $this->edit_summary_allowed( $revision ) ) {
 			// return as-is
 			return $data;
 		}
@@ -116,7 +219,7 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 		// get revision edit summary
 		$revision_meta = get_metadata( 'post', $revision->ID, 'edit_summary', true );
 
-		if ( empty( $revision_meta ) || !is_array( $revision_meta ) ) {
+		if ( empty( $revision_meta ) || ! is_array( $revision_meta ) ) {
 			// empty or invalid
 			return $data;
 		}
@@ -138,24 +241,7 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 		return $data;
 	}
 
-	/**
-	 * Add edit summary textbox within the "Update" panel to posts and pages
-	 */
-	public function add_edit_summary_textbox( $post ) {
-		if ( $post->post_status == 'auto-draft' ) {
-			// post is newly created, so don't show an edit summary box
-			return;
-		} elseif ( !$this->edit_summary_allowed( $post ) ) {
-			return;
-		}
-
-		// add a nonce to check later
-		wp_nonce_field( 'ssl-alp-edit-summary', 'ssl_alp_edit_summary_nonce' );
-
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/post/post-edit-summary-display.php';
-	}
-
-	/**
+    /**
 	 * Restore the revision's meta values to the parent post.
 	 */
 	public function restore_post_revision_meta( $post_id, $revision_id ) {
@@ -197,7 +283,7 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 		update_metadata( 'post', $latest_revision_meta->ID, 'edit_summary', $latest_edit_summary );
 	}
 
-	/**
+    /**
 	 * Save the parent's meta fields to the revision.
 	 *
 	 * This should run when a post is created/updated, and WordPress creates the
@@ -213,7 +299,7 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 
 		$revision = get_post( $revision_id );
 
-		if ( !$this->edit_summary_allowed( $revision ) ) {
+		if ( ! $this->edit_summary_allowed( $revision ) ) {
 			return;
 		}
 
@@ -234,7 +320,7 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 		}
 	}
 
-	/**
+    /**
 	 * Check whether revisioned post meta fields have changed.
 	 */
 	public function check_revisioned_meta_fields_have_changed( $post_has_changed, WP_Post $last_revision, WP_Post $post ) {
@@ -249,9 +335,9 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 		// get revision meta
 		$revision_meta = get_post_meta( $last_revision->ID, 'edit_summary' );
 
-		if ( !is_array( $parent_meta ) || !is_array( $revision_meta ) ) {
+		if ( ! is_array( $parent_meta ) || ! is_array( $revision_meta ) ) {
 			// invalid
-		} elseif ( !isset( $parent_meta["message"] ) || !isset( $revision_meta["message"] ) ) {
+		} elseif ( ! isset( $parent_meta["message"] ) || ! isset( $revision_meta["message"] ) ) {
 			// invalid
 		} else {
 			// check if message has changed
@@ -263,7 +349,7 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 		return $post_has_changed;
 	}
 
-	/**
+    /**
 	 * Save post edit summary as meta data attached to that post. Due to the
 	 * use of a nonce, which only appears when the post is being updated, this
 	 * does not show a message for *new* posts.
@@ -272,9 +358,9 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 		// skip when autosaving, as custom post data is noted included in $_POST during autosaves (annoying)
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 			return;
-		} elseif ( !$this->edit_summary_allowed( $post ) ) {
+		} elseif ( ! $this->edit_summary_allowed( $post ) ) {
 			return;
-		} elseif ( !isset( $_POST['ssl_alp_edit_summary_nonce'] ) || !wp_verify_nonce( $_POST['ssl_alp_edit_summary_nonce'], 'ssl-alp-edit-summary' ) ) {
+		} elseif ( ! isset( $_POST['ssl_alp_edit_summary_nonce'] ) || ! wp_verify_nonce( $_POST['ssl_alp_edit_summary_nonce'], 'ssl-alp-edit-summary' ) ) {
 			// no or invalid nonce
 			return;
 		}
@@ -297,8 +383,8 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 		update_post_meta( $post_id, 'edit_summary', $edit_summary );
 	}
 
-	public function unhide_revisions_meta_box( $hidden, $screen ) {
-		if ( !post_type_supports( $screen->post_type, 'ssl-alp-edit-summaries' ) ) {
+    public function unhide_revisions_meta_box( $hidden, $screen ) {
+		if ( ! post_type_supports( $screen->post_type, 'ssl-alp-edit-summaries' ) ) {
 			// return as-is
 			return $hidden;
 		}
@@ -309,171 +395,5 @@ class SSL_ALP_Admin extends SSL_ALP_Base {
 		}
 
 		return $hidden;
-	}
-
-	/**
-     * Register the settings page.
-     */
-	public function add_admin_menu() {
-		add_options_page(
-			'Academic Labbook',
-			__('Academic Labbook', 'ssl-alp'),
-			'manage_options',
-			'ssl-alp-admin-options',
-			array($this, 'create_admin_interface')
-		);
-	}
-
-	/**
-	 * Callback function for the settings page.
-	 */
-	public function create_admin_interface() {
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/admin-display.php';
-	}
-
-	/**
-	 * Create settings sections.
-	 */
-	public function settings_api_init() {
-		/**
-		 * Settings sections
-		 */
-
-		 add_settings_section(
- 			'ssl_alp_site_settings_section', // id
- 			__( 'Site Settings', 'ssl-alp' ), // title
- 			array( $this, 'site_settings_section_callback' ), // callback
- 			'ssl-alp-admin-options' // page
-		);
-
-	 	add_settings_section(
-			'ssl_alp_post_settings_section', // id
-			__( 'Post Settings', 'ssl-alp' ), // title
-			array( $this, 'post_settings_section_callback' ), // callback
-			'ssl-alp-admin-options' // page
-		);
-
-		/**
-		 * Site settings fields
-		 */
-
-	 	add_settings_field(
-			'ssl_alp_access_settings', // id
-			__( 'Access', 'ssl-alp' ), // title
-			array( $this, 'access_settings_callback' ), // callback
-			'ssl-alp-admin-options', // page
-			'ssl_alp_site_settings_section' // section
-		);
-
-		add_settings_field(
-			'ssl_alp_display_settings',
-			__( 'Display', 'ssl-alp' ),
-			array( $this, 'display_settings_callback' ),
-			'ssl-alp-admin-options',
-			'ssl_alp_site_settings_section'
-		);
-
-		/**
-		 * Post settings fields
-		 */
-
-	 	add_settings_field(
-			'ssl_alp_category_settings', // id
-			__( 'Meta', 'ssl-alp' ), // title
-			array( $this, 'meta_settings_callback' ), // callback
-			'ssl-alp-admin-options', // page
-			'ssl_alp_post_settings_section' // section
-		);
-
-		add_settings_field(
-			'ssl_alp_author_settings',
-			__( 'Authors', 'ssl-alp' ),
-			array( $this, 'author_settings_callback' ),
-			'ssl-alp-admin-options',
-			'ssl_alp_post_settings_section'
-		);
-
-		add_settings_field(
-			'ssl_alp_edit_summary_settings',
-			__( 'Edit summaries', 'ssl-alp' ),
-			array( $this, 'edit_summary_settings_callback' ),
-			'ssl-alp-admin-options',
-			'ssl_alp_post_settings_section'
-		);
-
-		add_settings_field(
-			'ssl_alp_journal_reference_settings',
-			__( 'Journal references', 'ssl-alp' ),
-			array( $this, 'journal_reference_settings_callback' ),
-			'ssl-alp-admin-options',
-			'ssl_alp_post_settings_section'
-		);
-
-		add_settings_field(
-			'ssl_alp_enable_mathematics_settings',
-			__( 'Mathematics display', 'ssl-alp' ),
-			array( $this, 'enable_tex_settings_callback' ),
-			'ssl-alp-admin-options',
-			'ssl_alp_post_settings_section'
-		);
-
-		add_settings_field(
-			'ssl_alp_mathjax_url_settings',
-			__( 'MathJax JavaScript URL', 'ssl-alp' ),
-			array( $this, 'mathjax_javascript_url_settings_callback' ),
-			'ssl-alp-admin-options',
-			'ssl_alp_post_settings_section'
-		);
-	}
-
-	/**
-	 * Callback functions for settings
-	 */
-
-    /*
-	 * Site settings
-	 */
-
-	public function site_settings_section_callback() {
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/site/site-settings-section-display.php';
-	}
-
-	public function access_settings_callback() {
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/site/access-settings-display.php';
-	}
-
-	public function display_settings_callback() {
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/site/display-settings-display.php';
-	}
-
-	/*
-	 * Post settings
-	 */
-	public function post_settings_section_callback() {
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/post/post-settings-section-display.php';
-	}
-
-	public function meta_settings_callback() {
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/post/meta-settings-display.php';
-	}
-
-	public function author_settings_callback() {
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/post/author-settings-display.php';
-	}
-
-	public function edit_summary_settings_callback() {
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/post/edit-summary-settings-display.php';
-	}
-
-	public function journal_reference_settings_callback() {
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/post/journal-reference-settings-display.php';
-	}
-
-	public function enable_tex_settings_callback() {
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/post/enable-tex-settings-display.php';
-	}
-
-	public function mathjax_javascript_url_settings_callback() {
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/post/mathjax-javascript-url-settings-display.php';
 	}
 }

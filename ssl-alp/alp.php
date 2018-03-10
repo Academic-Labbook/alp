@@ -3,7 +3,7 @@
 /*
 Plugin Name:  Academic Labbook Plugin
 Plugin URI:   https://alp.attackllama.com/
-Description:  Turn WordPress into a collaborative academic notebook
+Description:  Turn WordPress into a collaborative academic notebook.
 Version:      0.1.0
 Author:       Sean Leavey
 Author URI:   https://attackllama.com/
@@ -22,6 +22,12 @@ if ( ! defined( 'WPINC' ) ) {
 define( 'SSL_ALP_VERSION', '0.1.0' );
 
 /**
+ * Base plugin directory
+ */
+define( 'SSL_ALP_BASE_DIR', plugin_dir_path( __FILE__ ) );
+define( 'SSL_ALP_BASE_URL', plugin_dir_url( __FILE__ ) );
+
+/**
  * Default settings
  */
 
@@ -35,8 +41,8 @@ define( 'SSL_ALP_ARXIV_BASE_URL', 'https://arxiv.org/abs/' );
  */
 
 // import classes
-require_once plugin_dir_path( __FILE__ ) . 'includes/class-activator.php';
-require_once plugin_dir_path( __FILE__ ) . 'includes/class-deactivator.php';
+require_once SSL_ALP_BASE_DIR . 'includes/class-activator.php';
+require_once SSL_ALP_BASE_DIR . 'includes/class-deactivator.php';
 
 // register hooks
 register_activation_hook( __FILE__, array('SSL_ALP_Activator', 'activate'));
@@ -46,13 +52,13 @@ register_activation_hook( __FILE__, array('SSL_ALP_Deactivator', 'deactivate'));
  * Add theme directory provided by this plugin
  */
 
-register_theme_directory( realpath( dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'themes' ) );
+register_theme_directory( SSL_ALP_BASE_DIR . 'themes' );
 
 /**
  * Core plugin class used to define internationalisation, hooks, etc.
  */
 
-require plugin_dir_path( __FILE__ ) . 'includes/class-alp.php';
+require SSL_ALP_BASE_DIR . 'includes/class-alp.php';
 
 /**
  * Execute plugin.
