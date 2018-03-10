@@ -83,9 +83,6 @@ if ( ! function_exists( 'ssl_alp_setup' ) ) :
 			'gallery',
 		) );
 
-		// Editor style.
-		add_editor_style( 'css/editor-style.css', 'https://fonts.googleapis.com/css?family=Open+Sans' );
-
 		// Setup the WordPress core custom background feature.
 		add_theme_support( 'custom-background', apply_filters(
 			'ssl_alp_custom_background_args', array(
@@ -122,8 +119,6 @@ add_action( 'widgets_init', 'ssl_alp_widgets_init' );
  * Enqueue scripts and styles.
  */
 function ssl_alp_scripts() {
-	wp_enqueue_style( 'ssl-alp-style-open-sans', '//fonts.googleapis.com/css?family=Open+Sans' );
-	wp_enqueue_style( 'ssl-alp-style-bootstrap', get_template_directory_uri().'/third-party/bootstrap/css/bootstrap.css', false, '3.3.6' );
 	wp_enqueue_style( 'fontawesome', get_template_directory_uri().'/third-party/font-awesome/css/font-awesome.css', false, '4.7.0' );
 
 	wp_enqueue_style( 'ssl-alp-style', get_stylesheet_uri(), array(), '2.3' );

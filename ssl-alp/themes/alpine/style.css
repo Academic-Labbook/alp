@@ -45,10 +45,11 @@ Based on Underscores http://underscores.me/, (C) 2012-2014 Automattic, Inc.
 /*--------------------------------------------------------------
 2.0 Typography
 --------------------------------------------------------------*/
+
 body, button, input, select, textarea {
 	color: #404040;
-	font-family: 'Open Sans', sans-serif;
-	font-size: 15px;
+	font-family: sans-serif;
+	font-size: 14px;
 	line-height: 1.5;
 }
 
@@ -58,6 +59,10 @@ h1, h2, h3, h4, h5, h6 {
 
 p {
 	margin-bottom: 1.5em;
+}
+
+a {
+	text-decoration: none;
 }
 
 b, strong {
@@ -71,7 +76,7 @@ dfn, cite, em, i {
 blockquote {
 	margin: 0 1.5em;
 	border-left: 3px solid #ccc;
-	font-size: 14px;
+	font-size: 95%;
 	font-style: italic;
 }
 
@@ -82,8 +87,7 @@ address {
 pre {
 	background: #eee;
 	font-family: "Courier 10 Pitch", Courier, monospace;
-	font-size: 15px;
-	font-size: 1.5rem;
+	font-size: 14px;
 	line-height: 1.6;
 	margin-bottom: 1.6em;
 	max-width: 100%;
@@ -92,7 +96,7 @@ pre {
 }
 
 code, kbd, tt, var {
-	font: 15px Monaco, Consolas, "Andale Mono", "DejaVu Sans Mono", monospace;
+	font: 14px Monaco, Consolas, "Andale Mono", "DejaVu Sans Mono", monospace;
 }
 
 abbr, acronym {
@@ -118,7 +122,7 @@ sup {
 }
 
 sub {
-	top: .5ex;
+	top: 0.5ex;
 }
 
 small {
@@ -191,8 +195,8 @@ code{
 :-ms-input-placeholder {
    color: #6e6e6e;
 }
-/* Clearing floats */
 
+/* Clearing floats */
 .clearfix:after,
 .entry-header:after,
 .entry-content:after,
@@ -202,6 +206,7 @@ code{
 .main-navigation > div > ul:after {
 	clear: both;
 }
+
 .clearfix:before,
 .clearfix:after,
 .entry-header:before,
@@ -215,6 +220,61 @@ code{
 	display: table;
 	content: "";
 }
+
+/* container for whole page */
+.site {
+	width: 95%;
+	margin-left: auto;
+    margin-right: auto;
+}
+
+/* container class for elements */
+.container {
+	width: 100%;
+	margin-left: auto;
+    margin-right: auto;
+}
+
+/* row within container */
+.row {
+	display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 20px;
+}
+
+/* column classes */
+/* default for screen widths up to 767px */
+.col-xs-3 {
+	grid-column: span 3;
+}
+
+.col-sm-1 {
+	grid-column: span 3;
+}
+
+.col-sm-2 {
+	grid-column: span 3;
+}
+
+.col-sm-3 {
+	grid-column: span 3;
+}
+
+/* screen sizes larger than 768px */
+@media (min-width: 768px) {
+    .col-sm-1 {
+        grid-column: span 1;
+    }
+
+	.col-sm-2 {
+        grid-column: span 2;
+    }
+
+	.col-sm-3 {
+        grid-column: span 3;
+    }
+}
+
 /*--------------------------------------------------------------
 4.0 Forms
 --------------------------------------------------------------*/
@@ -226,6 +286,7 @@ textarea {
 	margin: 0; /* Addresses margins set differently in IE6/7, F3/4, S5, Chrome */
 	vertical-align: baseline; /* Improves appearance and consistency in all browsers */
 }
+
 button,
 input[type="button"],
 input[type="reset"],
@@ -234,13 +295,14 @@ input[type="submit"] {
 	background: none repeat scroll 0 0 #0b789c;
 	cursor: pointer; /* Improves usability and consistency of cursor style between image-type 'input' and others */
 	-webkit-appearance: button; /* Corrects inability to style clickable 'input' types in iOS */
-	font-size: 12px;
+	font-size: 85%;
 	line-height: 1.4;
 	color: #ffffff;
 	padding: 0.75em 1.5em;
 	font-weight: bold;
 	text-transform: uppercase;
 }
+
 button:focus,
 input[type="button"]:focus,
 input[type="reset"]:focus,
@@ -249,24 +311,29 @@ input[type="submit"]:focus {
 	border-radius: 3px;
 	box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.6);
 }
+
 input[type="checkbox"],
 input[type="radio"] {
 	padding: 0; /* Addresses excess padding in IE8/9 */
 }
+
 input[type="search"] {
 	-webkit-appearance: textfield; /* Addresses appearance set to searchfield in S5, Chrome */
 	-webkit-box-sizing: content-box; /* Addresses box sizing set to border-box in S5, Chrome (include -moz to future-proof) */
 	-moz-box-sizing:    content-box;
 	box-sizing:         content-box;
 }
+
 input[type="search"]::-webkit-search-decoration { /* Corrects inner padding displayed oddly in S5, Chrome on OSX */
 	-webkit-appearance: none;
 }
+
 button::-moz-focus-inner,
 input::-moz-focus-inner { /* Corrects inner padding and border displayed oddly in FF3/4 www.sitepen.com/blog/2008/05/14/the-devils-in-the-details-fixing-dojos-toolbar-buttons/ */
 	border: 0;
 	padding: 0;
 }
+
 input[type="text"],
 input[type="email"],
 input[type="url"],
@@ -276,6 +343,7 @@ textarea {
 	color: #666;
 	border: 1px solid #ccc;
 }
+
 input[type="text"]:focus,
 input[type="email"]:focus,
 input[type="url"]:focus,
@@ -284,6 +352,7 @@ input[type="search"]:focus,
 textarea:focus {
 	color: #111;
 }
+
 input[type="text"],
 input[type="email"],
 input[type="url"],
@@ -291,6 +360,7 @@ input[type="password"],
 input[type="search"] {
 	padding: 3px;
 }
+
 textarea {
 	overflow: auto; /* Removes default vertical scrollbar in IE6/7/8/9 */
 	padding-left: 3px;
@@ -310,6 +380,10 @@ a:hover,
 a:focus,
 a:active {
 	color: #0b789c;
+}
+
+a:focus, a:hover {
+	text-decoration: underline;
 }
 
 a:focus {
@@ -443,7 +517,7 @@ a:active {
     right: 2px;
     top: 18px;
     content: "\f107";
-    font-size: 14px;
+    font-size: 95%;
     width: 14px;
     text-align: left;
     display: inline-block;
@@ -503,7 +577,6 @@ a:active {
   color: #21759b;
   display: block;
   font-size: 14px;
-  font-size: 0.875rem;
   font-weight: bold;
   height: auto;
   left: 5px;
@@ -620,7 +693,6 @@ div#post-revisions {
 
 div#post-revisions h3 {
 	color: #353535;
-    font-size: 1.154em;
     margin: 0 0 1em 0;
     font-weight: bold;
 }
@@ -629,10 +701,10 @@ div#post-revisions ul {
     margin: 0;
     padding: 0;
 	list-style: none;
-	font-size: 13px;
 }
 
 div#post-revisions ul li {
+	font-size: 85%;
 	margin-bottom: 6px;
 }
 
@@ -680,33 +752,32 @@ div#post-revisions ul li {
     color: #0b789c;
 }
 
-.entry-meta span {
+.entry-meta div, .entry-footer span {
 	margin-right: 15px;
-	font-size: 14px;
+	font-size: 85%;
 }
 
 .entry-meta span.byline {
 	font-size: inherit;
 }
 
-.entry-footer span {
-	margin-right: 15px;
-	font-size: 12px;
-}
-
 .entry-footer .edit-link a {
 	padding-left: 5px;
+}
+
+.entry-header .entry-meta {
+	margin-top: 5px;
+}
+
+.entry-meta .posted-on a {
+	margin-left: 5px;
 }
 
 .entry-header h1, .entry-header h2 {
 	margin: 0.25em 0 0;
 	font-weight: 400;
 	color: #252525;
-	font-size: 1.714em; /* 24px */
-}
-
-.entry-meta .posted-on a {
-	margin-left:5px;
+	font-size: 175%;
 }
 
 .entry-header h2 {
@@ -715,10 +786,6 @@ div#post-revisions ul li {
 	max-width: 89%;
 	clear: none;
 	margin-bottom: 10px;
-}
-
-.entry-header .entry-meta {
-	margin-top:5px;
 }
 
 footer.entry-footer {
@@ -750,14 +817,6 @@ h2 a, h3 a {
 
 h2 a:hover, h3 a:hover {
     color: #0b789c !important;
-}
-
-.entry-post-format {
-	position: relative;
-	float: right;
-  width: 48px;
-  color: #0b789c;
-  font-size: 20px;
 }
 
 .site-main .paging-navigation, .site-main .posts-navigation,
@@ -856,12 +915,12 @@ span.cat-links a {
 .comments-area {
     background-color: #ffffff;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06);
-    font-size: 0.929em;
+    font-size: 95%;
     margin: 1.5em 0;
     padding: 1.5em;
 }
 h2.comments-title {
-    font-size: 1.077em;
+    font-size: 110%;
     font-weight: 700;
 }
 .comment-list {
@@ -879,35 +938,35 @@ h2.comments-title {
 	padding: 10px 0px;
 }
 .comment-list .comment-content{
-	border:1px dotted #cccccc;
+	border: 1px dotted #cccccc;
 	padding: 10px;
 }
 .comment-list .comment-content p{
 	margin-bottom: 3px !important;
 }
 .comment-body .reply{
-	margin:5px 0px 10px 0px;
+	margin: 5px 0px 10px 0px;
 }
 .comment-body .comment-metadata{
-	margin:5px 0px;
+	margin: 5px 0px;
 }
 .comment-list a.comment-reply-link:before{
 	font-family: "FontAwesome";
 	content: '\f112' ;
-	margin-right:3px;
+	margin-right: 3px;
 }
 .comment-list a.comment-edit-link{
-	margin-left:10px;
+	margin-left: 10px;
 }
 .comment-list a.comment-edit-link:before{
 	font-family: "FontAwesome";
 	content: '\f044' ;
-	margin-right:3px;
+	margin-right: 3px;
 }
 .comment-list .comment-metadata > a:before{
 	font-family: "FontAwesome";
 	content: '\f073' ;
-	margin-right:3px;
+	margin-right: 3px;
 }
 /*--------------------------------------------------------------
 11.0 Infinite scroll
@@ -933,6 +992,7 @@ h2.comments-title {
 	margin-top: 0;
 	padding: 0;
 }
+
 /* Make sure embeds and iframes fit their containers */
 embed,
 iframe,
@@ -1012,7 +1072,7 @@ body{
 }
 .site-title {
 	font-family: sans-serif;
-	font-size: 2em; /* 28px */
+	font-size: 200%; /* 28px */
     font-weight: 700;
     line-height: 1.2;
     margin: 0;
@@ -1037,7 +1097,7 @@ body{
 .site-description {
     color: #555;
     font-family: sans-serif;
-    font-size: 1.071em;
+    font-size: 110%;
     letter-spacing: 1px;
     margin-top: 10px;
 
@@ -1045,8 +1105,9 @@ body{
 
 
 .main-navigation, .site-footer, .widget-area, .entry-meta p {
-    font-size: 0.95em;
+    font-size: 95%;
 }
+
 .widget {
     background-color: #ffffff;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06);
@@ -1057,7 +1118,7 @@ body{
 
 .widget-title {
     color: #353535;
-    font-size: 1.154em;
+    font-size: 110%;
     margin-bottom: 1em;
     font-weight: bold;
     margin-top: 0;
@@ -1084,12 +1145,10 @@ body{
 	color: #0b789c;
 }
 
-
-/*footer*/
+/* footer */
 footer#colophon {
     background-color: #32698b;
     color: #ffffff;
-    margin: ;
     min-height: 50px;
     text-align: center;
     padding: 1em;
@@ -1135,7 +1194,7 @@ footer#colophon a{
     padding: 1em;
 }
 .page-header h1 {
-    font-size: 1.1em;
+    font-size: 110%;
     margin: 0;
     text-transform: uppercase;
     font-weight: bold;
@@ -1154,122 +1213,21 @@ body.search-no-results .page-content {
   margin: 0 10px 10px 10px;
 }
 
-/*woocommerce starts*/
-.woocommerce .woocommerce-breadcrumb a,
-.woocommerce-page .woocommerce-breadcrumb a {
-    color: #0b789c;
-}
-.woocommerce #content div.product p.price del, .woocommerce #content div.product span.price del, .woocommerce div.product p.price del, .woocommerce div.product span.price del, .woocommerce-page #content div.product p.price del, .woocommerce-page #content div.product span.price del, .woocommerce-page div.product p.price del, .woocommerce-page div.product span.price del {
-    font-size: 0.9em;
-}
-
-.woocommerce-tabs ul.tabs{
-	margin-bottom: 0!important;
-}
-
-.woocommerce div.type-product{
-	background-color: #FFFFFF;
-	padding: 20px;
-}
-.woocommerce div.type-product h1.product_title{
-	font-size: 1.714em;
-	font-weight: bold;
-}
-.woocommerce .page-title{
-	font-size: 1.1em;
-	background-color: #FFFFFF;
-	font-weight: bold;
-	text-transform: uppercase;
-	padding: 1em;
-	margin-top: 0;
-}
-.woocommerce ul.products li.product{
-	background-color: #FFFFFF;
-	text-align: center;
-	padding-bottom: 5px;
-}
-.woocommerce ul.products li.product .price del,
-.woocommerce-page ul.products li.product .price del {
-    color: #333;
-    font-size: 0.9em;
-}
-.woocommerce span.onsale {
-	padding: 0;
-	left: 1em;
-	top: 1em;
-}
-.woocommerce .products .star-rating {
-	display: inline-block;
-	text-align: center;
-}
-/*woocommerce ends*/
-
 /* go to top */
 a.scrollup, a.scrollup:active {
     float: right;
     bottom: 50px;
     color: #444;
     display: none;
-    font-size: 20px;
+    font-size: 150%;
     outline: none;
     position: fixed;
     right: 20px;
     z-index: 9999;
 }
+
 a.scrollup:focus {
 	border: 1px #FFF solid;
 	border-radius: 3px;
 	box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.6);
-}
-
-#breadcrumb {
-	margin-top: 25px;
-}
-
-.breadcrumb-trail ul {
-	list-style: none;
-	margin: 0;
-	padding: 0;
-}
-
-.breadcrumb-trail ul li {
-	display: inline-block;
-}
-
-.breadcrumb-trail .trail-items li::after {
-	content: "\002F";
-	padding: 0 5px;
-}
-
-.breadcrumb-trail .trail-items li:last-of-type::after {
-	display: none;
-}
-
-@media only screen and (max-width:767px) {
-
-  #secondary{
-    clear: both;
-  }
-
-}
-
-@media only screen and (max-width:640px) {
-
-  header#masthead{
-    padding-top: 40px;
-  }
-  .site-branding{
-    margin: 0 5px;
-    padding: 30px 0 0;
-  }
-
-}
-
-@media only screen and (max-width:360px) {
-
-  .entry-header h2 {
-      max-width: 80%;
-      width: 80%;
-  }
-
 }

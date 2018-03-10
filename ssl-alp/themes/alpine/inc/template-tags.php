@@ -265,51 +265,6 @@ if ( ! function_exists( 'ssl_alp_get_revision_abbreviation' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'ssl_alp_post_format_icon' ) ) :
-	/**
-	 * Add post format icons.
-	 */
-	function ssl_alp_post_format_icon() {
-
-		$current_post_format = get_post_format();
-		if ( ! empty( $current_post_format ) ) {
-			switch ( $current_post_format ) {
-				case 'video':
-					$format_icon = 'video-camera';
-					break;
-				case 'audio':
-					$format_icon = 'microphone';
-					break;
-				case 'status':
-					$format_icon = 'tasks';
-					break;
-				case 'image':
-					$format_icon = 'file-image-o';
-					break;
-				case 'quote':
-					$format_icon = 'quote-left';
-					break;
-				case 'link':
-					$format_icon = 'link';
-					break;
-				case 'gallery':
-					$format_icon = 'photo';
-					break;
-				default:
-					$format_icon = 'file';
-					break;
-			}
-
-		?>
-			<span class="fa-stack fa-lg">
-			  <i class="fa fa-circle fa-stack-2x" aria-hidden="true"></i>
-			  <i class="fa fa-<?php echo esc_attr( $format_icon ); ?> fa-stack-1x fa-inverse" aria-hidden="true"></i>
-			</span>
-		<?php
-		} // End if.
-	}
-endif;
-
 if ( ! function_exists( 'ssl_alp_the_custom_logo' ) ) :
 	/**
 	 * Displays the optional custom logo.

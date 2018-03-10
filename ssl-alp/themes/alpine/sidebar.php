@@ -42,4 +42,4 @@
 		?>
 
 		<?php endif; // End sidebar widget area. ?>
-	</div><!-- #secondary -->
+	</div>

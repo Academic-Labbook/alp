@@ -65,6 +65,16 @@ namespaces, etc.), some more so than others:
 Some feature ideas not considered critical, but nice to have:
  - Outreach pages: share some posts/pages publicly.
 
+## Requirements
+In general, you should use the latest version of WordPress as that's the one
+that will be supported. With auto-updates to WordPress Core, this is easy.
+
+Your users should use up-to-date browsers. The theme bundled with ALP (Alpine)
+uses CSS Grid, which is only available in recent versions of the most popular
+browsers. The [browsers that don't support CSS Grid](https://caniuse.com/#feat=css-grid)
+represent only around 5% of global usage as of March 2018. This project is not
+concerned about losing sales from users running out of date browsers!
+
 ## Design principles
  - **Clean code**: there's an awful lot of terribly written code floating around
    in the WordPress ecosystem. This plugin attempts to use coding standards, and

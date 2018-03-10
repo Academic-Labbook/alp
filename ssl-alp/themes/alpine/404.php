@@ -7,7 +7,7 @@
 
 get_header(); ?>
 
-	<div id="primary" class="content-area col-sm-12">
+	<div id="primary" class="content-area col-sm-3">
 		<main id="main" class="site-main" role="main">
 
 			<section class="error-404 not-found text-center">

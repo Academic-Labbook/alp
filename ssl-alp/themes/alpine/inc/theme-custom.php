@@ -16,29 +16,29 @@ if ( ! function_exists( 'ssl_alp_custom_content_classes' ) ) :
 	 */
 	function ssl_alp_custom_content_classes( $input ) {
 		if ( is_page_template( 'template/content-sidebar.php' ) ) {
-			$input[] = 'col-sm-8';
+			$input[] = 'col-sm-2';
 			$input[] = 'pull-left';
 		} else if ( is_page_template( 'template/sidebar-content.php' ) ) {
-			$input[] = 'col-sm-8';
+			$input[] = 'col-sm-2';
 			$input[] = 'pull-right';
 		} else if ( is_page_template( 'template/full-width.php' ) ) {
-			$input[] = 'col-sm-12';
+			$input[] = 'col-sm-3';
 		} else {
 			$site_layout = ssl_alp_get_option( 'site_layout' );
 
 			if ( 'content-sidebar' === $site_layout ) {
-				$input[] = 'col-sm-8';
+				$input[] = 'col-sm-2';
 				$input[] = 'pull-left';
 			} else if ( 'sidebar-content' === $site_layout ) {
-				$input[] = 'col-sm-8';
+				$input[] = 'col-sm-2';
 				$input[] = 'pull-right';
 			} else if ( 'full-width' === $site_layout ) {
-				$input[] = 'col-sm-12';
+				$input[] = 'col-sm-3';
 			}
 		}
 
 		// For Mobile.
-		$input[] = 'col-xs-12';
+		$input[] = 'col-xs-3';
 
 		return $input;
 	}
@@ -57,9 +57,9 @@ if ( ! function_exists( 'ssl_alp_custom_sidebar_classes' ) ) :
 	 */
 	function ssl_alp_custom_sidebar_classes( $input ) {
 		if ( is_page_template( 'template/content-sidebar.php' ) ) {
-			$input[] = 'col-sm-4';
+			$input[] = 'col-sm-1';
 		} else if ( is_page_template( 'template/sidebar-content.php' ) ) {
-			$input[] = 'col-sm-4';
+			$input[] = 'col-sm-1';
 		} else if ( is_page_template( 'template/full-width.php' ) ) {
 			$input[] = 'hidden';
 		} else {
@@ -67,9 +67,9 @@ if ( ! function_exists( 'ssl_alp_custom_sidebar_classes' ) ) :
 			$site_layout = ssl_alp_get_option( 'site_layout' );
 
 			if ( 'content-sidebar' === $site_layout ) {
-				$input[] = 'col-sm-4';
+				$input[] = 'col-sm-1';
 			} else if ( 'sidebar-content' === $site_layout ) {
-				$input[] = 'col-sm-4';
+				$input[] = 'col-sm-1';
 			} else if ( 'full-width' === $site_layout ) {
 				$input[] = 'hidden';
 			}
