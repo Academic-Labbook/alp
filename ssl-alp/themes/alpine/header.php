@@ -27,7 +27,7 @@
 
 	<header id="masthead" class="site-header container" role="banner">
 		<div class="site-branding">
-			<?php ssl_alp_the_custom_logo(); ?>
+			<?php the_custom_logo(); ?>
   			<h1 class="site-title text-center"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a></h1>
 			<p class="site-description text-center"><?php bloginfo( 'description' ); ?></p>
 		</div>

@@ -7,12 +7,13 @@ to install additional plugins as you like.
 ## What does ALP do?
 Currently, not much, because it's in alpha development. Here are the features
 implemented so far...
+ - Multiple author support
  - Change logs for posts and pages
    - Unhides revisions meta box in editor by default
  - Force users to be logged in to view (but maybe later add ability to choose
    between network/individual site access)
  - LaTeX support
- - DOI and arXiv persistent references, using shortcodes
+ - DOI and arXiv shortcodes
  - Disable certain post meta fields mostly suited to commercial sites, like
    excerpts, trackbacks, tags, etc.
  - Labbook theme
@@ -35,7 +36,6 @@ implemented so far...
    - Keep normal pages for e.g. webcams, "about" pages, etc.
    - Show pages that link to this one?
  - Support wiki shortcodes (highlight red when page doesn't exist)
- - Multiple author support
  - LaTeX TinyMCE widget
  - More MathJax configuration options
  - Author list widget
@@ -90,7 +90,7 @@ licenced plugins and themes.
 The following list of plugins have been partialy adapted into ALP. All have been
 modified in some way (e.g. admin settings, class and setting namespaces, etc.),
 some more so than others:
- - Coauthors Plus
+ - [Coauthors Plus](https://wordpress.org/plugins/co-authors-plus/)
  - [WP-Post-Meta-Revisions](https://github.com/adamsilverstein/wp-post-meta-revisions)
  - [Revision Notes](https://wordpress.org/plugins/revision-notes/)
  - [MathJax-LaTeX](https://wordpress.org/plugins/mathjax-latex/)

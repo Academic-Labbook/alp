@@ -14,29 +14,28 @@ if ( ! function_exists( 'ssl_alp_get_option' ) ) :
 	 * @return mixed
 	 */
 	function ssl_alp_get_option( $key, $default = '' ) {
-
 		global $ssl_alp_default_options;
 
 		if ( empty( $key ) ) {
 			return;
 		}
+
 		$default = ( isset( $ssl_alp_default_options[ $key ] ) ) ? $ssl_alp_default_options[ $key ] : '';
 
 		$theme_options = get_theme_mod( 'ssl_alp_options', $ssl_alp_default_options );
-
 		$theme_options = array_merge( $ssl_alp_default_options, $theme_options );
 
 		$value = '';
+
 		if ( isset( $theme_options[ $key ] ) ) {
 			$value = $theme_options[ $key ];
 		}
-		return $value;
 
+		return $value;
 	}
 endif;
 
 if ( ! function_exists( 'ssl_alp_get_theme_option_defaults' ) ) :
-
 	/**
 	 * Get default theme options.
 	 *
@@ -62,29 +61,22 @@ if ( ! function_exists( 'ssl_alp_get_theme_option_defaults' ) ) :
 		$defaults = apply_filters( 'ssl_alp_filter_default_theme_options', $defaults );
 
 		return $defaults;
-
 	}
 endif;
 
 if ( ! function_exists( 'ssl_alp_get_options' ) ) :
-
 	/**
 	 * Get theme options.
 	 *
 	 * @since 1.8
 	 */
 	function ssl_alp_get_options() {
-
 		$value = array();
-
 		$value = get_theme_mod( 'ssl_alp_options' );
 
 		return $value;
-
 	}
-
 endif;
-
 
 /**
  * Render content class.
@@ -94,11 +86,13 @@ endif;
  * @param  string|array $class Class to be added.
  */
 function ssl_alp_content_class( $class = '' ) {
-
 	$classes = array();
+
 	if ( ! empty( $class ) ) {
 		if ( ! is_array( $class ) ) {
-			$class = preg_split( '#\s+#', $class ); }
+			$class = preg_split( '#\s+#', $class );
+		}
+
 		$classes = array_merge( $classes, $class );
 	} else {
 		// Ensure that we always coerce class to being an array.
@@ -107,8 +101,8 @@ function ssl_alp_content_class( $class = '' ) {
 
 	$classes = array_map( 'esc_attr', $classes );
 	$classes = apply_filters( 'ssl_alp_filter_content_class', $classes, $class );
-	echo 'class="' . join( ' ', $classes ) . '"'; // WPCS: XSS OK.
 
+	echo 'class="' . join( ' ', $classes ) . '"'; // WPCS: XSS OK.
 }
 
 /**
@@ -119,11 +113,13 @@ function ssl_alp_content_class( $class = '' ) {
  * @param  string|array $class Class to be added.
  */
 function ssl_alp_sidebar_class( $class = '' ) {
-
 	$classes = array();
+
 	if ( ! empty( $class ) ) {
 		if ( ! is_array( $class ) ) {
-			$class = preg_split( '#\s+#', $class ); }
+			$class = preg_split( '#\s+#', $class );
+		}
+
 		$classes = array_merge( $classes, $class );
 	} else {
 		// Ensure that we always coerce class to being an array.
@@ -132,6 +128,7 @@ function ssl_alp_sidebar_class( $class = '' ) {
 
 	$classes = array_map( 'esc_attr', $classes );
 	$classes = apply_filters( 'ssl_alp_filter_sidebar_class', $classes, $class );
+
 	echo 'class="' . join( ' ', $classes ) . '"'; // WPCS: XSS OK.
 }
 
@@ -143,21 +140,23 @@ if ( ! function_exists( 'ssl_alp_primary_menu_fallback' ) ) :
 	 * @since 1.0.0
 	 */
 	function ssl_alp_primary_menu_fallback() {
-
 		echo '<ul>';
 		echo '<li><a href="' . esc_url( home_url( '/' ) ) . '">' . __( 'Home', 'ssl-alp' ) . '</a></li>';
+
 		$args = array(
 			'number'       => 8,
 			'hierarchical' => false,
 			'sort_column'  => 'menu_order, post_title',
-			);
+		);
+
 		$pages = get_pages( $args );
+
 		if ( is_array( $pages ) && ! empty( $pages ) ) {
 			foreach ( $pages as $page ) {
 				echo '<li><a href="' . esc_url( get_permalink( $page->ID ) ) . '">' . esc_html( get_the_title( $page->ID ) ) . '</a></li>';
 			}
 		}
-		echo '</ul>';
 
+		echo '</ul>';
 	}
 endif;

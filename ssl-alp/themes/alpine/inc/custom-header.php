@@ -12,14 +12,20 @@
  * @uses ssl_alp_header_style()
  */
 function ssl_alp_custom_header_setup() {
-	add_theme_support( 'custom-header', apply_filters( 'ssl_alp_custom_header_args', array(
-		'default-image'          => '',
-		'default-text-color'     => '555555',
-		'width'                  => 1170,
-		'height'                 => 250,
-		'flex-height'            => true,
-		'wp-head-callback'       => 'ssl_alp_header_style',
-	) ) );
+	add_theme_support(
+		'custom-header',
+		apply_filters(
+			'ssl_alp_custom_header_args',
+			array(
+				'default-image'          => '',
+				'default-text-color'     => '555555',
+				'width'                  => 1170,
+				'height'                 => 250,
+				'flex-height'            => true,
+				'wp-head-callback'       => 'ssl_alp_header_style',
+			)
+		)
+	);
 }
 
 add_action( 'after_setup_theme', 'ssl_alp_custom_header_setup' );

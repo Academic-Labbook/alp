@@ -6,26 +6,22 @@
  */
 
 if ( ! function_exists( 'ssl_alp_get_image_alignment_options' ) ) :
-
 	/**
 	 * Returns image alignment options.
 	 */
 	function ssl_alp_get_image_alignment_options() {
-
 		$choices = array(
 			'none'   => _x( 'None', 'Alignment', 'ssl-alp' ),
 			'left'   => _x( 'Left', 'Alignment', 'ssl-alp' ),
 			'center' => _x( 'Center', 'Alignment', 'ssl-alp' ),
 			'right'  => _x( 'Right', 'Alignment', 'ssl-alp' ),
 		);
+
 		return $choices;
-
 	}
-
 endif;
 
 if ( ! function_exists( 'ssl_alp_get_image_sizes_options' ) ) :
-
 	/**
 	 * Returns image sizes options.
 	 *
@@ -36,13 +32,15 @@ if ( ! function_exists( 'ssl_alp_get_image_sizes_options' ) ) :
 	 * @param bool $show_dimension Show or hide dimension.
 	 */
 	function ssl_alp_get_image_sizes_options( $add_disable = true, $allowed = array(), $show_dimension = true ) {
-
 		global $_wp_additional_image_sizes;
+
 		$get_intermediate_image_sizes = get_intermediate_image_sizes();
 		$choices = array();
+
 		if ( true === $add_disable ) {
 			$choices['disable'] = esc_html__( 'No Image', 'ssl-alp' );
 		}
+
 		$choices['thumbnail'] = esc_html__( 'Thumbnail', 'ssl-alp' );
 		$choices['medium']    = esc_html__( 'Medium', 'ssl-alp' );
 		$choices['large']     = esc_html__( 'Large', 'ssl-alp' );
@@ -72,9 +70,7 @@ if ( ! function_exists( 'ssl_alp_get_image_sizes_options' ) ) :
 		}
 
 		return $choices;
-
 	}
-
 endif;
 
 /**
