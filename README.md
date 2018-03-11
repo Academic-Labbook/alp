@@ -17,6 +17,9 @@ implemented so far...
    excerpts, trackbacks, tags, etc.
  - Labbook theme
    - Revision history display
+   - Reference widget under posts:
+     - Links to posts referenced by the post
+     - Links to DOI and arXiv references
 
 ...and here are features planned for the future:
  - Labbook theme
@@ -46,10 +49,7 @@ implemented so far...
    - administrator -> administrator
  - Disable private posts (useless with forced login)
  - Reference widget under posts:
-   - Links to posts referenced
    - Links to posts that reference this one
-   - DOI and arXiv references
-   - Shortcode for any other reference
  - Advanced search:
    - Search within PDFs etc.
    - Advanced search page with options to search by revision, etc.

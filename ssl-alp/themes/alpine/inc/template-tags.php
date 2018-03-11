@@ -272,6 +272,127 @@ if ( ! function_exists( 'ssl_alp_get_revision_abbreviation' ) ) :
 	}
 endif;
 
+if ( ! function_exists( 'ssl_alp_the_references' ) ) :
+	/**
+	 * Prints HTML with post references
+	 */
+	function ssl_alp_the_references( $post = null ) {
+		$post = get_post( $post );
+
+		$internal_ref_to_terms = get_the_terms( $post, 'ssl_alp_post_internal_reference' );
+		$internal_ref_from_posts = ssl_alp_get_the_reference_from_posts( $post );
+		$external_terms = get_the_terms( $post, 'ssl_alp_post_external_reference' );
+
+		if ( ! $internal_ref_to_terms && ! $internal_ref_from_posts && ! $external_terms ) {
+			// no references
+			return;
+		}
+
+		echo '<div id="post-references"><h3>References</h3>';
+
+		if ( $internal_ref_to_terms ) {
+			echo '<h4>Links to</h4><ol>';
+
+			foreach ( $internal_ref_to_terms as $term ) {
+				// get post ID
+				$post_id = get_term_meta( $term->term_id, 'reference-to-post-id', 'ssl_alp_post_internal_reference' );
+
+				// get the referenced post
+				$referenced_post = get_post ( $post_id );
+
+				// get URL
+				$url = get_permalink( $referenced_post );
+
+				echo sprintf(
+					'<li><a href="%1$s">%2$s</a></li>',
+					$url,
+					$referenced_post->post_title // escape
+				);
+			}
+
+			echo '</ol>';
+		}
+
+		if ( $internal_ref_from_posts ) {
+			echo '<h4>Linked from</h4><ol>';
+
+			foreach ( $internal_ref_from_posts as $referenced_post ) {
+				// get post
+				$referenced_post = get_post( $referenced_post );
+
+				// get URL
+				$url = get_permalink( $referenced_post );
+
+				echo sprintf(
+					'<li><a href="%1$s">%2$s</a></li>',
+					$url,
+					$referenced_post->post_title // escape
+				);
+			}
+
+			echo '</ol>';
+		}
+
+		if ( $external_terms ) {
+			echo '<h4>External links</h4><ol>';
+
+			foreach ( $external_terms as $term ) {
+				// get URL
+				$url = esc_url( get_term_meta( $term->term_id, 'reference-to-url', 'ssl_alp_post_external_reference' ) );
+
+				// show at most 65 characters of URL
+				$url_display = substr( $url, 0, 65 );
+
+				echo sprintf(
+					'<li><a href="%1$s">%2$s</a></li>',
+					$url,
+					$url_display
+				);
+			}
+
+			echo '</ol>';
+		}
+
+		echo '</div>';
+	}
+endif;
+
+
+if ( ! function_exists( 'ssl_alp_get_the_reference_from_posts' ) ) :
+	/**
+	 * Gets the "reference from" terms for the specified post
+	 */
+	function ssl_alp_get_the_reference_from_posts( $post = null ) {
+		global $wpdb;
+
+		$post = get_post( $post );
+
+		if ( is_null( $post ) ) {
+			return;
+		}
+
+		// query for terms that reference this post
+		$object_ids = $wpdb->get_col(
+			$wpdb->prepare(
+				"
+				SELECT term_relationships.object_id
+				FROM {$wpdb->termmeta} AS termmeta
+				INNER JOIN {$wpdb->term_relationships} AS term_relationships
+					ON termmeta.term_id = term_relationships.term_taxonomy_id
+				WHERE
+					termmeta.meta_key = %s
+					AND termmeta.meta_value = %d
+				",
+				'reference-to-post-id',
+				$post->ID
+			)
+		);
+
+		// get the term objects associated with the term IDs
+		return array_map( 'get_post', $object_ids );
+	}
+endif;
+
 if ( ! function_exists( 'ssl_alp_the_custom_logo' ) ) :
 	/**
 	 * Displays the optional custom logo.

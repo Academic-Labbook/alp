@@ -685,26 +685,31 @@ article.sticky {
     padding: 0;
 }
 
-div#post-revisions {
+div#post-references, div#post-revisions {
 	background-color: #ffffff;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06);
     margin: 0 0 1.5em;
     padding: 1.5em 1.5em;
 }
 
-div#post-revisions h3 {
+div#post-references h3, div#post-revisions h3 {
 	color: #353535;
     margin: 0 0 1em 0;
     font-weight: bold;
 }
 
+div#post-references ol {
+	margin: 0;
+	padding: 0 0 0 20px;
+}
+
 div#post-revisions ul {
-    margin: 0;
-    padding: 0;
+	margin: 0;
+	padding: 0;
 	list-style: none;
 }
 
-div#post-revisions ul li {
+div#post-references ol li, div#post-revisions ul li {
 	font-size: 85%;
 	margin-bottom: 6px;
 }

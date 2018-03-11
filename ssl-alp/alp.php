@@ -65,8 +65,10 @@ require SSL_ALP_BASE_DIR . 'includes/class-alp.php';
  */
 
 function ssl_alp_run() {
-	$plugin = new SSL_ALP();
-	$plugin->run();
+    global $ssl_alp;
+
+    $ssl_alp = new SSL_ALP();
+	$ssl_alp->run();
 }
 
 ssl_alp_run();

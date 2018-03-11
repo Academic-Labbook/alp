@@ -92,6 +92,7 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 
         // MathJax shortcodes
 		$loader->add_action( 'init', $this, 'add_mathjax_shortcodes' );
+		$loader->add_filter( 'strip_shortcodes_tagnames', $this, 'prevent_tex_excerpt_strip' );
 		$loader->add_action( 'wp_footer', $this, 'add_mathjax_script' );
 	}
 
@@ -122,6 +123,10 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 		} elseif ( $shortcode_atts['display'] === 'block' ) {
 			return '\[' . $content . '\]';
 		}
+	}
+
+	public function prevent_tex_excerpt_strip( $tags_to_remove ) {
+		return $this->parent->core->prevent_excerpt_strip( 'tex', $tags_to_remove );
 	}
 
 	public function add_mathjax_script() {

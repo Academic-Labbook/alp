@@ -92,6 +92,14 @@ class SSL_ALP {
 		$this->core = new SSL_ALP_Core( $this );
 
 		/**
+		 * coauthor functionality
+		 */
+
+		require_once SSL_ALP_BASE_DIR . 'includes/class-coauthors.php';
+
+		$this->coauthors = new SSL_ALP_Coauthors( $this );
+
+		/**
 		 * revision summary functionality
 		 */
 
@@ -134,6 +142,7 @@ class SSL_ALP {
 
 		// register module hooks
 		$this->core->register_hooks();
+		$this->coauthors->register_hooks();
 		$this->revisions->register_hooks();
 		$this->references->register_hooks();
 		$this->tex->register_hooks();
@@ -156,6 +165,7 @@ class SSL_ALP {
 	public function register_settings() {
 		// call modules to create their settings
 		$this->core->register_settings();
+		$this->coauthors->register_hooks();
 		$this->revisions->register_settings();
 		$this->references->register_settings();
 		$this->tex->register_settings();
@@ -205,6 +215,7 @@ class SSL_ALP {
 
 		// call modules to create their settings fields
 		$this->core->register_settings_fields();
+		$this->coauthors->register_hooks();
 		$this->revisions->register_settings_fields();
 		$this->references->register_settings_fields();
 		$this->tex->register_settings_fields();

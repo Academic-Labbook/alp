@@ -51,4 +51,5 @@
 		<?php edit_post_link( esc_html__( 'Edit', 'ssl-alp' ), '<span class="edit-link pull-right"><i class="fa fa-edit" aria-hidden="true"></i>', '</span>' ); ?>
 	</footer><!-- .entry-footer -->
 </article><!-- #post-## -->
+<?php ssl_alp_the_references(); ?>
 <?php ssl_alp_the_revisions(); ?>

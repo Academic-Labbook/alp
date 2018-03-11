@@ -232,4 +232,16 @@ class SSL_ALP_Core extends SSL_ALP_Module {
             auth_redirect();
         }
     }
+
+	/**
+	 * Prevent WordPress's wp_trim_excerpt() function, which generates a default
+	 * excerpt when a user-specified one is not present, from removing shortcodes
+	 */
+	public function prevent_excerpt_strip( $tag, $tags_to_remove ) {
+		if ( ( $key = array_search( $tag, $tags_to_remove ) ) !== false ) {
+			unset( $tags_to_remove[ $key ] );
+		}
+
+		return $tags_to_remove;
+	}
 }
