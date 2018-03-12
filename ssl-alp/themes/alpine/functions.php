@@ -173,3 +173,8 @@ require get_template_directory() . '/inc/extras.php';
  * Customizer additions.
  */
 require get_template_directory() . '/inc/customizer.php';
+
+/**
+ * Admin functions (for is_plugin_active)
+ */
+include_once( ABSPATH . 'wp-admin/includes/plugin.php' );

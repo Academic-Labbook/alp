@@ -1,9 +1,7 @@
 <?php
 /**
- * Sample implementation of the Custom Header feature
+ * Custom header
  * http://codex.wordpress.org/Custom_Headers
- *
- * @package ssl-alp
  */
 
 /**
