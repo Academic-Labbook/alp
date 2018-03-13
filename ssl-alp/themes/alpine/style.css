@@ -698,9 +698,21 @@ div#post-references h3, div#post-revisions h3 {
     font-weight: bold;
 }
 
-div#post-references ol {
+div#post-references h4 {
+	margin-bottom: 5px;
+}
+
+div#post-references ul {
 	margin: 0;
 	padding: 0 0 0 20px;
+	list-style: none;
+}
+
+div#post-references ul li:before {
+	font-family: 'FontAwesome';
+	content: '\f105';
+	margin: 0 5px 0 -15px;
+	color: #0b789c;
 }
 
 div#post-revisions ul {
@@ -709,7 +721,7 @@ div#post-revisions ul {
 	list-style: none;
 }
 
-div#post-references ol li, div#post-revisions ul li {
+div#post-references ul li, div#post-revisions ul li {
 	font-size: 85%;
 	margin-bottom: 6px;
 }

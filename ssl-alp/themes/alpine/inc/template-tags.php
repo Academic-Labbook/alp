@@ -9,14 +9,18 @@ if ( ! function_exists( 'ssl_alpine_get_the_post_date_html' ) ) :
 	/**
 	 * Format a post date
 	 */
-	function ssl_alpine_get_the_post_date_html( $post = null, $modified = false, $icon = true, $url = true ) {
-		// combined date and time formats
-		$datetime_fmt = sprintf(
-			/* translators: 1: date, 2: time; note that "\a\t" escapes "at" in PHP's date() function */
-			__( '%1$s \a\t %2$s', 'ssl-alp' ),
-			get_option( 'date_format' ),
-			get_option( 'time_format' )
-		);
+	function ssl_alpine_get_the_post_date_html( $post = null, $modified = false, $time = true, $icon = true, $url = true ) {
+		$datetime_fmt = get_option( 'date_format' );
+
+		if ( $time ) {
+			// combined date and time formats
+			$datetime_fmt = sprintf(
+				/* translators: 1: date, 2: time; note that "\a\t" escapes "at" in PHP's date() function */
+				__( '%1$s \a\t %2$s', 'ssl-alp' ),
+				$datetime_fmt,
+				get_option( 'time_format' )
+			);
+		}
 
 		// ISO 8601 formatted date
 		$date_iso = $modified ? get_the_modified_date( 'c', $post ) : get_the_date( 'c', $post );
@@ -263,7 +267,7 @@ if ( ! function_exists( 'ssl_alpine_get_revision_description' ) ) :
 			}
 		}
 
-		$revision_time = ssl_alpine_get_the_post_date_html( $revision, false, false, false );
+		$revision_time = ssl_alpine_get_the_post_date_html( $revision, false, true, false, false );
 		$author_display_name = get_the_author_meta( 'display_name', $revision->post_author );
 
 		$description = sprintf(
@@ -305,7 +309,7 @@ if ( ! function_exists( 'ssl_alpine_get_revision_abbreviation' ) ) :
 
 		// add URL to diff if user can view
 		if ( $url ) {
-			if ( current_user_can( 'read_post', $revision->ID ) ) {
+			if ( current_user_can( 'edit_post', $revision->ID ) ) {
 				$revision_id = sprintf(
 					'<a href="%1$s">%2$s</a>',
 					get_edit_post_link( $revision->ID ),
@@ -338,101 +342,82 @@ if ( ! function_exists( 'ssl_alpine_the_references' ) ) :
 			return;
 		}
 
-		$internal_ref_to_terms = get_the_terms( $post, 'ssl_alp_post_internal_reference' );
-		$internal_ref_from_posts = ssl_alpine_get_reference_from_posts( $post );
-		$external_terms = get_the_terms( $post, 'ssl_alp_post_external_reference' );
+		$ref_to_terms = get_the_terms( $post, 'ssl_alp_post_crossreference' );
+		$ref_from_posts = ssl_alpine_get_reference_from_posts( $post );
 
-		if ( ! $internal_ref_to_terms && ! $internal_ref_from_posts && ! $external_terms ) {
+		if ( ! $ref_to_terms && ! $ref_from_posts ) {
 			// no references
 			return;
 		}
 
-		printf( '<div id="post-references"><h3>%1$s</h3>', __( 'References', 'ssl-alp' ));
+		printf( '<div id="post-references"><h3>%1$s</h3>', __( 'Cross-references', 'ssl-alp' ));
 
-		if ( $internal_ref_to_terms ) {
-			printf( '<h4>%1$s</h4><ol>', __( 'Links to', 'ssl-alp' ) );
+		if ( $ref_to_terms ) {
+			printf( '<h4>%1$s</h4><ul>', __( 'Links to', 'ssl-alp' ) );
 
-			foreach ( $internal_ref_to_terms as $term ) {
+			foreach ( $ref_to_terms as $term ) {
 				// get post ID
-				$post_id = get_term_meta( $term->term_id, 'reference-to-post-id', 'ssl_alp_post_internal_reference' );
+				$post_id = get_term_meta( $term->term_id, 'reference-to-post-id', 'ssl_alp_post_crossreference' );
 
 				// get the referenced post
-				$referenced_post = get_post ( $post_id );
+				$referenced_post = get_post( $post_id );
 
-				if ( is_null( $referenced_post ) ) {
-					// post doesn't exist
-					// TODO: remove relationship?
-					continue;
-				}
-
-				// get URL
-				$url = get_permalink( $referenced_post );
-
-				printf(
-					'<li><a href="%1$s">%2$s</a></li>',
-					$url,
-					$referenced_post->post_title // escape
-				);
+				// print reference post information
+				ssl_alpine_the_referenced_post_list_item( $referenced_post );
 			}
 
-			echo '</ol>';
+			echo '</ul>';
 		}
 
-		if ( $internal_ref_from_posts ) {
-			printf( '<h4>%1$s</h4><ol>', __( 'Linked from', 'ssl-alp' ));
+		if ( $ref_from_posts ) {
+			printf( '<h4>%1$s</h4><ul>', __( 'Linked from', 'ssl-alp' ));
 
-			foreach ( $internal_ref_from_posts as $referenced_post ) {
+			foreach ( $ref_from_posts as $referenced_post ) {
 				// get post
 				$referenced_post = get_post( $referenced_post );
 
-				if ( is_null( $referenced_post ) ) {
-					// post doesn't exist
-					// TODO: remove relationship?
-					continue;
-				}
-
-				// get URL
-				$url = get_permalink( $referenced_post );
-
-				printf(
-					'<li><a href="%1$s">%2$s</a></li>',
-					$url,
-					$referenced_post->post_title // escape
-				);
+				// print reference post information
+				ssl_alpine_the_referenced_post_list_item( $referenced_post );
 			}
 
-			echo '</ol>';
-		}
-
-		if ( $external_terms ) {
-			printf( '<h4>%1$s</h4><ol>', __( 'External links', 'ssl-alp' ));
-
-			foreach ( $external_terms as $term ) {
-				// get URL
-				$url = esc_url( get_term_meta( $term->term_id, 'reference-to-url', 'ssl_alp_post_external_reference' ) );
-
-				// show at most 65 characters of URL
-				$url_display = substr( $url, 0, 65 );
-
-				printf(
-					'<li><a href="%1$s">%2$s</a></li>',
-					$url,
-					$url_display
-				);
-			}
-
-			echo '</ol>';
+			echo '</ul>';
 		}
 
 		echo '</div>';
 	}
 endif;
 
+if ( ! function_exists( 'ssl_alpine_the_referenced_post_list_item' ) ) {
+	/**
+	 * Prints HTML link to the specified reference post
+	 */
+	function ssl_alpine_the_referenced_post_list_item( $referenced_post = null, $url = true ) {
+		$referenced_post = get_post( $referenced_post );
+
+		if ( is_null( $referenced_post ) ) {
+			// post doesn't exist
+			// TODO: remove relationship?
+			return;
+		}
+
+		// post title
+		$post_title = $referenced_post->post_title;
+
+		if ( $url ) {
+			// wrap URL
+			$post_title = sprintf( '<a href="%1$s">%2$s</a>', get_permalink( $referenced_post ), $post_title );
+		}
+
+		printf( '<li>%1$s</li>', $post_title );
+	}
+}
+
 if ( ! function_exists( 'ssl_alpine_get_reference_from_posts' ) ) :
 	/**
-	 * Gets the "reference from" terms for the specified post
+	 * Gets the "reference from" terms for the specified post. Optionally the
+	 * date order can be changed.
 	 */
-	function ssl_alpine_get_reference_from_posts( $post = null ) {
+	function ssl_alpine_get_reference_from_posts( $post = null, $date_order = 'DESC' ) {
 		global $wpdb;
 
 		$post = get_post( $post );
@@ -441,20 +426,30 @@ if ( ! function_exists( 'ssl_alpine_get_reference_from_posts' ) ) :
 			return;
 		}
 
+		$date_order = ( strtoupper( $date_order ) == 'ASC' ) ? 'ASC' : 'DESC';
+
 		// query for terms that reference this post
 		$object_ids = $wpdb->get_col(
 			$wpdb->prepare(
 				"
-				SELECT term_relationships.object_id
+				SELECT posts.ID
 				FROM {$wpdb->termmeta} AS termmeta
 				INNER JOIN {$wpdb->term_relationships} AS term_relationships
 					ON termmeta.term_id = term_relationships.term_taxonomy_id
+				INNER JOIN {$wpdb->posts} AS posts
+					ON term_relationships.object_id = posts.ID
+				INNER JOIN {$wpdb->term_taxonomy} AS term_taxonomy
+					ON termmeta.term_id = term_taxonomy.term_id
 				WHERE
 					termmeta.meta_key = %s
 					AND termmeta.meta_value = %d
+					AND term_taxonomy.taxonomy = %s
+				ORDER BY
+					posts.post_date {$date_order}
 				",
 				'reference-to-post-id',
-				$post->ID
+				$post->ID,
+				'ssl_alp_post_crossreference'
 			)
 		);
 

@@ -77,8 +77,8 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		$loader = $this->get_loader();
 
 		// extract references from saved posts
-		$loader->add_action( 'init', $this, 'create_reference_taxonomy' );
-		$loader->add_action( 'save_post', $this, 'extract_references', 10, 2 );
+		$loader->add_action( 'init', $this, 'create_crossreference_taxonomy' );
+		$loader->add_action( 'save_post', $this, 'extract_crossreferences', 10, 2 );
 
         // DOI shortcode
 		$loader->add_action( 'init', $this, 'add_doi_shortcodes' );
@@ -89,10 +89,10 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		$loader->add_filter( 'strip_shortcodes_tagnames', $this, 'prevent_arxiv_excerpt_strip' );
 	}
 
-	public function create_reference_taxonomy() {
+	public function create_crossreference_taxonomy() {
 		// create internal reference taxonomy
 		register_taxonomy(
-			'ssl_alp_post_internal_reference',
+			'ssl_alp_post_crossreference',
 			$this->supported_reference_post_types,
 			array(
 				'hierarchical'	=> false,
@@ -100,24 +100,8 @@ class SSL_ALP_References extends SSL_ALP_Module {
 				'meta_box_cb'	=> false,
 				'public'		=> false,
 				'labels' 		=> array(
-					'name'                       => _x( 'Internal References', 'internal reference taxonomy general name', 'ssl-alp' ),
-					'singular_name'              => _x( 'Internal Reference', 'internal reference taxonomy singular name', 'ssl-alp' )
-				)
-			)
-		);
-
-		// create external reference taxonomy
-		register_taxonomy(
-			'ssl_alp_post_external_reference',
-			$this->supported_reference_post_types,
-			array(
-				'hierarchical'	=> false,
-				'rewrite' 		=> false,
-				'meta_box_cb'	=> false,
-				'public'		=> false,
-				'labels' 		=> array(
-					'name'                       => _x( 'External References', 'external reference taxonomy general name', 'ssl-alp' ),
-					'singular_name'              => _x( 'External Reference', 'external reference taxonomy singular name', 'ssl-alp' )
+					'name'                       => _x( 'Cross-references', 'cross-reference taxonomy general name', 'ssl-alp' ),
+					'singular_name'              => _x( 'Cross-reference', 'cross-reference taxonomy singular name', 'ssl-alp' )
 				)
 			)
 		);
@@ -132,7 +116,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	 * Extract references from updated/created posts and insert them into the
 	 * term database for display under the post
 	 */
-	public function extract_references( $post_id, $post ) {
+	public function extract_crossreferences( $post_id, $post ) {
 		if ( ! post_type_supports( $post->post_type, 'ssl-alp-references' ) ) {
 			// post type not supported
 			return;
@@ -146,58 +130,42 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		$urls = wp_extract_urls( $content );
 
 		// terms to set
-		$internal_terms = array();
-		$external_terms = array();
+		$terms = array();
 
 		foreach ( $urls as $url ) {
 			// attempt to find the post ID for the URL
 			$reference_id = url_to_postid( $url );
 
-			if ( $reference_id === 0) {
-				// not an internal URL
-				// escape
-				$url = esc_url( $url );
-
-				// don't use wp_hash here because it salts the data
-				$term_name = "reference-to-url-" . md5( $url );
-				// add term name to list that will be associated with the post
-				$external_terms[$term_name] = $url;
-			} else {
-				$referenced_post = get_post( $reference_id );
-
-				if ( is_null( $referenced_post ) ) {
-					// invalid post - skip
-					continue;
-				}
-
-				/*
-				 * create referenced-to relationship
-				 */
-
-				// create "reference to" term
-				$ref_to_post_term_name = sprintf("reference-to-post-id-%d", $reference_id);
-
-				// add term name to list that will be associated with the post
-				$internal_terms[$ref_to_post_term_name] = $reference_id;
+			if ( $reference_id === 0 ) {
+				// invalid URL
+				continue;
 			}
+
+			$referenced_post = get_post( $reference_id );
+
+			if ( is_null( $referenced_post ) ) {
+				// invalid post - skip
+				continue;
+			}
+
+			/*
+			 * create referenced-to relationship
+			 */
+
+			// create "reference to" term
+			$ref_to_post_term_name = sprintf("reference-to-post-id-%d", $reference_id);
+
+			// add term name to list that will be associated with the post
+			$terms[$ref_to_post_term_name] = $reference_id;
 		}
 
 		// update post's reference taxonomy terms (replaces any existing terms)
-		wp_set_post_terms( $post->ID, array_keys( $external_terms ), 'ssl_alp_post_external_reference' );
-		wp_set_post_terms( $post->ID, array_keys( $internal_terms ), 'ssl_alp_post_internal_reference' );
-
-		// set external term metadata
-		foreach ( $external_terms as $term_name => $url ) {
-			// get term
-			$term = get_term_by( 'name', $term_name, 'ssl_alp_post_external_reference' );
-			// add term metadata
-			update_term_meta( $term->term_id, "reference-to-url", $url );
-		}
+		wp_set_post_terms( $post->ID, array_keys( $terms ), 'ssl_alp_post_crossreference' );
 
 		// set internal term metadata
-		foreach ( $internal_terms as $term_name => $post_id ) {
+		foreach ( $terms as $term_name => $post_id ) {
 			// get term
-			$term = get_term_by( 'name', $term_name, 'ssl_alp_post_internal_reference' );
+			$term = get_term_by( 'name', $term_name, 'ssl_alp_post_crossreference' );
 			// add term metadata
 			update_term_meta( $term->term_id, "reference-to-post-id", $post_id );
 		}
