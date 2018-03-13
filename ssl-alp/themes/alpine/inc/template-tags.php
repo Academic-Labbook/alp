@@ -331,10 +331,10 @@ if ( ! function_exists( 'ssl_alpine_the_references' ) ) :
 
 		$post = get_post( $post );
 
-		// TODO: check post type supports references
-		//if  ( ! post_type_supports( $post->post_type, 'ssl-alp-edit-summaries' ) ) {
-		//	return;
-		//}
+		if ( ! post_type_supports( $post->post_type, 'ssl-alp-references' ) ) {
+			// post type not supported
+			return;
+		}
 
 		$internal_ref_to_terms = get_the_terms( $post, 'ssl_alp_post_internal_reference' );
 		$internal_ref_from_posts = ssl_alpine_get_reference_from_posts( $post );

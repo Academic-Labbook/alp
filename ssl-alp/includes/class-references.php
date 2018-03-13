@@ -121,6 +121,11 @@ class SSL_ALP_References extends SSL_ALP_Module {
 				)
 			)
 		);
+
+		// add post type support
+		foreach ( $this->supported_reference_post_types as $post_type ) {
+			add_post_type_support( $post_type, 'ssl-alp-references' );
+		}
 	}
 
 	/**
@@ -128,7 +133,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	 * term database for display under the post
 	 */
 	public function extract_references( $post_id, $post ) {
-		if ( ! in_array( get_post_type( $post ), $this->supported_reference_post_types ) ) {
+		if ( ! post_type_supports( $post->post_type, 'ssl-alp-references' ) ) {
 			// post type not supported
 			return;
 		}
