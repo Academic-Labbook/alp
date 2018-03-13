@@ -342,7 +342,7 @@ if ( ! function_exists( 'ssl_alpine_the_references' ) ) :
 			return;
 		}
 
-		$ref_to_terms = get_the_terms( $post, 'ssl_alp_post_crossreference' );
+		$ref_to_terms = get_the_terms( $post, 'ssl_alp_crossreference' );
 		$ref_from_posts = ssl_alpine_get_reference_from_posts( $post );
 
 		if ( ! $ref_to_terms && ! $ref_from_posts ) {
@@ -357,7 +357,7 @@ if ( ! function_exists( 'ssl_alpine_the_references' ) ) :
 
 			foreach ( $ref_to_terms as $term ) {
 				// get post ID
-				$post_id = get_term_meta( $term->term_id, 'reference-to-post-id', 'ssl_alp_post_crossreference' );
+				$post_id = get_term_meta( $term->term_id, 'reference-to-post-id', 'ssl_alp_crossreference' );
 
 				// get the referenced post
 				$referenced_post = get_post( $post_id );
@@ -449,7 +449,7 @@ if ( ! function_exists( 'ssl_alpine_get_reference_from_posts' ) ) :
 				",
 				'reference-to-post-id',
 				$post->ID,
-				'ssl_alp_post_crossreference'
+				'ssl_alp_crossreference'
 			)
 		);
 

@@ -92,7 +92,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	public function create_crossreference_taxonomy() {
 		// create internal reference taxonomy
 		register_taxonomy(
-			'ssl_alp_post_crossreference',
+			'ssl_alp_crossreference',
 			$this->supported_reference_post_types,
 			array(
 				'hierarchical'	=> false,
@@ -160,12 +160,12 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		}
 
 		// update post's reference taxonomy terms (replaces any existing terms)
-		wp_set_post_terms( $post->ID, array_keys( $terms ), 'ssl_alp_post_crossreference' );
+		wp_set_post_terms( $post->ID, array_keys( $terms ), 'ssl_alp_crossreference' );
 
 		// set internal term metadata
 		foreach ( $terms as $term_name => $post_id ) {
 			// get term
-			$term = get_term_by( 'name', $term_name, 'ssl_alp_post_crossreference' );
+			$term = get_term_by( 'name', $term_name, 'ssl_alp_crossreference' );
 			// add term metadata
 			update_term_meta( $term->term_id, "reference-to-post-id", $post_id );
 		}
