@@ -110,6 +110,8 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * relevant tools added to their edit pages.
 	 */
 	public function add_edit_summary_support() {
+		// cannot use a generic list of supported post types, as get_post_meta
+		// used to get post edit summaries
 		add_post_type_support( 'post', 'ssl-alp-edit-summaries' );
 		add_post_type_support( 'page', 'ssl-alp-edit-summaries' );
 	}
@@ -180,8 +182,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		}
 
 		// get the stored meta value from the revision
-		// (use get_metadata instead of get_post_meta so we get the *revision's* data, not the parent's)
-		$revision_meta = get_metadata( 'post', $revision->ID, 'edit_summary', true );
+		$revision_meta = get_post_meta( $revision->ID, 'edit_summary', true );
 
 		if ( empty( $revision_meta ) || ! is_array( $revision_meta ) ) {
 			// empty or invalid
@@ -217,7 +218,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		}
 
 		// get revision edit summary
-		$revision_meta = get_metadata( 'post', $revision->ID, 'edit_summary', true );
+		$revision_meta = get_post_meta( $revision->ID, 'edit_summary', true );
 
 		if ( empty( $revision_meta ) || ! is_array( $revision_meta ) ) {
 			// empty or invalid
@@ -249,7 +250,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		delete_post_meta( $post_id, 'edit_summary' );
 
 		// get the stored meta value from the revision we are reverting to
-		$target_revision_meta = get_metadata( 'post', $revision_id, 'edit_summary', true );
+		$target_revision_meta = get_post_meta( $revision_id, 'edit_summary', true );
 
 		// add revision's meta value to parent
 		add_post_meta( $post_id, 'edit_summary', $target_revision_meta );

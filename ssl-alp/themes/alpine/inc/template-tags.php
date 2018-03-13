@@ -159,13 +159,14 @@ if ( ! function_exists( 'ssl_alpine_the_revisions' ) ) :
 		$post = get_post( $post );
 
 		if ( ! post_type_supports( $post->post_type, 'ssl-alp-edit-summaries' ) ) {
+			// post type not supported
 			return;
 		}
 
 		// get list of revisions to this post
-		$revisions = ssl_alpine_get_the_revisions( $post );
+		$revisions = ssl_alpine_get_revisions( $post );
 
-		if ( count( $revisions ) == 0 ) {
+		if ( is_null( $revisions ) || ! is_array( $revisions ) || count( $revisions ) == 0 ) {
 			// no revisions to show
 			return;
 		}
@@ -180,11 +181,11 @@ if ( ! function_exists( 'ssl_alpine_the_revisions' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'ssl_alpine_get_the_revisions' ) ) :
+if ( ! function_exists( 'ssl_alpine_get_revisions' ) ) :
 	/**
 	 * Get list of revisions for the current or specified post
 	 */
-	function ssl_alpine_get_the_revisions( $post = null ) {
+	function ssl_alpine_get_revisions( $post = null ) {
 		if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
 			return;
 		} elseif ( ! get_option( 'ssl_alp_post_edit_summaries' ) ) {
@@ -195,6 +196,7 @@ if ( ! function_exists( 'ssl_alpine_get_the_revisions' ) ) :
 		$post = get_post( $post );
 
 		if  ( ! post_type_supports( $post->post_type, 'ssl-alp-edit-summaries' ) ) {
+			// post type not supported
 			return;
 		}
 
@@ -229,8 +231,8 @@ if ( ! function_exists( 'ssl_alpine_get_revision_description' ) ) :
 			return;
 		}
 
-		// (use get_metadata instead of get_post_meta so we get the *revision's* data, not the parent's)
-		$revision_meta = get_metadata( 'post', $revision->ID, 'edit_summary', true );
+		// get revision's edit summary
+		$revision_meta = get_post_meta( $revision->ID, 'edit_summary', true );
 
 		// default message
 		$message = " " . ssl_alpine_get_revision_abbreviation( $revision );
