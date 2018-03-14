@@ -108,7 +108,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 
 		// add post type support
 		foreach ( $this->supported_reference_post_types as $post_type ) {
-			add_post_type_support( $post_type, 'ssl-alp-references' );
+			add_post_type_support( $post_type, 'ssl-alp-crossreferences' );
 		}
 	}
 
@@ -117,7 +117,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	 * term database for display under the post
 	 */
 	public function extract_crossreferences( $post_id, $post ) {
-		if ( ! post_type_supports( $post->post_type, 'ssl-alp-references' ) ) {
+		if ( ! post_type_supports( $post->post_type, 'ssl-alp-crossreferences' ) ) {
 			// post type not supported
 			return;
 		}

@@ -337,7 +337,7 @@ if ( ! function_exists( 'ssl_alpine_the_references' ) ) :
 
 		$post = get_post( $post );
 
-		if ( ! post_type_supports( $post->post_type, 'ssl-alp-references' ) ) {
+		if ( ! post_type_supports( $post->post_type, 'ssl-alp-crossreferences' ) ) {
 			// post type not supported
 			return;
 		}

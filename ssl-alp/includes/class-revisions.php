@@ -110,10 +110,12 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * relevant tools added to their edit pages.
 	 */
 	public function add_edit_summary_support() {
-		// cannot use a generic list of supported post types, as get_post_meta
-		// used to get post edit summaries
-		add_post_type_support( 'post', 'ssl-alp-edit-summaries' );
-		add_post_type_support( 'page', 'ssl-alp-edit-summaries' );
+		// support any post type that uses revisions
+		foreach ( get_post_types() as $post_type ) {
+			if ( post_type_supports( $post_type, 'revisions' ) ) {
+				add_post_type_support( $post_type, 'ssl-alp-edit-summaries' );
+			}
+		}
 	}
 
     /*

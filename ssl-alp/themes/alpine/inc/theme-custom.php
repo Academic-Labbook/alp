@@ -8,22 +8,18 @@
 if ( ! function_exists( 'ssl_alp_custom_content_classes' ) ) :
 	/**
 	 * Modify content classes.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param array $input Array of content classes.
-	 * @return array Modified array of content classes.
 	 */
 	function ssl_alp_custom_content_classes( $input ) {
-		if ( is_page_template( 'template/content-sidebar.php' ) ) {
+		if ( is_page_template( 'page.php' ) ) {
+			// standard page has contents on right
 			$input[] = 'col-sm-2';
 			$input[] = 'pull-left';
-		} else if ( is_page_template( 'template/sidebar-content.php' ) ) {
-			$input[] = 'col-sm-2';
-			$input[] = 'pull-right';
-		} else if ( is_page_template( 'template/full-width.php' ) ) {
+		} else if ( is_page_template( 'template/page-root.php' ) ) {
+			// contents page takes up full width
 			$input[] = 'col-sm-3';
 		} else {
+			// not using special page template
+			// get theme setting for layout instead
 			$site_layout = ssl_alp_get_option( 'site_layout' );
 
 			if ( 'content-sidebar' === $site_layout ) {
@@ -37,7 +33,7 @@ if ( ! function_exists( 'ssl_alp_custom_content_classes' ) ) :
 			}
 		}
 
-		// For Mobile.
+		// add extra small format as a fall-back for mobile
 		$input[] = 'col-xs-3';
 
 		return $input;
@@ -49,21 +45,17 @@ add_filter( 'ssl_alp_filter_content_class', 'ssl_alp_custom_content_classes' );
 if ( ! function_exists( 'ssl_alp_custom_sidebar_classes' ) ) :
 	/**
 	 * Modify sidebar classes.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param  array $input Array of sidebar classes.
-	 * @return array Modified array of sidebar classes.
 	 */
 	function ssl_alp_custom_sidebar_classes( $input ) {
-		if ( is_page_template( 'template/content-sidebar.php' ) ) {
+		if ( is_page_template( 'page.php' ) ) {
 			$input[] = 'col-sm-1';
-		} else if ( is_page_template( 'template/sidebar-content.php' ) ) {
-			$input[] = 'col-sm-1';
-		} else if ( is_page_template( 'template/full-width.php' ) ) {
+		} else if ( is_page_template( 'template/page-root.php' ) ) {
+			// shouldn't be necessary as sidebar isn't printed by standard.php,
+			// but we'll hide it anyway
 			$input[] = 'hidden';
 		} else {
-
+			// not using special page template
+			// get theme setting for layout instead
 			$site_layout = ssl_alp_get_option( 'site_layout' );
 
 			if ( 'content-sidebar' === $site_layout ) {
@@ -81,34 +73,6 @@ endif;
 
 add_filter( 'ssl_alp_filter_sidebar_class', 'ssl_alp_custom_sidebar_classes' );
 
-if ( ! function_exists( 'ssl_alp_custom_post_classes' ) ) :
-	/**
-	 * Modify post classes.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param  array $input Array of post classes.
-	 * @return array Modified array of post classes.
-	 */
-	function ssl_alp_custom_post_classes( $input ) {
-
-		if ( 'post' === get_post_type() ) {
-			$content_layout = ssl_alp_get_option( 'content_layout' );
-			if ( 'full' === $content_layout ) {
-				$input[] = 'content-layout-full';
-			} else if ( 'excerpt' === $content_layout ) {
-				$input[] = 'content-layout-excerpt';
-			} else if ( 'excerpt-thumb' === $content_layout ) {
-				$input[] = 'content-layout-excerpt-thumb';
-			}
-		}
-		return $input;
-
-	}
-endif;
-
-add_filter( 'post_class', 'ssl_alp_custom_post_classes' );
-
 if ( ! function_exists( 'ssl_alp_custom_excerpt_length' ) ) :
 	/**
 	 * Implement excerpt length.
@@ -121,9 +85,11 @@ if ( ! function_exists( 'ssl_alp_custom_excerpt_length' ) ) :
 	function ssl_alp_custom_excerpt_length( $length ) {
 		$excerpt_length = ssl_alp_get_option( 'excerpt_length' );
 		$excerpt_length = apply_filters( 'ssl_alp_filter_excerpt_length', esc_attr( $excerpt_length ) );
+
 		if ( empty( $excerpt_length ) ) {
 			$excerpt_length = $length;
 		}
+
 		return $excerpt_length;
 	}
 endif;
@@ -143,16 +109,20 @@ if ( ! function_exists( 'ssl_alp_excerpt_readmore' ) ) :
 		global $post;
 
 		$flag_apply_excerpt_readmore = apply_filters( 'ssl_alp_filter_excerpt_readmore', true );
+
 		if ( true !== $flag_apply_excerpt_readmore ) {
 			return $more;
 		}
 
 		$read_more_text = ssl_alp_get_option( 'read_more_text' );
+
 		if ( empty( $read_more_text ) ) {
 			return $more;
 		}
+
 		$output = '... <a href="'. esc_url( get_permalink( $post->ID ) ) . '" class="readmore">' . esc_attr( $read_more_text )  . '<span class="screen-reader-text">' . esc_html( get_the_title() ) . '</span><span class="fa fa-angle-double-right" aria-hidden="true"></span></a>';
-		$output = apply_filters( 'ssl_alp_filter_read_more_content' , $output );
+		$output = apply_filters( 'ssl_alp_filter_read_more_content', $output );
+
 		return $output;
 	}
 endif;
@@ -181,16 +151,16 @@ add_action( 'wp_footer', 'ssl_alp_add_go_to_top' );
 if ( ! function_exists( 'ssl_alp_custom_content_width' ) ) :
 	/**
 	 * Custom content width.
-	 *
-	 * @since 1.3
 	 */
 	function ssl_alp_custom_content_width() {
+		global $content_width;
 
-		global $post, $content_width;
 		if ( is_page() ) {
-			if ( is_page_template( 'template/full-width.php' ) ) {
+			if ( is_page_template( 'template/page-root.php' ) ) {
+				// use full width
 				$content_width = 1128;
-			} elseif ( is_page_template( array( 'template/content-sidebar.php', 'template/sidebar-content.php' ) ) ) {
+			} elseif ( is_page_template( 'page.php' ) ) {
+				// include space for contents
 				$content_width = 800;
 			}
 		}

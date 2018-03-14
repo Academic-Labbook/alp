@@ -100,10 +100,22 @@ add_action( 'after_setup_theme', 'ssl_alp_setup' );
  * Register widget area.
  */
 function ssl_alp_widgets_init() {
+	// standard sidebar for posts, search, etc.
 	register_sidebar( array(
-		'name'          => __( 'Sidebar', 'ssl-alp' ),
-		'id'            => 'sidebar-1',
-		'description'   => __( 'Add widgets here to appear in your sidebar.', 'ssl-alp' ),
+		'name'          => __( 'Standard Sidebar', 'ssl-alp' ),
+		'id'            => 'sidebar-standard',
+		'description'   => __( 'This is the sidebar appearing on front page, posts, archives, search, etc.', 'ssl-alp' ),
+		'before_widget' => '<aside id="%1$s" class="widget clearfix %2$s">',
+		'after_widget'  => '</aside>',
+		'before_title'  => '<h3 class="widget-title">',
+		'after_title'   => '</h3>',
+	) );
+
+	// sidebar for pages, intended to show contents
+	register_sidebar( array(
+		'name'          => __( 'Page Sidebar', 'ssl-alp' ),
+		'id'            => 'sidebar-page',
+		'description'   => __( 'This is the sidebar appearing on pages, except those using the "Page Root" template. This is intended to hold the page contents widget.', 'ssl-alp' ),
 		'before_widget' => '<aside id="%1$s" class="widget clearfix %2$s">',
 		'after_widget'  => '</aside>',
 		'before_title'  => '<h3 class="widget-title">',

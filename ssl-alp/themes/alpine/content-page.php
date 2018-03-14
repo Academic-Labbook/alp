@@ -31,3 +31,5 @@
 		<?php edit_post_link( __( 'Edit', 'ssl-alp' ), '<span class="edit-link"><i class="fa fa-edit" aria-hidden="true"></i>', '</span>' ); ?>
 	</footer><!-- .entry-footer -->
 </article><!-- #post-## -->
+<?php ssl_alpine_the_references(); ?>
+<?php ssl_alpine_the_revisions(); ?>
