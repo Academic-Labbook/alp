@@ -1234,13 +1234,13 @@ body.search-no-results .page-content {
 /* go to top */
 a.scrollup, a.scrollup:active {
     float: right;
-    bottom: 50px;
+    bottom: 25px;
     color: #444;
     display: none;
     font-size: 150%;
     outline: none;
     position: fixed;
-    right: 20px;
+    right: 30px;
     z-index: 9999;
 }
 
