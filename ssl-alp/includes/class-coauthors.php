@@ -44,6 +44,10 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * Register admin scripts
 	 */
 	public function enqueue_admin_scripts() {
+		if ( ! $this->is_post_type_enabled() || ! $this->current_user_can_set_authors() ) {
+			return;
+		}
+
 		wp_enqueue_script( 'ssl-alp-coauthors-js', SSL_ALP_BASE_URL . 'js/coauthors.js', array( 'jquery', 'jquery-ui-sortable', 'suggest' ), $this->get_version(), true );
 
 		$js_strings = array(
@@ -218,9 +222,8 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * Whether or not coauthors are enabled for this post type
 	 */
 	public function is_post_type_enabled( $post_type = null ) {
-		if ( ! $post_type ) {
-			$post_type = get_post_type();
-		}
+		// get post type if not specified
+		$post_type = get_post_type( $post_type );
 
 		return (bool) in_array( $post_type, $this->supported_post_types );
 	}
