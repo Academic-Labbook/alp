@@ -16,30 +16,29 @@ implemented so far...
  - DOI and arXiv shortcodes
  - Disable certain post meta fields mostly suited to commercial sites, like
    excerpts, trackbacks, tags, etc.
- - Labbook theme
-   - Revision history display
-   - Reference widget under posts:
-     - Links to posts referenced by the post
-     - Links to DOI and arXiv references
+ - Modifies pages to work more like a wiki:
+   - Remove authors and dates
+   - Display a table of contents in the sidebar (generated from header elements)
+ - Special ALP theme
+   - Displays revision history
+   - Shows reference widget under posts/pages showing cross-references to/from other posts/pages
 
 ...and here are features planned for the future:
  - Labbook theme
    - Enable authors, edited posts, recent comments widgets by default
    - Multiple author display
-   - Top bar for linking to other network sites
+   - Top bar for linking to other network sites?
+ - Email alerts for certain things
+   - New posts
+   - Comments (already built-in, or at least should be)
  - Disable public access
    - Private feed keys (default feeds NOT disabled by forced login; provide
      unique feeds to each user instead; replace feed URL)
    - Stop images being loaded from outside (might require htaccess changes?)
- - Add wiki pages as a new post type (display contents)
-   - (https://codex.wordpress.org/Post_Types#Custom_Post_Types)
-   - Keep normal pages for e.g. webcams, "about" pages, etc.
-   - Show pages that link to this one?
- - Support wiki shortcodes (highlight red when page doesn't exist)
  - LaTeX TinyMCE widget
  - More MathJax configuration options
  - Author list widget
- - Recently edited posts widget
+ - Recent edits widget
  - Change names and behaviours of user types:
    - subscriber -> subscriber
    - contributor -> [remove]
@@ -47,9 +46,7 @@ implemented so far...
    - editor -> researcher
      - can add new categories
    - administrator -> administrator
- - Disable private posts (useless with forced login)
- - Reference widget under posts:
-   - Links to posts that reference this one
+ - Disable private posts (kinda useless with forced login)
  - Advanced search:
    - Search within PDFs etc.
    - Advanced search page with options to search by revision, etc.
@@ -90,8 +87,8 @@ ALP is a mixture of new code and code forked from other open source, GPL
 licenced plugins and themes.
 
 The following list of plugins have been partialy adapted into ALP. All have been
-modified in some way (e.g. admin settings, class and setting namespaces, etc.),
-some more so than others:
+modified in some way (e.g. admin settings, class and setting namespaces, features
+added or removed, etc.), some more so than others:
  - [Coauthors Plus](https://wordpress.org/plugins/co-authors-plus/)
  - [WP-Post-Meta-Revisions](https://github.com/adamsilverstein/wp-post-meta-revisions)
  - [Revision Notes](https://wordpress.org/plugins/revision-notes/)

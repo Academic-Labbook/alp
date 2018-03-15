@@ -51,6 +51,9 @@ class SSL_ALP_Wiki extends SSL_ALP_Module {
 
 		// register page contents widget
 		$loader->add_action( 'widgets_init', $this, 'register_contents_widget' );
+
+		// modify post content to inject header ids
+		$loader->add_filter( 'the_content', $this, 'prepare_page_content' );
 	}
 
 	/**
@@ -91,6 +94,213 @@ class SSL_ALP_Wiki extends SSL_ALP_Module {
 	public function register_contents_widget() {
 		register_widget( 'SSL_ALP_Page_Contents' );
 	}
+
+	/**
+	 * Prepares page content by inserting id attributes into <h1>, <h2>, ... <h6> tags
+	 * where necessary and building a table of contents
+	 */
+	public function prepare_page_content( $content ) {
+		// variable to store contents for widget
+		global $ssl_alp_page_toc;
+
+		// disable visible XML error reporting temporarily
+		// (we will check for errors using libxml_get_errors)
+		$prev_libxml_error_setting = libxml_use_internal_errors( true );
+
+		// load content into DOM parser
+		$document = new DOMDocument();
+		$document->loadHTML($content);
+
+		if ( count( libxml_get_errors() ) ) {
+			// there were parser errors
+			error_log( sprintf( 'SSL_ALP parser errors: %s', print_r( libxml_get_errors(), true ) ) );
+
+			// return content without building a table of contents
+			return $content;
+		}
+		
+		// revert libxml error setting
+		libxml_use_internal_errors($prev_libxml_error_setting);
+
+		// create root list container
+		$contents = new SSL_ALP_Menu_Level(); // level "0"
+		$contents->is_root = true;
+
+		// set parent container to root
+		$head = &$contents; // level 0
+
+		// create XPath query to get header elements
+		$xpath = new DOMXPath( $document );
+		$xpath_query = $xpath->query( '//*[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6]' );
+
+		// default last level
+		$last_level = 1;
+
+		/**
+		 * Build table of contents.
+		 * 
+		 * This searches the document for <h1> .. <h6> elements, which are returned by
+		 * $xpath_query in the order they are found in the document. Before starting,
+		 * a root array is created to hold the whole tree, and this is defined as the
+		 * first "parent". Then the document's header elements are iterated over:
+		 * 
+		 *     First of all, the current header level (e.g. <h3> is level 3) is checked
+		 * 	   against the previous level. If it's higher (for example, when an <h3>
+		 *     follows an <h2>), a new array is created as a child of the current parent,
+		 *     and this becomes the new parent (this array does not initially contain a
+		 *     value, as there may not be a header for this level). If the current level
+		 *     is lower than the previous, the parent is set to the current parent's
+		 *     parent.
+		 * 
+		 *     After determining the current level, a new child is added to the current
+		 *     parent, and is given a value corresponding to the current header's id. The
+		 *     previous level is set to the current level, and the loop continues.
+		 * 
+		 * After the loop, the result is an tree structure containing each header from
+		 * each level, ordered in a hierarchy where higher headers are children of its
+		 * preceding lower one.
+		 */
+		foreach ( $xpath_query as $header ) {
+			// get header's level
+			sscanf( $header->tagName, 'h%u', $current_level );
+
+			// update parent pointer
+			if ( $current_level < $last_level ) {
+				// move parent up
+				for ( $i = $current_level; $i < $last_level; $i++ ) {
+					$head = &$head->parent_menu;
+				}
+			} elseif ( $current_level > $last_level) {
+				// move parent down
+				for ( $i = $last_level; $i < $current_level; $i++ ) {
+					// new parent should now be the last child of the current parent
+					//$head->add_child_menu( new SSL_ALP_Menu_Level() );
+
+					if ( is_null( $head->last_child ) ) {
+						$head->add_child_menu( new SSL_ALP_Menu_Level() );
+					}
+
+					$head = &$head->last_child;
+
+					// create child for new parent
+					//$child = $template;
+					//$child['parent'] = &$parent;
+					//$parent['children'][] = $child;
+				}
+			}
+
+			// update last level
+			$last_level = $current_level;
+
+			// add new child to parent
+			$child = new SSL_ALP_Menu_Level();
+			$child->set_menu_data(
+				array(
+					'id'	=>	$this->_unique_id( $header, $document ),
+					'title'	=>	$header->textContent
+				)
+			);
+
+			$head->add_child_menu( $child );
+		}
+
+		// reset global variable containing contents
+		$ssl_alp_page_toc = $contents;
+
+		// convert DOM with any changes made back into HTML
+		return $document->saveHTML();
+	}
+
+	/**
+	 * Get a unique id for the given tag
+	 */
+	protected function _unique_id( &$tag, &$dom ) {
+		$id = $tag->getAttribute( 'id' );
+
+		if ( empty( $id ) ) {
+			// no id; convert text content into id
+			$id = $this->_text_to_id( $tag->textContent );
+		}
+
+		if ( $this->_id_exists( $id, $dom ) && $dom->getElementById( $id ) !== $tag ) {
+			// id already used elsewhere
+			// generate new one
+
+			// copy original id
+			$original_id = $id;
+
+			// add increasing natural number onto end of id until unique is found
+			while ( $this->_id_exists( $id, $dom ) ) {
+				// number to add to end of id
+				static $num = 1;
+
+				// id with appended number
+				$id = $original_id . $num;
+					
+				$num++;
+			}
+		}
+
+		// set tag's id
+		$tag->setAttribute( 'id', $id );
+
+		return $id;
+	}
+
+	/**
+	 * Check if specified DOM element id already exists
+	 */
+	protected function _id_exists( $id, &$dom ) {
+		return ! is_null( $dom->getElementById( $id ) );
+	}
+
+	/**
+	 * Convert text within HTML tag to a valid id
+	 */
+	protected function _text_to_id( $text, $delimiter = '-' ) {
+		// convert to lowercase
+		$text = strtolower($text);
+
+		// strip whitespace before and after id
+		$text = trim($text, $delimiter);
+
+		// replace inner whitespace with delimeter
+		$text = preg_replace('/\s/', $delimiter, $text);
+
+		// remove anything that isn't a word or delimiter
+		$text = preg_replace('/[^\w\\' . $delimiter . ']/', '', $text);
+
+		return $text;
+	}
+}
+
+class SSL_ALP_Menu_Level {
+	public $parent_menu = null;
+	private $child_menus = array();
+	public $last_child = null;
+	private $menu_data = null;
+	public $is_root = false;
+
+	public function get_menu_data() {
+		return $this->menu_data;
+	}
+
+	public function set_menu_data( $menu_data ) {
+		$this->menu_data = $menu_data;
+	}
+
+	public function add_child_menu( $child ) {
+		$child->parent_menu = &$this;
+		$this->child_menus[] = $child;
+
+		// update last child reference
+		end($this->child_menus);
+		$this->last_child = &$this->child_menus[key($this->child_menus)];
+	}
+
+	public function get_child_menus() {
+		return $this->child_menus;
+	}
 }
 
 class SSL_ALP_Page_Contents extends WP_Widget {
@@ -111,7 +321,7 @@ class SSL_ALP_Page_Contents extends WP_Widget {
 	 * @param array $instance
 	 */
 	public function widget( $args, $instance ) {
-		if ( ! $this->is_page() ) {
+		if ( ! $this->has_contents() ) {
 			return;
 		}
 
@@ -121,8 +331,8 @@ class SSL_ALP_Page_Contents extends WP_Widget {
 			echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title'];
 		}
 
-		//echo esc_html__( 'Contents!', 'ssl-alp' );
-		echo $this->get_contents();
+		// output the contents
+		$this->the_contents();
 
 		echo $args['after_widget'];
 	}
@@ -162,70 +372,46 @@ class SSL_ALP_Page_Contents extends WP_Widget {
 	}
 
 	/**
-	 * Get current page, or null if no page exists
+	 * Checks if the widget is being displayed on a page with contents
 	 */
-	protected function get_page() {
-		// cannot use get_the_page() etc., so use get_queried_object instead
-		$obj = get_queried_object();
+	protected function has_contents() {
+		global $ssl_alp_page_toc;
 
-		if ( ! is_object( $obj ) ) {
-			// not valid object
-			return null;
-		} elseif ( ! property_exists( $obj, 'post_type' ) ) {
-			// no post type field
-			return null;
-		}
-
-		return ( $obj->post_type === 'page' ) ? $obj : null;
+		return ( ! empty( $ssl_alp_page_toc ) );
 	}
 
-	/**
-	 * Checks if the widget is being displayed on a page
-	 */
-	protected function is_page() {
-		return ! is_null( $this->get_page() );
+	protected function the_contents() {
+		global $ssl_alp_page_toc;
+
+		// call recursive menu printer
+		$this->_content_list( $ssl_alp_page_toc );
 	}
 
-	protected function get_contents() {
-		$page = $this->get_page();
+	protected function _content_list( $contents ) {
+		if ( ! $contents->is_root ) {
+			$menu_data = $contents->get_menu_data();
 
-		if ( is_null( $page ) ) {
-			// no page
-			return;
-		}
-
-		$content = $page->post_content;
-
-		// create DOM parser
-		$dom = new DOMDocument();
-		$dom->loadHTML($content);
-
-		echo "<ul>";
-		// get all headers
-		foreach ( array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ) as $header_tag ) {
-			$header_tags = $dom->getElementsByTagName( $header_tag );
-
-			foreach ( $header_tags as $tag ) {
-				if ( empty( $tag->getAttribute( 'id' ) ) ) {
-					// skip tag without id
-					continue;
-				}
-
-				// strip out any inner tags and filter
-				$tag_text = esc_html( $tag->textContent );
-
-				$url = sprintf(
-					'<a href="#%1$s">%2$s</a>',
-					$tag->getAttribute('id'),
-					$tag_text
-				);
+			if ( is_array( $menu_data ) ) {	
+				echo '<li>';
 
 				printf(
-					'<li>%1$s</li>',
-					$url
+					'<a href="#%1$s">%2$s</a>',
+					esc_html( $menu_data['id'] ),
+					esc_html( $menu_data['title'] )
 				);
+
+				echo '</li>';
 			}
 		}
-		echo "</ul>";
+
+		$children = $contents->get_child_menus();
+
+		foreach ( $children as $child ) {
+			echo '<ul>';
+
+			$this->_content_list( $child );
+
+			echo '</ul>';
+		}
 	}
 }
