@@ -69,6 +69,8 @@ Some feature ideas not considered critical, but nice to have:
 In general, you should use the latest version of WordPress as that's the one
 that will be supported. With auto-updates to WordPress Core, this is easy.
 
+The plugin has only been tested on PHP7. You must have the [DOM extension](http://www.php.net/manual/en/book.dom.php) installed.
+
 Your users should use up-to-date browsers. The theme bundled with ALP (Alpine)
 uses CSS Grid, which is only available in recent versions of the most popular
 browsers. The [browsers that don't support CSS Grid](https://caniuse.com/#feat=css-grid)

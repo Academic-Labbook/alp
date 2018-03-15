@@ -121,27 +121,10 @@ class SSL_ALP_Page_Contents extends WP_Widget {
 			echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title'];
 		}
 
-		echo esc_html__( 'Contents!', 'ssl-alp' );
+		//echo esc_html__( 'Contents!', 'ssl-alp' );
+		echo $this->get_contents();
 
 		echo $args['after_widget'];
-	}
-
-	/**
-	 * Checks if the widget is being displayed on a page
-	 */
-	protected function is_page() {
-		// cannot use get_the_page() etc., so use get_queried_object instead
-		$obj = get_queried_object();
-
-		if ( ! is_object( $obj ) ) {
-			// not valid object
-			return false;
-		} elseif ( ! property_exists( $obj, 'post_type' ) ) {
-			// no post type field
-			return false;
-		}
-
-		return ( $obj->post_type === 'page' );
 	}
 
 	/**
@@ -176,5 +159,73 @@ class SSL_ALP_Page_Contents extends WP_Widget {
 		$instance['title'] = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
 
 		return $instance;
+	}
+
+	/**
+	 * Get current page, or null if no page exists
+	 */
+	protected function get_page() {
+		// cannot use get_the_page() etc., so use get_queried_object instead
+		$obj = get_queried_object();
+
+		if ( ! is_object( $obj ) ) {
+			// not valid object
+			return null;
+		} elseif ( ! property_exists( $obj, 'post_type' ) ) {
+			// no post type field
+			return null;
+		}
+
+		return ( $obj->post_type === 'page' ) ? $obj : null;
+	}
+
+	/**
+	 * Checks if the widget is being displayed on a page
+	 */
+	protected function is_page() {
+		return ! is_null( $this->get_page() );
+	}
+
+	protected function get_contents() {
+		$page = $this->get_page();
+
+		if ( is_null( $page ) ) {
+			// no page
+			return;
+		}
+
+		$content = $page->post_content;
+
+		// create DOM parser
+		$dom = new DOMDocument();
+		$dom->loadHTML($content);
+
+		echo "<ul>";
+		// get all headers
+		foreach ( array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ) as $header_tag ) {
+			$header_tags = $dom->getElementsByTagName( $header_tag );
+
+			foreach ( $header_tags as $tag ) {
+				if ( empty( $tag->getAttribute( 'id' ) ) ) {
+					// skip tag without id
+					continue;
+				}
+
+				// strip out any inner tags and filter
+				$tag_text = esc_html( $tag->textContent );
+
+				$url = sprintf(
+					'<a href="#%1$s">%2$s</a>',
+					$tag->getAttribute('id'),
+					$tag_text
+				);
+
+				printf(
+					'<li>%1$s</li>',
+					$url
+				);
+			}
+		}
+		echo "</ul>";
 	}
 }
