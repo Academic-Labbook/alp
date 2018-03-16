@@ -84,15 +84,37 @@ concerned about losing sales from users running out of date browsers!
 
 ## Credits
 ALP is a mixture of new code and code forked from other open source, GPL
-licenced plugins and themes.
+licenced plugins and themes. The code specific to this plugin was authored by
+[Sean Leavey](https://attackllama.com/).
 
 The following list of plugins have been partialy adapted into ALP. All have been
 modified in some way (e.g. admin settings, class and setting namespaces, features
-added or removed, etc.), some more so than others:
- - [Coauthors Plus](https://wordpress.org/plugins/co-authors-plus/)
- - [WP-Post-Meta-Revisions](https://github.com/adamsilverstein/wp-post-meta-revisions)
- - [Revision Notes](https://wordpress.org/plugins/revision-notes/)
- - [MathJax-LaTeX](https://wordpress.org/plugins/mathjax-latex/)
- - [Simple Life](https://wordpress.org/themes/simple-life/)
+added or removed, etc.), some more so than others. Here is an incomplete list:
 
-The code specific to this plugin was authored by [Sean Leavey](https://attackllama.com/).
+### Co-Authors Plus
+Authors: Mohammad Jangda, Daniel Bachhuber, Automattic, Shepherd Interactive, Mark Jaquith  
+Link: [Co-Authors Plus](https://wordpress.org/plugins/co-authors-plus/)
+
+Most of this is adapted for ALP verbatim, but the guest author feature has been removed.
+
+### WP-Post-Meta-Revisions and Revision Notes
+Authors: Adam Silverstein, Helen Hou-Sandí  
+Links: [WP-Post-Meta-Revisions](https://github.com/adamsilverstein/wp-post-meta-revisions) and [Revision Notes](https://wordpress.org/plugins/revision-notes/)
+
+These plugins inspired parts of the design of ALP's revisions feature, but the code in ALP
+is not particularly based on either one.
+
+### MathJax-LaTeX
+Authors: Phillip Lord, Simon Cockell, Paul Schreiber  
+Link: [MathJax-LaTeX](https://wordpress.org/plugins/mathjax-latex/)
+
+Most of the functional code was adapted for ALP, but the options were reduced to just SVG
+rendered MathJax for simplicity.
+
+### Simple Life
+Author: Nilambar Sharma  
+Link: [Simple Life](https://wordpress.org/themes/simple-life/)
+
+Bootstrap was removed, and replaced with [CSS Grid](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Grid_Layout).
+The overall visual theme has been retained, but many small tweaks have been made, and
+support for other plugins like WooCommerce removed.
