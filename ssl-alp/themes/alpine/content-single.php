@@ -12,7 +12,7 @@
 		<?php the_title( '<h2 class="entry-title">', '</h2>' ); ?>
 
 		<div class="entry-meta">
-			<?php ssl_alpine_post_meta(); ?>
+			<?php ssl_alpine_the_post_meta(); ?>
 		</div><!-- .entry-meta -->
 	</header><!-- .entry-header -->
 

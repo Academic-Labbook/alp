@@ -60,12 +60,12 @@ if ( ! function_exists( 'ssl_alpine_get_the_post_date_html' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'ssl_alpine_post_meta' ) ) :
+if ( ! function_exists( 'ssl_alpine_the_post_meta' ) ) :
 	/**
 	 * Print HTML with meta information such as post date/time, author(s) and
 	 * revisions
 	 */
-	function ssl_alpine_post_meta( $post = null ) {
+	function ssl_alpine_the_post_meta( $post = null ) {
 		$post = get_post( $post );
 		$posted_on = ssl_alpine_get_the_post_date_html( $post );
 
@@ -105,18 +105,59 @@ if ( ! function_exists( 'ssl_alpine_post_meta' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'ssl_alpine_get_the_author' ) ) :
+if ( ! function_exists( 'ssl_alpine_get_the_authors' ) ) :
 	/**
 	 * Gets formatted author HTML
 	 */
-	function ssl_alpine_get_the_author( $post = null, $icon = true, $url = true ) {
+	function ssl_alpine_get_the_authors( $post = null, $icon = true, $url = true, $delimiter_between = null, $delimiter_between_last = null ) {
 		$post = get_post( $post );
 
-		$author_html = get_the_author_meta( 'display_name', $post->post_author );
+		if ( is_plugin_active( 'ssl-alp/alp.php' ) && get_option( 'ssl_alp_multiple_authors' ) ) {
+			$authors = get_coauthors( $post->ID );
+		} else {
+			// fall back to the_author if plugin is disabled
+			$authors = array( get_user_by( 'id', $post->post_author ) );
+		}
+
+		$author_html = array();
+
+		foreach ( $authors as $author ) {
+			$author_html[] = ssl_alpine_format_author( $author, $url, $icon );
+		}
+
+		if ( count( $author_html ) > 1 ) {
+			// get delimiters
+			if ( is_null( $delimiter_between ) ) {
+				$delimiter_between = _x( ', ', 'delimiter between coauthors except last', 'ssl-alp' );
+			}
+			if ( is_null( $delimiter_between_last ) ) {
+				$delimiter_between_last = _x( ' and ', 'delimiter between last two coauthors', 'ssl-alp' );
+			}
+
+			// pop last author off
+			$last_author = array_pop( $author_html );
+
+			// implode author list
+			$author_html = implode( __( ', ', 'ssl-alp' ), $author_html ) . $delimiter_between_last . $last_author;
+		} else {
+			$author_html = $author_html[0];
+		}
+
+		return $author_html;
+	}
+endif;
+
+if ( ! function_exists( 'ssl_alpine_format_author' ) ) :
+	/**
+	 * Gets formatted author name
+	 */
+	function ssl_alpine_format_author( $author, $icon = true, $url = true ) {
+		$author_html = $author->display_name;
 
 		if ( $url ) {
-			$author_url = esc_url( get_author_posts_url( $post->post_author ) );
+			$author_url = esc_url( get_author_posts_url( $author->ID ) );
 
+			// wrap author in link to their posts
 			$author_html = sprintf( '<span class="author vcard"><a class="url fn n" href="%1$s">%2$s</a></span>', $author_url, $author_html );
 		}
 
@@ -126,26 +167,6 @@ if ( ! function_exists( 'ssl_alpine_get_the_author' ) ) :
 		}
 
 		return $author_html;
-	}
-endif;
-
-if ( ! function_exists( 'ssl_alpine_get_the_authors' ) ) :
-	/**
-	 * Gets formatted author HTML
-	 */
-	function ssl_alpine_get_the_authors( $post = null, $icon = true, $url = true ) {
-		$post = get_post( $post );
-
-		if ( is_plugin_active( 'ssl-alp/alp.php' ) ) {
-			if ( get_option( 'ssl_alp_multiple_authors' ) ) {
-				// for now, just pass through
-				// later, do multiple authors here
-
-				// fall back to the_author if plugin is disabled
-			}
-		}
-
-		return ssl_alpine_get_the_author( $post, $icon, $url );
 	}
 endif;
 

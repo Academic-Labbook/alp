@@ -20,13 +20,13 @@ implemented so far...
    - Remove authors and dates
    - Display a table of contents in the sidebar (generated from header elements)
  - Special ALP theme
+   - Displays multiple authors
    - Displays revision history
    - Shows reference widget under posts/pages showing cross-references to/from other posts/pages
 
 ...and here are features planned for the future:
  - Labbook theme
-   - Enable authors, edited posts, recent comments widgets by default
-   - Multiple author display
+   - Display author, edited posts and recent comments widgets by default
    - Top bar for linking to other network sites?
  - Email alerts for certain things
    - New posts

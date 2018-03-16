@@ -721,10 +721,6 @@ div#post-references ul li, div#post-revisions ul li {
 	color: #0b789c;
 }
 
-.byline {
-	display: none;
-}
-
 .single .byline, .group-blog .byline {
 	display: inline;
 }

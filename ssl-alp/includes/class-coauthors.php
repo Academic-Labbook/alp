@@ -1310,6 +1310,7 @@ function get_coauthors( $post_id = 0 ) {
 			foreach ( $coauthor_terms as $coauthor ) {
 				$coauthor_slug = preg_replace( '#^cap\-#', '', $coauthor->slug );
 				$post_author = $ssl_alp->coauthors->get_coauthor_by( 'user_nicename', $coauthor_slug );
+				
 				// In case the user has been deleted while plugin was deactivated
 				if ( ! empty( $post_author ) ) {
 					$coauthors[] = $post_author;
@@ -1321,6 +1322,7 @@ function get_coauthors( $post_id = 0 ) {
 			} else {
 				$post_author = get_userdata( $wpdb->get_var( $wpdb->prepare( "SELECT post_author FROM $wpdb->posts WHERE ID = %d", $post_id ) ) );
 			}
+
 			if ( ! empty( $post_author ) ) {
 				$coauthors[] = $post_author;
 			}
