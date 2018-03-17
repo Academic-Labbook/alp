@@ -212,4 +212,23 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	public function prevent_arxiv_excerpt_strip( $tags_to_remove ) {
 		return $this->parent->core->prevent_excerpt_strip( 'arxiv', $tags_to_remove );
 	}
+
+	/**
+	 * Re-scan supported post types to update references
+	 */
+	public function rebuild_references() {
+		foreach ( $this->supported_reference_post_types as $post_type ) {
+			$posts = get_posts(
+				array( 
+					'post_type' 		=> $post_type,
+					'post_status'		=> 'published',
+					'posts_per_page'	=> -1 // needed to get all
+				)
+			);
+
+			foreach ( $posts as $post ) {
+				$this->extract_crossreferences( $post->ID, $post );
+			}
+		}
+	}
 }

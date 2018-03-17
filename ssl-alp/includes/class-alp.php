@@ -257,11 +257,16 @@ class SSL_ALP {
 		}
 
 		// default action confirmed state
-		$unconfirmed = false;
+		$role_conversion_unconfirmed = false;
 
 		// default completed action states
-		$override_completed = false;
-		$conversion_completed = false;
+		$override_core_settings_completed = false;
+		$role_conversion_completed = false;
+		$rebuild_references_completed = false;
+
+		/**
+		 * Handle manage core settings form
+		 */
 
 		// check if core settings are all overridden
 		$core_settings_overridden = $this->_core_settings_overriden();
@@ -269,9 +274,6 @@ class SSL_ALP {
 		// require login setting
 		$require_login = get_option( 'ssl_alp_require_login' );
 
-		/**
-		 * Handle manage core settings form
-		 */
 		if ( ! $core_settings_overridden && $require_login ) {
 			if ( array_key_exists( 'ssl_alp_manage_core_settings_submitted', $_POST ) && (bool) $_POST['ssl_alp_manage_core_settings_submitted'] ) {
 				// user has submitted the form
@@ -282,12 +284,16 @@ class SSL_ALP {
 				// do action
 				$this->_override_core_settings();
 
-				$override_completed = true;
+				$override_core_settings_completed = true;
 
 				// update override flag
 				$core_settings_overridden = $this->_core_settings_overriden();
 			}
 		}
+
+		/**
+		 * Handle convert roles form
+		 */
 
 		// check if user roles can be changed
 		$roles_convertable = $this->_roles_are_default();
@@ -295,9 +301,6 @@ class SSL_ALP {
 		// check if user roles have been changed already
 		$roles_converted = $this->_roles_converted();
 
-		/**
-		 * Handle convert roles form
-		 */
 		if ( $roles_convertable && ! $roles_converted ) {
 			if ( array_key_exists( 'ssl_alp_convert_role_submitted', $_POST ) && (bool) $_POST['ssl_alp_convert_role_submitted'] ) {
 				// user has submitted the form
@@ -310,14 +313,30 @@ class SSL_ALP {
 					// do action
 					$this->_convert_roles();
 
-					$conversion_completed = true;
+					$role_conversion_completed = true;
 
 					// update roles changed flag
 					$roles_converted = $this->_roles_converted();
 				} else {
-					$unconfirmed = true;
+					$role_conversion_unconfirmed = true;
 				}
 			}
+		}
+
+		/**
+		 * Handle rebuild references form
+		 */
+
+		if ( array_key_exists( 'ssl_alp_rebuild_references_submitted', $_POST ) && (bool) $_POST['ssl_alp_rebuild_references_submitted'] ) {
+			// user has submitted the form
+
+			// verify the nonce
+			check_admin_referer( 'ssl-alp-rebuild-references', 'ssl_alp_rebuild_references_nonce' );
+
+			// do action
+			$this->_rebuild_references();
+
+			$rebuild_references_completed = true;
 		}
 
 		require_once SSL_ALP_BASE_DIR . 'partials/admin/tools/display.php';
@@ -430,6 +449,16 @@ class SSL_ALP {
 		if( get_role( $role ) ) {
 			remove_role( $role );
 		}
+	}
+
+	/**
+	 * Rebuild post/page references
+	 */
+	private function _rebuild_references() {
+		global $ssl_alp;
+
+		// pass call to reference object
+		return $ssl_alp->references->rebuild_references();
 	}
 
     /**

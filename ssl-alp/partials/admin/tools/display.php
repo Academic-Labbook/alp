@@ -5,21 +5,25 @@
  */
 ?>
 
-<?php if ( $override_completed ): ?>
+<?php if ( $override_core_settings_completed ): ?>
 <div class="notice notice-success">
 	<p><?php _e( 'Core settings changed.', 'ssl-alp' ); ?></p>
 </div>
 <?php endif;?>
-<?php if ( $conversion_completed ): ?>
+<?php if ( $role_conversion_completed ): ?>
 <div class="notice notice-success">
 	<p><?php _e( 'User roles converted.', 'ssl-alp' ); ?></p>
 </div>
-<?php elseif ( $unconfirmed ): ?>
+<?php elseif ( $role_conversion_unconfirmed ): ?>
 <div class="notice notice-error">
 	<p><?php _e( 'Please click the confirmation checkbox below.', 'ssl-alp' ); ?></p>
 </div>
 <?php endif; ?>
-
+<?php if ( $rebuild_references_completed ): ?>
+<div class="notice notice-success">
+	<p><?php _e( 'References rebuilt.', 'ssl-alp' ); ?></p>
+</div>
+<?php endif;?>
 <div class="wrap">
 	<h2><?php _e('Academic Labbook Tools', 'ssl-alp'); ?></h2>
 	<div class="ssl-alp-tools-cards">
@@ -81,12 +85,12 @@
 			<form method="post" action="">
 				<input type="hidden" name="ssl_alp_manage_core_settings_submitted" value="1"/>
 				<p class="submit">
-					<input name="submit" id="submit" class="button button-primary" value="Change Settings" type="submit"<?php if ( ! $require_login || $core_settings_overridden ) : ?> disabled<?php endif; ?>/>
+					<input name="submit" id="submit" class="button button-primary" value="<?php _e( 'Change Settings', 'ssl-alp' ); ?>" type="submit"<?php if ( ! $require_login || $core_settings_overridden ) : ?> disabled<?php endif; ?>/>
 				</p>
 				<?php wp_nonce_field( 'ssl-alp-manage-core-settings', 'ssl_alp_manage_core_settings_nonce' ); ?>
 			</form>
 			<?php if ( $core_settings_overridden ) : ?>
-			<p class="description"><?php _e( 'Core settings have already been set to the above values.', 'ssl-alp' ); ?></p>
+			<p class="description"><?php _e( 'Core settings are already set to the above values.', 'ssl-alp' ); ?></p>
 			<?php elseif ( ! $require_login ) : ?>
 			<p class="description"><?php _e( sprintf( 'The <a href="options-general.php?page=ssl-alp-admin-options">%1$s</a> setting is not enabled. Please enable it first before running this tool.', __( ' Require login to access site', 'ssl-alp' ) ), 'ssl-alp' ); ?></p>
 			<?php endif; ?>
@@ -102,14 +106,14 @@
 				<li><?php printf( __( 'The <strong>%1$s</strong> role is unchanged from the WordPress default. This can be used to provide read-only access to a user. %2$s can still comment on posts.', 'ssl-alp' ), __( 'Subscriber' ), __( 'Subscribers' ) ); ?></li>
 				<li><?php printf( __( 'The <strong>%1$s</strong> role is added, with no permissions to perform any actions on the site, including to read it. This is intended for users who are no longer to be given access to the site. On private sites, this avoids the need to delete a user\'s account in order to remove their access, which would also delete their contributions.', 'ssl-alp' ), __( 'Excluded', 'ssl-alp' ) ); ?></li>
 			</ul>
-			<p><?php _e( 'This action involves <strong>deleting</strong> existing roles from the database. The lack of default WordPress user roles may lead to compatiblity issues with other plugins. For more information on roles, please see <a href="https://codex.wordpress.org/Roles_and_Capabilities">Roles and Capabilities</a> in the WordPress Codex.', 'ssl-alp' ); ?></p>
+			<p><?php _e( 'This action <strong>deletes</strong> the default WordPress roles from the database. For more information on roles, please see <a href="https://codex.wordpress.org/Roles_and_Capabilities">Roles and Capabilities</a> in the WordPress Codex.', 'ssl-alp' ); ?></p>
 			<p><strong><?php _e( 'This action cannot be undone.', 'ssl-alp' ); ?></strong></p>
 			<form method="post" action="">
 				<input type="hidden" name="ssl_alp_convert_role_submitted" value="1"/>
 				<input type="checkbox" id="ssl_alp_convert_role_confirm_checkbox" name="ssl_alp_convert_role_confirm" value="1"/>
 				<label for="ssl_alp_convert_role_confirm_checkbox"><?php _e( 'I have read and understood the above information', 'ssl-alp' ); ?></label>
 				<p class="submit">
-					<input name="submit" id="submit" class="button button-primary" value="Convert User Roles" type="submit"<?php if ( ! $roles_convertable ) : ?> disabled<?php endif; ?>/>
+					<input name="submit" id="submit" class="button button-primary" value="<?php _e( 'Convert User Roles', 'ssl-alp' ); ?>" type="submit"<?php if ( ! $roles_convertable ) : ?> disabled<?php endif; ?>/>
 				</p>
 				<?php wp_nonce_field( 'ssl-alp-convert-user-roles', 'ssl_alp_convert_user_roles_nonce' ); ?>
 			</form>
@@ -118,6 +122,17 @@
 			<?php else : ?>
 			<p class="description"><?php _e( 'User roles are not currently set to WordPress defaults, and so cannot be converted.', 'ssl-alp' ); ?></p>
 			<?php endif; ?>
+		</span>
+		<span class="ssl-alp-tools-card">
+			<h2 class="title"><?php _e( 'Rebuild references', 'ssl-alp' ); ?></h2>
+			<p><?php _e( 'This tool will rebuild the references related to each published post and page.', 'ssl-alp' ); ?></p>
+			<form method="post" action="">
+				<input type="hidden" name="ssl_alp_rebuild_references_submitted" value="1"/>
+				<p class="submit">
+					<input name="submit" id="submit" class="button button-primary" value="<?php _e( 'Rebuild References', 'ssl-alp' ); ?>" type="submit"/>
+				</p>
+				<?php wp_nonce_field( 'ssl-alp-rebuild-references', 'ssl_alp_rebuild_references_nonce' ); ?>
+			</form>
 		</span>
 	</div>
 </div>
