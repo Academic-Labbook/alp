@@ -262,34 +262,27 @@ code{
 
 /* column classes */
 /* default for screen widths up to 767px */
-.col-xs-3 {
+.col-xs-3, .col-sm-1-left, .col-sm-1-right, .col-sm-2-left, .col-sm-2-right, .col-sm-3 {
 	grid-column: span 3;
-}
-
-.col-sm-1 {
-	grid-column: span 3;
-}
-
-.col-sm-2 {
-	grid-column: span 3;
-}
-
-.col-sm-3 {
-	grid-column: span 3;
+	grid-row: 1;
 }
 
 /* screen sizes larger than 768px */
 @media (min-width: 768px) {
-    .col-sm-1 {
-        grid-column: span 1;
-    }
+    .col-sm-1-left {
+		grid-column: 1 / 2;
+	}
 
-	.col-sm-2 {
-        grid-column: span 2;
-    }
+	.col-sm-1-right {
+		grid-column: 3 / 4;
+	}
 
-	.col-sm-3 {
-        grid-column: span 3;
+	.col-sm-2-left {
+		grid-column: 1 / 3;
+	}
+	
+	.col-sm-2-right {
+		grid-column: 2 / 4;
     }
 }
 

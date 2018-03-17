@@ -40,16 +40,6 @@ class SSL_ALP_Core extends SSL_ALP_Module {
        );
 
         register_setting(
-           'ssl-alp-admin-options',
-           'ssl_alp_copyright_text',
-           array(
-               'type'				=>	'text',
-               'sanitize_callback'	=>	'sanitize_text_field',
-               'default'			=>	'Institute'
-           )
-       );
-
-        register_setting(
 			'ssl-alp-admin-options',
 			'ssl_alp_disable_post_tags',
 			array(
@@ -112,18 +102,6 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 		);
 
         /**
-         * Site display settings
-         */
-
-		add_settings_field(
-			'ssl_alp_display_settings',
-			__( 'Display', 'ssl-alp' ),
-			array( $this, 'display_settings_callback' ),
-			'ssl-alp-admin-options',
-			'ssl_alp_site_settings_section'
-		);
-
-        /**
          * Post meta settings field
          */
 
@@ -150,10 +128,6 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 
     public function access_settings_callback() {
 		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/site/access-settings-display.php';
-	}
-
-	public function display_settings_callback() {
-		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/site/display-settings-display.php';
 	}
 
     public function meta_settings_callback() {

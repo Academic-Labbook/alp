@@ -46,14 +46,12 @@ if ( ! function_exists( 'ssl_alp_get_theme_option_defaults' ) ) :
 			'site_logo'                    => '',
 			'replace_site_title'           => false,
 			'site_layout'                  => 'content-sidebar',
-			'content_layout'               => 'excerpt-thumb',
-			'archive_image_thumbnail_size' => 'large',
-			'archive_image_alignment'      => 'center',
+			'content_layout'               => 'excerpt',
 			'read_more_text'               => esc_html__( 'Read more', 'ssl-alp' ),
 			'search_placeholder'           => esc_html__( 'Search...', 'ssl-alp' ),
-			'excerpt_length'               => 40,
+			'excerpt_length'               => 55, // WordPress default
 			'pagination_type'              => 'default',
-			'copyright_text'               => sanitize_text_field( get_option( 'ssl_alp_copyright_text' ) ),
+			'copyright_text'               => '',
 			'powered_by'                   => true,
 			'go_to_top'                    => true,
 		);

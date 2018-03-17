@@ -82,52 +82,9 @@ function ssl_alp_customize_register( $wp_customize ) {
 			'type'     => 'select',
 			'priority' => 115,
 			'choices'  => array(
-				'full'          => __( 'Full Post (with image)', 'ssl-alp' ),
-				'excerpt'       => __( 'Excerpt Only', 'ssl-alp' ),
-				'excerpt-thumb' => __( 'Excerpt with thumbnail', 'ssl-alp' ),
+				'full'          => __( 'Full post', 'ssl-alp' ),
+				'excerpt'       => __( 'Excerpt', 'ssl-alp' )
 			),
-		)
-	);
-
-	// Setting - archive_image_thumbnail_size.
-	$wp_customize->add_setting(
-		'ssl_alp_options[archive_image_thumbnail_size]',
-		array(
-			'default'           => $ssl_alp_default_options['archive_image_thumbnail_size'],
-			'capability'        => 'edit_theme_options',
-			'sanitize_callback' => 'ssl_alp_sanitize_select',
-		)
-	);
-	$wp_customize->add_control(
-		'ssl_alp_options[archive_image_thumbnail_size]',
-		array(
-			'label'           => __( 'Archive Image Size', 'ssl-alp' ),
-			'section'         => 'ssl_alp_options_general',
-			'type'            => 'select',
-			'priority'        => 120,
-			'choices'         => ssl_alp_get_image_sizes_options( false ),
-			'active_callback' => 'ssl_alp_is_non_excerpt_content_layout_active',
-		)
-	);
-
-	// Setting - archive_image_alignment.
-	$wp_customize->add_setting(
-		'ssl_alp_options[archive_image_alignment]',
-		array(
-			'default'           => $ssl_alp_default_options['archive_image_alignment'],
-			'capability'        => 'edit_theme_options',
-			'sanitize_callback' => 'ssl_alp_sanitize_select',
-		)
-	);
-	$wp_customize->add_control(
-		'ssl_alp_options[archive_image_alignment]',
-		array(
-			'label'           => __( 'Archive Image Alignment', 'ssl-alp' ),
-			'section'         => 'ssl_alp_options_general',
-			'type'            => 'select',
-			'priority'        => 125,
-			'choices'         => ssl_alp_get_image_alignment_options(),
-			'active_callback' => 'ssl_alp_is_non_excerpt_content_layout_active',
 		)
 	);
 
@@ -177,7 +134,7 @@ function ssl_alp_customize_register( $wp_customize ) {
 	$wp_customize->add_control(
 		'ssl_alp_options[excerpt_length]',
 		array(
-			'label'    => __( 'Excerpt Length', 'ssl-alp' ),
+			'label'    => __( 'Excerpt length (words)', 'ssl-alp' ),
 			'section'  => 'ssl_alp_options_blog',
 			'type'     => 'text',
 			'priority' => 220,
@@ -333,25 +290,6 @@ function ssl_alp_customize_preview_js() {
 }
 
 add_action( 'customize_preview_init', 'ssl_alp_customize_preview_js' );
-
-if ( ! function_exists( 'ssl_alp_is_non_excerpt_content_layout_active' ) ) :
-	/**
-	 * Check if non excerpt content layout is active.
-	 *
-	 * @since 2.0.0
-	 *
-	 * @param WP_Customize_Control $control WP_Customize_Control instance.
-	 *
-	 * @return bool Whether the control is active to the current preview.
-	 */
-	function ssl_alp_is_non_excerpt_content_layout_active( $control ) {
-		if ( 'excerpt' !== $control->manager->get_setting( 'ssl_alp_options[content_layout]' )->value() ) {
-			return true;
-		}
-
-		return false;
-	}
-endif;
 
 // Sanitization callback functions.
 if ( ! function_exists( 'ssl_alp_sanitize_number_absint' ) ) {
