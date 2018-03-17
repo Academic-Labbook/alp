@@ -77,11 +77,11 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
     }
 
     public function enable_tex_settings_callback() {
-		require_once SSL_ALP_BASE_DIR . 'partials/admin/enable-tex-settings-display.php';
+		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/enable-tex-settings-display.php';
 	}
 
 	public function mathjax_javascript_url_settings_callback() {
-		require_once SSL_ALP_BASE_DIR . 'partials/admin/mathjax-javascript-url-settings-display.php';
+		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/mathjax-javascript-url-settings-display.php';
 	}
 
 	/**

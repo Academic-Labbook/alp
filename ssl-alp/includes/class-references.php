@@ -67,7 +67,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
     }
 
     public function journal_reference_settings_callback() {
-		require_once SSL_ALP_BASE_DIR . 'partials/admin/journal-reference-settings-display.php';
+		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/journal-reference-settings-display.php';
 	}
 
 	/**

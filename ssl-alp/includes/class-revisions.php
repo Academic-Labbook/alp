@@ -68,7 +68,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
     }
 
     public function edit_summary_settings_callback() {
-		require_once SSL_ALP_BASE_DIR . 'partials/admin/edit-summary-settings-display.php';
+		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/edit-summary-settings-display.php';
 	}
 
 	/**
@@ -161,7 +161,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		// add a nonce to check later
 		wp_nonce_field( 'ssl-alp-edit-summary', 'ssl_alp_edit_summary_nonce' );
 
-		require_once SSL_ALP_BASE_DIR . 'partials/admin/post-edit-summary-display.php';
+		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post-edit-summary-display.php';
 	}
 
     /*

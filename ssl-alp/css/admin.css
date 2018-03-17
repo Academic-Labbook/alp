@@ -15,3 +15,36 @@ div.ssl-alp-misc-pub-edit-summary:before {
     color: #82878c;
     content: "\f464"; /* pencil icon */
 }
+
+table.ssl-alp-builtin-settings {
+    margin-bottom: 15px;
+}
+
+table.ssl-alp-builtin-settings td.desc {
+    font-style: italic;
+}
+
+table.ssl-alp-builtin-settings th.column-setting {
+    width: auto;
+}
+
+table.ssl-alp-builtin-settings th.column-control {
+    width: 15%;
+}
+
+div.ssl-alp-tools-cards {
+    display: block;
+    width: 100%;
+}
+
+span.ssl-alp-tools-card {
+    position: relative;
+    float: left;
+    outline: 0;
+    width: 550px;
+    margin: 20px 10px 0 10px;
+    padding: .7em 2em 1em;
+    border: 1px solid #e5e5e5;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+    background: #fff;
+}

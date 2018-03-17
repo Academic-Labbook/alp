@@ -8,8 +8,11 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 	 * Register the stylesheets for the public-facing side of the site.
 	 */
 	public function enqueue_styles() {
-        wp_enqueue_style( 'ssl-alp-admin-css', SSL_ALP_BASE_URL . 'css/admin.css', array(), $this->get_version(), 'all' );
         wp_enqueue_style( 'ssl-alp-public-css', SSL_ALP_BASE_URL . 'css/public.css', array(), $this->get_version(), 'all' );
+	}
+
+	public function enqueue_admin_styles() {
+        wp_enqueue_style( 'ssl-alp-admin-css', SSL_ALP_BASE_URL . 'css/admin.css', array(), $this->get_version(), 'all' );
 	}
 
 	/**
@@ -17,6 +20,10 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 	 */
 	public function enqueue_scripts() {
         wp_enqueue_script( 'ssl-alp-public-js', SSL_ALP_BASE_URL . 'js/public.js', array( 'jquery' ), $this->get_version(), false );
+	}
+
+	public function enqueue_admin_scripts() {
+        
 	}
 
 	/**
@@ -142,19 +149,19 @@ class SSL_ALP_Core extends SSL_ALP_Module {
     }
 
     public function access_settings_callback() {
-		require_once SSL_ALP_BASE_DIR . 'partials/admin/access-settings-display.php';
+		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/site/access-settings-display.php';
 	}
 
 	public function display_settings_callback() {
-		require_once SSL_ALP_BASE_DIR . 'partials/admin/display-settings-display.php';
+		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/site/display-settings-display.php';
 	}
 
     public function meta_settings_callback() {
-		require_once SSL_ALP_BASE_DIR . 'partials/admin/meta-settings-display.php';
+		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/meta-settings-display.php';
 	}
 
     public function author_settings_callback() {
-		require_once SSL_ALP_BASE_DIR . 'partials/admin/author-settings-display.php';
+		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/author-settings-display.php';
 	}
 
 	/**
@@ -165,6 +172,8 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 
 		$loader->add_action( 'wp_enqueue_scripts', $this, 'enqueue_styles' );
 		$loader->add_action( 'wp_enqueue_scripts', $this, 'enqueue_scripts' );
+		$loader->add_action( 'admin_enqueue_scripts', $this, 'enqueue_admin_styles' );
+		$loader->add_action( 'admin_enqueue_scripts', $this, 'enqueue_admin_scripts' );
 
         // private site
         $loader->add_action( 'get_header', $this, 'check_logged_in');

@@ -53,7 +53,6 @@ implemented so far...
  - Optionally display institute logo (also on login page)
  - Shortcodes for linking to Git/SVN commits and other archives
  - Offline download, e.g. [Simply Static](https://wordpress.org/plugins/simply-static/)
- - DOI shortcode validation (https://www.crossref.org/blog/dois-and-matching-regular-expressions/)
  - LSC-specific extensions:
    - DCC shortcodes
      - Add entries to reference widget
