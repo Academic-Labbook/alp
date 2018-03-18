@@ -349,12 +349,12 @@ if ( ! function_exists( 'ssl_alpine_the_references' ) ) :
 	 */
 	function ssl_alpine_the_references( $post = null ) {
 		if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
+			// plugin is disabled
+			return;
+		} elseif ( ! get_option( 'ssl_alp_enable_crossreferences' ) ) {
+			// cross-references are disabled
 			return;
 		}
-		// TODO: check for reference setting
-		//} elseif ( ! get_option( '' ) ) {
-		//	return;
-		//}
 
 		$post = get_post( $post );
 
