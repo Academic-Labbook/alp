@@ -8,7 +8,7 @@ Version: 0.1.0
 License: GNU General Public License v3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Text Domain: ssl-alp
-Tags: one-column, two-columns, left-sidebar, right-sidebar, custom-background, custom-colors, custom-logo, custom-header, custom-menu, editor-style, featured-images, full-width-template, post-formats, sticky-post, translation-ready, accessibility-ready, blog, threaded-comments
+Tags: one-column, two-columns, left-sidebar, right-sidebar, custom-background, custom-colors, custom-logo, custom-menu, editor-style, featured-images, full-width-template, post-formats, sticky-post, translation-ready, accessibility-ready, blog, threaded-comments
 
 Based on Underscores http://underscores.me/, (C) 2012-2014 Automattic, Inc.
 */
@@ -257,7 +257,8 @@ code {
 .row {
 	display: grid;
     grid-template-columns: repeat(3, 1fr);
-    grid-gap: 20px;
+	grid-gap: 20px;
+	grid-auto-flow: dense; /* back-fill unoccupied cells with items that fit */
 }
 
 /* unstyled lists, for e.g. sidebar lists which use fontawesome icons instead */
@@ -270,7 +271,6 @@ code {
 /* default for screen widths up to 767px */
 .col-xs-3, .col-sm-1-left, .col-sm-1-right, .col-sm-2-left, .col-sm-2-right, .col-sm-3 {
 	grid-column: span 3;
-	grid-row: 1;
 }
 
 /* screen sizes larger than 768px */
@@ -1052,21 +1052,66 @@ object {
 body{
 	background: none repeat scroll 0 0 #f0f3f5;
 }
-.site-branding {
-    margin: 2em 0;
-    text-align: center;
+
+#site-branding {
+	display: grid;
+	grid-auto-flow: dense; /* back-fill unoccupied cells with items that fit */
+	grid-template-columns: 300px 1fr;
+	grid-template-rows: auto;
+    grid-gap: 20px;
+	margin: 2em 0 0 0;
+	background-color: #ffffff;
 }
-.site-title {
+
+#site-title-group {
+	grid-column: span 2;
+	align-self: center;
+	text-align: center;
+	padding: 20px;
+}
+
+#site-logo {
+	grid-column: span 2;
+	text-align: center;
+	font-size: 0; /* needed to get rid of gap between image and nav menu */
+}
+
+/* screen sizes larger than 768px */
+@media (min-width: 768px) {
+	#site-title-group {
+		grid-column: 1 / 2;
+		text-align: left;
+	}
+
+	#site-logo {
+		grid-column: 2 / 3;
+		text-align: right;
+	}
+}
+
+.site-title, .site-description {
 	font-family: sans-serif;
+}
+
+.site-title {
 	font-size: 200%; /* 28px */
     font-weight: 700;
-    line-height: 1.2;
-    margin: 0;
+	line-height: 1.2;
+	margin: 0 0 5px 0;
+	padding: 0;
 }
 
 .site-title a {
 	display: inline-block;
 	color: #555;
+}
+
+.site-description {
+    color: #555;
+    font-size: 110%;
+	letter-spacing: 1px;
+	margin: 5px 0 0 0;
+	padding: 0;
 }
 
 .site-title a:hover,
@@ -1075,20 +1120,6 @@ body{
 	text-decoration: none;
 	color: #0b789c;
 }
-
-.site-branding .custom-logo-link img, .site-branding .site-logo-link img {
-  margin-bottom: 10px;
-}
-
-.site-description {
-    color: #555;
-    font-family: sans-serif;
-    font-size: 110%;
-    letter-spacing: 1px;
-    margin-top: 10px;
-
-}
-
 
 .main-navigation, .site-footer, .widget-area, .entry-meta p {
     font-size: 95%;
@@ -1144,6 +1175,7 @@ footer#colophon {
     text-align: center;
     padding: 1em;
 }
+
 footer#colophon a{
 	color: #eeeeee;
 }
@@ -1155,6 +1187,7 @@ footer#colophon a{
 	padding: 0;
 	margin-bottom: 10px;
 }
+
 .footer-nav-wrapper ul{
 	list-style: none outside none;
 	width: 100%;
@@ -1163,16 +1196,20 @@ footer#colophon a{
 	margin: 0;
 	padding: 0;
 }
+
 .footer-nav-wrapper ul li{
 	display: inline-block;
 	margin: 0px 4px;
 }
+
 .footer-nav-wrapper ul li a{
 	text-decoration: underline;
 }
+
 .footer-nav-wrapper ul li a:hover{
 	text-decoration: none;
 }
+
 #copyright-wrap{
 	margin-bottom: 10px;
 }

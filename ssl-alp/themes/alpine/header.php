@@ -26,10 +26,20 @@
 	<?php do_action( 'ssl_alp_action_before_header' ); ?>
 
 	<header id="masthead" class="site-header container" role="banner">
-		<div class="site-branding">
-			<?php the_custom_logo(); ?>
-  			<h1 class="site-title text-center"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a></h1>
-			<p class="site-description text-center"><?php bloginfo( 'description' ); ?></p>
+		<div id="site-branding">
+			<?php if ( has_custom_logo() ) : ?>
+			<div id="site-logo">
+				<?php the_custom_logo(); ?>
+			</div>
+			<?php endif; ?>
+			<div id="site-title-group">
+  				<h1 class="site-title text-center">
+					  <a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a>
+				</h1>
+				<p class="site-description text-center">
+					<?php bloginfo( 'description' ); ?>
+				</p>
+			</div>
 		</div>
 
 		<nav id="site-navigation" class="main-navigation" role="navigation">
