@@ -252,7 +252,7 @@ code {
 /* row within container */
 .row {
 	display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr 1fr 350px;
 	grid-gap: 20px;
 	grid-auto-flow: dense; /* back-fill unoccupied cells with items that fit */
 }
