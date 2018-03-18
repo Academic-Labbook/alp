@@ -8,7 +8,16 @@
 ?>
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 	<header class="entry-header">
-		<?php the_title( sprintf( '<h2 class="entry-title"><a href="%s" rel="bookmark" >', esc_url( get_permalink() ) ), '</a></h2>' ); ?>
+		<?php
+		the_title(
+			sprintf(
+				'<h2 class="entry-title"><a href="%2$s" class="%1$s" rel="bookmark" >',
+				( 'status' === get_post_format() ) ? "status-post-title" : "", // add icon class for status updates
+				esc_url( get_permalink() )
+			),
+			'</a></h2>'
+		);
+		?>
 
 		<?php if ( 'post' === get_post_type() ) : ?>
 		<div class="entry-meta">
@@ -17,7 +26,8 @@
 		<?php endif; ?>
 	</header><!-- .entry-header -->
 
-	<?php
+	<?php if ( 'status' === get_post_format() ) : // status update theme type; don't show content ?>
+	<?php else :
 	$content_layout = ssl_alp_get_option( 'content_layout' );
 	?>
 
@@ -37,7 +47,7 @@
 		);
 		?>
 	</div><!-- .entry-content -->
-	<?php endif ?>
+	<?php endif; ?>
 
 	<footer class="entry-footer">
 		<?php if ( 'post' === get_post_type() ) : // Hide category and tag text for pages on Search. ?>
@@ -74,4 +84,5 @@
 
 		<?php edit_post_link( esc_html__( 'Edit', 'ssl-alp' ), '<span class="edit-link pull-right"><i class="fa fa-edit" aria-hidden="true"></i>', '</span>' ); ?>
 	</footer><!-- .entry-footer -->
+	<?php endif; ?>
 </article><!-- #post-## -->

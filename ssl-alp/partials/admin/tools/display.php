@@ -124,15 +124,18 @@
 			<?php endif; ?>
 		</span>
 		<span class="ssl-alp-tools-card">
-			<h2 class="title"><?php _e( 'Rebuild references', 'ssl-alp' ); ?></h2>
-			<p><?php _e( 'This tool will rebuild the references related to each published post and page.', 'ssl-alp' ); ?></p>
+			<h2 class="title"><?php _e( 'Rebuild cross-references', 'ssl-alp' ); ?></h2>
+			<p><?php _e( 'This tool will rebuild the cross-references related to each published post and page. This is useful for extracting cross-references from posts or pages created or edited during any time in which the cross-references feature was disabled, and from posts or pages created before the plugin was installed or activated.', 'ssl-alp' ); ?></p>
 			<form method="post" action="">
 				<input type="hidden" name="ssl_alp_rebuild_references_submitted" value="1"/>
 				<p class="submit">
-					<input name="submit" id="submit" class="button button-primary" value="<?php _e( 'Rebuild References', 'ssl-alp' ); ?>" type="submit"/>
+					<input name="submit" id="submit" class="button button-primary" value="<?php _e( 'Rebuild Cross-References', 'ssl-alp' ); ?>" type="submit"<?php if ( ! $references_enabled ) : ?> disabled<?php endif; ?>/>
 				</p>
 				<?php wp_nonce_field( 'ssl-alp-rebuild-references', 'ssl_alp_rebuild_references_nonce' ); ?>
 			</form>
+			<?php if ( ! $references_enabled ) : ?>
+			<p class="description"><?php _e( 'Cross-references are disabled. To enable them, go to <a href="options-general.php?page=ssl-alp-admin-options">this settings page</a>.', 'ssl-alp' ); ?></p>
+			<?php endif; ?>
 		</span>
 	</div>
 </div>

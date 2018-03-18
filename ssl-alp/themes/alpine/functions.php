@@ -47,23 +47,18 @@ if ( ! function_exists( 'ssl_alp_setup' ) ) :
 		 */
 		add_theme_support( 'customize-selective-refresh-widgets' );
 
-		/*
-		 * Enable support for Post Thumbnails on posts and pages.
-		 */
-		add_theme_support( 'post-thumbnails' );
-
 		register_nav_menus( array(
 			'primary' => __( 'Primary Menu', 'ssl-alp' ),
 			'footer'  => __( 'Footer Menu', 'ssl-alp' ),
 		) );
 
 		/*
-		 * Switch default core markup for search form, comment form, and comments
-		 * to output valid HTML5.
+		 * Switch default HTML5 output.
 		 */
 		add_theme_support( 'html5', array(
-			'comment-form',
 			'comment-list',
+			'comment-form',
+			'search-form',
 			'gallery',
 			'caption',
 		) );
@@ -72,15 +67,7 @@ if ( ! function_exists( 'ssl_alp_setup' ) ) :
 		 * Enable support for Post Formats.
 		 */
 		add_theme_support( 'post-formats', array(
-			'aside',
-			'image',
-			'video',
-			'audio',
-			'quote',
-			'status',
-			'link',
-			'chat',
-			'gallery',
+			'status'
 		) );
 
 		// Setup the WordPress core custom background feature.

@@ -154,7 +154,6 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 
         // post meta stuff
         $loader->add_action( 'init', $this, 'unregister_tags' );
-        $loader->add_action( 'init', $this, 'disable_post_formats' );
         $loader->add_action( 'init', $this, 'disable_post_excerpts' );
         $loader->add_action( 'init', $this, 'disable_post_trackbacks' );
 	}
@@ -168,17 +167,6 @@ class SSL_ALP_Core extends SSL_ALP_Module {
         }
 
         unregister_taxonomy_for_object_type( 'post_tag', 'post' );
-    }
-
-    /**
-     * Disable post formats
-     */
-    public function disable_post_formats() {
-        if ( ! get_option( 'ssl_alp_disable_post_formats' ) ) {
-            return;
-        }
-
-        remove_post_type_support( 'post', 'post-formats' );
     }
 
     /**

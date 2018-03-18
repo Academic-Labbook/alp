@@ -1,3 +1,10 @@
+<p>
+    <label for="ssl_alp_enable_crossreferences_checkbox">
+        <input type="checkbox" name="ssl_alp_enable_crossreferences" id="ssl_alp_enable_crossreferences_checkbox" value="1" <?php checked( get_option( 'ssl_alp_enable_crossreferences' ) ); ?> />
+        <?php _e( 'Enable cross-references', 'ssl-alp' ); ?>
+    </label>
+</p>
+<p class="description"><?php _e( 'When enabled, a box is displayed containing links to posts and pages referenced from the current post or page, or by another post or page.', 'ssl-alp' ); ?></p>
 <p><?php _e( 'Enable shortcodes for:' ); ?></p>
 <p>
     <label for="ssl_alp_doi_shortcode_checkbox">

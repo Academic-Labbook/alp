@@ -32,6 +32,15 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	public function register_settings() {
         register_setting(
 			'ssl-alp-admin-options',
+			'ssl_alp_enable_crossreferences',
+			array(
+				'type'		=>	'boolean',
+				'default'	=>	true
+			)
+		);
+
+        register_setting(
+			'ssl-alp-admin-options',
 			'ssl_alp_doi_shortcode',
 			array(
 				'type'		=>	'boolean',
@@ -58,16 +67,16 @@ class SSL_ALP_References extends SSL_ALP_Module {
          */
 
         add_settings_field(
-			'ssl_alp_journal_reference_settings',
-			__( 'Journal references', 'ssl-alp' ),
-			array( $this, 'journal_reference_settings_callback' ),
+			'ssl_alp_reference_settings',
+			__( 'References', 'ssl-alp' ),
+			array( $this, 'reference_settings_callback' ),
 			'ssl-alp-admin-options',
 			'ssl_alp_post_settings_section'
 		);
     }
 
-    public function journal_reference_settings_callback() {
-		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/journal-reference-settings-display.php';
+    public function reference_settings_callback() {
+		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/reference-settings-display.php';
 	}
 
 	/**
@@ -90,6 +99,11 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	}
 
 	public function create_crossreference_taxonomy() {
+		if ( ! get_option( 'ssl_alp_enable_crossreferences' ) ) {
+			// cross-references are disabled
+			return;
+		}
+
 		// create internal reference taxonomy
 		register_taxonomy(
 			'ssl_alp_crossreference',
@@ -117,7 +131,10 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	 * term database for display under the post
 	 */
 	public function extract_crossreferences( $post_id, $post ) {
-		if ( ! post_type_supports( $post->post_type, 'ssl-alp-crossreferences' ) ) {
+		if ( ! get_option( 'ssl_alp_enable_crossreferences' ) ) {
+			// cross-references are disabled
+			return;
+		} elseif ( ! post_type_supports( $post->post_type, 'ssl-alp-crossreferences' ) ) {
 			// post type not supported
 			return;
 		}
@@ -173,6 +190,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 
     public function add_doi_shortcodes() {
         if ( ! get_option( 'ssl_alp_doi_shortcode' ) ) {
+			// DOI shortcodes disabled
             return;
         }
 
@@ -194,6 +212,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 
 	public function add_arxiv_shortcodes() {
         if ( ! get_option( 'ssl_alp_arxiv_shortcode' ) ) {
+			// arXiv shortcodes disabled
             return;
         }
 
@@ -217,6 +236,11 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	 * Re-scan supported post types to update references
 	 */
 	public function rebuild_references() {
+		if ( ! get_option( 'ssl_alp_enable_crossreferences' ) ) {
+			// cross-references are disabled
+			return;
+		}
+
 		foreach ( $this->supported_reference_post_types as $post_type ) {
 			$posts = get_posts(
 				array( 

@@ -327,16 +327,21 @@ class SSL_ALP {
 		 * Handle rebuild references form
 		 */
 
-		if ( array_key_exists( 'ssl_alp_rebuild_references_submitted', $_POST ) && (bool) $_POST['ssl_alp_rebuild_references_submitted'] ) {
-			// user has submitted the form
+		// check if cross-references are enabled
+		$references_enabled = get_option( 'ssl_alp_enable_crossreferences' );
 
-			// verify the nonce
-			check_admin_referer( 'ssl-alp-rebuild-references', 'ssl_alp_rebuild_references_nonce' );
+		if ( $references_enabled ) {
+			if ( array_key_exists( 'ssl_alp_rebuild_references_submitted', $_POST ) && (bool) $_POST['ssl_alp_rebuild_references_submitted'] ) {
+				// user has submitted the form
 
-			// do action
-			$this->_rebuild_references();
+				// verify the nonce
+				check_admin_referer( 'ssl-alp-rebuild-references', 'ssl_alp_rebuild_references_nonce' );
 
-			$rebuild_references_completed = true;
+				// do action
+				$this->_rebuild_references();
+
+				$rebuild_references_completed = true;
+			}
 		}
 
 		require_once SSL_ALP_BASE_DIR . 'partials/admin/tools/display.php';

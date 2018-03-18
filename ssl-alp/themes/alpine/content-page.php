@@ -13,12 +13,6 @@
 	</header><!-- .entry-header -->
 
 	<div class="entry-content">
- 		<?php if ( has_post_thumbnail() ) : ?>
- 			<div class="post-thumbnail-wrapper">
-				<?php the_post_thumbnail( 'large', array( 'class' => 'aligncenter' ) ); ?>
- 			</div>
- 		<?php endif; ?>
-
 		<?php the_content(); ?>
 		<?php
 			wp_link_pages( array(
