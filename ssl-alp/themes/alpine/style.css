@@ -760,7 +760,7 @@ div#post-references ul li, div#post-revisions ul li {
 }
 
 .entry-header h1, .entry-header h2 {
-	margin: 0.25em 0 0;
+	margin: 0.25em 0 0.25em 0;
 	font-weight: 400;
 	color: #252525;
 	font-size: 175%;
@@ -771,7 +771,6 @@ div#post-references ul li, div#post-revisions ul li {
 	width: 89%;
 	max-width: 89%;
 	clear: none;
-	margin-bottom: 10px;
 }
 
 footer.entry-footer {
@@ -1136,7 +1135,7 @@ body{
 .widget-title {
     color: #353535;
     font-size: 110%;
-    margin-bottom: 1em;
+    margin-bottom: 0.5em;
     font-weight: bold;
     margin-top: 0;
 }
