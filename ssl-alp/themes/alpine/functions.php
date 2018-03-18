@@ -141,32 +141,32 @@ add_action( 'wp_enqueue_scripts', 'ssl_alp_scripts' );
 /**
  * Include helper.
  */
-require get_template_directory() . '/inc/helper.php';
+require get_template_directory() . '/includes/helper.php';
 
 /**
  * Custom template tags for this theme.
  */
-require get_template_directory() . '/inc/template-tags.php';
+require get_template_directory() . '/includes/template-tags.php';
 
 /**
  * Custom theme functions.
  */
-require get_template_directory() . '/inc/theme-functions.php';
+require get_template_directory() . '/includes/theme-functions.php';
 
 /**
  * Custom theme custom.
  */
-require get_template_directory() . '/inc/theme-custom.php';
+require get_template_directory() . '/includes/theme-custom.php';
 
 /**
  * Custom functions that act independently of the theme templates.
  */
-require get_template_directory() . '/inc/extras.php';
+require get_template_directory() . '/includes/extras.php';
 
 /**
  * Customizer additions.
  */
-require get_template_directory() . '/inc/customizer.php';
+require get_template_directory() . '/includes/customizer.php';
 
 /**
  * Admin functions (for is_plugin_active)
