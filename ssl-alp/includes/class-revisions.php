@@ -399,4 +399,116 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		return $hidden;
 	}
+
+	/**
+	 * Get revisions, optionally grouping by object
+	 */
+	public function get_revisions( $number, $group ) {
+		// get last $number revisions (don't need parents) grouped by parent id, ordered by date descending
+	}
+}
+
+class SSL_ALP_Revisions_Widget extends WP_Widget {
+	const DEFAULT_NUMBER = 10;
+	const DEFAULT_GROUP = true;
+
+	public function __construct() {
+		parent::__construct(
+			'ssl_alp_revisions_widget', // base ID
+			esc_html__( 'Revisions', 'ssl-alp' ), // name
+			array(
+				'description' => __( "Recent revisions to posts and pages", 'ssl-alp' )
+			)
+		);
+	}
+
+	/**
+	 * Outputs the content of the widget
+	 *
+	 * @param array $args
+	 * @param array $instance
+	 */
+	public function widget( $args, $instance ) {
+		echo $args['before_widget'];
+
+		if ( ! empty( $instance['title'] ) ) {
+			echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title'];
+		}
+
+		// number of revisions to display
+		$number = ( ! empty( $instance['number'] ) ) ? absint( $instance['number'] ) : self::DEFAULT_NUMBER;
+		
+		if ( ! $number ) {
+			$number = self::DEFAULT_NUMBER;
+		}
+
+		// group by default
+		$group = ! empty( $instance['group'] ) ? ( $instance['group'] ) : self::DEFAULT_GROUP;
+
+		// print revisions
+		$this->the_revisions( $number, $group );
+
+		echo $args['after_widget'];
+	}
+
+	/**
+	 * Outputs the options form on admin
+	 *
+	 * @param array $instance The widget options
+	 */
+	public function form( $instance ) {
+		$title = ! empty( $instance['title'] ) ? $instance['title'] : esc_html__( 'Recent Revisions', 'ssl-alp' );
+		$number = isset( $instance['number'] ) ? absint( $instance['number'] ) : self::DEFAULT_NUMBER;
+		$group = isset( $instance['group'] ) ? (bool) $instance['group'] : self::DEFAULT_GROUP;
+
+		?>
+		<p>
+			<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_attr_e( 'Title:' ); ?></label>
+			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>">
+		</p>
+		<p>
+			<label for="<?php echo $this->get_field_id( 'number' ); ?>"><?php _e( 'Number of revisions to show:', 'ssl-alp' ); ?></label>
+			<input class="tiny-text" id="<?php echo $this->get_field_id( 'number' ); ?>" name="<?php echo $this->get_field_name( 'number' ); ?>" type="number" step="1" min="1" value="<?php echo $number; ?>" size="3" />
+		</p>
+		<p>
+			<input type="checkbox" class="checkbox" id="<?php echo esc_attr( $this->get_field_id( 'group' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'group' ) ); ?>"<?php checked( $group ); ?>>
+			<label for="<?php echo esc_attr( $this->get_field_id( 'group' ) ); ?>"><?php _e( 'Group by post', 'ssl-alp' ); ?></label>
+		</p>
+		<?php
+	}
+
+	/**
+	 * Processing widget options on save
+	 *
+	 * @param array $new_instance The new options
+	 * @param array $old_instance The previous options
+	 *
+	 * @return array
+	 */
+	public function update( $new_instance, $old_instance ) {
+		$instance = array();
+
+		$instance['title'] = ! empty( $new_instance['title'] ) ? strip_tags( $new_instance['title'] ) : '';
+		$instance['number'] = absint( $new_instance['number'] );
+		$instance['group'] = ! empty( $new_instance['group'] ) ? true : false;
+
+		return $instance;
+	}
+
+	/**
+	 * Print the revision list
+	 */
+	private function the_revisions( $number, $group ) {
+		$revisions = $this->get_revisions( $number, $group );
+	}
+
+	/**
+	 * Get revisions
+	 */
+	private function get_revisions( $number, $group ) {
+		global $ssl_alp;
+
+		// pass through to main revisions class
+		return $ssl_alp->revisions->get_revisions( $number, $group );
+	}
 }

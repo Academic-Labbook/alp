@@ -40,7 +40,15 @@ if ( ! function_exists( 'ssl_alp_setup' ) ) :
 		/*
 		 * Enable support for custom logo.
 		 */
-		add_theme_support( 'custom-logo' );
+		add_theme_support(
+			'custom-logo',
+			array(
+				'height'		=>	150,
+				'width'			=>	600,
+				'flex-width'	=>	true,
+				'flex-height'	=>	true
+			)
+		);
 
 		/*
 		 * Enable support for partial refresh in Customizer widgets.
