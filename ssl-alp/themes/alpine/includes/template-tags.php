@@ -413,6 +413,8 @@ if ( ! function_exists( 'ssl_alpine_the_referenced_post_list_item' ) ) {
 	 * Prints HTML link to the specified reference post
 	 */
 	function ssl_alpine_the_referenced_post_list_item( $referenced_post = null, $url = true ) {
+		global $ssl_alp;
+
 		$referenced_post = get_post( $referenced_post );
 
 		if ( is_null( $referenced_post ) ) {
@@ -429,7 +431,15 @@ if ( ! function_exists( 'ssl_alpine_the_referenced_post_list_item' ) ) {
 			$post_title = sprintf( '<a href="%1$s">%2$s</a>', get_permalink( $referenced_post ), $post_title );
 		}
 
-		printf( '<li>%1$s</li>', $post_title );
+		// post date
+		// only used if post type supports it
+		if ( $ssl_alp->references->show_date( $referenced_post ) ) {
+			$post_date = sprintf( ' <span class="post-date">%1$s</span>', get_the_date( get_option( 'date_format' ), $referenced_post ) );
+		} else {
+			$post_date = '';
+		}
+
+		printf( '<li>%1$s%2$s</li>', $post_title, $post_date );
 	}
 }
 

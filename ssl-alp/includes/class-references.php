@@ -5,11 +5,12 @@
  */
 class SSL_ALP_References extends SSL_ALP_Module {
 	/**
-	 * Supported post types for reference extraction/display
+	 * Supported post types for reference extraction/display, and whether to display their date
+	 * on the revisions list
 	 */
 	protected $supported_reference_post_types = array(
-		'post',
-		'page'
+		'post'	=>	true,
+		'page'	=>	false
 	);
 
 	/**
@@ -107,7 +108,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		// create internal reference taxonomy
 		register_taxonomy(
 			'ssl_alp_crossreference',
-			$this->supported_reference_post_types,
+			array_keys( $this->supported_reference_post_types ),
 			array(
 				'hierarchical'	=> false,
 				'rewrite' 		=> false,
@@ -121,7 +122,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		);
 
 		// add post type support
-		foreach ( $this->supported_reference_post_types as $post_type ) {
+		foreach ( array_keys( $this->supported_reference_post_types ) as $post_type ) {
 			add_post_type_support( $post_type, 'ssl-alp-crossreferences' );
 		}
 	}
@@ -163,6 +164,9 @@ class SSL_ALP_References extends SSL_ALP_Module {
 			if ( is_null( $referenced_post ) ) {
 				// invalid post - skip
 				continue;
+			} elseif ( ! $this->is_supported( $referenced_post ) ) {
+				// not supported for referencing
+				continue;
 			}
 
 			/*
@@ -186,6 +190,30 @@ class SSL_ALP_References extends SSL_ALP_Module {
 			// add term metadata
 			update_term_meta( $term->term_id, "reference-to-post-id", $post_id );
 		}
+	}
+
+	/**
+	 * Check if specified post is supported with references
+	 */
+	public function is_supported( $post ) {
+		$post = get_post( $post );
+
+		return array_key_exists( $post->post_type, $this->supported_reference_post_types );
+	}
+
+	/**
+	 * Check whether the specified post should have its publication date shown in cross-references
+	 */
+	public function show_date( $post ) {
+		$post = get_post( $post );
+
+		if ( ! $this->is_supported( $post ) ) {
+			// post type is not supported
+			return null;
+		}
+
+		// values of supported_reference_post_types specifies whether to show date
+		return (bool) $this->supported_reference_post_types[$post->post_type];
 	}
 
     public function add_doi_shortcodes() {
@@ -241,7 +269,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 			return;
 		}
 
-		foreach ( $this->supported_reference_post_types as $post_type ) {
+		foreach ( array_keys( $this->supported_reference_post_types ) as $post_type ) {
 			$posts = get_posts(
 				array( 
 					'post_type' 		=> $post_type,
