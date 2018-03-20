@@ -181,11 +181,6 @@ class SSL_ALP_Wiki extends SSL_ALP_Module {
 					}
 
 					$head = &$head->last_child;
-
-					// create child for new parent
-					//$child = $template;
-					//$child['parent'] = &$parent;
-					//$parent['children'][] = $child;
 				}
 			}
 

@@ -103,6 +103,9 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
         // show revisions screen in editor by default
 		$loader->add_filter( 'default_hidden_meta_boxes', $this, 'unhide_revisions_meta_box', 10, 2 );
+
+		// register revisions widget
+		$loader->add_action( 'widgets_init', $this, 'register_revisions_widget' );
 	}
 
     /**
@@ -401,10 +404,47 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	}
 
 	/**
+	 * Register revisions widget
+	 */
+	public function register_revisions_widget() {
+		register_widget( 'SSL_ALP_Revisions_Widget' );
+	}
+
+	/**
 	 * Get revisions, optionally grouping by object
 	 */
-	public function get_revisions( $number, $group ) {
+	public function get_recent_revisions( $number, $order = 'DESC' ) {
+		global $wpdb;
+
+		$order = ( strtoupper( $order ) == 'ASC' ) ? 'ASC' : 'DESC';
+		$number = absint( $number );
+
+		// get post types that support edit summaries, and filter for SQL
+		$supported_post_types = get_post_types_by_support( 'ssl-alp-edit-summaries' );
+		$supported_post_types = array_map( 'esc_sql', $supported_post_types );
+		$supported_types_clause = '"' . implode( '", "', $supported_post_types ) . '"';
+
 		// get last $number revisions (don't need parents) grouped by parent id, ordered by date descending
+		$object_ids = $wpdb->get_results(
+			$wpdb->prepare(
+				"
+				SELECT ANY_VALUE(posts.post_title) AS post_title, posts.post_author, MAX(posts.post_date) AS post_date, COUNT(1) - 1 AS repeats
+				FROM {$wpdb->posts} AS posts
+				WHERE
+					post_type = %s
+					AND post_status = %s
+                    AND (SELECT post_type FROM wp_posts WHERE ID = posts.post_parent) IN ({$supported_types_clause})
+                GROUP BY posts.post_author, posts.post_parent
+				ORDER BY post_date {$order}
+				LIMIT %d
+				",
+				"revision",
+				"inherit",
+				$number
+			)
+		);
+
+		return $object_ids;
 	}
 }
 
@@ -415,9 +455,9 @@ class SSL_ALP_Revisions_Widget extends WP_Widget {
 	public function __construct() {
 		parent::__construct(
 			'ssl_alp_revisions_widget', // base ID
-			esc_html__( 'Revisions', 'ssl-alp' ), // name
+			esc_html__( 'Recent Revisions', 'ssl-alp' ), // name
 			array(
-				'description' => __( "Recent revisions to posts and pages", 'ssl-alp' )
+				'description' => __( "Your site's most recent revisions", 'ssl-alp' )
 			)
 		);
 	}
@@ -442,11 +482,8 @@ class SSL_ALP_Revisions_Widget extends WP_Widget {
 			$number = self::DEFAULT_NUMBER;
 		}
 
-		// group by default
-		$group = ! empty( $instance['group'] ) ? ( $instance['group'] ) : self::DEFAULT_GROUP;
-
 		// print revisions
-		$this->the_revisions( $number, $group );
+		$this->the_revisions( $number );
 
 		echo $args['after_widget'];
 	}
@@ -459,7 +496,6 @@ class SSL_ALP_Revisions_Widget extends WP_Widget {
 	public function form( $instance ) {
 		$title = ! empty( $instance['title'] ) ? $instance['title'] : esc_html__( 'Recent Revisions', 'ssl-alp' );
 		$number = isset( $instance['number'] ) ? absint( $instance['number'] ) : self::DEFAULT_NUMBER;
-		$group = isset( $instance['group'] ) ? (bool) $instance['group'] : self::DEFAULT_GROUP;
 
 		?>
 		<p>
@@ -469,10 +505,6 @@ class SSL_ALP_Revisions_Widget extends WP_Widget {
 		<p>
 			<label for="<?php echo $this->get_field_id( 'number' ); ?>"><?php _e( 'Number of revisions to show:', 'ssl-alp' ); ?></label>
 			<input class="tiny-text" id="<?php echo $this->get_field_id( 'number' ); ?>" name="<?php echo $this->get_field_name( 'number' ); ?>" type="number" step="1" min="1" value="<?php echo $number; ?>" size="3" />
-		</p>
-		<p>
-			<input type="checkbox" class="checkbox" id="<?php echo esc_attr( $this->get_field_id( 'group' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'group' ) ); ?>"<?php checked( $group ); ?>>
-			<label for="<?php echo esc_attr( $this->get_field_id( 'group' ) ); ?>"><?php _e( 'Group by post', 'ssl-alp' ); ?></label>
 		</p>
 		<?php
 	}
@@ -490,7 +522,6 @@ class SSL_ALP_Revisions_Widget extends WP_Widget {
 
 		$instance['title'] = ! empty( $new_instance['title'] ) ? strip_tags( $new_instance['title'] ) : '';
 		$instance['number'] = absint( $new_instance['number'] );
-		$instance['group'] = ! empty( $new_instance['group'] ) ? true : false;
 
 		return $instance;
 	}
@@ -498,17 +529,46 @@ class SSL_ALP_Revisions_Widget extends WP_Widget {
 	/**
 	 * Print the revision list
 	 */
-	private function the_revisions( $number, $group ) {
-		$revisions = $this->get_revisions( $number, $group );
+	private function the_revisions( $number ) {
+		$revisions = $this->get_revisions( $number );
+
+		if ( ! count( $revisions ) ) {
+			echo '<p>There are no revisions yet.</p>';
+		} else {
+			echo '<ul id="" class="list-unstyled">';
+
+			foreach ( $revisions as $revision ) {
+				// check if there are extra revisions from this author for this post
+				if ( $revision->repeats > 0 ) {
+					$extra_revisions = sprintf( " (+%d)", $revision->repeats );
+				} else {
+					$extra_revisions = "";
+				}
+
+				$author = get_the_author_meta( 'display_name', $revision->post_author );
+				$post_title = esc_html( $revision->post_title );
+				$post_date = human_time_diff( strtotime( $revision->post_date ) );
+
+				printf(
+					'<li class="recent-revision">%s on %s%s</li>',
+					$author,
+					$post_title,
+					$extra_revisions,
+					$post_date
+				);
+			}
+
+			echo '</ul>';
+		}
 	}
 
 	/**
 	 * Get revisions
 	 */
-	private function get_revisions( $number, $group ) {
+	private function get_revisions( $number ) {
 		global $ssl_alp;
 
 		// pass through to main revisions class
-		return $ssl_alp->revisions->get_revisions( $number, $group );
+		return $ssl_alp->revisions->get_recent_revisions( $number );
 	}
 }
