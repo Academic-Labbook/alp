@@ -10,17 +10,7 @@ if ( ! function_exists( 'ssl_alpine_get_the_post_date_html' ) ) :
 	 * Format a post date
 	 */
 	function ssl_alpine_get_the_post_date_html( $post = null, $modified = false, $time = true, $icon = true, $url = true ) {
-		$datetime_fmt = get_option( 'date_format' );
-
-		if ( $time ) {
-			// combined date and time formats
-			$datetime_fmt = sprintf(
-				/* translators: 1: date, 2: time; note that "\a\t" escapes "at" in PHP's date() function */
-				__( '%1$s \a\t %2$s', 'ssl-alp' ),
-				$datetime_fmt,
-				get_option( 'time_format' )
-			);
-		}
+		$datetime_fmt = ssl_alpine_get_date_format( $time );
 
 		// ISO 8601 formatted date
 		$date_iso = $modified ? get_the_modified_date( 'c', $post ) : get_the_date( 'c', $post );
@@ -57,6 +47,27 @@ if ( ! function_exists( 'ssl_alpine_get_the_post_date_html' ) ) :
 		}
 
 		return $time_str;
+	}
+endif;
+
+if ( ! function_exists( 'ssl_alpine_get_date_format' ) ):
+	/**
+	 * Get date and optionall time format strings to pass to get_the_date or get_the_modified_date
+	 */
+	function ssl_alpine_get_date_format( $time = true ) {
+		$datetime_fmt = get_option( 'date_format' );
+
+		if ( $time ) {
+			// combined date and time formats
+			$datetime_fmt = sprintf(
+				/* translators: 1: date, 2: time; note that "\a\t" escapes "at" in PHP's date() function */
+				__( '%1$s \a\t %2$s', 'ssl-alp' ),
+				$datetime_fmt,
+				get_option( 'time_format' )
+			);
+		}
+
+		return $datetime_fmt;
 	}
 endif;
 
@@ -288,15 +299,19 @@ if ( ! function_exists( 'ssl_alpine_get_revision_description' ) ) :
 			}
 		}
 
-		$revision_time = ssl_alpine_get_the_post_date_html( $revision, false, true, false, false );
+		$revision_time = sprintf(
+			/* translators: 1: revision date, 2: time ago */
+			__( '<span title="%1$s">%2$s ago</span>', 'ssl-alp' ),
+			get_the_modified_date( ssl_alpine_get_date_format( true ), $revision ),
+			human_time_diff( strtotime( $revision->post_modified ), current_time( 'timestamp' ) )
+		);
+
 		$author_display_name = get_the_author_meta( 'display_name', $revision->post_author );
 
 		$description = sprintf(
-			/* translators: post revision title: 1: author avatar, 2: author name, 3: time ago, 4: date, 5: edit message */
-			__( '%1$s %2$s, %3$s ago (%4$s)%5$s', 'ssl-alp' ),
+			'%1$s %2$s, %3$s, %4$s',
 			get_avatar( $revision->post_author, 18, null, $author_display_name ),
 			$author_display_name,
-			human_time_diff( strtotime( $revision->post_modified ), current_time( 'timestamp' ) ),
 			$revision_time,
 			$message
 		);
@@ -436,7 +451,10 @@ if ( ! function_exists( 'ssl_alpine_the_referenced_post_list_item' ) ) {
 		// post date
 		// only used if post type supports it
 		if ( $ssl_alp->references->show_date( $referenced_post ) ) {
-			$post_date = sprintf( ' <span class="post-date">%1$s</span>', get_the_date( get_option( 'date_format' ), $referenced_post ) );
+			$post_date = sprintf(
+				' <span class="post-date">%1$s</span>',
+				get_the_date( get_option( 'date_format' ), $referenced_post )
+			);
 		} else {
 			$post_date = '';
 		}

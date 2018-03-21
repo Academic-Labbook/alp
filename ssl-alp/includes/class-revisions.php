@@ -533,12 +533,17 @@ class SSL_ALP_Revisions_Widget extends WP_Widget {
 		if ( ! count( $revisions ) ) {
 			echo '<p>There are no revisions yet.</p>';
 		} else {
-			echo '<ul id="" class="list-unstyled">';
+			echo '<ul id="recent-revisions-list" class="list-unstyled">';
 
 			foreach ( $revisions as $revision ) {
 				// check if there are extra revisions from this author for this post
 				if ( $revision->repeats > 0 ) {
-					$extra_revisions = sprintf( " (+%d)", $revision->repeats );
+					$extra_revisions = sprintf(
+						' (<span title="%s">+%d</span>)',
+						/* translators: 1: number of additional revisions made by this author */
+						sprintf( __( '%1$s additional edits', 'ssl-alp' ), $revision->repeats ),
+						$revision->repeats
+					);
 				} else {
 					$extra_revisions = "";
 				}
