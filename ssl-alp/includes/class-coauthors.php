@@ -1287,6 +1287,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 }
 
+if ( ! function_exists( 'get_coauthors' ) ) :
 function get_coauthors( $post_id = 0 ) {
 	global $post, $post_ID, $wpdb;
 
@@ -1331,6 +1332,7 @@ function get_coauthors( $post_id = 0 ) {
 
 	return $coauthors;
 }
+endif;
 
 if ( ! function_exists( 'wp_notify_postauthor' ) ) :
 	/**
@@ -1443,4 +1445,46 @@ if ( ! function_exists( 'wp_notify_postauthor' ) ) :
 
 		return true;
 	}
+endif;
+
+if ( ! function_exists( 'is_coauthor_for_post' ) ) :
+/**
+ * Checks to see if the the specified user is author of the current global post or post (if specified)
+ * @param object|int $user
+ * @param int $post_id
+ */
+function is_coauthor_for_post( $user, $post_id = 0 ) {
+	global $post;
+
+	if ( ! $post_id && $post ) {
+		$post_id = $post->ID;
+	}
+
+	if ( ! $post_id ) {
+		return false;
+	}
+
+	if ( ! $user ) {
+		return false;
+	}
+
+	$coauthors = get_coauthors( $post_id );
+
+	if ( is_numeric( $user ) ) {
+		$user = get_userdata( $user );
+		$user = $user->user_login;
+	} else if ( isset( $user->user_login ) ) {
+		$user = $user->user_login;
+	} else {
+		return false;
+	}
+
+	foreach ( $coauthors as $coauthor ) {
+		if ( $user == $coauthor->user_login || $user == $coauthor->linked_account ) {
+			return true;
+		}
+	}
+
+	return false;
+}
 endif;
