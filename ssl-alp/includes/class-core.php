@@ -150,12 +150,22 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 		$loader->add_action( 'admin_enqueue_scripts', $this, 'enqueue_admin_scripts' );
 
         // private site
-        $loader->add_action( 'get_header', $this, 'check_logged_in');
+		$loader->add_action( 'get_header', $this, 'check_logged_in');
+		
+		// remove WordPress link in meta widget
+		$loader->add_filter( 'widget_meta_poweredby', $this, 'filter_powered_by' );
 
         // post meta stuff
         $loader->add_action( 'init', $this, 'unregister_tags' );
         $loader->add_action( 'init', $this, 'disable_post_excerpts' );
         $loader->add_action( 'init', $this, 'disable_post_trackbacks' );
+	}
+
+	/**
+	 * Remove WordPress URL from meta widget
+	 */
+	public function filter_powered_by( $list_item ) {
+		return '';
 	}
 
     /**

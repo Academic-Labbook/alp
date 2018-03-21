@@ -343,8 +343,6 @@ if ( ! function_exists( 'ssl_alpine_get_revision_abbreviation' ) ) :
 			$revision->ID
 		);
 
-		error_log($revision->ID);
-
 		// add URL to diff if user can view
 		if ( $url ) {
 			if ( current_user_can( 'edit_post', $revision->ID ) ) {
