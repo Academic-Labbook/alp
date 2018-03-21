@@ -133,9 +133,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			// this is a revision of another post type
 			// check the parent post
 			return $this->edit_summary_allowed( get_post( $post->post_parent ) );
-		}
-
-		if ( ! post_type_supports( $post->post_type, 'ssl-alp-edit-summaries' ) ) {
+		} elseif  ( ! post_type_supports( $post->post_type, 'ssl-alp-edit-summaries' ) ) {
 			// unsupported post type
 			return false;
 		}
@@ -428,7 +426,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		$object_ids = $wpdb->get_results(
 			$wpdb->prepare(
 				"
-				SELECT ANY_VALUE(posts.post_title) AS post_title, posts.post_author, MAX(posts.post_date) AS post_date, COUNT(1) - 1 AS repeats
+				SELECT posts.post_author, posts.post_parent, MAX(posts.post_date) AS post_date, COUNT(1) - 1 AS repeats
 				FROM {$wpdb->posts} AS posts
 				WHERE
 					post_type = %s
@@ -545,9 +543,26 @@ class SSL_ALP_Revisions_Widget extends WP_Widget {
 					$extra_revisions = "";
 				}
 
+				// get the revision's parent
+				$parent = get_post ( $revision->post_parent );
+
+				// revision author
 				$author = get_the_author_meta( 'display_name', $revision->post_author );
-				$post_title = esc_html( $revision->post_title );
-				$post_date = human_time_diff( strtotime( $revision->post_date ) );
+
+				// human revision date
+				$post_date = sprintf(
+					/* translators: 1: time ago */
+					__( '%s ago', 'ssl-alp' ),
+					human_time_diff( strtotime( $revision->post_date ) )
+				);
+
+				// title with URL, with human date on hover
+				$post_title = sprintf(
+					'<a href="%1$s" title="%2$s">%3$s</a>',
+					get_permalink( $parent->ID ),
+					$post_date,
+					esc_html( $parent->post_title )
+				);
 
 				printf(
 					'<li class="recent-revision">%s on %s%s</li>',
