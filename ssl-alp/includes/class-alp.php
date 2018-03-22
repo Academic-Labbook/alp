@@ -23,6 +23,7 @@ class SSL_ALP {
 		'comment_whitelist'		=>	null, // comment author must have a previously approved comment
 		'comment_max_links'		=>	0, // hold comment in queue if it contains more than x links
 		'blog_public'			=>	0, // disencourage search engine indexing
+		'rss_use_excerpt'		=>	0, // show full text in RSS feeds
 	);
 
 	/**

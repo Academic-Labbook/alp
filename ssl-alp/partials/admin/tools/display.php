@@ -80,6 +80,13 @@
 						</th>
 						<td><?php _e( 'Yes' ); ?></td>
 					</tr>
+					<tr>
+						<th>
+							<strong><?php _e( 'For each article in a feed, show full text', 'ssl-alp' ); ?></strong>
+							<p class="description"><?php _e( 'This allows your users to read full article texts via syndication feed aggregator clients and services.', 'ssl-alp' ); ?></p>
+						</th>
+						<td><?php _e( 'Yes' ); ?></td>
+					</tr>
 				</tbody>
 			</table>
 			<form method="post" action="">
