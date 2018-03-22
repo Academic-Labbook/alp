@@ -296,6 +296,10 @@ class SSL_ALP_Menu_Level {
 	public function get_child_menus() {
 		return $this->child_menus;
 	}
+
+	public function is_empty() {
+		return empty( $this->child_menus ) && is_null( $this->menu_data );
+	}
 }
 
 class SSL_ALP_Page_Contents extends WP_Widget {
@@ -321,7 +325,7 @@ class SSL_ALP_Page_Contents extends WP_Widget {
 	 * @param array $instance
 	 */
 	public function widget( $args, $instance ) {
-		if ( ! $this->has_contents() ) {
+		if ( ! $this->page_has_contents() ) {
 			return;
 		}
 
@@ -383,10 +387,16 @@ class SSL_ALP_Page_Contents extends WP_Widget {
 	/**
 	 * Checks if the widget is being displayed on a page with contents
 	 */
-	protected function has_contents() {
+	protected function page_has_contents() {
 		global $ssl_alp_page_toc;
 
-		return ( ! empty( $ssl_alp_page_toc ) );
+		if ( ! is_object( $ssl_alp_page_toc ) || ! ( $ssl_alp_page_toc instanceof SSL_ALP_Menu_Level ) ) {
+			return false;
+		} elseif ( $ssl_alp_page_toc->is_empty() ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	protected function the_contents( $max_levels ) {
