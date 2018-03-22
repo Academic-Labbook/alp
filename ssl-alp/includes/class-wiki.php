@@ -299,6 +299,11 @@ class SSL_ALP_Menu_Level {
 }
 
 class SSL_ALP_Page_Contents extends WP_Widget {
+	/**
+	 * Default maximum number of levels to show in contents
+	 */
+	const DEFAULT_MAX_LEVELS = 4;
+
 	public function __construct() {
 		parent::__construct(
 			'ssl_alp_page_contents_widget', // base ID
@@ -326,8 +331,14 @@ class SSL_ALP_Page_Contents extends WP_Widget {
 			echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title'];
 		}
 
+		$max_levels = ( ! empty( $instance['max_levels'] ) ) ? absint( $instance['max_levels'] ) : self::DEFAULT_MAX_LEVELS;
+		
+		if ( ! $max_levels ) {
+			$max_levels = self::DEFAULT_MAX_LEVELS;
+		}
+
 		// output the contents
-		$this->the_contents();
+		$this->the_contents( $max_levels );
 
 		echo $args['after_widget'];
 	}
@@ -339,14 +350,16 @@ class SSL_ALP_Page_Contents extends WP_Widget {
 	 */
 	public function form( $instance ) {
 		$title = ! empty( $instance['title'] ) ? $instance['title'] : esc_html__( 'Contents', 'ssl-alp' );
-
-		// TODO: add option for number of levels of contents to display
+		$max_levels = isset( $instance['max_levels'] ) ? absint( $instance['max_levels'] ) : self::DEFAULT_MAX_LEVELS;
 
 		?>
 		<p>
 			<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_attr_e( 'Title:' ); ?></label>
 			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>">
 		</p>
+
+		<p><label for="<?php echo $this->get_field_id( 'max_levels' ); ?>"><?php _e( 'Maximum number of levels to show:', 'ssl-alp' ); ?></label>
+		<input class="tiny-text" id="<?php echo $this->get_field_id( 'max_levels' ); ?>" name="<?php echo $this->get_field_name( 'max_levels' ); ?>" type="number" step="1" min="1" max="6" value="<?php echo $max_levels; ?>" size="3" /></p>
 		<?php
 	}
 
@@ -362,6 +375,7 @@ class SSL_ALP_Page_Contents extends WP_Widget {
 		$instance = array();
 
 		$instance['title'] = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
+		$instance['max_levels'] = absint( $new_instance['max_levels'] );
 
 		return $instance;
 	}
@@ -375,14 +389,19 @@ class SSL_ALP_Page_Contents extends WP_Widget {
 		return ( ! empty( $ssl_alp_page_toc ) );
 	}
 
-	protected function the_contents() {
+	protected function the_contents( $max_levels ) {
 		global $ssl_alp_page_toc;
 
 		// call recursive menu printer
-		$this->_content_list( $ssl_alp_page_toc );
+		$this->_content_list( $ssl_alp_page_toc, $max_levels );
 	}
 
-	protected function _content_list( $contents ) {
+	protected function _content_list( $contents, $max_levels ) {
+		if ( $max_levels < 0 ) {
+			// beyond the maximum level setting
+			return;
+		}
+
 		if ( ! $contents->is_root ) {
 			$menu_data = $contents->get_menu_data();
 
@@ -404,7 +423,8 @@ class SSL_ALP_Page_Contents extends WP_Widget {
 		foreach ( $children as $child ) {
 			echo '<ul>';
 
-			$this->_content_list( $child );
+			// show sublevel
+			$this->_content_list( $child, $max_levels - 1 );
 
 			echo '</ul>';
 		}
