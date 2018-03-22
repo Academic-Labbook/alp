@@ -1,0 +1,4 @@
+#backtoblog {
+    /* hide "Back to [Blog]" link on private sites */
+    display: none;
+}

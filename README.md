@@ -65,7 +65,9 @@ Some feature ideas not considered critical, but nice to have:
 In general, you should use the latest version of WordPress as that's the one
 that will be supported. With auto-updates to WordPress Core, this is easy.
 
-The plugin has only been tested on PHP7. You must have the [DOM extension](http://www.php.net/manual/en/book.dom.php) installed.
+The plugin has only been tested on PHP7. You must have the [DOM extension](http://www.php.net/manual/en/book.dom.php) installed. You also cannot use
+PHP via CGI if you wish to make the site private but still have syndication
+feeds available to the user.
 
 Your users should use up-to-date browsers. The theme bundled with ALP (Alpine)
 uses CSS Grid, which is only available in recent versions of the most popular
@@ -109,6 +111,14 @@ Link: [MathJax-LaTeX](https://wordpress.org/plugins/mathjax-latex/)
 
 Most of the functional code was adapted for ALP, but the options were reduced to just SVG
 rendered MathJax for simplicity.
+
+### Authenticator
+Authors: Inpsyde GmbH
+Link: [Authenticator](https://wordpress.org/plugins/authenticator/)
+
+The core authentication code, and the feed HTTP authenticator, have been adapted. The special
+settings page, private feed keys, cookie lifetime and XML-RPC and REST settings have been
+removed.
 
 ### Simple Life
 Author: Nilambar Sharma  

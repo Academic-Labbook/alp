@@ -117,6 +117,14 @@ class SSL_ALP {
 		$this->core = new SSL_ALP_Core( $this );
 
 		/**
+		 * authentication
+		 */
+
+		require_once SSL_ALP_BASE_DIR . 'includes/class-authenticate.php';
+
+		$this->auth = new SSL_ALP_Authenticate( $this );
+
+		/**
 		 * Wiki functionality
 		 */
 
@@ -175,6 +183,7 @@ class SSL_ALP {
 
 		// register module hooks
 		$this->core->register_hooks();
+		$this->auth->register_hooks();
 		$this->wiki->register_hooks();
 		$this->coauthors->register_hooks();
 		$this->revisions->register_hooks();
@@ -199,6 +208,7 @@ class SSL_ALP {
 	public function register_settings() {
 		// call modules to create their settings
 		$this->core->register_settings();
+		$this->auth->register_settings();
 		$this->wiki->register_settings();
 		$this->coauthors->register_hooks();
 		$this->revisions->register_settings();
@@ -490,6 +500,7 @@ class SSL_ALP {
 
 		// call modules to create their settings fields
 		$this->core->register_settings_fields();
+		$this->auth->register_settings_fields();
 		$this->wiki->register_settings_fields();
 		$this->coauthors->register_hooks();
 		$this->revisions->register_settings_fields();

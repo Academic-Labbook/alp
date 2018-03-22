@@ -31,15 +31,6 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 	 */
 	public function register_settings() {
         register_setting(
-           'ssl-alp-admin-options',
-           'ssl_alp_require_login',
-           array(
-               'type'		=>	'boolean',
-               'default'	=>	true
-           )
-       );
-
-        register_setting(
 			'ssl-alp-admin-options',
 			'ssl_alp_disable_post_tags',
 			array(
@@ -148,9 +139,6 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 		$loader->add_action( 'wp_enqueue_scripts', $this, 'enqueue_scripts' );
 		$loader->add_action( 'admin_enqueue_scripts', $this, 'enqueue_admin_styles' );
 		$loader->add_action( 'admin_enqueue_scripts', $this, 'enqueue_admin_scripts' );
-
-        // private site
-		$loader->add_action( 'get_header', $this, 'check_logged_in');
 		
 		// remove WordPress link in meta widget
 		$loader->add_filter( 'widget_meta_poweredby', $this, 'filter_powered_by' );
@@ -199,19 +187,6 @@ class SSL_ALP_Core extends SSL_ALP_Module {
         }
 
         remove_post_type_support( 'post', 'trackbacks' );
-    }
-
-    /**
-     * Check user is logged in
-     */
-    public function check_logged_in() {
-        if ( ! get_option( 'ssl_alp_require_login', true ) ) {
-            return;
-        }
-
-        if ( ! is_user_logged_in() ) {
-            auth_redirect();
-        }
     }
 
 	/**
