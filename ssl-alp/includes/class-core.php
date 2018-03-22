@@ -143,6 +143,9 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 		// remove WordPress link in meta widget
 		$loader->add_filter( 'widget_meta_poweredby', $this, 'filter_powered_by' );
 
+		// hide WordPress news and events
+		$loader->add_filter( 'wp_dashboard_setup', $this, 'remove_wp_dashboard_metaboxes' );
+
         // post meta stuff
         $loader->add_action( 'init', $this, 'unregister_tags' );
         $loader->add_action( 'init', $this, 'disable_post_excerpts' );
@@ -154,6 +157,11 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 	 */
 	public function filter_powered_by( $list_item ) {
 		return '';
+	}
+
+	public function remove_wp_dashboard_metaboxes() {
+		remove_meta_box( 'dashboard_primary', 'dashboard', 'side' );
+		remove_meta_box( 'dashboard_secondary', 'dashboard', 'side' );
 	}
 
     /**

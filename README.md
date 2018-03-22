@@ -23,6 +23,7 @@ implemented so far...
    - Displays multiple authors
    - Displays revision history
    - Shows reference widget under posts/pages showing cross-references to/from other posts/pages
+ - Hides some WordPress branding and news
 
 ...and here are features planned for the future:
  - Labbook theme
