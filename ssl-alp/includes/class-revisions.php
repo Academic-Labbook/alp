@@ -435,13 +435,18 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 				WHERE
 					post_type = %s
 					AND post_status = %s
-                    AND (SELECT post_type FROM wp_posts WHERE ID = posts.post_parent) IN ({$supported_types_clause})
+					AND EXISTS(SELECT 1
+						 FROM wp_posts
+						 WHERE ID = posts.post_parent
+						 AND post_type IN ({$supported_types_clause})
+						 AND post_status = %s)
                 GROUP BY posts.post_author, posts.post_parent
 				ORDER BY post_date {$order}
 				LIMIT %d
 				",
 				"revision",
 				"inherit",
+				"publish",
 				$number
 			)
 		);
