@@ -113,7 +113,7 @@
 				<li><?php printf( __( 'The <strong>%1$s</strong> role is unchanged from the WordPress default. This can be used to provide read-only access to a user. %2$s can still comment on posts.', 'ssl-alp' ), __( 'Subscriber' ), __( 'Subscribers' ) ); ?></li>
 				<li><?php printf( __( 'The <strong>%1$s</strong> role is added, with no permissions to perform any actions on the site, including to read it. This is intended for users who are no longer to be given access to the site. On private sites, this avoids the need to delete a user\'s account in order to remove their access, which would also delete their contributions.', 'ssl-alp' ), __( 'Excluded', 'ssl-alp' ) ); ?></li>
 			</ul>
-			<p><?php _e( 'This action <strong>deletes</strong> the default WordPress roles from the database. For more information on roles, please see <a href="https://codex.wordpress.org/Roles_and_Capabilities">Roles and Capabilities</a> in the WordPress Codex.', 'ssl-alp' ); ?></p>
+			<p><?php _e( 'This action <strong>deletes</strong> the default WordPress roles from the database, meaning that these roles will remain even if the Academic Labbook Plugin is disabled or uninstalled in the future. For more information on roles, please see <a href="https://codex.wordpress.org/Roles_and_Capabilities">Roles and Capabilities</a> in the WordPress Codex.', 'ssl-alp' ); ?></p>
 			<p><strong><?php _e( 'This action cannot be undone.', 'ssl-alp' ); ?></strong></p>
 			<form method="post" action="">
 				<input type="hidden" name="ssl_alp_convert_role_submitted" value="1"/>
