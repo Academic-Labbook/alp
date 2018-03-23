@@ -205,8 +205,12 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		}
 
 		// add message
-		/* translators: %s: revision edit summary */
-		$revision_date_author .= " &mdash; " . sprintf( __( "<em>\"%s\"</em>", 'ssl-alp' ), esc_html( $revision_meta["message"] ) );
+		$revision_message = esc_html( $revision_meta["message"] );
+
+		if ( ! empty( $revision_message ) ) {
+			/* translators: %s: revision edit summary */
+			$revision_date_author .= " &mdash; " . sprintf( __( "<em>\"%s\"</em>", 'ssl-alp' ), $revision_message );
+		}
 
 		return $revision_date_author;
 	}
