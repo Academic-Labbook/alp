@@ -507,6 +507,66 @@ if ( ! function_exists( 'ssl_alpine_get_reference_from_posts' ) ) :
 	}
 endif;
 
+if ( ! function_exists( 'ssl_alpine_get_page_breadcrumbs' ) ) :
+	/**
+	 * Gets page breadcrumbs
+	 */
+	function ssl_alpine_get_page_breadcrumbs( $page = null ) {
+		$page = get_post( $page );
+
+		$ancestors = array();
+
+		if ( $page->post_parent ) {
+			// page is a child
+			// get ancestors in reverse order
+			$ancestors = array_reverse( get_post_ancestors( $page->ID ) );
+		}
+
+		// URL list with home
+		$breadcrumbs = array(
+			array(
+				'title'	=>	__( 'Home', 'ssl-alp' ),
+				'url'	=>	get_home_url()
+			)
+		);
+
+		// add ancestor titles and URLs
+		foreach ( $ancestors as $ancestor ) {
+			$breadcrumbs[] = array(
+				'title'	=>	get_the_title( $ancestor ),
+				'url'	=>	get_permalink( $ancestor )
+			);
+		}
+
+		return $breadcrumbs;
+	}
+endif;
+
+if ( ! function_exists( 'ssl_alpine_the_page_breadcrumbs' ) ) :
+	/**
+	 * Print page breadcrumbs
+	 */
+	function ssl_alpine_the_page_breadcrumbs( $page = null ) {
+		$breadcrumbs = ssl_alpine_get_page_breadcrumbs( $page );
+
+		if ( ! count( $breadcrumbs ) ) {
+			return;
+		}
+
+		echo '<ul>';
+
+		foreach ( $breadcrumbs as $breadcrumb ) {
+			printf(
+				'<li><a href="%1$s">%2$s</a></li>',
+				esc_url( $breadcrumb['url'] ),
+				esc_html( $breadcrumb['title'] )
+			);
+		}
+
+		echo '</ul>';
+	}
+endif;
+
 /**
  * Returns true if a blog has more than 1 category.
  *

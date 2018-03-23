@@ -10,6 +10,9 @@
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 	<header class="entry-header">
 		<?php the_title( '<h2 class="entry-title">', '</h2>' ); ?>
+		<div id="breadcrumbs">
+			<?php ssl_alpine_the_page_breadcrumbs(); ?>
+		</div>
 	</header><!-- .entry-header -->
 
 	<div class="entry-content">

@@ -23,6 +23,7 @@ Based on Underscores http://underscores.me/, (C) 2012-2014 Automattic, Inc.
 5.0 - Navigation
 	5.1 - Links
 	5.2 - Menus
+	5.3 - Breadcrumbs
 6.0 - Accessibility
 7.0 - Alignments
 8.0 - Clearings
@@ -542,6 +543,33 @@ a:hover, a:active {
 .site-content {
     padding: 2em 0;
 }
+
+/*--------------------------------------------------------------
+5.3 Breadcrumbs
+--------------------------------------------------------------*/
+
+#breadcrumbs ul {
+	font-size: 85%;
+	clear: both;
+    list-style: none;
+	margin: 0;
+	padding: 0;
+    overflow: hidden;
+}
+
+#breadcrumbs ul li {
+	display: inline;
+    vertical-align: middle;
+    margin-right: 15px;
+}
+
+/* Breadcrumb list item separator */
+#breadcrumbs ul li + li:before {
+	font-family: "FontAwesome" !important;
+	content: "\f101";
+    margin-right: 15px;
+}
+
 /*--------------------------------------------------------------
 6.0 Accessibility
 --------------------------------------------------------------*/
