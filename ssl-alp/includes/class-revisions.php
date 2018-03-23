@@ -328,7 +328,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * Check whether revisioned post meta fields have changed.
 	 */
 	public function check_revisioned_meta_fields_have_changed( $post_has_changed, WP_Post $last_revision, WP_Post $post ) {
-		// skip when autosaving, as custom post data is noted included in $_POST during autosaves (annoying)
+		// skip when autosaving, as custom post data is annoyingly not included in $_POST during autosaves
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 			return $post_has_changed;
 		}

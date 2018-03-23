@@ -63,8 +63,9 @@ Some feature ideas not considered critical, but nice to have:
  - Outreach pages: share some posts/pages publicly.
 
 ## Requirements
-In general, you should use the latest version of WordPress as that's the one
-that will be supported. With auto-updates to WordPress Core, this is easy.
+In general, you should use the latest version of WordPress 4.x as that's the
+branch that will be supported. With auto-updates to WordPress Core, this is
+easy.
 
 The plugin has only been tested on PHP7. You must have the [DOM extension](http://www.php.net/manual/en/book.dom.php) installed. You also cannot use
 PHP via CGI if you wish to make the site private but still have syndication
@@ -75,6 +76,20 @@ uses CSS Grid, which is only available in recent versions of the most popular
 browsers. The [browsers that don't support CSS Grid](https://caniuse.com/#feat=css-grid)
 represent only around 5% of global usage as of March 2018. This project is not
 concerned about losing sales from users running out of date browsers!
+
+### Gutenberg
+WordPress 5.0 will introduce a new editor interface called [Gutenberg](https://wordpress.org/gutenberg/).
+This does not show some of the custom interface additions that ALP makes to the
+standard editor, but it is not anticipated that support for these additions will
+be difficult to add, eventually. Depending on how Gutenberg is added to WordPress 5.0,
+ALP may optionally "deactivate" Gutenberg under the hood until support is added.
+
+The impending arrival of Gutenberg means ALP will not, for the time being,
+include changes to the TinyMCE editor, such as those provided by the (great)
+[TinyMCE Advanced](https://wordpress.org/plugins/tinymce-advanced/) plugin. (While
+the changes made by TinyMCE Advanced should not affect Gutenberg, some Gutenberg-
+specific "blocks" may take over functionality of a lot of what TinyMCE Advanced
+provides, such as table building.)
 
 ## Design principles
  - **Clean code**: there's an awful lot of terribly written code floating around
