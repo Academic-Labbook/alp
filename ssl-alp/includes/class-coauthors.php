@@ -130,6 +130,9 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$loader->add_filter( 'posts_selection', $this, 'fix_author_page' ); // use posts_selection since it's after WP_Query has built the request and before it's queried any posts
 		$loader->add_action( 'the_post', $this, 'fix_author_page' );
 
+		// save revisions if coauthors have changed
+		$loader->add_filter( 'wp_save_post_revision_post_has_changed', $this, 'check_coauthors_have_changed', 10, 3 );
+
 		// Filter to send comment moderation notification e-mail to multiple authors
 		$loader->add_filter( 'comment_moderation_recipients', $this, 'filter_comment_moderation_email_recipients', 10, 2 );
 
@@ -222,8 +225,10 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * Whether or not coauthors are enabled for this post type
 	 */
 	public function is_post_type_enabled( $post_type = null ) {
-		// get post type if not specified
-		$post_type = get_post_type( $post_type );
+		if ( ! $post_type ) {
+			// post type was not specified directly, so get it
+			$post_type = get_post_type();
+		}
 
 		return (bool) in_array( $post_type, $this->supported_post_types );
 	}
@@ -1263,6 +1268,42 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		return $coauthor_terms;
+	}
+
+	/**
+	 * Check whether the coauthors for this post have changed, to determine whether to trigger a save.
+	 */
+	public function check_coauthors_have_changed( $post_has_changed, WP_Post $last_revision, WP_Post $post ) {
+		// skip when autosaving, as custom post data is annoyingly not included in $_POST during autosaves
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return $post_has_changed;
+		}
+
+		if ( ! array_key_exists( 'coauthors', $_POST ) ) {
+			// no coauthors submitted
+			return $post_has_changed;
+		}
+
+		// coauthors on published post
+		$parent_coauthors = get_coauthors( $post->ID );
+
+		// coauthors on current revision
+		$current_coauthors = array();
+
+		foreach ( $_POST['coauthors'] as $author ) {
+			$author = sanitize_text_field( $author );
+
+			if ( $author ) {
+				$current_coauthors[] = $this->get_coauthor_by( 'user_nicename', $author );
+			}
+		}
+
+		// check if coauthors have changed
+		if ( $parent_coauthors != $current_coauthors ) {
+			$post_has_changed = true;
+		}
+
+		return $post_has_changed;
 	}
 
 	/**
