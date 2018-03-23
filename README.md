@@ -5,13 +5,12 @@ minimally invasive on the core WordPress functionality, which should allow you
 to install additional plugins as you like.
 
 ## What does ALP do?
-Currently, not much, because it's in alpha development. Here are the features
-implemented so far...
+Here are the features implemented so far...
  - Multiple author support
  - Change logs for posts and pages
    - Unhides revisions meta box in editor by default
- - Force users to be logged in to view (but maybe later add ability to choose
-   between network/individual site access)
+ - Force users to be logged in to view
+   - Feeds still accessible using HTTP authentication
  - LaTeX support
  - DOI and arXiv shortcodes
  - Disable certain post meta fields mostly suited to commercial sites, like
@@ -22,7 +21,15 @@ implemented so far...
  - Special ALP theme
    - Displays multiple authors
    - Displays revision history
+     - Recent revisions widget
    - Shows reference widget under posts/pages showing cross-references to/from other posts/pages
+ - (Optional) Change names and behaviours of user types:
+   - Administrator -> [unchanged]
+   - Editor -> Researcher
+   - Author -> Intern
+   - Contributor -> [removed]
+   - Subscriber -> [unchanged]
+   - Excluded -> [new]
  - Hides some WordPress branding and news
 
 ...and here are features planned for the future:
@@ -33,20 +40,8 @@ implemented so far...
    - New posts
    - Comments (already built-in, or at least should be)
  - Disable public access
-   - Private feed keys (default feeds NOT disabled by forced login; provide
-     unique feeds to each user instead; replace feed URL)
    - Stop images being loaded from outside (might require htaccess changes?)
- - LaTeX TinyMCE widget
- - More MathJax configuration options
  - Author list widget
- - Recent edits widget
- - Change names and behaviours of user types:
-   - subscriber -> subscriber
-   - contributor -> [remove]
-   - author -> [remove, or keep for small project students]
-   - editor -> researcher
-     - can add new categories
-   - administrator -> administrator
  - Disable private posts (kinda useless with forced login)
  - Advanced search:
    - Search within PDFs etc.
