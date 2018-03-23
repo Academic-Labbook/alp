@@ -108,6 +108,11 @@ class SSL_ALP_Wiki extends SSL_ALP_Module {
 		$prev_libxml_error_setting = libxml_use_internal_errors( true );
 
 		// load content into DOM parser
+		if ( empty( $content ) ) {
+			// no point continuing
+			return $content;
+		}
+		
 		$document = new DOMDocument();
 		$document->loadHTML($content);
 
