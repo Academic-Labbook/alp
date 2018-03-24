@@ -68,8 +68,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	public function register_hooks() {
 		$loader = $this->get_loader();
 
+		// register the authors widget regardless of settings
+		$loader->add_action( 'widgets_init', $this, 'register_users_widget' );
+
 		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
-			// setting disabled; no point continuing
+			// coauthors disabled; no point continuing
 			return;
 		}
 
@@ -180,6 +183,13 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	
 	public function author_settings_callback() {
 		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/author-settings-display.php';
+	}
+
+	/**
+	 * Register users widget
+	 */
+	public function register_users_widget() {
+		register_widget( 'SSL_ALP_Users' );
 	}
 
 	/**
@@ -1555,3 +1565,145 @@ function is_coauthor_for_post( $user, $post_id = 0 ) {
 	return false;
 }
 endif;
+
+class SSL_ALP_Users extends WP_Widget {
+	public function __construct() {
+		parent::__construct(
+			'ssl_alp_users_widget', // base ID
+			esc_html__( 'Users', 'ssl-alp' ), // name
+			array(
+				'description' => __( "A list of users and their post counts.", 'ssl-alp' )
+			)
+		);
+	}
+
+	/**
+	 * Outputs the content of the widget
+	 *
+	 * @param array $args
+	 * @param array $instance
+	 */
+	public function widget( $args, $instance ) {
+		global $ssl_alp;
+
+		echo $args['before_widget'];
+
+		if ( ! empty( $instance['title'] ) ) {
+			echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title'];
+		}
+
+		// show dropdown by default
+		$dropdown = isset( $instance['dropdown'] ) ? (bool) $instance['dropdown'] : true;
+
+		// default dropdown ID
+		$dropdown_id = 'ssl_alp_users_dropdown';
+
+		if ( $dropdown ) {
+			// unfortunately wp_dropdown_users doesn't support displaying post counts,
+			// so we have to do it ourselves
+
+			// get users
+			$users = get_users(
+				array(
+					'fields'	=>	array(
+						'ID',
+						'display_name'
+					),
+					'order'		=>	'ASC',
+					'orderby'	=>	'display_name'
+				)
+			);
+
+			// get user post counts (only including public / user's own posts)
+			$user_ids = array_map( create_function( '$user', 'return $user->ID;' ), $users );
+			$post_counts = count_many_users_posts( $user_ids, 'post', true );
+
+			if ( ! empty( $users ) ) {
+				// enqueue script to take the user to the author's page
+				wp_enqueue_script( 'ssl-alp-user-widget-js', SSL_ALP_BASE_URL . 'js/user-widget.js', array( 'jquery' ), $ssl_alp->get_version(), true );
+
+				// set element to handle click events for
+				wp_localize_script( 'ssl-alp-user-widget-js', 'ssl_alp_dropdown_id', esc_js( $dropdown_id ) );
+
+				// enclose dropdown in a form so we can handle redirect to user page
+				printf( '<form action="%s" method="get">', esc_url( home_url() ) );
+
+				// make select name 'author' so the form redirects to the selected user page
+				printf( '<select name="author" id="%s">\n', esc_html( $dropdown_id ) );
+
+				// print default
+				printf(
+					'\t<option value="#">%1$s</option>',
+					__( 'Select User', 'ssl-alp' )
+				);
+
+				foreach ( (array) $users as $user ) {
+					$name = esc_html( $user->display_name );
+					$post_count = $post_counts[$user->ID];
+
+					printf(
+						_x( '\t<option value="%1$s">%2$s (%3$d)</option>\n', 'User list', 'ssl-alp' ),
+						$user->ID,
+						$name,
+						$post_count
+					);
+				}
+
+				echo '</select>';
+				echo '</form>';
+			}
+		} else {
+			echo '<ul>';
+
+			wp_list_authors(
+				array(
+					'optioncount'	=>	true,
+					'show'			=>	false // use display_name
+				)
+			);
+
+			echo '</ul>';
+		}
+
+		echo $args['after_widget'];
+	}
+
+	/**
+	 * Outputs the options form on admin
+	 *
+	 * @param array $instance The widget options
+	 */
+	public function form( $instance ) {
+		$title = ! empty( $instance['title'] ) ? $instance['title'] : esc_html__( 'Users' );
+		$dropdown = isset( $instance['dropdown'] ) ? (bool) $instance['dropdown'] : true;
+
+		?>
+		<p>
+			<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_attr_e( 'Title:' ); ?></label>
+			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>">
+		</p>
+
+		<p>
+			<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id( 'dropdown' ); ?>" name="<?php echo $this->get_field_name( 'dropdown' ); ?>"<?php checked( $dropdown ); ?> />
+			<label for="<?php echo $this->get_field_id( 'dropdown' ); ?>"><?php _e( 'Display as dropdown' ); ?></label>
+		</p>
+		<?php
+	}
+
+	/**
+	 * Processing widget options on save
+	 *
+	 * @param array $new_instance The new options
+	 * @param array $old_instance The previous options
+	 *
+	 * @return array
+	 */
+	public function update( $new_instance, $old_instance ) {
+		$instance = array();
+
+		$instance['title'] = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
+		$instance['dropdown'] = ! empty( $new_instance['dropdown'] ) ? true : false;
+
+		return $instance;
+	}
+}
