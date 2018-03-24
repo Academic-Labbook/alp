@@ -146,15 +146,36 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * Register settings
 	 */
 	public function register_settings() {
-
+        register_setting(
+			'ssl-alp-admin-options',
+			'ssl_alp_multiple_authors',
+			array(
+				'type'		=>	'boolean',
+				'default'	=>	true
+			)
+		);
     }
 
 	/**
 	 * Register settings fields
 	 */
 	public function register_settings_fields() {
+        /**
+         * Post multiple author settings field
+         */
 
-    }
+        add_settings_field(
+			'ssl_alp_author_settings',
+			__( 'Authors', 'ssl-alp' ),
+			array( $this, 'author_settings_callback' ),
+			'ssl-alp-admin-options',
+			'ssl_alp_post_settings_section'
+		);
+	}
+	
+	public function author_settings_callback() {
+		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/author-settings-display.php';
+	}
 
 	/**
 	 * Register the 'ssl_alp_coauthor' taxonomy and add post type support

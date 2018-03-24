@@ -65,15 +65,6 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 				'default'	=>	true
 			)
 		);
-
-        register_setting(
-			'ssl-alp-admin-options',
-			'ssl_alp_multiple_authors',
-			array(
-				'type'		=>	'boolean',
-				'default'	=>	true
-			)
-		);
 	}
 
     /**
@@ -103,18 +94,6 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 			'ssl-alp-admin-options', // page
 			'ssl_alp_post_settings_section' // section
 		);
-
-        /**
-         * Post multiple author settings field (TODO: move to module)
-         */
-
-        add_settings_field(
-			'ssl_alp_author_settings',
-			__( 'Authors', 'ssl-alp' ),
-			array( $this, 'author_settings_callback' ),
-			'ssl-alp-admin-options',
-			'ssl_alp_post_settings_section'
-		);
     }
 
     public function access_settings_callback() {
@@ -123,10 +102,6 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 
     public function meta_settings_callback() {
 		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/meta-settings-display.php';
-	}
-
-    public function author_settings_callback() {
-		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/author-settings-display.php';
 	}
 
 	/**

@@ -211,7 +211,7 @@ class SSL_ALP {
 		$this->core->register_settings();
 		$this->auth->register_settings();
 		$this->wiki->register_settings();
-		$this->coauthors->register_hooks();
+		$this->coauthors->register_settings();
 		$this->revisions->register_settings();
 		$this->references->register_settings();
 		$this->tex->register_settings();
@@ -503,7 +503,7 @@ class SSL_ALP {
 		$this->core->register_settings_fields();
 		$this->auth->register_settings_fields();
 		$this->wiki->register_settings_fields();
-		$this->coauthors->register_hooks();
+		$this->coauthors->register_settings_fields();
 		$this->revisions->register_settings_fields();
 		$this->references->register_settings_fields();
 		$this->tex->register_settings_fields();
