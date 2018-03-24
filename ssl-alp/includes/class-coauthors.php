@@ -116,6 +116,10 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// Action to reassign posts when a user is deleted
 		$loader->add_action( 'delete_user', $this, 'delete_user_action' );
 
+		// Include coauthored posts in post counts.
+		// Unfortunately, this doesn't filter results retrieved with `count_many_users_posts`, which
+		// also doesn't have hooks to allow filtering; therefore know that this filter doesn't catch
+		// every count event.
 		$loader->add_filter( 'get_usernumposts', $this, 'filter_count_user_posts', 10, 2 );
 
 		// Action to set up author auto-suggest
@@ -595,7 +599,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		if ( ! $query->is_author() ) {
             // not an author query, so return unmodified
             return $where;
-        }
+		}
 
 		if ( ! empty( $query->query_vars['post_type'] ) && ! is_object_in_taxonomy( $query->query_vars['post_type'], 'ssl_alp_coauthor' ) ) {
             // not a valid post type, so return unmodified
@@ -633,7 +637,15 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 			$terms_implode = rtrim( $terms_implode, ' OR' );
 			$this->having_terms = rtrim( $this->having_terms, ' OR' );
-			$where = preg_replace( '/(\b(?:' . $wpdb->posts . '\.)?post_author\s*=\s*(\d+))/', '($1 OR ' . $terms_implode . ')', $where, -1 ); #' . $wpdb->postmeta . '.meta_id IS NOT NULL AND
+
+			// match "wp_posts.post_author = [number]" or "wp_posts.post_author IN ([list of numbers])"
+			// and append "OR (wp_term_taxonomy.taxonomy = 'ssl_alp_coauthor' AND wp_term_taxonomy.term_id = '6')"
+			$where = preg_replace(
+				'/(\b(?:' . $wpdb->posts . '\.)?post_author\s*(?:=|IN)\s*\(?(\d+)\)?)/',
+				'($1 OR ' . $terms_implode . ')',
+				$where,
+				1
+			);
 		}
 
 		return $where;
@@ -935,13 +947,19 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return;
 		}
 
+		$author_id = absint( get_query_var( 'author' ) );
 		$author_name = sanitize_title( get_query_var( 'author_name' ) );
 
-		if ( ! $author_name ) {
+		if ( isset( $author_id ) ) {
+			// get author by id
+			$author = $this->get_coauthor_by( 'id', $author_id );
+		} elseif ( isset( $author_name ) ) {
+			// get author by specified name
+			$author = $this->get_coauthor_by( 'user_nicename', $author_name );
+		} else {
+			// no query variable was specified; not much we can do
 			return;
 		}
-
-		$author = $this->get_coauthor_by( 'user_nicename', $author_name );
 
 		global $wp_query, $authordata;
 
@@ -1614,9 +1632,9 @@ class SSL_ALP_Users extends WP_Widget {
 				)
 			);
 
-			// get user post counts (only including public / user's own posts)
+			// get user post counts
 			$user_ids = array_map( create_function( '$user', 'return $user->ID;' ), $users );
-			$post_counts = count_many_users_posts( $user_ids, 'post', true );
+			$post_counts = $this->count_many_users_posts( $user_ids );
 
 			if ( ! empty( $users ) ) {
 				// enqueue script to take the user to the author's page
@@ -1705,5 +1723,37 @@ class SSL_ALP_Users extends WP_Widget {
 		$instance['dropdown'] = ! empty( $new_instance['dropdown'] ) ? true : false;
 
 		return $instance;
+	}
+
+	/**
+	 * Override default `count_many_users_posts` if coauthors are enabled
+	 */
+	protected function count_many_users_posts( $user_ids ) {
+		global $ssl_alp;
+
+		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
+			// return standard counts
+			return count_many_users_posts( $user_ids );
+		}
+
+		/**
+		 * Unfortunately, WordPress doesn't provide a hook for overriding the
+		 * behaviour of count_many_users_posts, and so it cannot inject
+		 * coauthor posts. Instead, we just have to query it manually here.
+		 */
+		
+		// list of counts by user id
+		$counts = array();
+
+		foreach ( $user_ids as $user_id ) {
+			/**
+			 * Call coauthor class to get filtered counts. This tells the function that the
+			 * user currently has 0 posts, which is not usually true. This is fine, unless
+			 * for some reason the user's "count" metadata has not been updated.
+			 */
+			$counts[$user_id] = $ssl_alp->coauthors->filter_count_user_posts( 0, $user_id );
+		}
+
+		return $counts;
 	}
 }
