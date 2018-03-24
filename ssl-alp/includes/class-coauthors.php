@@ -68,6 +68,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	public function register_hooks() {
 		$loader = $this->get_loader();
 
+		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
+			// setting disabled; no point continuing
+			return;
+		}
+
 		$loader->add_action( 'wp_enqueue_scripts', $this, 'enqueue_styles' );
         $loader->add_action( 'wp_enqueue_scripts', $this, 'enqueue_scripts' );
         $loader->add_action( 'admin_enqueue_scripts', $this, 'enqueue_admin_styles' );
