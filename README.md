@@ -20,6 +20,7 @@ Here are the features implemented so far...
    - Display a table of contents in the sidebar (generated from header elements)
  - Special ALP theme
    - Displays multiple authors
+   - Displays author widget, to view lists of each authors' posts
    - Displays revision history
      - Recent revisions widget
    - Shows reference widget under posts/pages showing cross-references to/from other posts/pages
