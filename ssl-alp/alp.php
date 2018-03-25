@@ -22,8 +22,15 @@ if ( ! defined( 'WPINC' ) ) {
 define( 'SSL_ALP_VERSION', '0.1.0' );
 
 /**
+ * Plugin name
+ */
+
+define( 'SSL_ALP_PLUGIN_NAME', 'Academic Labbook' );
+
+/**
  * Base plugin directory
  */
+
 define( 'SSL_ALP_BASE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SSL_ALP_BASE_URL', plugin_dir_url( __FILE__ ) );
 
@@ -46,8 +53,8 @@ require_once SSL_ALP_BASE_DIR . 'includes/class-activator.php';
 require_once SSL_ALP_BASE_DIR . 'includes/class-deactivator.php';
 
 // register hooks
-register_activation_hook( __FILE__, array('SSL_ALP_Activator', 'activate'));
-register_activation_hook( __FILE__, array('SSL_ALP_Deactivator', 'deactivate'));
+register_activation_hook( __FILE__, array( 'SSL_ALP_Activator', 'activate' ) );
+register_activation_hook( __FILE__, array( 'SSL_ALP_Deactivator', 'deactivate' ) );
 
 /**
  * Add theme directory provided by this plugin
@@ -56,10 +63,11 @@ register_activation_hook( __FILE__, array('SSL_ALP_Deactivator', 'deactivate'));
 register_theme_directory( SSL_ALP_BASE_DIR . 'themes' );
 
 /**
- * Core plugin class used to define internationalisation, hooks, etc.
+ * Core plugin class used to load modules.
  */
 
 require SSL_ALP_BASE_DIR . 'includes/class-alp.php';
+require SSL_ALP_BASE_DIR . 'includes/class-alp-module.php';
 
 /**
  * Execute plugin.
