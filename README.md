@@ -18,6 +18,7 @@ Here are the features implemented so far...
  - Modifies pages to work more like a wiki:
    - Remove authors and dates
    - Display a table of contents in the sidebar (generated from header elements)
+   - Shows breadcrumb trail back to home page
  - Special ALP theme
    - Displays multiple authors
    - Displays author widget, to view lists of each authors' posts
@@ -32,6 +33,7 @@ Here are the features implemented so far...
    - Subscriber -> [unchanged]
    - Excluded -> [new]
  - Hides some WordPress branding and news
+ - Support for custom media (MIME) upload types
 
 ...and here are features planned for the future:
  - Labbook theme
@@ -107,6 +109,7 @@ reports have also been pushed back to these plugins and WordPress itself:
  - [Co-Authors Plus](https://wordpress.org/support/topic/two-bug-fixes-for-author-page/)
  - [wpDirAuth](https://wordpress.org/support/topic/overriding-cookie-expiry-for-directory-authenticated-users/)
  - [WordPress Core](https://core.trac.wordpress.org/ticket/43613)
+ - [WordPress Core](https://core.trac.wordpress.org/ticket/43629)
 
 ### Co-Authors Plus
 Authors: Mohammad Jangda, Daniel Bachhuber, Automattic, Shepherd Interactive, Mark Jaquith  

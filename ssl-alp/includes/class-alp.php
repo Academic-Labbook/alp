@@ -499,6 +499,13 @@ class SSL_ALP {
 			'ssl-alp-admin-options' // page
 		);
 
+		add_settings_section(
+			'ssl_alp_media_settings_section', // id
+			__( 'Media Settings', 'ssl-alp' ), // title
+			array( $this, 'media_settings_section_callback' ), // callback
+			'ssl-alp-admin-options' // page
+		);
+
 		// call modules to create their settings fields
 		$this->core->register_settings_fields();
 		$this->auth->register_settings_fields();
@@ -515,6 +522,10 @@ class SSL_ALP {
 
     public function post_settings_section_callback() {
 		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/section-display.php';
+	}
+
+	public function media_settings_section_callback() {
+		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/media/section-display.php';
 	}
 }
 
