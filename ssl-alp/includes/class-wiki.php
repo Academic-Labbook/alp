@@ -114,7 +114,8 @@ class SSL_ALP_Wiki extends SSL_ALP_Module {
 		}
 		
 		$document = new DOMDocument();
-		$document->loadHTML($content);
+		// load HTML, without adding doctype, head or body implicitly
+		$document->loadHTML($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
 
 		if ( count( libxml_get_errors() ) ) {
 			// there were parser errors
