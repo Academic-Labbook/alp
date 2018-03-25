@@ -11,6 +11,7 @@
         <?php _e( 'Pages' ); ?>
     </label>
 </p>
+<br/>
 <p>
     <label for="ssl_alp_edit_summary_max_length_textbox">
         <?php _e( 'Allow up to', 'ssl-alp' ); ?>

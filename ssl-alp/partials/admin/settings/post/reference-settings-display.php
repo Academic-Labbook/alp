@@ -5,6 +5,7 @@
     </label>
 </p>
 <p class="description"><?php _e( 'When enabled, a box is displayed containing links to posts and pages referenced from the current post or page, or by another post or page.', 'ssl-alp' ); ?></p>
+<br/>
 <p><?php _e( 'Enable shortcodes for:' ); ?></p>
 <p>
     <label for="ssl_alp_doi_shortcode_checkbox">
