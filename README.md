@@ -124,12 +124,12 @@ Links: [WP-Post-Meta-Revisions](https://github.com/adamsilverstein/wp-post-meta-
 These plugins inspired parts of the design of ALP's revisions feature, but the code in ALP
 is not particularly based on either one.
 
-### MathJax-LaTeX
-Authors: Phillip Lord, Simon Cockell, Paul Schreiber  
-Link: [MathJax-LaTeX](https://wordpress.org/plugins/mathjax-latex/)
+### WP-KaTeX
+Author: Andrew Sun
+Link: [WP-KaTeX](https://wordpress.org/plugins/wp-katex/)
 
-Most of the functional code was adapted for ALP, but the options were reduced to just SVG
-rendered MathJax for simplicity.
+The JavaScript function used to enable KaTeX rendering for particular elements was adapted
+in ALP.
 
 ### Authenticator
 Authors: Inpsyde GmbH

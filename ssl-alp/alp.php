@@ -31,8 +31,9 @@ define( 'SSL_ALP_BASE_URL', plugin_dir_url( __FILE__ ) );
  * Default settings
  */
 
-define( 'SSL_ALP_MATHJAX_VERSION', '2.7.2' );
-define( 'SSL_ALP_DEFAULT_MATHJAX_URL', 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_SVG' );
+define( 'SSL_ALP_KATEX_VERSION', '0.9.0' );
+define( 'SSL_ALP_DEFAULT_KATEX_JS_URL', 'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js' );
+define( 'SSL_ALP_DEFAULT_KATEX_CSS_URL', 'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css' );
 define( 'SSL_ALP_DOI_BASE_URL', 'https://doi.org/' );
 define( 'SSL_ALP_ARXIV_BASE_URL', 'https://arxiv.org/abs/' );
 

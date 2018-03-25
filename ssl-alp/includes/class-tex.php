@@ -5,9 +5,9 @@
  */
 class SSL_ALP_Tex extends SSL_ALP_Module {
     /**
-	 * Whether to add the MathJax script to the page
+	 * Whether to add the TeX rendering scripts to the page
 	 */
-	public $add_mathjax_script = false;
+	public $add_tex_scripts = false;
 
 	/**
 	 * Register the stylesheets.
@@ -38,11 +38,21 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 
         register_setting(
 			'ssl-alp-admin-options',
-			'ssl_alp_mathjax_url',
+			'ssl_alp_katex_js_url',
 			array(
 				'type'				=>	'string',
 				'sanitize_callback'	=>	'esc_url_raw',
-				'default'			=>	SSL_ALP_DEFAULT_MATHJAX_URL
+				'default'			=>	SSL_ALP_DEFAULT_KATEX_JS_URL
+			)
+		);
+	
+        register_setting(
+			'ssl-alp-admin-options',
+			'ssl_alp_katex_css_url',
+			array(
+				'type'				=>	'string',
+				'sanitize_callback'	=>	'esc_url_raw',
+				'default'			=>	SSL_ALP_DEFAULT_KATEX_CSS_URL
 			)
 		);
 	}
@@ -62,26 +72,10 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 			'ssl-alp-admin-options',
 			'ssl_alp_post_settings_section'
 		);
-
-        /**
-         * Post MathJax settings
-         */
-
-		add_settings_field(
-			'ssl_alp_mathjax_url_settings',
-			__( 'MathJax JavaScript URL', 'ssl-alp' ),
-			array( $this, 'mathjax_javascript_url_settings_callback' ),
-			'ssl-alp-admin-options',
-			'ssl_alp_post_settings_section'
-		);
     }
 
     public function enable_tex_settings_callback() {
 		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/enable-tex-settings-display.php';
-	}
-
-	public function mathjax_javascript_url_settings_callback() {
-		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/mathjax-javascript-url-settings-display.php';
 	}
 
 	/**
@@ -90,16 +84,23 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 	public function register_hooks() {
 		$loader = $this->get_loader();
 
-        // MathJax shortcodes
-		$loader->add_action( 'init', $this, 'add_mathjax_shortcodes' );
+		// tex shortcode
+		$loader->add_action( 'init', $this, 'add_tex_shortcode' );
+
+		// prevent removal of tags when excerpt is shown
 		$loader->add_filter( 'strip_shortcodes_tagnames', $this, 'prevent_tex_excerpt_strip' );
-		$loader->add_action( 'wp_footer', $this, 'add_mathjax_script' );
+
+		// add JavaScript
+		$loader->add_action( 'wp_footer', $this, 'enqueue_tex_scripts' );
+
+		// prevent processing of contents inside [tex][/tex] tags
+		$loader->add_filter( 'no_texturize_shortcodes', $this, 'exempt_texturize' );
 	}
 
     /**
-	 * Add MathJax shortcodes to editor
+	 * Add TeX shortcodes to editor
 	 */
-	public function add_mathjax_shortcodes() {
+	public function add_tex_shortcode() {
         if ( ! get_option( 'ssl_alp_tex_enabled' ) ) {
             return;
         }
@@ -108,9 +109,9 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 	}
 
 	public function tex_shortcode_hook( $atts, $content ) {
-		$this->add_mathjax_script = true;
+		$this->add_tex_scripts = true;
 
-		// add optional "syntax" attribute, which defaults to "inline", but can also be "block"
+		// add optional "display" attribute, to allow display in block form instead of inline
 		$shortcode_atts = shortcode_atts(
 			array(
 				'display' => 'inline',
@@ -118,27 +119,49 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 			$atts
 		);
 
-		if ( $shortcode_atts['display'] === 'inline' ) {
-			return '\(' . $content . '\)';
-		} elseif ( $shortcode_atts['display'] === 'block' ) {
-			return '\[' . $content . '\]';
+		// default span classes
+		$classes = array( 'ssl-alp-katex-equation' );
+
+		$data_display = false;
+
+		if ( $shortcode_atts['display'] === 'block' ) {
+			// render as block
+			$classes[] = "katex-display";
+			$data_display = true;
 		}
+
+		return sprintf(
+			'<span class="%1$s" data-display="%2$s">%3$s</span>',
+			implode( ' ', $classes ),
+			($data_display) ? "true" : "false",
+			htmlspecialchars( html_entity_decode( $content ) )
+		);
+	}
+
+	public function exempt_texturize( $shortcodes ) {
+		// add tex shortcode to exemption list
+		$shortcodes[] = 'tex';
+
+		return $shortcodes;
 	}
 
 	public function prevent_tex_excerpt_strip( $tags_to_remove ) {
 		return $this->parent->core->prevent_excerpt_strip( 'tex', $tags_to_remove );
 	}
 
-	public function add_mathjax_script() {
-		if ( ! $this->add_mathjax_script ) {
+	public function enqueue_tex_scripts() {
+		if ( ! $this->add_tex_scripts ) {
 			// don't load script
 			return;
 		}
 
-		// MathJax URL and SRI settings
-		$mathjax_url = esc_url( get_option( 'ssl_alp_mathjax_url' ) );
+		// JavaScript and CSS URLs
+		$js_url = esc_url( get_option( 'ssl_alp_katex_js_url' ) );
+		$css_url = esc_url( get_option( 'ssl_alp_katex_css_url' ) );
 
-		// enqueue script in footer
-		wp_enqueue_script( 'ssl-alp-mathjax-script', $mathjax_url, array(), SSL_ALP_MATHJAX_VERSION, true );
+		// enqueue scripts
+		wp_enqueue_script( 'ssl-alp-katex-js', $js_url, array(), SSL_ALP_KATEX_VERSION );
+		wp_enqueue_script( 'ssl-alp-katex-render-js', SSL_ALP_BASE_URL . 'js/katex.js', array(), SSL_ALP_KATEX_VERSION );
+		wp_enqueue_style( 'ssl-alp-katex-css', $css_url, array(), SSL_ALP_KATEX_VERSION );
 	}
 }
