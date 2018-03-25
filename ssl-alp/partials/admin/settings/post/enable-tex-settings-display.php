@@ -16,4 +16,4 @@
     </label>
     <input name="ssl_alp_katex_css_url" id="ssl_alp_katex_css_url_textbox" value="<?php echo esc_url( get_option( 'ssl_alp_katex_css_url' ) ); ?>" class="large-text code" type="url">
 </fieldset>
-<p class="description"><?php _e(' For self-hosted scripts, these can be relative URLs.', 'ssl-alp' ); ?></p>
+<p class="description"><?php _e(' Please enter the absolute URL to the scripts.', 'ssl-alp' ); ?></p>
