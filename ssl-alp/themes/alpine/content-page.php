@@ -10,9 +10,9 @@
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 	<header class="entry-header">
 		<?php the_title( '<h2 class="entry-title">', '</h2>' ); ?>
-		<div id="breadcrumbs">
-			<?php ssl_alpine_the_page_breadcrumbs(); ?>
-		</div>
+		<div class="entry-meta">
+			<?php ssl_alpine_the_page_meta(); ?>
+		</div><!-- .entry-meta -->
 	</header><!-- .entry-header -->
 
 	<div class="entry-content">
@@ -24,9 +24,6 @@
 			) );
 		?>
 	</div><!-- .entry-content -->
-	<footer class="entry-footer">
-		<?php edit_post_link( __( 'Edit', 'ssl-alp' ), '<span class="edit-link"><i class="fa fa-edit" aria-hidden="true"></i>', '</span>' ); ?>
-	</footer><!-- .entry-footer -->
 </article><!-- #post-## -->
 <?php ssl_alpine_the_references(); ?>
 <?php ssl_alpine_the_revisions(); ?>

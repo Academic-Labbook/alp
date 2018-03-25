@@ -18,10 +18,14 @@ if ( ! function_exists( 'ssl_alpine_get_the_post_date_html' ) ) :
 		// date formatted to WordPress preference
 		$date_str = $modified ? get_the_modified_date( $datetime_fmt, $post ) : get_the_date( $datetime_fmt, $post );
 
+		// how long ago
+		$human_date = $modified ? ssl_alpine_get_human_date( $post->post_modified ) : ssl_alpine_get_human_date( $post->post_date );
+
 		$time_str = sprintf(
-			'<time class="%1$s" datetime="%2$s">%3$s</time>',
+			'<time class="%1$s" datetime="%2$s" title="%3$s">%4$s</time>',
 			$modified ? "updated" : "entry-date published",
 			esc_attr( $date_iso ),
+			esc_html( $human_date ),
 			esc_html( $date_str )
 		);
 
@@ -52,7 +56,7 @@ endif;
 
 if ( ! function_exists( 'ssl_alpine_get_date_format' ) ):
 	/**
-	 * Get date and optionall time format strings to pass to get_the_date or get_the_modified_date
+	 * Get date and optional time format strings to pass to get_the_date or get_the_modified_date
 	 */
 	function ssl_alpine_get_date_format( $time = true ) {
 		$datetime_fmt = get_option( 'date_format' );
@@ -71,10 +75,29 @@ if ( ! function_exists( 'ssl_alpine_get_date_format' ) ):
 	}
 endif;
 
+if ( ! function_exists( 'ssl_alpine_get_human_date' ) ):
+	/**
+	 * Get human formatted date, e.g. "3 hours ago"
+	 */
+	function ssl_alpine_get_human_date( $date_str, $compare_timestamp = null ) {
+		if ( is_null( $compare_timestamp ) ) {
+			// use current time
+			$compare_timestamp = current_time( 'timestamp' );
+		}
+
+		$timestamp = strtotime( $date_str );
+
+		return sprintf(
+			/* translators: 1: time ago */
+			__( '%s ago', 'ssl-alp' ),
+			human_time_diff( $timestamp, $compare_timestamp )
+		);
+	}
+endif;
+
 if ( ! function_exists( 'ssl_alpine_the_post_meta' ) ) :
 	/**
-	 * Print HTML with meta information such as post date/time, author(s) and
-	 * revisions
+	 * Print HTML with meta information about post
 	 */
 	function ssl_alpine_the_post_meta( $post = null ) {
 		$post = get_post( $post );
@@ -87,6 +110,7 @@ if ( ! function_exists( 'ssl_alpine_the_post_meta' ) ) :
 			$posted_on .= sprintf( __( ' (last edited %1$s)', 'ssl-alp' ), $modified_on );
 		}
 
+		// post id and authors
 		printf(
 			'<div class="byline"><i class="fa fa-link"></i> %1$s&nbsp;&nbsp;%2$s</div>',
 			$post->ID,
@@ -101,7 +125,7 @@ if ( ! function_exists( 'ssl_alpine_the_post_meta' ) ) :
 					$revision_str = sprintf( _n( '%s revision', '%s revisions', $revision_count, 'ssl-alp' ), $revision_count );
 
 					$posted_on .= sprintf(
-						'&nbsp;&nbsp;<span class="revision-count"><i class="fa fa-pencil" aria-hidden="true"></i><a href="%1$s#post-revisions">%2$s</a></span>',
+						'&nbsp;&nbsp;<i class="fa fa-pencil" aria-hidden="true"></i><a href="%1$s#post-revisions">%2$s</a>',
 						esc_url( get_the_permalink( $post ) ),
 						$revision_str
 					);
@@ -109,10 +133,41 @@ if ( ! function_exists( 'ssl_alpine_the_post_meta' ) ) :
 			}
 		}
 
+		if ( current_user_can( 'edit_post', $post ) ) {
+			// add edit post link
+			$posted_on .= sprintf(
+				'&nbsp;&nbsp;<i class="fa fa-edit" aria-hidden="true"></i><a href="%1$s">%2$s</a>',
+				get_edit_post_link(),
+				__( 'Edit' )
+			);
+		}
+
 		printf(
 			'<div class="posted-on">%1$s</div>',
 			$posted_on
 		);
+	}
+endif;
+
+if ( ! function_exists( 'ssl_alpine_the_page_meta' ) ) :
+	/**
+	 * Print HTML with meta information about page
+	 */
+	function ssl_alpine_the_page_meta( $page = null ) {
+		$page = get_post( $page );
+
+		echo '<div id="breadcrumbs">';
+		ssl_alpine_the_page_breadcrumbs();
+		echo '</div>';
+
+		if ( current_user_can( 'edit_page', $page ) ) {
+			// add edit page link
+			printf(
+				'<div class="posted-on"><i class="fa fa-edit" aria-hidden="true"></i><a href="%1$s">%2$s</a></div>',
+				get_edit_post_link(),
+				__( 'Edit' )
+			);
+		}
 	}
 endif;
 
@@ -300,10 +355,9 @@ if ( ! function_exists( 'ssl_alpine_get_revision_description' ) ) :
 		}
 
 		$revision_time = sprintf(
-			/* translators: 1: revision date, 2: time ago */
-			__( '<span title="%1$s">%2$s ago</span>', 'ssl-alp' ),
+			'<span title="%1$s">%2$s</span>',
 			get_the_modified_date( ssl_alpine_get_date_format( true ), $revision ),
-			human_time_diff( strtotime( $revision->post_modified ), current_time( 'timestamp' ) )
+			ssl_alpine_get_human_date( strtotime( $revision->post_modified ) )
 		);
 
 		$author_display_name = get_the_author_meta( 'display_name', $revision->post_author );

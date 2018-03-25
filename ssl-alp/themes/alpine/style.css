@@ -549,10 +549,9 @@ a:hover, a:active {
 --------------------------------------------------------------*/
 
 #breadcrumbs ul {
-	font-size: 85%;
 	clear: both;
     list-style: none;
-	margin: 0;
+	margin: 0 0 0.5em 0;
 	padding: 0;
     overflow: hidden;
 }
@@ -722,10 +721,10 @@ div#post-references ul li, div#post-revisions ul li {
 	margin-bottom: 6px;
 }
 
-.revision-count {
+.entry-header {
 	margin-right: 15px;
 	clear: both;
-	color: #0b789c;
+	color: #0b789c;	
 }
 
 .single .byline, .group-blog .byline {
@@ -768,10 +767,6 @@ div#post-references ul li, div#post-revisions ul li {
 
 .entry-meta span.byline {
 	font-size: inherit;
-}
-
-.entry-footer .edit-link a {
-	padding-left: 5px;
 }
 
 .entry-header .entry-meta {
@@ -1184,7 +1179,7 @@ body{
 }
 
 .widget_ssl_alp_revisions_widget #recent-revisions-list li:before {
-	content: '\f044'; /* pencil icon */
+	content: '\f040'; /* pencil icon */
 }
 
 .nav-links i.fa{

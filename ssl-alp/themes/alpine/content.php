@@ -18,7 +18,6 @@
 			'</a></h2>'
 		);
 		?>
-
 		<?php if ( 'post' === get_post_type() ) : ?>
 		<div class="entry-meta">
 			<?php ssl_alpine_the_post_meta(); ?>
@@ -81,8 +80,6 @@
 			<i class="fa fa-comment" aria-hidden="true"></i>&nbsp;<?php comments_popup_link( esc_html__( 'Leave a comment', 'ssl-alp' ), esc_html__( '1 Comment', 'ssl-alp' ), esc_html__( '% Comments', 'ssl-alp' ) ); ?>
 		</span>
 		<?php endif; ?>
-
-		<?php edit_post_link( esc_html__( 'Edit', 'ssl-alp' ), '<span class="edit-link pull-right"><i class="fa fa-edit" aria-hidden="true"></i>', '</span>' ); ?>
 	</footer><!-- .entry-footer -->
 	<?php endif; ?>
 </article><!-- #post-## -->
