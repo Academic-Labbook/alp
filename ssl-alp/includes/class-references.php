@@ -78,11 +78,9 @@ class SSL_ALP_References extends SSL_ALP_Module {
 
         // DOI shortcode
 		$loader->add_action( 'init', $this, 'add_doi_shortcodes' );
-		$loader->add_filter( 'strip_shortcodes_tagnames', $this, 'prevent_doi_excerpt_strip' );
 
 		// arXiv shortcode
 		$loader->add_action( 'init', $this, 'add_arxiv_shortcodes' );
-		$loader->add_filter( 'strip_shortcodes_tagnames', $this, 'prevent_arxiv_excerpt_strip' );
 	}
 
 	public function create_crossreference_taxonomy() {
@@ -220,10 +218,6 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		return '<a href="' . $url . '">doi:' . $content . '</a>';
 	}
 
-	public function prevent_doi_excerpt_strip( $tags_to_remove ) {
-		return $this->parent->core->prevent_excerpt_strip( 'doi', $tags_to_remove );
-	}
-
 	public function add_arxiv_shortcodes() {
         if ( ! get_option( 'ssl_alp_arxiv_shortcode' ) ) {
 			// arXiv shortcodes disabled
@@ -240,10 +234,6 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		$url = SSL_ALP_ARXIV_BASE_URL . $content;
 
 		return '<a href="' . $url . '">arXiv:' . $content . '</a>';
-	}
-
-	public function prevent_arxiv_excerpt_strip( $tags_to_remove ) {
-		return $this->parent->core->prevent_excerpt_strip( 'arxiv', $tags_to_remove );
 	}
 
 	/**

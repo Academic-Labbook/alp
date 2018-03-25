@@ -141,7 +141,7 @@ class SSL_ALP_Core extends SSL_ALP_Module {
         // post meta stuff
         $loader->add_action( 'init', $this, 'unregister_tags' );
         $loader->add_action( 'init', $this, 'disable_post_excerpts' );
-        $loader->add_action( 'init', $this, 'disable_post_trackbacks' );
+		$loader->add_action( 'init', $this, 'disable_post_trackbacks' );
 	}
 
 	/**
@@ -293,14 +293,11 @@ class SSL_ALP_Core extends SSL_ALP_Module {
     }
 
 	/**
-	 * Prevent WordPress's wp_trim_excerpt() function, which generates a default
-	 * excerpt when a user-specified one is not present, from removing shortcodes
+	 * Process shortcodes on content
+	 * 
+	 * Used for adding shortcodes to excerpts.
 	 */
-	public function prevent_excerpt_strip( $tag, $tags_to_remove ) {
-		if ( ( $key = array_search( $tag, $tags_to_remove ) ) !== false ) {
-			unset( $tags_to_remove[ $key ] );
-		}
-
-		return $tags_to_remove;
+	public function do_shortcode( $content ) {
+		return do_shortcode( $content );
 	}
 }

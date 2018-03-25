@@ -82,9 +82,6 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 		// tex shortcode
 		$loader->add_action( 'init', $this, 'add_tex_shortcode' );
 
-		// prevent removal of tags when excerpt is shown
-		$loader->add_filter( 'strip_shortcodes_tagnames', $this, 'prevent_tex_excerpt_strip' );
-
 		// add JavaScript
 		$loader->add_action( 'wp_footer', $this, 'enqueue_tex_scripts' );
 
@@ -138,10 +135,6 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 		$shortcodes[] = 'tex';
 
 		return $shortcodes;
-	}
-
-	public function prevent_tex_excerpt_strip( $tags_to_remove ) {
-		return $this->parent->core->prevent_excerpt_strip( 'tex', $tags_to_remove );
 	}
 
 	public function enqueue_tex_scripts() {

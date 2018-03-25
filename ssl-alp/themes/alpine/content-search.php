@@ -28,7 +28,6 @@
 		<?php the_excerpt(); ?>
 	</div><!-- .entry-summary -->
 
-
 	<?php if ( 'post' == get_post_type() ) : ?>
 	<footer class="entry-footer">
 		<?php if ( 'post' == get_post_type() ) : // Hide category and tag text for pages on Search. ?>
