@@ -10,21 +10,16 @@ if ( ! function_exists( 'ssl_alp_custom_content_classes' ) ) :
 	 * Modify content classes.
 	 */
 	function ssl_alp_custom_content_classes( $input ) {
-		if ( is_page_template( 'template/page-root.php' ) ) {
-			// contents page takes up full width
-			$input[] = 'col-sm-3';
-		} else {
-			// not using special page template
-			// get theme setting for layout instead
-			$site_layout = ssl_alp_get_option( 'site_layout' );
+		// not using special page template
+		// get theme setting for layout instead
+		$site_layout = ssl_alp_get_option( 'site_layout' );
 
-			if ( 'content-sidebar' === $site_layout ) {
-				$input[] = 'col-sm-2-left';
-			} else if ( 'sidebar-content' === $site_layout ) {
-				$input[] = 'col-sm-2-right';
-			} else if ( 'full-width' === $site_layout ) {
-				$input[] = 'col-sm-3';
-			}
+		if ( 'content-sidebar' === $site_layout ) {
+			$input[] = 'col-sm-2-left';
+		} else if ( 'sidebar-content' === $site_layout ) {
+			$input[] = 'col-sm-2-right';
+		} else if ( 'full-width' === $site_layout ) {
+			$input[] = 'col-sm-3';
 		}
 
 		// add extra small format as a fall-back for mobile
@@ -41,22 +36,14 @@ if ( ! function_exists( 'ssl_alp_custom_sidebar_classes' ) ) :
 	 * Modify sidebar classes.
 	 */
 	function ssl_alp_custom_sidebar_classes( $input ) {
-		if ( is_page_template( 'template/page-root.php' ) ) {
-			// shouldn't be necessary as sidebar isn't printed by standard.php,
-			// but we'll hide it anyway
-			$input[] = 'hidden';
-		} else {
-			// not using special page template
-			// get theme setting for layout instead
-			$site_layout = ssl_alp_get_option( 'site_layout' );
+		$site_layout = ssl_alp_get_option( 'site_layout' );
 
-			if ( 'content-sidebar' === $site_layout ) {
-				$input[] = 'col-sm-1-right';
-			} else if ( 'sidebar-content' === $site_layout ) {
-				$input[] = 'col-sm-1-left';
-			} else if ( 'full-width' === $site_layout ) {
-				$input[] = 'hidden';
-			}
+		if ( 'content-sidebar' === $site_layout ) {
+			$input[] = 'col-sm-1-right';
+		} else if ( 'sidebar-content' === $site_layout ) {
+			$input[] = 'col-sm-1-left';
+		} else if ( 'full-width' === $site_layout ) {
+			$input[] = 'hidden';
 		}
 
 		return $input;
@@ -132,24 +119,3 @@ if ( ! function_exists( 'ssl_alp_add_go_to_top' ) ) :
 endif;
 
 add_action( 'wp_footer', 'ssl_alp_add_go_to_top' );
-
-if ( ! function_exists( 'ssl_alp_custom_content_width' ) ) :
-	/**
-	 * Custom content width.
-	 */
-	function ssl_alp_custom_content_width() {
-		global $content_width;
-
-		if ( is_page() ) {
-			if ( is_page_template( 'template/page-root.php' ) ) {
-				// use full width
-				$content_width = 1128;
-			} elseif ( is_page_template( 'page.php' ) ) {
-				// include space for contents
-				$content_width = 800;
-			}
-		}
-	}
-endif;
-
-add_filter( 'template_redirect', 'ssl_alp_custom_content_width' );

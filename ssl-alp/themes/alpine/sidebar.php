@@ -9,27 +9,21 @@
 	<div id="secondary" <?php echo ssl_alp_sidebar_class( 'widget-area container clearfix' ); ?> role="complementary">
 		<?php
 		if ( is_page() ) {
-			// this is a page, but is it special?
-			if ( is_page_template( 'template/page-root.php' ) ) {
-				// special page root
-				// no sidebar
-			} else {
-				// standard page
-				if ( ! dynamic_sidebar( 'sidebar-page' ) ) {
-					/**
-					 * default sidebar shown before admin customisation
-					 */
+			// standard page
+			if ( ! dynamic_sidebar( 'sidebar-page' ) ) {
+				/**
+				 * default sidebar shown before admin customisation
+				 */
 
-					// search widget
-					the_widget(
-						'WP_Widget_Search',
-						array(),
-						array()
-					);
+				// search widget
+				the_widget(
+					'WP_Widget_Search',
+					array(),
+					array()
+				);
 
-					// contents widget
-					// ...
-				}
+				// contents widget
+				// ...
 			}
 		} else {
 			// not a page

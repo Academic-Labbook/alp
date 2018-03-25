@@ -110,7 +110,7 @@ function ssl_alp_widgets_init() {
 	register_sidebar( array(
 		'name'          => __( 'Page Sidebar', 'ssl-alp' ),
 		'id'            => 'sidebar-page',
-		'description'   => __( 'This is the sidebar appearing on pages, except those using the "Page Root" template. This is intended to hold the page contents widget.', 'ssl-alp' ),
+		'description'   => __( 'This is the sidebar appearing on pages. This is intended to hold the page contents widget.', 'ssl-alp' ),
 		'before_widget' => '<aside id="%1$s" class="widget clearfix %2$s">',
 		'after_widget'  => '</aside>',
 		'before_title'  => '<h3 class="widget-title">',
