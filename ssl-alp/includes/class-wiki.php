@@ -99,30 +99,63 @@ class SSL_ALP_Wiki extends SSL_ALP_Module {
 	 * Prepares page content by inserting id attributes into <h1>, <h2>, ... <h6> tags
 	 * where necessary and building a table of contents
 	 */
-	public function prepare_page_content( $content ) {
+	public function prepare_page_content( $page_content ) {
 		// variable to store contents for widget
 		global $ssl_alp_page_toc;
+
+		// load content into DOM parser
+		if ( empty( $page_content ) ) {
+			// no point continuing
+			return $page_content;
+		}
 
 		// disable visible XML error reporting temporarily
 		// (we will check for errors using libxml_get_errors)
 		$prev_libxml_error_setting = libxml_use_internal_errors( true );
-
-		// load content into DOM parser
-		if ( empty( $content ) ) {
-			// no point continuing
-			return $content;
-		}
 		
 		$document = new DOMDocument();
-		// load HTML, without adding doctype, head or body implicitly
-		$document->loadHTML($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+
+		/**
+		 * Nasty hack to remove doctype and html/body elements added automatically
+		 * 
+		 * Because we use DOMDocument, it implies a doctype and <html><body> ... </body></html>
+		 * in the output unless the LIBXML_HTML_NOIMPLIED and LIBXML_HTML_NODEFDTD flags are
+		 * set. However, the LIBXML_HTML_NOIMPLIED flag messes up the document structure,
+		 * leading to complications with $header->textContent below. The code below immediately
+		 * removes the doctype and html tags. It's not nice, but it works.
+		 * 
+		 * https://stackoverflow.com/a/29499718/2251982
+		 */
+
+		// load HTML document contained within a div
+		$document->loadHTML( '<div>' . $page_content . '</div>' );
+
+		// get div (it should be the only one)
+		$container = $document->getElementsByTagName( 'div' )->item( 0 );
+
+		// remove the container element from the document, but keep a reference to it
+		$container = $container->parentNode->removeChild($container);
+
+		// get rid of all other children in the document (doctype, html, body...)
+		while ( $document->firstChild ) {
+			$document->removeChild( $document->firstChild );
+		}
+
+		// add children from the container back into document
+		while ( $container->firstChild ) {
+			$document->appendChild( $container->firstChild );
+		}
+
+		/**
+		 * end of hack
+		 */
 
 		if ( count( libxml_get_errors() ) ) {
 			// there were parser errors
 			error_log( sprintf( 'SSL_ALP parser errors: %s', print_r( libxml_get_errors(), true ) ) );
 
 			// return content without building a table of contents
-			return $content;
+			return $page_content;
 		}
 		
 		// revert libxml error setting
@@ -193,11 +226,17 @@ class SSL_ALP_Wiki extends SSL_ALP_Module {
 			// update last level
 			$last_level = $current_level;
 
+			// unique id for this header
+			$header_id = $this->_unique_id( $header, $document );
+
+			// set tag's id
+			$header->setAttribute( 'id', $header_id );
+
 			// add new child to parent
 			$child = new SSL_ALP_Menu_Level();
 			$child->set_menu_data(
 				array(
-					'id'	=>	$this->_unique_id( $header, $document ),
+					'id'	=>	$header_id,
 					'title'	=>	$header->textContent
 				)
 			);
@@ -215,7 +254,7 @@ class SSL_ALP_Wiki extends SSL_ALP_Module {
 	/**
 	 * Get a unique id for the given tag
 	 */
-	protected function _unique_id( &$tag, &$dom ) {
+	protected function _unique_id( $tag, $dom ) {
 		$id = $tag->getAttribute( 'id' );
 
 		if ( empty( $id ) ) {
@@ -230,20 +269,17 @@ class SSL_ALP_Wiki extends SSL_ALP_Module {
 			// copy original id
 			$original_id = $id;
 
+			// number to add to end of id
+			$num = 1;
+
 			// add increasing natural number onto end of id until unique is found
 			while ( $this->_id_exists( $id, $dom ) ) {
-				// number to add to end of id
-				static $num = 1;
-
 				// id with appended number
 				$id = $original_id . $num;
 					
 				$num++;
 			}
 		}
-
-		// set tag's id
-		$tag->setAttribute( 'id', $id );
 
 		return $id;
 	}
@@ -260,16 +296,16 @@ class SSL_ALP_Wiki extends SSL_ALP_Module {
 	 */
 	protected function _text_to_id( $text, $delimiter = '-' ) {
 		// convert to lowercase
-		$text = strtolower($text);
+		$text = strtolower( $text );
 
 		// strip whitespace before and after id
-		$text = trim($text, $delimiter);
+		$text = trim( $text, $delimiter );
 
 		// replace inner whitespace with delimeter
-		$text = preg_replace('/\s/', $delimiter, $text);
+		$text = preg_replace( '/\s/', $delimiter, $text );
 
 		// remove anything that isn't a word or delimiter
-		$text = preg_replace('/[^\w\\' . $delimiter . ']/', '', $text);
+		$text = preg_replace( '/[^\w\\' . $delimiter . ']/', '', $text );
 
 		return $text;
 	}
