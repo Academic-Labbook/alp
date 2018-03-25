@@ -47,15 +47,6 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 
 		register_setting(
 			'ssl-alp-admin-options',
-			'ssl_alp_disable_post_formats',
-			array(
-				'type'		=>	'boolean',
-				'default'	=>	true
-			)
-		);
-
-		register_setting(
-			'ssl-alp-admin-options',
 			'ssl_alp_disable_post_excerpts',
 			array(
 				'type'		=>	'boolean',

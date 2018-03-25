@@ -6,13 +6,6 @@
 </p>
 <p class="description"><?php _e( 'Tags are very similar to categories, but do not support hierarchies and are mainly useful for search engine optimisation on commercial sites.', 'ssl-alp' ); ?></p>
 <p>
-    <label for="ssl_alp_disable_post_formats_checkbox">
-        <input type="checkbox" name="ssl_alp_disable_post_formats" id="ssl_alp_disable_post_formats_checkbox" value="1" <?php checked( get_option( 'ssl_alp_disable_post_formats' ) ); ?> />
-        <?php _e( 'Disable formats', 'ssl-alp' ); ?>
-    </label>
-</p>
-<p class="description"><?php _e( 'These are post styles selected from the editor such as "quote" or "gallery". They make no difference to the way in which the post is displayed unless the chosen theme supports it, and so this seemingly irrelevant setting may lead to confusion.', 'ssl-alp' ); ?></p>
-<p>
     <label for="ssl_alp_disable_post_excerpts_checkbox">
         <input type="checkbox" name="ssl_alp_disable_post_excerpts" id="ssl_alp_disable_post_excerpts_checkbox" value="1" <?php checked( get_option( 'ssl_alp_disable_post_excerpts' ) ); ?> />
         <?php _e( 'Disable excerpts', 'ssl-alp' ); ?>
