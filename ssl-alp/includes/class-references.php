@@ -77,10 +77,10 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		$loader->add_action( 'save_post', $this, 'extract_crossreferences', 10, 2 );
 
         // DOI shortcode
-		$loader->add_action( 'init', $this, 'add_doi_shortcodes' );
+		$loader->add_action( 'init', $this, 'add_doi_shortcode' );
 
 		// arXiv shortcode
-		$loader->add_action( 'init', $this, 'add_arxiv_shortcodes' );
+		$loader->add_action( 'init', $this, 'add_arxiv_shortcode' );
 	}
 
 	public function create_crossreference_taxonomy() {
@@ -200,7 +200,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		return (bool) $this->supported_reference_post_types[$post->post_type];
 	}
 
-    public function add_doi_shortcodes() {
+    public function add_doi_shortcode() {
         if ( ! get_option( 'ssl_alp_doi_shortcode' ) ) {
 			// DOI shortcodes disabled
             return;
@@ -218,7 +218,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		return '<a href="' . $url . '">doi:' . $content . '</a>';
 	}
 
-	public function add_arxiv_shortcodes() {
+	public function add_arxiv_shortcode() {
         if ( ! get_option( 'ssl_alp_arxiv_shortcode' ) ) {
 			// arXiv shortcodes disabled
             return;
