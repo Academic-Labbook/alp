@@ -22,22 +22,8 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
     /**
 	 * Register stylesheets
 	 */
-	public function enqueue_styles() {
-
-	}
-
-    /**
-	 * Register stylesheets
-	 */
 	public function enqueue_admin_styles() {
         wp_enqueue_style( 'ssl-alp-coauthors-css', SSL_ALP_BASE_URL . 'css/coauthors.css', array(), $this->get_version(), 'all' );
-	}
-
-    /**
-	 * Register scripts
-	 */
-	public function enqueue_scripts() {
-
 	}
 
     /**
@@ -75,11 +61,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			// coauthors disabled; no point continuing
 			return;
 		}
-
-		$loader->add_action( 'wp_enqueue_scripts', $this, 'enqueue_styles' );
-        $loader->add_action( 'wp_enqueue_scripts', $this, 'enqueue_scripts' );
-        $loader->add_action( 'admin_enqueue_scripts', $this, 'enqueue_admin_styles' );
-		$loader->add_action( 'admin_enqueue_scripts', $this, 'enqueue_admin_scripts' );
 
 		// Register our models
 		$loader->add_action( 'init', $this, 'action_init', 100 );

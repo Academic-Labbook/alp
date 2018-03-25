@@ -5,20 +5,6 @@
  */
 class SSL_ALP_Revisions extends SSL_ALP_Module {
 	/**
-	 * Register the stylesheets.
-	 */
-	public function enqueue_styles() {
-
-	}
-
-	/**
-	 * Register JavaScript.
-	 */
-	public function enqueue_scripts() {
-
-	}
-
-	/**
 	 * Register settings
 	 */
 	public function register_settings() {

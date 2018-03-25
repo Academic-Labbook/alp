@@ -20,20 +20,6 @@ class SSL_ALP_Authenticate extends SSL_ALP_Module {
 	public static $exclude_ajax_actions = array();
 
 	/**
-	 * Register the stylesheets.
-	 */
-	public function enqueue_styles() {
-
-	}
-
-	/**
-	 * Register JavaScript.
-	 */
-	public function enqueue_scripts() {
-
-	}
-
-	/**
 	 * Register settings
 	 */
 	public function register_settings() {
@@ -46,13 +32,6 @@ class SSL_ALP_Authenticate extends SSL_ALP_Module {
             )
         );
 	}
-
-    /**
-     * Register settings fields
-     */
-    public function register_settings_fields() {
-
-    }
 
 	/**
 	 * Register hooks

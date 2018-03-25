@@ -28,10 +28,6 @@ class SSL_ALP_Core extends SSL_ALP_Module {
         wp_enqueue_script( 'ssl-alp-public-js', SSL_ALP_BASE_URL . 'js/public.js', array( 'jquery' ), $this->get_version(), false );
 	}
 
-	public function enqueue_admin_scripts() {
-        
-	}
-
 	/**
 	 * Register settings
 	 */
@@ -132,11 +128,6 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 	 */
 	public function register_hooks() {
 		$loader = $this->get_loader();
-
-		$loader->add_action( 'wp_enqueue_scripts', $this, 'enqueue_styles' );
-		$loader->add_action( 'wp_enqueue_scripts', $this, 'enqueue_scripts' );
-		$loader->add_action( 'admin_enqueue_scripts', $this, 'enqueue_admin_styles' );
-		$loader->add_action( 'admin_enqueue_scripts', $this, 'enqueue_admin_scripts' );
 
 		// add additional media type support
 		$loader->add_filter( 'upload_mimes', $this, 'filter_mime_types' );

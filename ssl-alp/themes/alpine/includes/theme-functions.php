@@ -42,9 +42,7 @@ if ( ! function_exists( 'ssl_alp_get_theme_option_defaults' ) ) :
 	 * @return array
 	 */
 	function ssl_alp_get_theme_option_defaults() {
-		$defaults = array(
-			'site_logo'                    => '',
-			'replace_site_title'           => false,
+		return array(
 			'site_layout'                  => 'content-sidebar',
 			'content_layout'               => 'excerpt',
 			'read_more_text'               => esc_html__( 'Read more', 'ssl-alp' ),
@@ -55,10 +53,6 @@ if ( ! function_exists( 'ssl_alp_get_theme_option_defaults' ) ) :
 			'powered_by'                   => true,
 			'go_to_top'                    => true,
 		);
-
-		$defaults = apply_filters( 'ssl_alp_filter_default_theme_options', $defaults );
-
-		return $defaults;
 	}
 endif;
 
@@ -69,10 +63,7 @@ if ( ! function_exists( 'ssl_alp_get_options' ) ) :
 	 * @since 1.8
 	 */
 	function ssl_alp_get_options() {
-		$value = array();
-		$value = get_theme_mod( 'ssl_alp_options' );
-
-		return $value;
+		return get_theme_mod( 'ssl_alp_options' );
 	}
 endif;
 

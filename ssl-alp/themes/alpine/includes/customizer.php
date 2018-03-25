@@ -13,177 +13,26 @@
 function ssl_alp_customize_register( $wp_customize ) {
 	global $ssl_alp_default_options;
 
-	// Panels, sections and fields.
+	// enable core settings to live update
 	$wp_customize->get_setting( 'blogname' )->transport         = 'postMessage';
 	$wp_customize->get_setting( 'blogdescription' )->transport  = 'postMessage';
 	$wp_customize->get_setting( 'header_textcolor' )->transport = 'postMessage';
 
-	// Add Panel.
-	$wp_customize->add_panel(
-		'ssl_alp_options_panel',
-		array(
-			'title'      => __( 'Alpine Theme', 'ssl-alp' ),
-			'priority'   => 0,
-			'capability' => 'edit_theme_options',
-		)
-	);
+	/**
+	 * Post lists section
+	 */
 
-	// General Section.
 	$wp_customize->add_section(
-		'ssl_alp_options_general',
+		'ssl_alp_post_list_options',
 		array(
-			'title'      => __( 'General Options', 'ssl-alp' ),
-			'priority'   => 100,
+			'title'      => __( 'Post Lists', 'ssl-alp' ),
+			'priority'   => 80,
 			'capability' => 'edit_theme_options',
-			'panel'      => 'ssl_alp_options_panel',
+			'panel'      => '',
 		)
 	);
 
-	// Setting - site_layout.
-	$wp_customize->add_setting(
-		'ssl_alp_options[site_layout]',
-		array(
-			'default'           => $ssl_alp_default_options['site_layout'],
-			'capability'        => 'edit_theme_options',
-			'sanitize_callback' => 'ssl_alp_sanitize_select',
-		)
-	);
-
-	$wp_customize->add_control(
-		'ssl_alp_options[site_layout]',
-		array(
-			'label'    => __( 'Site Layout', 'ssl-alp' ),
-			'section'  => 'ssl_alp_options_general',
-			'type'     => 'select',
-			'priority' => 105,
-			'choices'  => array(
-				'content-sidebar' => __( 'Sidebar on right', 'ssl-alp' ),
-				'sidebar-content' => __( 'Sidebar on left', 'ssl-alp' ),
-				'full-width'      => __( 'No sidebar', 'ssl-alp' ),
-			),
-		)
-	);
-
-	// Setting - content_layout.
-	$wp_customize->add_setting(
-		'ssl_alp_options[content_layout]',
-		array(
-			'default'           => $ssl_alp_default_options['content_layout'],
-			'capability'        => 'edit_theme_options',
-			'sanitize_callback' => 'ssl_alp_sanitize_select',
-		)
-	);
-
-	$wp_customize->add_control(
-		'ssl_alp_options[content_layout]',
-		array(
-			'label'    => __( 'Content Layout', 'ssl-alp' ),
-			'section'  => 'ssl_alp_options_general',
-			'type'     => 'select',
-			'priority' => 115,
-			'choices'  => array(
-				'full'          => __( 'Full post', 'ssl-alp' ),
-				'excerpt'       => __( 'Excerpt', 'ssl-alp' )
-			),
-		)
-	);
-
-	// Blog Section.
-	$wp_customize->add_section(
-		'ssl_alp_options_blog',
-		array(
-			'title'      => __( 'Blog Options', 'ssl-alp' ),
-			'priority'   => 100,
-			'capability' => 'edit_theme_options',
-			'panel'      => 'ssl_alp_options_panel',
-		)
-	);
-
-	// Setting - read_more_text.
-	$wp_customize->add_setting(
-		'ssl_alp_options[read_more_text]',
-		array(
-			'default'           => $ssl_alp_default_options['read_more_text'],
-			'capability'        => 'edit_theme_options',
-			'sanitize_callback' => 'sanitize_text_field',
-			'transport'         => 'postMessage',
-		)
-	);
-
-	$wp_customize->add_control(
-		'ssl_alp_options[read_more_text]',
-		array(
-			'label'    => __( 'Read more text', 'ssl-alp' ),
-			'section'  => 'ssl_alp_options_blog',
-			'type'     => 'text',
-			'priority' => 210,
-		)
-	);
-
-	// Setting - excerpt_length.
-	$wp_customize->add_setting(
-		'ssl_alp_options[excerpt_length]',
-		array(
-			'default'              => $ssl_alp_default_options['excerpt_length'],
-			'capability'           => 'edit_theme_options',
-			'sanitize_callback'    => 'ssl_alp_sanitize_number_absint',
-			'sanitize_js_callback' => 'esc_attr',
-		)
-	);
-
-	$wp_customize->add_control(
-		'ssl_alp_options[excerpt_length]',
-		array(
-			'label'    => __( 'Excerpt length (words)', 'ssl-alp' ),
-			'section'  => 'ssl_alp_options_blog',
-			'type'     => 'text',
-			'priority' => 220,
-		)
-	);
-
-	// Search Section.
-	$wp_customize->add_section(
-		'ssl_alp_options_search',
-		array(
-			'title'      => __( 'Search Options', 'ssl-alp' ),
-			'priority'   => 100,
-			'capability' => 'edit_theme_options',
-			'panel'      => 'ssl_alp_options_panel',
-		)
-	);
-
-	// Setting - search_placeholder.
-	$wp_customize->add_setting(
-		'ssl_alp_options[search_placeholder]',
-		array(
-			'default'           => $ssl_alp_default_options['search_placeholder'],
-			'capability'        => 'edit_theme_options',
-			'sanitize_callback' => 'sanitize_text_field',
-		)
-	);
-
-	$wp_customize->add_control(
-		'ssl_alp_options[search_placeholder]',
-		array(
-			'label'    => __( 'Search Placeholder', 'ssl-alp' ),
-			'section'  => 'ssl_alp_options_search',
-			'type'     => 'text',
-			'priority' => 220,
-		)
-	);
-
-	// Pagination Section.
-	$wp_customize->add_section(
-		'ssl_alp_options_pagination',
-		array(
-			'title'      => __( 'Pagination Options', 'ssl-alp' ),
-			'priority'   => 100,
-			'capability' => 'edit_theme_options',
-			'panel'      => 'ssl_alp_options_panel',
-		)
-	);
-
-	// Setting - pagination_type.
+	// pagination setting
 	$wp_customize->add_setting(
 		'ssl_alp_options[pagination_type]',
 		array(
@@ -197,9 +46,10 @@ function ssl_alp_customize_register( $wp_customize ) {
 		'ssl_alp_options[pagination_type]',
 		array(
 			'label'       => __( 'Pagination Type', 'ssl-alp' ),
-			'section'     => 'ssl_alp_options_pagination',
+			'description'	=>	__( 'Determines whether to display an "Older Posts" link or page numbers at the bottom of a list of posts.', 'ssl-alp' ),
+			'section'     => 'ssl_alp_post_list_options',
 			'type'        => 'select',
-			'priority'    => 220,
+			'priority'    => 110,
 			'choices'     => array(
 				'default' => __( 'Default', 'ssl-alp' ),
 				'numeric' => __( 'Numeric', 'ssl-alp' ),
@@ -207,18 +57,150 @@ function ssl_alp_customize_register( $wp_customize ) {
 		)
 	);
 
-	// Footer Section.
-	$wp_customize->add_section(
-		'ssl_alp_options_footer',
+	// post display setting
+	$wp_customize->add_setting(
+		'ssl_alp_options[content_layout]',
 		array(
-			'title'      => __( 'Footer Options', 'ssl-alp' ),
-			'priority'   => 100,
-			'capability' => 'edit_theme_options',
-			'panel'      => 'ssl_alp_options_panel',
+			'default'           => $ssl_alp_default_options['content_layout'],
+			'capability'        => 'edit_theme_options',
+			'sanitize_callback' => 'ssl_alp_sanitize_select',
 		)
 	);
 
-	// Setting - copyright_text.
+	$wp_customize->add_control(
+		'ssl_alp_options[content_layout]',
+		array(
+			'label'    => __( 'Post Display', 'ssl-alp' ),
+			'description'	=>	__( 'Determines how much post content is displayed in lists. Post pages always show the full content.', 'ssl-alp' ),
+			'section'  => 'ssl_alp_post_list_options',
+			'type'     => 'select',
+			'priority' => 120,
+			'choices'  => array(
+				'full'          => __( 'Full post', 'ssl-alp' ),
+				'excerpt'       => __( 'Excerpt', 'ssl-alp' )
+			),
+		)
+	);
+
+	// excerpt length setting
+	$wp_customize->add_setting(
+		'ssl_alp_options[excerpt_length]',
+		array(
+			'default'              => $ssl_alp_default_options['excerpt_length'],
+			'capability'           => 'edit_theme_options',
+			'sanitize_callback'    => 'ssl_alp_sanitize_number_absint',
+			'sanitize_js_callback' => 'esc_attr',
+		)
+	);
+
+	$wp_customize->add_control(
+		'ssl_alp_options[excerpt_length]',
+		array(
+			'label'    => __( 'Excerpt length', 'ssl-alp' ),
+			'description'	=>	__( 'The number of words to display in the excerpt.', 'ssl-alp' ),
+			'section'  => 'ssl_alp_post_list_options',
+			'type'     => 'text',
+			'priority' => 130,
+		)
+	);
+
+	// read more text setting
+	$wp_customize->add_setting(
+		'ssl_alp_options[read_more_text]',
+		array(
+			'default'           => $ssl_alp_default_options['read_more_text'],
+			'capability'        => 'edit_theme_options',
+			'sanitize_callback' => 'sanitize_text_field',
+			'transport'         => 'postMessage',
+		)
+	);
+
+	$wp_customize->add_control(
+		'ssl_alp_options[read_more_text]',
+		array(
+			'label'    => __( '"Read More" Text', 'ssl-alp' ),
+			'description'	=>	__( 'The text used to link to the full post.', 'ssl-alp' ),
+			'section'  => 'ssl_alp_post_list_options',
+			'type'     => 'text',
+			'priority' => 140,
+		)
+	);
+
+	/**
+	 * Sidebar section
+	 */
+
+	$wp_customize->add_section(
+		'ssl_alpine_sidebar_options',
+		array(
+			'title'      => __( 'Sidebar', 'ssl-alp' ),
+			'priority'   => 90,
+			'capability' => 'edit_theme_options',
+			'panel'      => ''
+		)
+	);
+
+	// site_layout setting
+	$wp_customize->add_setting(
+		'ssl_alp_options[site_layout]',
+		array(
+			'default'           => $ssl_alp_default_options['site_layout'],
+			'capability'        => 'edit_theme_options',
+			'sanitize_callback' => 'ssl_alp_sanitize_select',
+		)
+	);
+
+	$wp_customize->add_control(
+		'ssl_alp_options[site_layout]',
+		array(
+			'label'    => __( 'Sidebar Placement', 'ssl-alp' ),
+			'section'  => 'ssl_alpine_sidebar_options',
+			'type'     => 'select',
+			'priority' => 110,
+			'choices'  => array(
+				'content-sidebar' => __( 'Right of main content', 'ssl-alp' ),
+				'sidebar-content' => __( 'Left of main content', 'ssl-alp' ),
+				'full-width'      => __( 'Disabled', 'ssl-alp' ),
+			),
+		)
+	);
+
+	// search placeholder setting
+	$wp_customize->add_setting(
+		'ssl_alp_options[search_placeholder]',
+		array(
+			'default'           => $ssl_alp_default_options['search_placeholder'],
+			'capability'        => 'edit_theme_options',
+			'sanitize_callback' => 'sanitize_text_field',
+		)
+	);
+
+	$wp_customize->add_control(
+		'ssl_alp_options[search_placeholder]',
+		array(
+			'label'    => __( 'Search Placeholder', 'ssl-alp' ),
+			'description'	=>	__( 'The text to display in background of search box.', 'ssl-alp' ),
+			'section'  => 'ssl_alpine_sidebar_options',
+			'type'     => 'text',
+			'priority' => 120,
+		)
+	);
+
+	/**
+	 * Footer section
+	 */
+
+	$wp_customize->add_section(
+		'ssl_alp_footer_options',
+		array(
+			'title'      => __( 'Footer', 'ssl-alp' ),
+			'priority'   => 100,
+			'capability' => 'edit_theme_options',
+			'panel'      => '',
+		)
+	);
+
+	// copyright text setting
 	$wp_customize->add_setting(
 		'ssl_alp_options[copyright_text]',
 		array(
@@ -232,14 +214,14 @@ function ssl_alp_customize_register( $wp_customize ) {
 	$wp_customize->add_control(
 		'ssl_alp_options[copyright_text]',
 		array(
-			'label'    => __( 'Copyright text', 'ssl-alp' ),
-			'section'  => 'ssl_alp_options_footer',
+			'label'    => __( 'Copyright Text', 'ssl-alp' ),
+			'section'  => 'ssl_alp_footer_options',
 			'type'     => 'text',
-			'priority' => 910,
+			'priority' => 110,
 		)
 	);
 
-	// Setting - powered_by.
+	// "powered by" setting
 	$wp_customize->add_setting(
 		'ssl_alp_options[powered_by]',
 		array(
@@ -252,14 +234,14 @@ function ssl_alp_customize_register( $wp_customize ) {
 	$wp_customize->add_control(
 		'ssl_alp_options[powered_by]',
 		array(
-			'label'    => __( 'Show Powered By', 'ssl-alp' ),
-			'section'  => 'ssl_alp_options_footer',
+			'label'    => __( 'Show "Powered By" label', 'ssl-alp' ),
+			'section'  => 'ssl_alp_footer_options',
 			'type'     => 'checkbox',
-			'priority' => 920,
+			'priority' => 120,
 		)
 	);
 
-	// Setting - go_to_top.
+	// "go to top" setting
 	$wp_customize->add_setting(
 		'ssl_alp_options[go_to_top]',
 		array(
@@ -272,10 +254,10 @@ function ssl_alp_customize_register( $wp_customize ) {
 	$wp_customize->add_control(
 		'ssl_alp_options[go_to_top]',
 		array(
-			'label'    => __( 'Enable Go To Top', 'ssl-alp' ),
-			'section'  => 'ssl_alp_options_footer',
+			'label'    => __( 'Enable "Go To Top" button', 'ssl-alp' ),
+			'section'  => 'ssl_alp_footer_options',
 			'type'     => 'checkbox',
-			'priority' => 920,
+			'priority' => 130,
 		)
 	);
 }
@@ -335,6 +317,7 @@ if ( ! function_exists( 'ssl_alp_sanitize_select' ) ) {
 	function ssl_alp_sanitize_select( $input, $setting ) {
 		$input = sanitize_key( $input );
 		$choices = $setting->manager->get_control( $setting->id )->choices;
+		
 		return ( array_key_exists( $input, $choices ) ? $input : $setting->default );
 	}
 }

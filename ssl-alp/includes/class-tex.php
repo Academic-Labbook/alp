@@ -13,14 +13,9 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 	 * Register the stylesheets.
 	 */
 	public function enqueue_styles() {
+		$css_url = esc_url( get_option( 'ssl_alp_katex_css_url' ) );
 
-	}
-
-	/**
-	 * Register JavaScript.
-	 */
-	public function enqueue_scripts() {
-
+		wp_enqueue_style( 'ssl-alp-katex', $css_url, array(), SSL_ALP_KATEX_VERSION );
 	}
 
 	/**
@@ -122,18 +117,18 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 		// default span classes
 		$classes = array( 'ssl-alp-katex-equation' );
 
-		$data_display = false;
+		$display_block = false;
 
 		if ( $shortcode_atts['display'] === 'block' ) {
 			// render as block
 			$classes[] = "katex-display";
-			$data_display = true;
+			$display_block = true;
 		}
 
 		return sprintf(
 			'<span class="%1$s" data-display="%2$s">%3$s</span>',
 			implode( ' ', $classes ),
-			($data_display) ? "true" : "false",
+			($display_block) ? "true" : "false",
 			htmlspecialchars( html_entity_decode( $content ) )
 		);
 	}
@@ -157,11 +152,9 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 
 		// JavaScript and CSS URLs
 		$js_url = esc_url( get_option( 'ssl_alp_katex_js_url' ) );
-		$css_url = esc_url( get_option( 'ssl_alp_katex_css_url' ) );
 
 		// enqueue scripts
-		wp_enqueue_script( 'ssl-alp-katex-js', $js_url, array(), SSL_ALP_KATEX_VERSION );
-		wp_enqueue_script( 'ssl-alp-katex-render-js', SSL_ALP_BASE_URL . 'js/katex.js', array(), SSL_ALP_KATEX_VERSION );
-		wp_enqueue_style( 'ssl-alp-katex-css', $css_url, array(), SSL_ALP_KATEX_VERSION );
+		wp_enqueue_script( 'ssl-alp-katex', $js_url, array(), SSL_ALP_KATEX_VERSION );
+		wp_enqueue_script( 'ssl-alp-katex-render', SSL_ALP_BASE_URL . 'js/katex.js', array(), SSL_ALP_KATEX_VERSION );
 	}
 }

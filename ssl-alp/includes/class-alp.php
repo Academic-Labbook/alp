@@ -65,7 +65,7 @@ class SSL_ALP {
 
 		$this->plugin_name = 'Academic Labbook Plugin';
 		$this->load_modules();
-		$this->register_hooks();
+		$this->register();
 	}
 
 	/**
@@ -169,7 +169,7 @@ class SSL_ALP {
 	/**
 	 * Register plugin hooks.
 	 */
-	private function register_hooks() {
+	private function register() {
 		// register plugin settings (high priority)
 		$this->loader->add_action( 'init', $this, 'register_settings', 3 );
 
@@ -182,14 +182,14 @@ class SSL_ALP {
 		// plugin settings (high priority)
 		$this->loader->add_action( 'admin_init', $this, 'admin_settings_init' );
 
-		// register module hooks
-		$this->core->register_hooks();
-		$this->auth->register_hooks();
-		$this->wiki->register_hooks();
-		$this->coauthors->register_hooks();
-		$this->revisions->register_hooks();
-		$this->references->register_hooks();
-		$this->tex->register_hooks();
+		// register submodules
+		$this->core->register();
+		$this->auth->register();
+		$this->wiki->register();
+		$this->coauthors->register();
+		$this->revisions->register();
+		$this->references->register();
+		$this->tex->register();
 	}
 
 	/**
@@ -208,13 +208,7 @@ class SSL_ALP {
 	 */
 	public function register_settings() {
 		// call modules to create their settings
-		$this->core->register_settings();
-		$this->auth->register_settings();
-		$this->wiki->register_settings();
-		$this->coauthors->register_settings();
-		$this->revisions->register_settings();
-		$this->references->register_settings();
-		$this->tex->register_settings();
+		
 	}
 
 	/**
@@ -505,15 +499,6 @@ class SSL_ALP {
 			array( $this, 'media_settings_section_callback' ), // callback
 			'ssl-alp-admin-options' // page
 		);
-
-		// call modules to create their settings fields
-		$this->core->register_settings_fields();
-		$this->auth->register_settings_fields();
-		$this->wiki->register_settings_fields();
-		$this->coauthors->register_settings_fields();
-		$this->revisions->register_settings_fields();
-		$this->references->register_settings_fields();
-		$this->tex->register_settings_fields();
     }
 
     public function site_settings_section_callback() {
@@ -551,28 +536,43 @@ abstract class SSL_ALP_Module {
 		return $this->parent->get_version();
 	}
 
+	public function register() {
+		$loader = $this->get_loader();
+
+		// register hooks
+		$this->register_hooks();
+
+		// register settings
+		$loader->add_action( 'admin_init', $this, 'register_settings' );
+		$loader->add_action( 'admin_init', $this, 'register_settings_fields' );
+
+		// enqueue styles and scripts
+		$loader->add_action( 'wp_enqueue_scripts', $this, 'enqueue_styles' );
+        $loader->add_action( 'wp_enqueue_scripts', $this, 'enqueue_scripts' );
+        $loader->add_action( 'admin_enqueue_scripts', $this, 'enqueue_admin_styles' );
+		$loader->add_action( 'admin_enqueue_scripts', $this, 'enqueue_admin_scripts' );
+	}
+
 	/**
 	 * Enqueue styles in the page header
 	 */
-	abstract public function enqueue_styles();
+	public function enqueue_styles() {}
+	public function enqueue_admin_styles() {}
 
 	/**
 	 * Enqueue scripts in the page header
 	 */
-	abstract public function enqueue_scripts();
+	public function enqueue_scripts() {}
+	public function enqueue_admin_scripts() {}
 
 	/**
-	 * Register settings
+	 * Register settings and fields
 	 */
-	abstract public function register_settings();
-
-	/**
-	 * Register settings fields
-	 */
-	abstract public function register_settings_fields();
+	public function register_settings() {}
+	public function register_settings_fields() {}
 
 	/**
 	 * Register hooks
 	 */
-	abstract public function register_hooks();
+	public function register_hooks() {}
 }

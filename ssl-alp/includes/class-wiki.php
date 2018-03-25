@@ -5,36 +5,6 @@
  */
 class SSL_ALP_Wiki extends SSL_ALP_Module {
 	/**
-	 * Register the stylesheets.
-	 */
-	public function enqueue_styles() {
-
-	}
-
-	/**
-	 * Register JavaScript.
-	 */
-	public function enqueue_scripts() {
-
-	}
-
-	/**
-	 * Register settings
-	 */
-	public function register_settings() {
-
-	}
-
-    /**
-     * Register settings fields
-     */
-    public function register_settings_fields() {
-        /**
-         * Post references settings
-         */
-    }
-
-	/**
 	 * Register hooks
 	 */
 	public function register_hooks() {

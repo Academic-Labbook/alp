@@ -76,7 +76,6 @@ if ( ! function_exists( 'ssl_alp_custom_excerpt_length' ) ) :
 	 */
 	function ssl_alp_custom_excerpt_length( $length ) {
 		$excerpt_length = ssl_alp_get_option( 'excerpt_length' );
-		$excerpt_length = apply_filters( 'ssl_alp_filter_excerpt_length', esc_attr( $excerpt_length ) );
 
 		if ( empty( $excerpt_length ) ) {
 			$excerpt_length = $length;
@@ -100,12 +99,6 @@ if ( ! function_exists( 'ssl_alp_excerpt_readmore' ) ) :
 	function ssl_alp_excerpt_readmore( $more ) {
 		global $post;
 
-		$flag_apply_excerpt_readmore = apply_filters( 'ssl_alp_filter_excerpt_readmore', true );
-
-		if ( true !== $flag_apply_excerpt_readmore ) {
-			return $more;
-		}
-
 		$read_more_text = ssl_alp_get_option( 'read_more_text' );
 
 		if ( empty( $read_more_text ) ) {
@@ -113,7 +106,6 @@ if ( ! function_exists( 'ssl_alp_excerpt_readmore' ) ) :
 		}
 
 		$output = '... <a href="'. esc_url( get_permalink( $post->ID ) ) . '" class="readmore">' . esc_attr( $read_more_text )  . '<span class="screen-reader-text">' . esc_html( get_the_title() ) . '</span><span class="fa fa-angle-double-right" aria-hidden="true"></span></a>';
-		$output = apply_filters( 'ssl_alp_filter_read_more_content', $output );
 
 		return $output;
 	}
@@ -130,11 +122,12 @@ if ( ! function_exists( 'ssl_alp_add_go_to_top' ) ) :
 	function ssl_alp_add_go_to_top() {
 
 		$go_to_top = ssl_alp_get_option( 'go_to_top' );
+
 		if ( true !== $go_to_top ) {
 			return;
 		}
-		echo '<a href="#" class="scrollup" id="btn-scrollup"><span class="fa-stack"> <i class="fa fa-square fa-stack-2x" aria-hidden="true"></i><i class="fa fa-angle-up fa-stack-1x fa-inverse" aria-hidden="true"></i></span><span class="screen-reader-text">' . __( 'Go to top', 'ssl-alp' ) . '</span></a>';
 
+		echo '<a href="#" class="scrollup" id="btn-scrollup"><span class="fa-stack"> <i class="fa fa-square fa-stack-2x" aria-hidden="true"></i><i class="fa fa-angle-up fa-stack-1x fa-inverse" aria-hidden="true"></i></span><span class="screen-reader-text">' . __( 'Go to top', 'ssl-alp' ) . '</span></a>';
 	}
 endif;
 
