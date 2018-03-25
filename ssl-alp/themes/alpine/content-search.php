@@ -16,16 +16,20 @@
 		<div class="entry-meta">
 			<?php ssl_alpine_the_post_meta(); ?>
 		</div><!-- .entry-meta -->
+		<?php elseif ( 'page' == get_post_type() ) : ?>
+		<div class="entry-meta">
+			<?php ssl_alpine_the_page_meta(); ?>
+		</div><!-- .entry-meta -->
 		<?php endif; ?>
 	</header><!-- .entry-header -->
 
+	<?php if ( 'status' !== get_post_format() ) : // status update theme type; don't show content ?>
 	<div class="entry-summary">
 		<?php the_excerpt(); ?>
 	</div><!-- .entry-summary -->
 
-	<?php if ( 'page' == get_post_type() ) : ?>
-	<?php // no footer for pages ?>
-	<?php else: ?>
+
+	<?php if ( 'post' == get_post_type() ) : ?>
 	<footer class="entry-footer">
 		<?php if ( 'post' == get_post_type() ) : // Hide category and tag text for pages on Search. ?>
 			<?php
@@ -55,5 +59,6 @@
 		<span class="comments-link"><i class="fa fa-comment" aria-hidden="true"></i>&nbsp;<?php comments_popup_link( esc_html__( 'Leave a comment', 'ssl-alp' ), esc_html__( '1 Comment', 'ssl-alp' ), esc_html__( '% Comments', 'ssl-alp' ) ); ?></span>
 		<?php endif; ?>
 	</footer><!-- .entry-footer -->
+	<?php endif; ?>
 	<?php endif; ?>
 </article><!-- #post-## -->

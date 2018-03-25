@@ -357,7 +357,7 @@ if ( ! function_exists( 'ssl_alpine_get_revision_description' ) ) :
 		$revision_time = sprintf(
 			'<span title="%1$s">%2$s</span>',
 			get_the_modified_date( ssl_alpine_get_date_format( true ), $revision ),
-			ssl_alpine_get_human_date( strtotime( $revision->post_modified ) )
+			ssl_alpine_get_human_date( $revision->post_modified )
 		);
 
 		$author_display_name = get_the_author_meta( 'display_name', $revision->post_author );
