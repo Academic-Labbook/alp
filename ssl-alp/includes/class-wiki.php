@@ -13,6 +13,9 @@ class SSL_ALP_Wiki extends SSL_ALP_Module {
 		// remove comment, author and thumbnail support
 		$loader->add_action( 'init', $this, 'disable_post_type_support' );
 
+		// remove month dropdown filter on admin page list
+		$loader->add_action( 'months_dropdown_results', $this, 'disable_months_dropdown_results', 10, 2 );
+
 		// remove date column from list of wiki pages in admin
 		$loader->add_filter( 'manage_edit-page_columns', $this, 'manage_edit_columns' );
 
@@ -33,6 +36,18 @@ class SSL_ALP_Wiki extends SSL_ALP_Module {
 		remove_post_type_support( 'page', 'comments' );
 		remove_post_type_support( 'page', 'author' );
 		remove_post_type_support( 'page', 'thumbnail' );
+	}
+
+	/**
+	 * Disable months dropdown box in admin page list
+	 */
+	public function disable_months_dropdown_results( $months, $post_type ) {
+		if ( $post_type == 'page' ) {
+			// return empty array to force it to hide (see months_dropdown() in class-wp-list-table.php)
+			return array();
+		}
+
+		return $months;
 	}
 
 	/**
