@@ -179,7 +179,7 @@ if ( ! function_exists( 'ssl_alpine_get_the_authors' ) ) :
 		$post = get_post( $post );
 
 		if ( is_plugin_active( 'ssl-alp/alp.php' ) && get_option( 'ssl_alp_multiple_authors' ) ) {
-			$authors = get_coauthors( $post->ID );
+			$authors = get_coauthors( $post );
 		} else {
 			// fall back to the_author if plugin is disabled
 			$authors = array( get_user_by( 'id', $post->post_author ) );
