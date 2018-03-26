@@ -8,6 +8,10 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
         'post'
     );
 
+	/**
+	 * Fields of WP_User to search against to find coauthors to add to posts
+	 * in the admin post edit screen
+	 */
 	protected $ajax_search_fields = array(
         'display_name',
         'first_name',
@@ -1233,7 +1237,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		// See if the prefixed term is available, otherwise default to just the nicename
-		$term = get_term_by( 'slug', 'cap-' . $coauthor->user_nicename, 'ssl_alp_coauthor' );
+		$term = get_term_by( 'slug', 'ssl-alp-coauthor-' . $coauthor->user_nicename, 'ssl_alp_coauthor' );
 
 		if ( ! $term ) {
 			$term = get_term_by( 'slug', $coauthor->user_nicename, 'ssl_alp_coauthor' );
@@ -1271,7 +1275,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 				wp_update_term( $term->term_id, 'ssl_alp_coauthor', array( 'description' => $term_description ) );
 			}
 		} else {
-			$coauthor_slug = 'cap-' . $coauthor->user_nicename;
+			$coauthor_slug = 'ssl-alp-coauthor-' . $coauthor->user_nicename;
 
 			$args = array(
 				'slug'          => $coauthor_slug,
