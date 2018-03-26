@@ -233,7 +233,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 				// Ensure we aren't doing the lookup by the prefixed value
 				if ( 'login' == $key || 'slug' == $key ) {
-					$value = preg_replace( '#^cap\-#', '', $value );
+					$value = preg_replace( '/^ssl\-alp\-coauthor\-/', '', $value );
 				}
 
 				$user = get_user_by( $key, $value );
@@ -1405,7 +1405,7 @@ function get_coauthors( $post_id = 0 ) {
 
 		if ( is_array( $coauthor_terms ) && ! empty( $coauthor_terms ) ) {
 			foreach ( $coauthor_terms as $coauthor ) {
-				$coauthor_slug = preg_replace( '#^cap\-#', '', $coauthor->slug );
+				$coauthor_slug = preg_replace( '/^ssl\-alp\-coauthor\-/', '', $coauthor->slug );
 				$post_author = $ssl_alp->coauthors->get_coauthor_by( 'user_nicename', $coauthor_slug );
 				
 				// In case the user has been deleted while plugin was deactivated
