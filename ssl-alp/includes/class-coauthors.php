@@ -275,7 +275,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Adds a custom Authors box
+	 * Adds a custom authors box
 	 */
 	public function add_coauthors_box() {
 		if ( ! $this->is_post_type_enabled() || ! $this->current_user_can_set_authors() ) {
@@ -676,7 +676,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return $data;
 		}
 
-		// This action happens when a post is saved while editing a post
+		// this action happens when a post is saved while editing a post
 		if ( isset( $_REQUEST['ssl-alp-coauthors-nonce'] ) && isset( $_POST['coauthors'] ) && is_array( $_POST['coauthors'] ) ) {
 			$author = sanitize_text_field( $_POST['coauthors'][0] );
 
@@ -686,7 +686,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			}
 		}
 
-		// If for some reason we don't have the coauthors fields set
+		// if for some reason we don't have the coauthors fields set, set the author to the current user
 		if ( ! isset( $data['post_author'] ) ) {
 			$user = wp_get_current_user();
 			$data['post_author'] = $user->ID;
@@ -716,12 +716,14 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 				$coauthors = (array) $_POST['coauthors'];
 				$coauthors = array_map( 'sanitize_text_field', $coauthors );
+
 				$this->add_coauthors( $post_id, $coauthors );
 			}
 		} else {
 			// If the user can't set authors and a co-author isn't currently set, we need to explicity set one
 			if ( ! $this->has_author_terms( $post_id ) ) {
 				$user = get_userdata( $post->post_author );
+
 				if ( $user ) {
 					$this->add_coauthors( $post_id, array( $user->user_login ) );
 				}
@@ -736,18 +738,19 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Add one or more co-authors as bylines for a post
+	 * Set one or more coauthors for a post
 	 */
 	public function add_coauthors( $post_id, $coauthors, $append = false ) {
 		global $wpdb;
 
-		$post_id = (int) $post_id;
+		$post = get_post( $post_id );
+
 		$insert = false;
         $current_user = wp_get_current_user();
 
 		// Best way to persist order
 		if ( $append ) {
-			$existing_coauthors = wp_list_pluck( get_coauthors( $post_id ), 'user_login' );
+			$existing_coauthors = wp_list_pluck( get_coauthors( $post->ID ), 'user_login' );
 		} else {
 			$existing_coauthors = array();
 		}
@@ -768,11 +771,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			$author_name = $term->slug;
 		}
 
-		wp_set_post_terms( $post_id, $coauthors, 'ssl_alp_coauthor', false );
+		wp_set_post_terms( $post->ID, $coauthors, 'ssl_alp_coauthor', false );
 
 		// If the original post_author is no longer assigned,
 		// update to the first WP_User $coauthor
-		$post_author_user = get_user_by( 'id', get_post( $post_id )->post_author );
+		$post_author_user = get_user_by( 'id', $post->post_author );
 
 		if ( empty( $post_author_user ) || ! in_array( $post_author_user->user_login, $coauthors ) ) {
 			foreach ( $coauthor_objects as $coauthor_object ) {
@@ -785,8 +788,8 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 				return false;
 			}
 
-			$wpdb->update( $wpdb->posts, array( 'post_author' => $new_author->ID ), array( 'ID' => $post_id ) );
-			clean_post_cache( $post_id );
+			$wpdb->update( $wpdb->posts, array( 'post_author' => $new_author->ID ), array( 'ID' => $post->ID ) );
+			clean_post_cache( $post->ID );
 		}
 
 		return true;
