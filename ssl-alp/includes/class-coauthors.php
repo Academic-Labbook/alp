@@ -126,13 +126,17 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// save revisions if coauthors have changed
 		$loader->add_filter( 'wp_save_post_revision_post_has_changed', $this, 'check_coauthors_have_changed', 10, 3 );
 
-		// Filter to send comment moderation notification e-mail to multiple authors
+		// filters to send comment notification/moderation emails to multiple authors
+		$loader->add_filter( 'comment_notification_recipients', $this, 'filter_comment_notification_email_recipients', 10, 2 );
 		$loader->add_filter( 'comment_moderation_recipients', $this, 'filter_comment_moderation_email_recipients', 10, 2 );
 
 		// delete coauthor cache on post save and delete
 		$loader->add_action( 'save_post', $this, 'clear_cache' );
 		$loader->add_action( 'delete_post', $this, 'clear_cache' );
 		$loader->add_action( 'set_object_terms', $this, 'clear_cache_on_terms_set', 10, 6 );
+
+		// update term description when user profile is edited
+		$loader->add_action( 'profile_update', $this, 'update_author_term' );
 	}
 
     /**
@@ -960,7 +964,30 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
     /**
-     * Filter array of moderation notification email addresses
+     * Filter array of comment notification email addresses
+     */
+    public function filter_comment_notification_email_recipients( $recipients, $comment_id ) {
+    	$comment = get_comment( $comment_id );
+    	$post_id = $comment->comment_post_ID;
+
+    	if ( isset( $post_id ) ) {
+    		$coauthors = get_coauthors( $post_id );
+    		$extra_recipients = array();
+
+    		foreach ( $coauthors as $user ) {
+    			if ( ! empty( $user->user_email ) ) {
+    				$extra_recipients[] = $user->user_email;
+    			}
+    		}
+
+    		$recipients = array_unique( array_merge( $recipients, $extra_recipients ) );
+    	}
+
+    	return $recipients;
+    }
+
+    /**
+     * Filter array of comment moderation email addresses
      */
     public function filter_comment_moderation_email_recipients( $recipients, $comment ) {
     	$comment = get_comment( $comment );
@@ -976,7 +1003,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
     			}
     		}
 
-    		return array_unique( array_merge( $recipients, $extra_recipients ) );
+    		$recipients = array_unique( array_merge( $recipients, $extra_recipients ) );
     	}
 
     	return $recipients;
@@ -987,11 +1014,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 */
 	public function ajax_suggest() {
 		if ( ! isset( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'ssl-alp-coauthors-search' ) ) {
-			die();
+			exit();
 		}
 
 		if ( empty( $_REQUEST['q'] ) ) {
-			die();
+			exit();
 		}
 
 		$search = sanitize_text_field( strtolower( $_REQUEST['q'] ) );
@@ -1003,7 +1030,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			echo esc_html( $author->ID . ' | ' . $author->user_login . ' | ' . $author->display_name . ' | ' . $author->user_email . ' | ' . $author->user_nicename ) . "\n";
 		}
 
-		die();
+		exit();
 	}
 
 	/**
@@ -1026,9 +1053,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			'fields' => 'all_with_meta',
 		);
 
-		add_action( 'pre_user_query', array( $this, 'action_pre_user_query' ) );
 		$found_users = get_users( $args );
-		remove_action( 'pre_user_query', array( $this, 'action_pre_user_query' ) );
 
 		foreach ( $found_users as $found_user ) {
 			$term = $this->get_author_term( $found_user );
@@ -1064,10 +1089,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		foreach ( $found_users as $key => $found_user ) {
-			// make sure the user is contributor and above (or a custom cap)
 			if ( in_array( $found_user->user_login, $ignored_authors ) ) {
-				unset( $found_users[ $key ] );
-			} else if ( false === $found_user->has_cap( 'edit_posts' ) ) {
 				unset( $found_users[ $key ] );
 			}
 		}
@@ -1083,17 +1105,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$pieces['where'] = str_replace( 't.name LIKE', 'tt.description LIKE', $pieces['where'] );
 
 		return $pieces;
-	}
-
-    /**
-	 * Modify get_users() to search display_name instead of user_nicename
-	 */
-	function action_pre_user_query( &$user_query ) {
-
-		if ( is_object( $user_query ) ) {
-			$user_query->query_where = str_replace( 'user_nicename LIKE', 'display_name LIKE', $user_query->query_where );
-		}
-
 	}
 
 	/**
@@ -1237,6 +1248,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * Update the author term for a given co-author
 	 */
 	public function update_author_term( $coauthor ) {
+		if ( is_int( $coauthor ) ) {
+			// get user by their id
+			$coauthor = get_user_by( 'id', $coauthor );
+		}
+		
 		if ( ! is_object( $coauthor ) ) {
 			return false;
 		}
@@ -1410,133 +1426,16 @@ function get_coauthors( $post_id = 0 ) {
 }
 endif;
 
-if ( ! function_exists( 'wp_notify_postauthor' ) ) :
-	/**
-	 * Notify a co-author of a comment/trackback/pingback to one of their posts.
-	 * This is a modified version of the core function in wp-includes/pluggable.php that
-	 * supports notifs to multiple co-authors. Unfortunately, this is the best way to do it :(
-	 */
-	function wp_notify_postauthor( $comment_id ) {
-		$comment = get_comment( $comment_id );
-		$post = get_post( $comment->comment_post_ID );
-		$coauthors = get_coauthors( $post->ID );
-
-		foreach ( $coauthors as $author ) {
-			if ( $comment->user_id == $author->ID ) {
-                // the comment was left by the co-author
-				continue;
-			}
-
-			if ( $author->ID == get_current_user_id() ) {
-                // the co-author moderated a comment on their own post
-				continue;
-			}
-
-			// If there's no email to send the comment to
-			if ( '' == $author->user_email ) {
-				return false;
-			}
-
-			$comment_author_domain = @gethostbyaddr( $comment->comment_author_IP );
-
-			// The blogname option is escaped with esc_html on the way into the database in sanitize_option
-			// we want to reverse this for the plain text arena of emails.
-			$blogname = wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES );
-
-			if ( empty( $comment_type ) ) {
-				$comment_type = 'comment';
-			}
-
-			if ( 'comment' == $comment_type ) {
-				$notify_message  = sprintf( __( 'New comment on your post "%s"' ), $post->post_title ) . "\r\n";
-				/* translators: 1: comment author, 2: author IP, 3: author domain */
-				$notify_message .= sprintf( __( 'Author : %1$s (IP: %2$s , %3$s)' ), $comment->comment_author, $comment->comment_author_IP, $comment_author_domain ) . "\r\n";
-				$notify_message .= sprintf( __( 'E-mail : %s' ), $comment->comment_author_email ) . "\r\n";
-				$notify_message .= sprintf( __( 'URL    : %s' ), $comment->comment_author_url ) . "\r\n";
-				$notify_message .= sprintf( __( 'Whois  : http://whois.arin.net/rest/ip/%s' ), $comment->comment_author_IP ) . "\r\n";
-				$notify_message .= __( 'Comment: ' ) . "\r\n" . $comment->comment_content . "\r\n\r\n";
-				$notify_message .= __( 'You can see all comments on this post here: ' ) . "\r\n";
-				/* translators: 1: blog name, 2: post title */
-				$subject = sprintf( __( '[%1$s] Comment: "%2$s"' ), $blogname, $post->post_title );
-			} elseif ( 'trackback' == $comment_type ) {
-				$notify_message  = sprintf( __( 'New trackback on your post "%s"' ), $post->post_title ) . "\r\n";
-				/* translators: 1: website name, 2: author IP, 3: author domain */
-				$notify_message .= sprintf( __( 'Website: %1$s (IP: %2$s , %3$s)' ), $comment->comment_author, $comment->comment_author_IP, $comment_author_domain ) . "\r\n";
-				$notify_message .= sprintf( __( 'URL    : %s' ), $comment->comment_author_url ) . "\r\n";
-				$notify_message .= __( 'Excerpt: ' ) . "\r\n" . $comment->comment_content . "\r\n\r\n";
-				$notify_message .= __( 'You can see all trackbacks on this post here: ' ) . "\r\n";
-				/* translators: 1: blog name, 2: post title */
-				$subject = sprintf( __( '[%1$s] Trackback: "%2$s"' ), $blogname, $post->post_title );
-			} elseif ( 'pingback' == $comment_type ) {
-				$notify_message  = sprintf( __( 'New pingback on your post "%s"' ), $post->post_title ) . "\r\n";
-				/* translators: 1: comment author, 2: author IP, 3: author domain */
-				$notify_message .= sprintf( __( 'Website: %1$s (IP: %2$s , %3$s)' ), $comment->comment_author, $comment->comment_author_IP, $comment_author_domain ) . "\r\n";
-				$notify_message .= sprintf( __( 'URL    : %s' ), $comment->comment_author_url ) . "\r\n";
-				$notify_message .= __( 'Excerpt: ' ) . "\r\n" . sprintf( '[...] %s [...]', $comment->comment_content ) . "\r\n\r\n";
-				$notify_message .= __( 'You can see all pingbacks on this post here: ' ) . "\r\n";
-				/* translators: 1: blog name, 2: post title */
-				$subject = sprintf( __( '[%1$s] Pingback: "%2$s"' ), $blogname, $post->post_title );
-			}
-
-			$notify_message .= get_permalink( $comment->comment_post_ID ) . "#comments\r\n\r\n";
-			$notify_message .= sprintf( __( 'Permalink: %s' ), get_permalink( $comment->comment_post_ID ) . '#comment-' . $comment_id ) . "\r\n";
-
-			if ( EMPTY_TRASH_DAYS ) {
-				$notify_message .= sprintf( __( 'Trash it: %s' ), admin_url( "comment.php?action=trash&c=$comment_id" ) ) . "\r\n";
-			} else {
-				$notify_message .= sprintf( __( 'Delete it: %s' ), admin_url( "comment.php?action=delete&c=$comment_id" ) ) . "\r\n";
-			}
-
-			$notify_message .= sprintf( __( 'Spam it: %s' ), admin_url( "comment.php?action=spam&c=$comment_id" ) ) . "\r\n";
-
-			$wp_email = 'wordpress@' . preg_replace( '#^www\.#', '', strtolower( $_SERVER['SERVER_NAME'] ) );
-
-			if ( '' == $comment->comment_author ) {
-				$from = "From: \"$blogname\" <$wp_email>";
-
-				if ( '' != $comment->comment_author_email ) {
-					$reply_to = "Reply-To: $comment->comment_author_email";
-				}
-			} else {
-				$from = "From: \"$comment->comment_author\" <$wp_email>";
-
-				if ( '' != $comment->comment_author_email ) {
-					$reply_to = "Reply-To: \"$comment->comment_author_email\" <$comment->comment_author_email>";
-				}
-			}
-
-			$message_headers = "$from\n"
-				. 'Content-Type: text/plain; charset="' . get_option( 'blog_charset' ) . "\"\n";
-
-			if ( isset( $reply_to ) ) {
-				$message_headers .= $reply_to . "\n";
-			}
-
-			$notify_message = apply_filters( 'comment_notification_text', $notify_message, $comment_id );
-			$subject = apply_filters( 'comment_notification_subject', $subject, $comment_id );
-			$message_headers = apply_filters( 'comment_notification_headers', $message_headers, $comment_id );
-
-			@wp_mail( $author->user_email, $subject, $notify_message, $message_headers );
-		}
-
-		return true;
-	}
-endif;
-
 if ( ! function_exists( 'is_coauthor_for_post' ) ) :
 /**
  * Checks to see if the the specified user is author of the current global post or post (if specified)
  * @param object|int $user
  * @param int $post_id
  */
-function is_coauthor_for_post( $user, $post_id = 0 ) {
-	global $post;
+function is_coauthor_for_post( $user, $post_id = null ) {
+	$post = get_post( $post_id );
 
-	if ( ! $post_id && $post ) {
-		$post_id = $post->ID;
-	}
-
-	if ( ! $post_id ) {
+	if ( ! $post ) {
 		return false;
 	}
 
@@ -1544,7 +1443,7 @@ function is_coauthor_for_post( $user, $post_id = 0 ) {
 		return false;
 	}
 
-	$coauthors = get_coauthors( $post_id );
+	$coauthors = get_coauthors( $post->ID );
 
 	if ( is_numeric( $user ) ) {
 		$user = get_userdata( $user );
