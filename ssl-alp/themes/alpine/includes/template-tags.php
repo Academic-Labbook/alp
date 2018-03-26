@@ -432,50 +432,48 @@ if ( ! function_exists( 'ssl_alpine_the_references' ) ) :
 			return;
 		}
 
-		$ref_to_terms = get_the_terms( $post, 'ssl_alp_crossreference' );
+		$ref_to_posts = ssl_alpine_get_reference_to_posts( $post );
 		$ref_from_posts = ssl_alpine_get_reference_from_posts( $post );
 
-		if ( ! $ref_to_terms && ! $ref_from_posts ) {
+		if ( ( ! is_array( $ref_to_posts ) || ! count( $ref_to_posts ) ) && ( ! is_array( $ref_from_posts ) || ! count( $ref_from_posts ) ) ) {
 			// no references
 			return;
 		}
 
 		printf( '<div id="post-references"><h3>%1$s</h3>', __( 'Cross-references', 'ssl-alp' ));
 
-		if ( $ref_to_terms ) {
-			printf( '<h4>%1$s</h4><ul>', __( 'Links to', 'ssl-alp' ) );
-
-			foreach ( $ref_to_terms as $term ) {
-				// get post ID
-				$post_id = get_term_meta( $term->term_id, 'reference-to-post-id', 'ssl_alp_crossreference' );
-
-				// get the referenced post
-				$referenced_post = get_post( $post_id );
-
-				// print reference post information
-				ssl_alpine_the_referenced_post_list_item( $referenced_post );
-			}
-
-			echo '</ul>';
+		if ( $ref_to_posts ) {
+			printf( '<h4>%1$s</h4>', __( 'Links to', 'ssl-alp' ) );
+			ssl_alpine_the_referenced_post_list( $ref_to_posts );
 		}
 
 		if ( $ref_from_posts ) {
-			printf( '<h4>%1$s</h4><ul>', __( 'Linked from', 'ssl-alp' ));
-
-			foreach ( $ref_from_posts as $referenced_post ) {
-				// get post
-				$referenced_post = get_post( $referenced_post );
-
-				// print reference post information
-				ssl_alpine_the_referenced_post_list_item( $referenced_post );
-			}
-
-			echo '</ul>';
+			printf( '<h4>%1$s</h4>', __( 'Linked from', 'ssl-alp' ));
+			ssl_alpine_the_referenced_post_list( $ref_from_posts );
 		}
 
 		echo '</div>';
 	}
 endif;
+
+if ( ! function_exists( 'ssl_alpine_the_referenced_post_list' ) ) {
+	/**
+	 * Prints list of reference links
+	 */
+	function ssl_alpine_the_referenced_post_list( $referenced_posts ) {
+		echo '<ul>';
+
+		foreach ( $referenced_posts as $referenced_post ) {
+			// get post
+			$referenced_post = get_post( $referenced_post );
+
+			// print reference post information
+			ssl_alpine_the_referenced_post_list_item( $referenced_post );
+		}
+
+		echo '</ul>';
+	}
+}
 
 if ( ! function_exists( 'ssl_alpine_the_referenced_post_list_item' ) ) {
 	/**
@@ -520,7 +518,7 @@ if ( ! function_exists( 'ssl_alpine_get_reference_from_posts' ) ) :
 	 * Gets the "reference from" terms for the specified post. Optionally the
 	 * date order can be changed.
 	 */
-	function ssl_alpine_get_reference_from_posts( $post = null, $date_order = 'DESC' ) {
+	function ssl_alpine_get_reference_from_posts( $post = null ) {
 		global $wpdb;
 
 		$post = get_post( $post );
@@ -528,8 +526,6 @@ if ( ! function_exists( 'ssl_alpine_get_reference_from_posts' ) ) :
 		if ( is_null( $post ) ) {
 			return;
 		}
-
-		$date_order = ( strtoupper( $date_order ) == 'ASC' ) ? 'ASC' : 'DESC';
 
 		// query for terms that reference this post
 		$object_ids = $wpdb->get_col(
@@ -548,7 +544,7 @@ if ( ! function_exists( 'ssl_alpine_get_reference_from_posts' ) ) :
 					AND termmeta.meta_value = %d
 					AND term_taxonomy.taxonomy = %s
 				ORDER BY
-					posts.post_date {$date_order}
+					posts.post_date DESC
 				",
 				'reference-to-post-id',
 				$post->ID,
@@ -556,8 +552,48 @@ if ( ! function_exists( 'ssl_alpine_get_reference_from_posts' ) ) :
 			)
 		);
 
-		// get the term objects associated with the term IDs
-		return array_map( 'get_post', $object_ids );
+		$posts = array();
+
+		// get the posts associated with the term IDs
+		foreach ( $object_ids as $object_id ) {
+			// check permission
+			if ( current_user_can( 'read_post', $object_id ) ) {
+				$posts[] = get_post( $object_id );
+			}
+		}
+
+		return $posts;
+	}
+endif;
+
+if ( ! function_exists( 'ssl_alpine_get_reference_to_posts' ) ) :
+	/**
+	 * Gets the "reference to" terms for the specified post.
+	 */
+	function ssl_alpine_get_reference_to_posts( $post = null ) {
+		$post = get_post( $post );
+		
+		$terms = get_the_terms( $post, 'ssl_alp_crossreference' );
+
+		$posts = array();
+
+		if ( empty( $terms ) ) {
+			// no terms to get posts from
+			return $posts;
+		}
+
+		// get the posts associated with the terms
+		foreach ( $terms as $term ) {
+			// get post ID
+			$post_id = get_term_meta( $term->term_id, 'reference-to-post-id', 'ssl_alp_crossreference' );
+
+			// check permission
+			if ( current_user_can( 'read_post', $post_id ) ) {
+				$posts[] = get_post( $post_id );
+			}
+		}
+
+		return $posts;
 	}
 endif;
 
