@@ -4,11 +4,7 @@ jQuery( document ).ready(function () {
 	 * @param event
 	 */
 	var coauthors_delete_onclick = function( e ) {
-		if ( confirm( coAuthorsPlusStrings.confirm_delete ) ) {
-			return coauthors_delete( this );
-		}
-
-		return false;
+		return coauthors_delete( this );
 	};
 
 	var $coauthors_loading;
@@ -17,16 +13,16 @@ jQuery( document ).ready(function () {
 		var $coauthor_row = jQuery( elem ).closest( '.coauthor-row' );
 		$coauthor_row.remove();
 
-		// Hide the delete button when there's only one Co-Author
-		if ( jQuery( '#coauthors-list .coauthor-row .coauthor-tag' ).length <= 1 )
+		// hide the delete button when there's only one coauthor
+		if ( jQuery( '#coauthors-list .coauthor-row .coauthor-tag' ).length <= 1 ) {
 			jQuery( '#coauthors-list .coauthor-row .coauthors-author-options' ).addClass( 'hidden' );
+		}
 
 		return true;
 	}
 
 	var coauthors_edit_onclick = function( event ) {
 		var $tag = jQuery( this );
-
 		var $co = $tag.prev();
 
 		$tag.hide();
@@ -48,7 +44,7 @@ jQuery( document ).ready(function () {
 			.append( coauthors_create_author_gravatar( author ) )
 			.show();
 
-		// Update the value of the hidden input
+		// update the value of the hidden input
 		co.siblings( 'input[name="coauthors[]"]' ).val( author.nicename );
 	}
 
@@ -59,21 +55,22 @@ jQuery( document ).ready(function () {
 	 * @param boolean Initial set up or not?
 	 */
 	function coauthors_add_coauthor( author, co, init, count ) {
-		// Check if editing
+		// check if editing
 		if ( co && co.siblings( '.coauthor-tag' ).length ) {
 			coauthors_save_coauthor( author, co );
 		} else {
-			// Not editing, so we create a new author entry
+			// not editing, so we create a new author entry
 			if ( count == 0 ) {
-				var coName = ( count == 0 ) ? 'coauthors-main' : '';
-				// Add new author to <select>
-				//coauthors_select_author( author );
+				var co_name = ( count == 0 ) ? 'coauthors-main' : '';
 			}
 
 			var options = { addDelete: true, addEdit: false };
 
-			// Create autosuggest box and text tag
-			if ( ! co ) var co = coauthors_create_autosuggest( author.name, coName );
+			// create autosuggest box and text tag
+			if ( ! co ) {
+				var co = coauthors_create_autosuggest( author.name, co_name );
+			}
+
 			var tag = coauthors_create_author_tag( author );
 			var input = coauthors_create_author_hidden_input( author );
 			var $gravatar = coauthors_create_author_gravatar( author, 25 );
@@ -83,10 +80,10 @@ jQuery( document ).ready(function () {
 			coauthors_add_to_table( co, tag, input, options );
 
 			if ( ! init ) {
-				// Create new author-suggest and append it to a new row
-				var newCO = coauthors_create_autosuggest( '', false );
-				coauthors_add_to_table( newCO );
-				move_loading( newCO );
+				// create new author-suggest and append it to a new row
+				var new_co = coauthors_create_autosuggest( '', false );
+				coauthors_add_to_table( new_co );
+				move_loading( new_co );
 			}
 		}
 
@@ -99,7 +96,6 @@ jQuery( document ).ready(function () {
 
 		return true;
 	}
-
 
 	/*
 	 * Add the autosuggest box and text tag to the Co-Authors table
@@ -116,8 +112,10 @@ jQuery( document ).ready(function () {
 						.append( tag )
 						.append( input );
 
-			//Add buttons to row
-			if ( tag ) coauthors_insert_author_edit_cells( $div, options );
+			// add buttons to row
+			if ( tag ) {
+				coauthors_insert_author_edit_cells( $div, options );
+			}
 
 			jQuery( '#coauthors-list' ).append( $div );
 		}
@@ -132,14 +130,15 @@ jQuery( document ).ready(function () {
 			.addClass( 'coauthors-author-options' );
 
 		if ( options.addDelete ) {
-			var deleteBtn = jQuery( '<span/>' )
+			var delete_btn = jQuery( '<span/>' )
 								.addClass( 'delete-coauthor' )
-								.text( coAuthorsPlusStrings.delete_label )
+								.text( ssl_alp_coauthors_strings.delete_label )
 								.bind( 'click', coauthors_delete_onclick );
-			$options.append( deleteBtn );
+			$options.append( delete_btn );
 		}
 
 		$div.append( $options );
+
 		return $div;
 	}
 
@@ -148,28 +147,29 @@ jQuery( document ).ready(function () {
 	 * @param string [optional] Name of the author
 	 * @param string [optional] Name to be applied to the input box
 	 */
-	function coauthors_create_autosuggest( authorName, inputName ) {
-		if ( ! inputName ) inputName = 'coauthorsinput[]';
+	function coauthors_create_autosuggest( author_name, input_name ) {
+		if ( ! input_name ) input_name = 'coauthorsinput[]';
 
 		var $co = jQuery( '<input/>' );
 
 		$co.attr({
 			'class': 'coauthor-suggest'
-			, 'name': inputName
+			, 'name': input_name
 			})
 			.appendTo( $coauthors_div )
-			.suggest( coAuthorsPlus_ajax_suggest_link, {
+			.suggest( ssl_alp_coauthors_ajax_suggest_link, {
 				onSelect: coauthors_autosuggest_select,
 				delay: 500
 			})
 			.keydown( coauthors_autosuggest_keydown );
 
-		if ( authorName )
-			$co.attr( 'value', unescape( authorName ) );
-		else
-			$co.attr( 'value', coAuthorsPlusStrings.search_box_text )
-				.focus( function(){ $co.val( '' ) } )
-				.blur( function(){ $co.val( coAuthorsPlusStrings.search_box_text ) } );
+		if ( author_name ) {
+			$co.attr( 'value', unescape( author_name ) );
+		} else {
+			$co.attr( 'value', ssl_alp_coauthors_strings.search_box_text )
+				.focus( function() { $co.val( '' ) } )
+				.blur( function() { $co.val( ssl_alp_coauthors_strings.search_box_text ) } );
+		}
 
 		return $co;
 	}
@@ -187,7 +187,7 @@ jQuery( document ).ready(function () {
 		author.email = jQuery.trim( vals[3] );
 		author.nicename = jQuery.trim( vals[4] );
 
-		if ( author.id=='New' ) {
+		if ( author.id == 'New' ) {
 			coauthors_new_author_display( name );
 		} else {
 			coauthors_add_coauthor( author, $this );
@@ -210,13 +210,13 @@ jQuery( document ).ready(function () {
 	 * @param event
 	 */
 	function coauthors_stop_editing( event ) {
-		var co = jQuery( this );
-		var tag = jQuery( co.next() );
+		var $co = jQuery( this );
+		var $tag = jQuery( $co.next() );
 
-		co.attr( 'value',tag.text() );
+		$co.attr( 'value', $tag.text() );
 
-		co.hide();
-		tag.show();
+		$co.hide();
+		$tag.show();
 	}
 
 	/*
@@ -226,7 +226,7 @@ jQuery( document ).ready(function () {
 	function coauthors_create_author_tag( author ) {
 		var $tag = jQuery( '<span></span>' )
 			.html( unescape( author.name ) )
-			.attr( 'title', coAuthorsPlusStrings.input_box_title )
+			.attr( 'title', ssl_alp_coauthors_strings.input_box_title )
 			.addClass( 'coauthor-tag' )
 			// Add Click event to edit
 			.click( coauthors_edit_onclick );
@@ -269,7 +269,7 @@ jQuery( document ).ready(function () {
 	 * @param string Name of the author
 	 */
 	function coauthors_create_author_hidden_input ( author ) {
-		var input = jQuery( '<input />' )
+		var $input = jQuery( '<input />' )
 			.attr({
 				'type': 'hidden',
 				'id': 'coauthors_hidden_input',
@@ -277,7 +277,7 @@ jQuery( document ).ready(function () {
 				'value': unescape( author.nicename )
 			});
 
-		return input;
+		return $input;
 	}
 
 	var $coauthors_div = null;
@@ -293,19 +293,18 @@ jQuery( document ).ready(function () {
 	 *    nicename
 	 */
 	function coauthors_initialize( post_coauthors ) {
-		// Add the controls to add co-authors
+		// add the controls to add co-authors
 		$coauthors_div = jQuery( '#coauthors-edit' );
 
 		if ( $coauthors_div.length ) {
-			// Create the co-authors table
+			// create the co-authors table
 			var table = jQuery( '<div/>' )
 				.attr( 'id', 'coauthors-list' );
 
 			$coauthors_div.append( table );
 		}
 
-		// Select authors already added to the post
-		var addedAlready = [];
+		// select authors already added to the post
 		var count = 0;
 
 		jQuery.each( post_coauthors, function() {
@@ -314,18 +313,19 @@ jQuery( document ).ready(function () {
 			count++;
 		});
 
-		// Hide the delete button if there's only one co-author
-		if ( jQuery( '#coauthors-list .coauthor-row .coauthor-tag' ).length < 2 )
+		// hide the delete button if there's only one co-author
+		if ( jQuery( '#coauthors-list .coauthor-row .coauthor-tag' ).length < 2 ) {
 			jQuery( '#coauthors-list .coauthor-row .coauthors-author-options' ).addClass( 'hidden' );
+		}
 
-		// Create new author-suggest and append it to a new row
-		var newCO = coauthors_create_autosuggest( '', false );
-		coauthors_add_to_table( newCO );
+		// create new author-suggest and append it to a new row
+		var new_co = coauthors_create_autosuggest( '', false );
+		coauthors_add_to_table( new_co );
 
 		$coauthors_loading = jQuery( '#ajax-loading' ).clone().attr( 'id', 'coauthors-loading' );
-		move_loading( newCO );
+		move_loading( new_co );
 
-		// Make co-authors sortable so an editor can control the order of the authors
+		// make co-authors sortable so an editor can control the order of the authors
 		jQuery( '#coauthors-edit' ).ready(function( $ ) {
 			$( '#coauthors-list' ).sortable({
 				axis: 'y',
@@ -349,9 +349,9 @@ jQuery( document ).ready(function () {
 		$coauthors_loading.insertAfter( $input );
 	}
 
-	// Show laoding cursor for autocomplete ajax requests
+	// show loading cursor for autocomplete ajax requests
 	jQuery( document ).ajaxSend(function( e, xhr, settings ) {
-		if ( settings.url.indexOf( coAuthorsPlus_ajax_suggest_link ) != -1 ) {
+		if ( settings.url.indexOf( ssl_alp_coauthors_ajax_suggest_link ) != -1 ) {
 			// Including existing authors on the AJAX suggest link
 			// allows us to filter them out of the search request
 			var existing_authors = jQuery( 'input[name="coauthors[]"]' ).map(function(){return jQuery( this ).val();}).get();
@@ -363,10 +363,11 @@ jQuery( document ).ready(function () {
 		}
 	});
 
-	// Hide loading cursor when autocomplete ajax requests are finished
+	// hide loading cursor when autocomplete ajax requests are finished
 	jQuery( document ).ajaxComplete(function( e, xhr, settings ) {
-		if ( settings.url.indexOf( coAuthorsPlus_ajax_suggest_link ) != -1 )
+		if ( settings.url.indexOf( ssl_alp_coauthors_ajax_suggest_link ) != -1 ) {
 			hide_loading();
+		}
 	});
 
 	if ( 'post-php' == adminpage || 'post-new-php' == adminpage ) {
@@ -386,48 +387,48 @@ jQuery( document ).ready(function () {
 			});
 		}
 
-		// Remove the read-only coauthors so we don't get craziness
+		// remove the read-only coauthors so we don't get craziness
 		jQuery( '#coauthors-readonly' ).remove();
 		coauthors_initialize( post_coauthors );
-	}
-	else if ( 'edit-php' == adminpage ) {
+	} else if ( 'edit-php' == adminpage ) {
+		// this is an inline edit
+		var wp_inline_edit = inlineEditPost.edit;
 
-		var wpInlineEdit = inlineEditPost.edit;
-
+		// set edit function
 		inlineEditPost.edit = function( id ) {
-
-			wpInlineEdit.apply( this, arguments )
+			// call original edit function first
+			wp_inline_edit.apply( this, arguments );
 
 			// get the post ID
-			var postId = 0
-			if ( typeof( id ) == 'object' )
-				postId = parseInt( this.getId( id ) )
+			var post_id = 0;
 
-			if ( postId > 0 ) {
+			if ( typeof( id ) == 'object' ) {
+				post_id = parseInt( this.getId( id ) );
+			}
 
-				var $postRow = jQuery( '#post-' + postId )
+			if ( post_id > 0 ) {
+				var post_row = jQuery( '#post-' + post_id )
 
 				// Move the element to the appropriate position in the view
 				// JS hack for core bug: https://core.trac.wordpress.org/ticket/26982
 				jQuery( '.quick-edit-row .inline-edit-col-left .inline-edit-col' ).find( '.inline-edit-coauthors' ).remove() // remove any previously added elements
-				var el = jQuery( '.inline-edit-group.inline-edit-coauthors', '#edit-' + postId );
+				var el = jQuery( '.inline-edit-group.inline-edit-coauthors', '#edit-' + post_id );
 				el.detach().appendTo( '.quick-edit-row .inline-edit-col-left .inline-edit-col' ).show();
 
 				// initialize coauthors
-				var post_coauthors = jQuery.map( jQuery( '.column-coauthors a', $postRow ), function( el ) {
+				var post_coauthors = jQuery.map( jQuery( '.column-ssl-alp-coauthors a', post_row ), function( el ) {
 					return {
 						login: jQuery( el ).data( 'user_login' ),
 						name: jQuery( el ).data( 'display_name' ),
 						email: jQuery( el ).data( 'user_email' ),
 						nicename: jQuery( el ).data( 'user_nicename' )
 					}
-				})
-				coauthors_initialize( post_coauthors );
+				});
 
+				coauthors_initialize( post_coauthors );
 			}
 		}
 	}
-
 });
 
 if ( typeof( console ) === 'undefined' ) {

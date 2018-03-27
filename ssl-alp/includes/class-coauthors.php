@@ -34,7 +34,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * Register admin scripts
 	 */
 	public function enqueue_admin_scripts() {
-		if ( ! $this->is_post_type_enabled() || ! $this->current_user_can_set_authors() ) {
+		if ( ! $this->post_supports_coauthors() || ! $this->current_user_can_set_authors() ) {
 			return;
 		}
 
@@ -49,7 +49,19 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			'help_text' => __( 'Click on an author to change them. Drag to change their order. Click on <strong>Remove</strong> to remove them.', 'ssl-alp' ),
 		);
 
-		wp_localize_script( 'ssl-alp-coauthors-js', 'coAuthorsPlusStrings', $js_strings );
+		wp_localize_script( 'ssl-alp-coauthors-js', 'ssl_alp_coauthors_strings', $js_strings );
+
+		if ( $this->is_post_type_enabled( get_post_type() ) ) {
+			$data = add_query_arg(
+				array(
+					'action' => 'coauthors_ajax_suggest',
+					'post_type' => rawurlencode( get_post_type() ),
+				),
+				wp_nonce_url( 'admin-ajax.php', 'ssl-alp-coauthors-search' )
+			);
+
+			wp_localize_script( 'ssl-alp-coauthors-js', 'ssl_alp_coauthors_ajax_suggest_link', $data );
+		}
 	}
 
     /**
@@ -69,17 +81,15 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// Register our models
 		$loader->add_action( 'init', $this, 'action_init', 100 );
 
-        // Add necessary JS variables
-		$loader->add_action( 'admin_head', $this, 'js_vars' );
-
 		// Hooks to add additional coauthors to author column to Edit page
 		$loader->add_filter( 'manage_posts_columns', $this, '_filter_manage_posts_columns' );
 		$loader->add_filter( 'manage_pages_columns', $this, '_filter_manage_posts_columns' );
 		$loader->add_action( 'manage_posts_custom_column', $this, '_filter_manage_posts_custom_column' );
 		$loader->add_action( 'manage_pages_custom_column', $this, '_filter_manage_posts_custom_column' );
 
-		// Add quick-edit author select field
-		$loader->add_action( 'quick_edit_custom_box', $this, '_action_quick_edit_custom_box', 10, 2 );
+		// remove the author dropdown from the post quick edit and add the coauthor edit box
+		$loader->add_action( 'admin_head', $this, 'remove_quick_edit_authors_box' );
+		$loader->add_action( 'quick_edit_custom_box', $this, 'add_quick_edit_custom_box', 10, 2 );
 
 		// Hooks to modify the published post number count on the Users WP List Table
 		$loader->add_filter( 'manage_users_columns', $this, '_filter_manage_users_columns' );
@@ -116,9 +126,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// Handle the custom author meta box
 		$loader->add_action( 'add_meta_boxes', $this, 'add_coauthors_box' );
 		$loader->add_action( 'add_meta_boxes', $this, 'remove_authors_box' );
-
-		// Removes the author dropdown from the post quick edit
-		$loader->add_action( 'admin_head', $this, 'remove_quick_edit_authors_box' );
 
 		// Restricts WordPress from blowing away term order on bulk edit
 		$loader->add_filter( 'wp_get_object_terms', $this, 'filter_wp_get_object_terms', 10, 4 );
@@ -196,8 +203,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			'query_var'      => false,
 			'rewrite'        => false,
 			'public'         => false,
-			'sort'           => true,
-			'args'           => array( 'orderby' => 'term_order' ),
+			'sort'           => true, // remember order terms are added to posts
 			'show_ui'        => false,
 		);
 
@@ -251,11 +257,19 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
+	 * Whether or not coauthors are enabled for this post
+	 */
+	public function post_supports_coauthors( $post = null ) {
+		$post = get_post( $post );
+		$post_type = get_post_type( $post );
+
+		return $this->is_post_type_enabled( $post_type );
+	}
+
+	/**
 	 * Whether or not coauthors are enabled for this post type
 	 */
-	public function is_post_type_enabled( $post_type = null ) {
-		$post_type = get_post_type( $post_type );
-
+	public function is_post_type_enabled( $post_type ) {
 		return in_array( $post_type, $this->supported_post_types );
 	}
 
@@ -263,7 +277,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * Remove the standard post edit authors metabox (is replaced with coauthors box by add_coauthors_box)
 	 */
 	public function remove_authors_box() {
-		if ( $this->is_post_type_enabled() ) {
+		if ( $this->post_supports_coauthors() ) {
 			remove_meta_box( 'authordiv', get_post_type(), 'normal' );	
         }
 	}
@@ -272,7 +286,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * Add the coauthors metabox
 	 */
 	public function add_coauthors_box() {
-		if ( ! $this->is_post_type_enabled() || ! $this->current_user_can_set_authors() ) {
+		if ( ! $this->post_supports_coauthors() || ! $this->current_user_can_set_authors() ) {
             return;
         }
 
@@ -338,7 +352,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	function remove_quick_edit_authors_box() {
 		global $pagenow;
 
-		if ( 'edit.php' == $pagenow && $this->is_post_type_enabled() ) {
+		if ( 'edit.php' == $pagenow && $this->post_supports_coauthors() ) {
 			remove_post_type_support( get_post_type(), 'author' );
 		}
 	}
@@ -351,7 +365,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	function _filter_manage_posts_columns( $posts_columns ) {
 		$new_columns = array();
 
-		if ( ! $this->is_post_type_enabled() ) {
+		if ( ! $this->post_supports_coauthors() ) {
 			return $posts_columns;
 		}
 
@@ -461,7 +475,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	/**
 	 * Quick Edit co-authors box.
 	 */
-	function _action_quick_edit_custom_box( $column_name, $post_type ) {
+	function add_quick_edit_custom_box( $column_name, $post_type ) {
 		if ( 'ssl-alp-coauthors' != $column_name || ! $this->is_post_type_enabled( $post_type ) || ! $this->current_user_can_set_authors() ) {
 			return;
 		}
@@ -695,7 +709,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return;
 		}
 
-		if ( ! $this->is_post_type_enabled( $post->post_type ) ) {
+		if ( ! $this->post_supports_coauthors( $post ) ) {
 			return;
 		}
 
@@ -740,9 +754,9 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 		// best way to persist order
 		if ( $append ) {
-			$existing_coauthors = wp_list_pluck( get_coauthors( $post ), 'user_login' );
+			$existing_coauthor_names = wp_list_pluck( get_coauthors( $post ), 'user_login' );
 		} else {
-			$existing_coauthors = array();
+			$existing_coauthor_names = array();
 		}
 
 		// at least one co-author is always required
@@ -751,7 +765,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		// set the coauthors
-		$coauthors = array_unique( array_merge( $existing_coauthors, $coauthors ) );
+		$coauthors = array_unique( array_merge( $existing_coauthor_names, $coauthors ) );
 		$coauthor_objects = array();
 
 		foreach ( $coauthors as &$author_name ) {
@@ -1121,30 +1135,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Adds necessary JavaScript variables to admin head section
-	 */
-	public function js_vars() {
-		if ( ! $this->is_post_type_enabled() || ! $this-> current_user_can_set_authors() ) {
-			return;
-		}
-		?>
-			<script type="text/javascript">
-				// AJAX link used for the autosuggest
-				var coAuthorsPlus_ajax_suggest_link = <?php
-				echo wp_json_encode(
-					add_query_arg(
-						array(
-							'action' => 'coauthors_ajax_suggest',
-							'post_type' => rawurlencode( get_post_type() ),
-						),
-						wp_nonce_url( 'admin-ajax.php', 'ssl-alp-coauthors-search' )
-					)
-				); ?>;
-			</script>
-		<?php
-	}
-
-	/**
 	 * Allows coauthors to edit the post they're coauthors of
 	 */
 	function filter_user_has_cap( $allcaps, $caps, $args ) {
@@ -1311,18 +1301,25 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$parent_coauthors = get_coauthors( $post );
 
 		// coauthors on current revision
-		$current_coauthors = array();
+		$current_coauthor_ids = array();
 
-		foreach ( $_POST['coauthors'] as $author ) {
-			$author = sanitize_text_field( $author );
+		foreach ( $_POST['coauthors'] as $author_nicename ) {
+			$author_nicename = sanitize_text_field( $author_nicename );
+
+			// get author (returns false if author doesn't exist)
+			$author = $this->get_coauthor_by( 'user_nicename', $author_nicename );
 
 			if ( $author ) {
-				$current_coauthors[] = $this->get_coauthor_by( 'user_nicename', $author );
+				$current_coauthor_ids[] = $author->ID;
 			}
 		}
 
+		// get parent coauthor ids
+		$parent_coauthor_ids = wp_list_pluck( $parent_coauthors, 'id' );
+
 		// check if coauthors have changed
-		if ( $parent_coauthors != $current_coauthors ) {
+		// a change in order of existing authors will trigger post change due to !==
+		if ( $parent_coauthor_ids !== $current_coauthor_ids ) {
 			$post_has_changed = true;
 		}
 
