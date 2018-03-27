@@ -176,10 +176,12 @@ if ( ! function_exists( 'ssl_alpine_get_the_authors' ) ) :
 	 * Gets formatted author HTML
 	 */
 	function ssl_alpine_get_the_authors( $post = null, $icon = true, $url = true, $delimiter_between = null, $delimiter_between_last = null ) {
+		global $ssl_alp;
+
 		$post = get_post( $post );
 
 		if ( is_plugin_active( 'ssl-alp/alp.php' ) && get_option( 'ssl_alp_multiple_authors' ) ) {
-			$authors = get_coauthors( $post );
+			$authors = $ssl_alp->coauthors->get_coauthors( $post );
 		} else {
 			// fall back to the_author if plugin is disabled
 			$authors = array( get_user_by( 'id', $post->post_author ) );

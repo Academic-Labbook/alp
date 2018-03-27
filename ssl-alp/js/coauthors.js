@@ -392,9 +392,11 @@ jQuery( document ).ready(function () {
 		coauthors_initialize( post_coauthors );
 	} else if ( 'edit-php' == adminpage ) {
 		// this is an inline edit
+
+		// make a copy of the existing edit function
 		var wp_inline_edit = inlineEditPost.edit;
 
-		// set edit function
+		// override the edit function
 		inlineEditPost.edit = function( id ) {
 			// call original edit function first
 			wp_inline_edit.apply( this, arguments );
@@ -416,7 +418,7 @@ jQuery( document ).ready(function () {
 				el.detach().appendTo( '.quick-edit-row .inline-edit-col-left .inline-edit-col' ).show();
 
 				// initialize coauthors
-				var post_coauthors = jQuery.map( jQuery( '.column-ssl-alp-coauthors a', post_row ), function( el ) {
+				var post_coauthors = jQuery.map( jQuery( '.column-taxonomy-ssl_alp_coauthor a', post_row ), function( el ) {
 					return {
 						login: jQuery( el ).data( 'user_login' ),
 						name: jQuery( el ).data( 'display_name' ),
