@@ -6,72 +6,71 @@ to install additional plugins as you like.
 
 ## What does ALP do?
 Here are the features implemented so far...
- - Multiple author support
- - Change logs for posts and pages
+ - Allows multiple authors to be assigned to single posts
+ - Provides change logs for posts and pages with user-defined comments
    - Unhides revisions meta box in editor by default
- - Force users to be logged in to view
+ - Shows list of cross-references made between posts and pages
+ - Option to force users to be logged in to view
    - Feeds still accessible using HTTP authentication
- - LaTeX support
- - DOI and arXiv shortcodes
+   - Images still accessible with direct link (not possible to block without server configuration)
+ - TeX support in posts and pages
+ - DOI and arXiv shortcode support
  - Disable certain post meta fields mostly suited to commercial sites, like
    excerpts, trackbacks, tags, etc.
  - Modifies pages to work more like a wiki:
-   - Remove authors and dates
-   - Display a table of contents in the sidebar (generated from header elements)
+   - Removes authors and dates
+   - Displays a table of contents in the sidebar (generated from header elements)
    - Shows breadcrumb trail back to home page
  - Special ALP theme
    - Displays multiple authors
-   - Displays author widget, to view lists of each authors' posts
-   - Displays revision history
-     - Recent revisions widget
+   - Displays author widget, to view lists of each authors' posts, including those coauthored
+   - Displays revision history under posts and pages
+     - Recent revisions widget for sidebar
    - Shows reference widget under posts/pages showing cross-references to/from other posts/pages
- - (Optional) Change names and behaviours of user types:
-   - Administrator -> [unchanged]
-   - Editor -> Researcher
-   - Author -> Intern
-   - Contributor -> [removed]
-   - Subscriber -> [unchanged]
-   - Excluded -> [new]
+   - Optionally display institute logo and icon
+ - Optionally changes user roles:
+   - *Administrator* is unchanged
+   - *Editor* is renamed *Researcher*
+   - *Author* is renamed *Intern*
+   - *Contributor* is removed
+   - *Subscriber* is unchanged
+   - *Excluded* is added (for keeping ex-users' posts, comments, etc. on record but not giving them access)
  - Hides some WordPress branding and news
- - Support for custom media (MIME) upload types
+ - Supports custom media (MIME) upload types
 
-...and here are features planned for the future:
+## Future ideas
+Some ideas pondered for the future:
+ - Outreach pages: share some posts/pages publicly.
  - Labbook theme
    - Display author, edited posts and recent comments widgets by default
    - Top bar for linking to other network sites?
- - Email alerts for certain things
+ - Configurable email alerts for certain things
    - New posts
-   - Comments (already built-in, or at least should be)
- - Disable public access
-   - Stop images being loaded from outside (might require htaccess changes?)
- - Author list widget
+   - Comments on other posts
  - Disable private posts (kinda useless with forced login)
  - Advanced search:
    - Search within PDFs etc.
    - Advanced search page with options to search by revision, etc.
- - Optionally display institute logo (also on login page)
  - Shortcodes for linking to Git/SVN commits and other archives
  - Offline download, e.g. [Simply Static](https://wordpress.org/plugins/simply-static/)
  - LSC-specific extensions:
    - DCC shortcodes
      - Add entries to reference widget
 
-## Future ideas
-Some feature ideas not considered critical, but nice to have:
- - Outreach pages: share some posts/pages publicly.
-
 ## Requirements
 In general, you should use the latest version of WordPress 4.x as that's the
 branch that will be supported. With auto-updates to WordPress Core, this is
-easy.
+easy. The pending 2018 arrival of WordPress 5 may complicate matters, especially
+surrounding Gutenberg (see below). It is likely that WordPress 4.9 will be
+supported for a short while after 5.0 is released, but not for many months.
 
-The plugin has only been tested on PHP7. You must have the [DOM extension](http://www.php.net/manual/en/book.dom.php) installed. You also cannot use
-PHP via CGI if you wish to make the site private but still have syndication
-feeds available to the user.
+The plugin has only been tested on PHP7. You must have the [DOM extension](http://www.php.net/manual/en/book.dom.php) installed in order for the page
+table of contents lists to work. You also cannot use PHP via CGI if you wish
+to make the site private but still have syndication feeds available to the user.
 
 Your users should use up-to-date browsers. The theme bundled with ALP (Alpine)
-uses CSS Grid, which is only available in recent versions of the most popular
-browsers. The [browsers that don't support CSS Grid](https://caniuse.com/#feat=css-grid)
+uses CSS Grid, which is only available in recent versions (i.e. within the last
+year or two) of the most popular browsers. The [browsers that don't support CSS Grid](https://caniuse.com/#feat=css-grid)
 represent only around 5% of global usage as of March 2018. This project is not
 concerned about losing sales from users running out of date browsers!
 
@@ -80,7 +79,8 @@ WordPress 5.0 will introduce a new editor interface called [Gutenberg](https://w
 This does not show some of the custom interface additions that ALP makes to the
 standard editor, but it is not anticipated that support for these additions will
 be difficult to add, eventually. Depending on how Gutenberg is added to WordPress 5.0,
-ALP may optionally "deactivate" Gutenberg under the hood until support is added.
+ALP may optionally "deactivate" Gutenberg under the hood until it is fully supported
+later.
 
 The impending arrival of Gutenberg means ALP will not, for the time being,
 include changes to the TinyMCE editor, such as those provided by the (great)
@@ -115,7 +115,8 @@ reports have also been pushed back to these plugins and WordPress itself:
 Authors: Mohammad Jangda, Daniel Bachhuber, Automattic, Shepherd Interactive, Mark Jaquith  
 Link: [Co-Authors Plus](https://wordpress.org/plugins/co-authors-plus/)
 
-Most of this is adapted for ALP verbatim, but the guest author feature has been removed.
+Most of the architecture of this plugin has been adapted for ALP, but some features have
+been changed (such as email alerts) or removed (such as the guest author feature).
 
 ### WP-Post-Meta-Revisions and Revision Notes
 Authors: Adam Silverstein, Helen Hou-Sandí  
@@ -143,6 +144,5 @@ removed.
 Author: Nilambar Sharma  
 Link: [Simple Life](https://wordpress.org/themes/simple-life/)
 
-Bootstrap was removed, and replaced with [CSS Grid](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Grid_Layout).
-The overall visual theme has been retained, but many small tweaks have been made, and
-support for other plugins like WooCommerce removed.
+The core theme has been forked, but with many features added, removed or changed. Bootstrap was
+removed and replaced with [CSS Grid](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Grid_Layout).
