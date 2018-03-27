@@ -1192,12 +1192,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return $term;
 		}
 
-		// See if the prefixed term is available, otherwise default to just the nicename
 		$term = get_term_by( 'slug', 'ssl-alp-coauthor-' . $coauthor->user_nicename, 'ssl_alp_coauthor' );
-
-		if ( ! $term ) {
-			$term = get_term_by( 'slug', $coauthor->user_nicename, 'ssl_alp_coauthor' );
-		}
 
 		wp_cache_set( $cache_key, $term, 'ssl-alp' );
 
