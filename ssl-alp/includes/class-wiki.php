@@ -88,6 +88,11 @@ class SSL_ALP_Wiki extends SSL_ALP_Module {
 		// variable to store contents for widget
 		global $ssl_alp_page_toc;
 
+		if ( ! is_page() ) {
+			// don't need to generate contents
+			return $page_content;
+		}
+
 		// load content into DOM parser
 		if ( empty( $page_content ) ) {
 			// no point continuing
