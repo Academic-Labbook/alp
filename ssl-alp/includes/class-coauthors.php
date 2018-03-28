@@ -78,15 +78,14 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return;
 		}
 
-		// Register our models
-		$loader->add_action( 'init', $this, 'action_init', 100 );
+		// register authors taxonomy
+		$loader->add_action( 'init', $this, 'register_taxonomy', 100 );
+
+		// remove author support
+		$loader->add_action( 'init', $this, 'remove_author_support' );
 		
 		// filter the internal term name to display the coauthor name
 		$loader->add_filter( 'term_name', $this, 'filter_term_name', 10, 4 );
-
-		// remove the author dropdown from the post quick edit and add the coauthor edit box
-		$loader->add_action( 'admin_head', $this, 'remove_quick_edit_authors_box' );
-		$loader->add_action( 'quick_edit_custom_box', $this, 'add_quick_edit_custom_box', 10, 2 );
 
 		// hooks to modify the published post number count on the Users WP List Table
 		// these are required because the count_many_users_posts() function has no hooks
@@ -107,7 +106,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$loader->add_action( 'wp_ajax_ssl_alp_coauthors_ajax_suggest', $this, 'ajax_suggest' );
 
 		// delete user terms from posts when a user is deleted
-		$loader->add_action( 'delete_user', $this, 'delete_user_action' );
+		$loader->add_action( 'delete_user', $this, 'delete_user_action', 10, 2 );
 
 		// Include coauthored posts in post counts.
 		// Unfortunately, this doesn't filter results retrieved with `count_many_users_posts`, which
@@ -121,9 +120,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// Handle the custom author meta box
 		$loader->add_action( 'add_meta_boxes', $this, 'add_coauthors_box' );
 		$loader->add_action( 'add_meta_boxes', $this, 'remove_authors_box' );
-
-		// Restricts WordPress from blowing away term order on bulk edit
-		$loader->add_filter( 'wp_get_object_terms', $this, 'filter_wp_get_object_terms', 10, 4 );
 
 		// Make sure we've correctly set author data on author pages
 		$loader->add_filter( 'posts_selection', $this, 'fix_author_page' ); // use posts_selection since it's after WP_Query has built the request and before it's queried any posts
@@ -190,7 +186,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	/**
 	 * Register the 'ssl_alp_coauthor' taxonomy and add post type support
 	 */
-	public function action_init() {
+	public function register_taxonomy() {
 		// Register new taxonomy so that we can store all of the relationships
 		$args = array(
 			'hierarchical'   	=> false,
@@ -211,6 +207,15 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
+	 * Remove author support (replaced by coauthor support)
+	 */
+	public function remove_author_support() {
+		foreach ( $this->supported_post_types as $post_type ) {
+			remove_post_type_support( $post_type, 'author' );
+		}
+	}
+
+	/**
 	 * Whether or not coauthors are enabled for this post
 	 */
 	public function post_supports_coauthors( $post = null ) {
@@ -223,7 +228,12 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	/**
 	 * Whether or not coauthors are enabled for this post type
 	 */
-	public function is_post_type_enabled( $post_type ) {
+	public function is_post_type_enabled( $post_type = null ) {
+		if ( is_null( $post_type ) ) {
+			// get current post type
+			$post_type = get_post_type();
+		}
+
 		return in_array( $post_type, $this->supported_post_types );
 	}
 
@@ -301,17 +311,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Remove the standard author dropdown from the post quick edit
-	 */
-	function remove_quick_edit_authors_box() {
-		global $pagenow;
-
-		if ( 'edit.php' == $pagenow && $this->post_supports_coauthors() ) {
-			remove_post_type_support( get_post_type(), 'author' );
-		}
-	}
-
-	/**
 	 * Filter term name for display
 	 * 
 	 * This is used to format the author names displayed in the admin post list
@@ -376,25 +375,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		return $value;
-	}
-
-	/**
-	 * Quick Edit co-authors box.
-	 */
-	function add_quick_edit_custom_box( $column_name, $post_type ) {
-		if ( 'ssl-alp-coauthors' != $column_name || ! $this->is_post_type_enabled( $post_type ) || ! $this->current_user_can_set_authors() ) {
-			return;
-		}
-
-		?>
-		<label class="inline-edit-group inline-edit-coauthors">
-			<span class="title"><?php esc_html_e( 'Authors', 'ssl-alp' ) ?></span>
-			<div id="coauthors-edit" class="hide-if-no-js">
-				<p><?php echo wp_kses( __( 'Click on an author to change them. Drag to change their order. Click on <strong>Remove</strong> to remove them.', 'ssl-alp' ), array( 'strong' => array() ) ); ?></p>
-			</div>
-			<?php wp_nonce_field( 'ssl-alp-coauthors-edit', 'ssl-alp-coauthors-nonce' ); ?>
-		</label>
-		<?php
 	}
 
 	/**
@@ -709,58 +689,42 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 	/**
 	 * Action taken when user is deleted.
-	 * - User term is removed from all associated posts
-	 * - Option to specify alternate user in place for each post
 	 */
-	function delete_user_action( $delete_id ) {
+	function delete_user_action( $delete_id, $reassign ) {
 		global $wpdb;
 
+		// get user to be deleted
 		$delete_user = get_user_by( 'id', $delete_id );
 
-		if ( is_object( $delete_user ) ) {
-			// delete terms for user
-			wp_delete_term( $delete_user->user_login, 'ssl_alp_coauthor' );
-		}
-	}
-
-	/**
-	 * Restrict WordPress from blowing away author order when bulk editing terms
-	 */
-	function filter_wp_get_object_terms( $terms, $object_ids, $taxonomies, $args ) {
-		if ( ! isset( $_REQUEST['bulk_edit'] ) || "'author'" !== $taxonomies ) {
-            // not bulk editing authors
-			return $terms;
+		if ( ! is_object( $delete_user ) ) {
+			// do nothing
+			return;
 		}
 
-		global $wpdb;
+		if ( $reassign ) {
+			// user's posts are to be reassigned
 
-		$orderby = 'ORDER BY tr.term_order';
-		$order = 'ASC';
-		$object_ids = (int) $object_ids;
-		$query = $wpdb->prepare( "SELECT t.name, t.term_id, tt.term_taxonomy_id FROM $wpdb->terms AS t INNER JOIN $wpdb->term_taxonomy AS tt ON tt.term_id = t.term_id INNER JOIN $wpdb->term_relationships AS tr ON tr.term_taxonomy_id = tt.term_taxonomy_id WHERE tt.taxonomy IN (%s) AND tr.object_id IN (%s) $orderby $order", 'ssl_alp_coauthor', $object_ids );
-		$raw_coauthors = $wpdb->get_results( $query );
-		$terms = array();
+			// get user to reassign posts to
+			$reassign_user = get_user_by( 'id', $reassign );
 
-		foreach ( $raw_coauthors as $author ) {
-			if ( true === is_array( $args ) && true === isset( $args['fields'] ) ) {
-				switch ( $args['fields'] ) {
-					case 'names' :
-						$terms[] = $author->name;
-						break;
-					case 'tt_ids' :
-						$terms[] = $author->term_taxonomy_id;
-						break;
-					case 'all' :
-					default :
-						$terms[] = get_term( $author->term_id, 'ssl_alp_coauthor' );
-						break;
+			if ( is_object( $reassign_user ) ) {
+				// get post ids of deleted user
+				$post_ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_author = %d", $delete_id ) );
+
+				if ( $post_ids ) {
+					foreach ( $post_ids as $post_id ) {
+						// set the reassigned coauthor
+						$this->add_coauthors( $post_id, array( $reassign_user->user_login ), true );
+					}
 				}
-			} else {
-				$terms[] = get_term( $author->term_id, 'ssl_alp_coauthor' );
 			}
 		}
 
-		return $terms;
+		// get the user's term
+		$term = get_term_by( 'name', $delete_user->user_login, 'ssl_alp_coauthor' );
+		
+		// delete user's term
+		wp_delete_term( $term->term_id, 'ssl_alp_coauthor' );
 	}
 
 	/**
@@ -795,8 +759,8 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return false;
 		}
 
-        $can_edit_others_posts = $current_user->allcaps['edit_others_posts'];
-		$can_set_authors = isset( $can_edit_others_posts ) ? $can_edit_others_posts : false;
+        $can_edit_others_posts = $current_user->has_cap( 'edit_posts' );
+		$can_set_authors = $can_edit_others_posts ? $can_edit_others_posts : false;
 
 		return $can_set_authors;
 	}

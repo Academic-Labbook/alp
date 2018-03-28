@@ -154,8 +154,6 @@ jQuery( document ).ready(function () {
 
 		var $co = jQuery( '<input/>' );
 
-		console.log(ssl_alp_coauthors_ajax_suggest_link);
-
 		$co.attr({
 			'class': 'coauthor-suggest'
 			, 'name': input_name
@@ -375,6 +373,8 @@ jQuery( document ).ready(function () {
 	});
 
 	if ( 'post-php' == adminpage || 'post-new-php' == adminpage ) {
+		// this is the full edit page
+
 		var $post_coauthor_logins = jQuery( 'input[name="coauthors[]"]' );
 		var $post_coauthor_names = jQuery( 'input[name="coauthorsinput[]"]' );
 		var $post_coauthor_emails = jQuery( 'input[name="coauthorsemails[]"]' );
@@ -396,44 +396,7 @@ jQuery( document ).ready(function () {
 		coauthors_initialize( post_coauthors );
 	} else if ( 'edit-php' == adminpage ) {
 		// this is an inline edit
-
-		// make a copy of the existing edit function
-		var wp_inline_edit = inlineEditPost.edit;
-
-		// override the edit function
-		inlineEditPost.edit = function( id ) {
-			// call original edit function first
-			wp_inline_edit.apply( this, arguments );
-
-			// get the post ID
-			var post_id = 0;
-
-			if ( typeof( id ) == 'object' ) {
-				post_id = parseInt( this.getId( id ) );
-			}
-
-			if ( post_id > 0 ) {
-				var post_row = jQuery( '#post-' + post_id )
-
-				// Move the element to the appropriate position in the view
-				// JS hack for core bug: https://core.trac.wordpress.org/ticket/26982
-				jQuery( '.quick-edit-row .inline-edit-col-left .inline-edit-col' ).find( '.inline-edit-coauthors' ).remove() // remove any previously added elements
-				var el = jQuery( '.inline-edit-group.inline-edit-coauthors', '#edit-' + post_id );
-				el.detach().appendTo( '.quick-edit-row .inline-edit-col-left .inline-edit-col' ).show();
-
-				// initialize coauthors
-				var post_coauthors = jQuery.map( jQuery( '.column-taxonomy-ssl_alp_coauthor a', post_row ), function( el ) {
-					return {
-						login: jQuery( el ).data( 'user_login' ),
-						name: jQuery( el ).data( 'display_name' ),
-						email: jQuery( el ).data( 'user_email' ),
-						nicename: jQuery( el ).data( 'user_nicename' )
-					}
-				});
-
-				coauthors_initialize( post_coauthors );
-			}
-		}
+		// not supported; do nothing
 	}
 });
 
