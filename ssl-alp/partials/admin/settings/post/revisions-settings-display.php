@@ -1,4 +1,4 @@
-<p><?php _e( 'Enable edit summaries for:'); ?></p>
+<p><?php _e( 'Enable edit summaries for:' , 'ssl-alp' ); ?></p>
 <p>
     <label for="ssl_alp_post_edit_summaries_checkbox">
         <input name="ssl_alp_post_edit_summaries" type="checkbox" id="ssl_alp_post_edit_summaries_checkbox" value="1" <?php checked( get_option( 'ssl_alp_post_edit_summaries' ) ); ?> />
@@ -11,6 +11,7 @@
         <?php _e( 'Pages' ); ?>
     </label>
 </p>
+<p class="description"><?php _e( 'When enabled, a textbox is displayed on post/page edit forms allowing users to write a message summarising their edit.', 'ssl-alp' ); ?></p>
 <br/>
 <p>
     <label for="ssl_alp_edit_summary_max_length_textbox">

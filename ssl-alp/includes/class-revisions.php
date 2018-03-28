@@ -46,15 +46,15 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
         add_settings_field(
 			'ssl_alp_edit_summary_settings',
-			__( 'Edit summaries', 'ssl-alp' ),
-			array( $this, 'edit_summary_settings_callback' ),
+			__( 'Revisions', 'ssl-alp' ),
+			array( $this, 'revisions_settings_callback' ),
 			'ssl-alp-admin-options',
 			'ssl_alp_post_settings_section'
 		);
     }
 
-    public function edit_summary_settings_callback() {
-		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/edit-summary-settings-display.php';
+    public function revisions_settings_callback() {
+		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/revisions-settings-display.php';
 	}
 
 	/**
