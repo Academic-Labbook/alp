@@ -386,6 +386,8 @@ if ( ! function_exists( 'ssl_alpine_get_revision_abbreviation' ) ) :
 	 * Gets abbreviated revision ID, with optional URL
 	 */
 	function ssl_alpine_get_revision_abbreviation( $revision, $url = true ) {
+		global $ssl_alp;
+		
 		// get revision object if id is specified
 		$revision = wp_get_post_revision( $revision );
 
@@ -401,7 +403,7 @@ if ( ! function_exists( 'ssl_alpine_get_revision_abbreviation' ) ) :
 
 		// add URL to diff if user can view
 		if ( $url ) {
-			if ( current_user_can( 'edit_post', $revision->ID ) ) {
+			if ( $ssl_alp->revisions->current_user_can_view_revision( $revision ) ) {
 				$revision_id = sprintf(
 					'<a href="%1$s">%2$s</a>',
 					get_edit_post_link( $revision->ID ),

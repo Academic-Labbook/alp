@@ -439,6 +439,14 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		return $object_ids;
 	}
+
+	/**
+	 * Checks if the specified user can view the specified revisions
+	 */
+	public function current_user_can_view_revision( $revision ) {
+		// taken from revision.php for viewing revisions
+		return ( current_user_can( 'read_post', $revision->ID ) && current_user_can( 'edit_post', $revision->post_parent ) );
+	}
 }
 
 class SSL_ALP_Revisions_Widget extends WP_Widget {
