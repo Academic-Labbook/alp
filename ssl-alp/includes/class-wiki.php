@@ -93,9 +93,13 @@ class SSL_ALP_Wiki extends SSL_ALP_Module {
 			return $page_content;
 		}
 
-		// load content into DOM parser
 		if ( empty( $page_content ) ) {
-			// no point continuing
+			// cannot generate table of contents
+			return $page_content;
+		}
+
+		if ( ! extension_loaded( 'dom' ) ) {
+			// cannot generate table of contents
 			return $page_content;
 		}
 
