@@ -419,6 +419,8 @@ if ( ! function_exists( 'ssl_alpine_the_references' ) ) :
 	 * Prints HTML with post references
 	 */
 	function ssl_alpine_the_references( $post = null ) {
+		global $ssl_alp;
+
 		if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
 			// plugin is disabled
 			return;
@@ -434,8 +436,8 @@ if ( ! function_exists( 'ssl_alpine_the_references' ) ) :
 			return;
 		}
 
-		$ref_to_posts = ssl_alpine_get_reference_to_posts( $post );
-		$ref_from_posts = ssl_alpine_get_reference_from_posts( $post );
+		$ref_to_posts = $ssl_alp->references->get_reference_to_posts( $post );
+		$ref_from_posts = $ssl_alp->references->get_reference_from_posts( $post );
 
 		if ( ( ! is_array( $ref_to_posts ) || ! count( $ref_to_posts ) ) && ( ! is_array( $ref_from_posts ) || ! count( $ref_from_posts ) ) ) {
 			// no references
@@ -514,90 +516,6 @@ if ( ! function_exists( 'ssl_alpine_the_referenced_post_list_item' ) ) {
 		printf( '<li>%1$s%2$s</li>', $post_title, $post_date );
 	}
 }
-
-if ( ! function_exists( 'ssl_alpine_get_reference_from_posts' ) ) :
-	/**
-	 * Gets the "reference from" terms for the specified post. Optionally the
-	 * date order can be changed.
-	 */
-	function ssl_alpine_get_reference_from_posts( $post = null ) {
-		global $wpdb;
-
-		$post = get_post( $post );
-
-		if ( is_null( $post ) ) {
-			return;
-		}
-
-		// query for terms that reference this post
-		$object_ids = $wpdb->get_col(
-			$wpdb->prepare(
-				"
-				SELECT posts.ID
-				FROM {$wpdb->termmeta} AS termmeta
-				INNER JOIN {$wpdb->term_relationships} AS term_relationships
-					ON termmeta.term_id = term_relationships.term_taxonomy_id
-				INNER JOIN {$wpdb->posts} AS posts
-					ON term_relationships.object_id = posts.ID
-				INNER JOIN {$wpdb->term_taxonomy} AS term_taxonomy
-					ON termmeta.term_id = term_taxonomy.term_id
-				WHERE
-					termmeta.meta_key = %s
-					AND termmeta.meta_value = %d
-					AND term_taxonomy.taxonomy = %s
-				ORDER BY
-					posts.post_date DESC
-				",
-				'reference-to-post-id',
-				$post->ID,
-				'ssl_alp_crossreference'
-			)
-		);
-
-		$posts = array();
-
-		// get the posts associated with the term IDs
-		foreach ( $object_ids as $object_id ) {
-			// check permission
-			if ( current_user_can( 'read_post', $object_id ) ) {
-				$posts[] = get_post( $object_id );
-			}
-		}
-
-		return $posts;
-	}
-endif;
-
-if ( ! function_exists( 'ssl_alpine_get_reference_to_posts' ) ) :
-	/**
-	 * Gets the "reference to" terms for the specified post.
-	 */
-	function ssl_alpine_get_reference_to_posts( $post = null ) {
-		$post = get_post( $post );
-		
-		$terms = get_the_terms( $post, 'ssl_alp_crossreference' );
-
-		$posts = array();
-
-		if ( empty( $terms ) ) {
-			// no terms to get posts from
-			return $posts;
-		}
-
-		// get the posts associated with the terms
-		foreach ( $terms as $term ) {
-			// get post ID
-			$post_id = get_term_meta( $term->term_id, 'reference-to-post-id', 'ssl_alp_crossreference' );
-
-			// check permission
-			if ( current_user_can( 'read_post', $post_id ) ) {
-				$posts[] = get_post( $post_id );
-			}
-		}
-
-		return $posts;
-	}
-endif;
 
 if ( ! function_exists( 'ssl_alpine_get_page_breadcrumbs' ) ) :
 	/**

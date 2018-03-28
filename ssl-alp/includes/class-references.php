@@ -259,4 +259,105 @@ class SSL_ALP_References extends SSL_ALP_Module {
 			}
 		}
 	}
+
+	/**
+	 * Get posts that are referenced by the specified post
+	 */
+	public function get_reference_to_posts( $post = null ) {
+		$post = get_post( $post );
+		
+		$terms = get_the_terms( $post, 'ssl_alp_crossreference' );
+
+		$posts = array();
+
+		if ( empty( $terms ) ) {
+			// no terms to get posts from
+			return $posts;
+		}
+
+		// get the posts associated with the terms
+		foreach ( $terms as $term ) {
+			// get post ID
+			$post_id = get_term_meta( $term->term_id, 'reference-to-post-id', 'ssl_alp_crossreference' );
+
+			// get the post
+			$referenced_post = get_post( $post_id );
+
+			if ( ! is_null( $referenced_post ) ) {
+				// check permission
+				if ( 'post' === $referenced_post->post_type ) {
+					$capability = 'read_post';
+				} elseif ( 'page' == $referenced_post->post_type ) {
+					$capability = 'read_page';
+				}
+
+				if ( current_user_can( $capability, $post_id ) ) {
+					$posts[] = $referenced_post;
+				}
+			}
+		}
+
+		return $posts;
+	}
+
+	/**
+	 * Get posts that reference the specified post
+	 */
+	public function get_reference_from_posts( $post = null ) {
+		global $wpdb;
+
+		$post = get_post( $post );
+
+		$posts = array();
+
+		if ( is_null( $post ) ) {
+			return $posts;
+		}
+
+		// query for terms that reference this post
+		$object_ids = $wpdb->get_col(
+			$wpdb->prepare(
+				"
+				SELECT posts.ID
+				FROM {$wpdb->termmeta} AS termmeta
+				INNER JOIN {$wpdb->term_relationships} AS term_relationships
+					ON termmeta.term_id = term_relationships.term_taxonomy_id
+				INNER JOIN {$wpdb->posts} AS posts
+					ON term_relationships.object_id = posts.ID
+				INNER JOIN {$wpdb->term_taxonomy} AS term_taxonomy
+					ON termmeta.term_id = term_taxonomy.term_id
+				WHERE
+					termmeta.meta_key = %s
+					AND termmeta.meta_value = %d
+					AND term_taxonomy.taxonomy = %s
+				ORDER BY
+					posts.post_date DESC
+				",
+				'reference-to-post-id',
+				$post->ID,
+				'ssl_alp_crossreference'
+			)
+		);
+
+		// get the posts associated with the term IDs
+		foreach ( $object_ids as $post_id ) {
+			// get the post
+			$referenced_post = get_post( $post_id );
+
+			if ( ! is_null( $referenced_post ) ) {
+				// check permission
+				if ( 'post' === $referenced_post->post_type ) {
+					$capability = 'read_post';
+				} elseif ( 'page' == $referenced_post->post_type ) {
+					$capability = 'read_page';
+				}
+
+				if ( current_user_can( $capability, $post_id ) ) {
+					$posts[] = $referenced_post;
+				}
+			}
+		}
+
+		return $posts;
+	}
 }
