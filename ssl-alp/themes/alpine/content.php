@@ -54,7 +54,7 @@
 			/* Translators: used between list items, there is a space after the comma. */
 			$categories_list = get_the_category_list( esc_html__( ', ', 'ssl-alp' ) );
 
-			if ( $categories_list && ssl_alp_categorized_blog() ) :
+			if ( $categories_list ) :
 			?>
 			<span class="cat-links">
 				<i class="fa fa-folder-open" aria-hidden="true"></i>

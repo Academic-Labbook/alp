@@ -5,11 +5,11 @@
  * @package ssl-alp
  */
 
-if ( ! function_exists( 'ssl_alpine_get_the_post_date_html' ) ) :
+if ( ! function_exists( 'ssl_alpine_get_post_date_html' ) ) :
 	/**
 	 * Format a post date
 	 */
-	function ssl_alpine_get_the_post_date_html( $post = null, $modified = false, $time = true, $icon = true, $url = true ) {
+	function ssl_alpine_get_post_date_html( $post = null, $modified = false, $time = true, $icon = true, $url = true ) {
 		$datetime_fmt = ssl_alpine_get_date_format( $time );
 
 		// ISO 8601 formatted date
@@ -101,11 +101,11 @@ if ( ! function_exists( 'ssl_alpine_the_post_meta' ) ) :
 	 */
 	function ssl_alpine_the_post_meta( $post = null ) {
 		$post = get_post( $post );
-		$posted_on = ssl_alpine_get_the_post_date_html( $post );
+		$posted_on = ssl_alpine_get_post_date_html( $post );
 
 		// check post timestamps to see if modified
 		if ( get_the_time( 'U', $post ) !== get_the_modified_time( 'U', $post ) ) {
-			$modified_on = ssl_alpine_get_the_post_date_html( $post, true );
+			$modified_on = ssl_alpine_get_post_date_html( $post, true );
 			/* translators: 1: post modification date */
 			$posted_on .= sprintf( __( ' (last edited %1$s)', 'ssl-alp' ), $modified_on );
 		}
@@ -114,12 +114,12 @@ if ( ! function_exists( 'ssl_alpine_the_post_meta' ) ) :
 		printf(
 			'<div class="byline"><i class="fa fa-link"></i> %1$s&nbsp;&nbsp;%2$s</div>',
 			$post->ID,
-			ssl_alpine_get_the_authors( $post )
+			ssl_alpine_get_authors( $post )
 		);
 
 		if ( is_plugin_active( 'ssl-alp/alp.php' ) ) {
 			if ( get_option( 'ssl_alp_post_edit_summaries' ) ) {
-				$revision_count = ssl_alpine_get_the_revision_count();
+				$revision_count = ssl_alpine_get_revision_count();
 
 				if ( $revision_count > 0 ) {
 					$revision_str = sprintf( _n( '%s revision', '%s revisions', $revision_count, 'ssl-alp' ), $revision_count );
@@ -171,11 +171,11 @@ if ( ! function_exists( 'ssl_alpine_the_page_meta' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'ssl_alpine_get_the_authors' ) ) :
+if ( ! function_exists( 'ssl_alpine_get_authors' ) ) :
 	/**
 	 * Gets formatted author HTML
 	 */
-	function ssl_alpine_get_the_authors( $post = null, $icon = true, $url = true, $delimiter_between = null, $delimiter_between_last = null ) {
+	function ssl_alpine_get_authors( $post = null, $icon = true, $url = true, $delimiter_between = null, $delimiter_between_last = null ) {
 		global $ssl_alp;
 
 		$post = get_post( $post );
@@ -240,7 +240,7 @@ endif;
 
 if ( ! function_exists( 'ssl_alpine_the_revisions' ) ) :
 	/**
-	 * Prints formatted author HTML
+	 * Prints revisions for the specified post
 	 */
 	function ssl_alpine_the_revisions( $post = null ) {
 		if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
@@ -472,18 +472,18 @@ if ( ! function_exists( 'ssl_alpine_the_referenced_post_list' ) ) {
 			$referenced_post = get_post( $referenced_post );
 
 			// print reference post information
-			ssl_alpine_the_referenced_post_list_item( $referenced_post );
+			ssl_alpine_referenced_post_list_item( $referenced_post );
 		}
 
 		echo '</ul>';
 	}
 }
 
-if ( ! function_exists( 'ssl_alpine_the_referenced_post_list_item' ) ) {
+if ( ! function_exists( 'ssl_alpine_referenced_post_list_item' ) ) {
 	/**
 	 * Prints HTML link to the specified reference post
 	 */
-	function ssl_alpine_the_referenced_post_list_item( $referenced_post = null, $url = true ) {
+	function ssl_alpine_referenced_post_list_item( $referenced_post = null, $url = true ) {
 		global $ssl_alp;
 
 		$referenced_post = get_post( $referenced_post );
@@ -577,49 +577,8 @@ if ( ! function_exists( 'ssl_alpine_the_page_breadcrumbs' ) ) :
 	}
 endif;
 
-/**
- * Returns true if a blog has more than 1 category.
- *
- * @return bool
- */
-function ssl_alp_categorized_blog() {
-	if ( false === ( $all_the_cool_cats = get_transient( 'ssl_alp_categories' ) ) ) {
-		// Create an array of all the categories that are attached to posts.
-		$all_the_cool_cats = get_categories( array(
-			'fields'     => 'ids',
-			'hide_empty' => 1,
-			// We only need to know if there is more than one category.
-			'number'     => 2,
-		) );
-
-		// Count the number of categories that are attached to the posts.
-		$all_the_cool_cats = count( $all_the_cool_cats );
-
-		set_transient( 'ssl_alp_categories', $all_the_cool_cats );
-	}
-
-	if ( $all_the_cool_cats > 1 ) {
-		// This blog has more than 1 category so ssl_alp_categorized_blog should return true.
-		return true;
-	} else {
-		// This blog has only 1 category so ssl_alp_categorized_blog should return false.
-		return false;
-	}
-}
-
-/**
- * Flush out the transients used in ssl_alp_categorized_blog.
- */
-function ssl_alpine_category_transient_flusher() {
-	// Like, beat it. Dig?
-	delete_transient( 'ssl_alp_categories' );
-}
-
-add_action( 'edit_category', 'ssl_alpine_category_transient_flusher' );
-add_action( 'save_post',     'ssl_alpine_category_transient_flusher' );
-
-if ( ! function_exists( 'ssl_alpine_get_the_revision_count' ) ) :
-	function ssl_alpine_get_the_revision_count( $post = null ) {
+if ( ! function_exists( 'ssl_alpine_get_revision_count' ) ) :
+	function ssl_alpine_get_revision_count( $post = null ) {
 		// get current post
 		$post = get_post( $post );
 
