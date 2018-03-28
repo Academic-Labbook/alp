@@ -131,14 +131,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// filters to send comment notification/moderation emails to multiple authors
 		$loader->add_filter( 'comment_notification_recipients', $this, 'filter_comment_notification_email_recipients', 10, 2 );
 		$loader->add_filter( 'comment_moderation_recipients', $this, 'filter_comment_moderation_email_recipients', 10, 2 );
-
-		// delete coauthor cache on post save and delete
-		$loader->add_action( 'save_post', $this, 'clear_cache' );
-		$loader->add_action( 'delete_post', $this, 'clear_cache' );
-		$loader->add_action( 'set_object_terms', $this, 'clear_cache_on_terms_set', 10, 6 );
-
-		// update term description when user profile is edited
-		$loader->add_action( 'profile_update', $this, 'update_author_term' );
 	}
 
     /**
@@ -425,8 +417,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 		$count = $wpdb->query( $query );
 		$wpdb->update( $wpdb->term_taxonomy, array( 'count' => $count ), array( 'term_taxonomy_id' => $term->term_taxonomy_id ) );
-
-		wp_cache_delete( 'ssl-alp-coauthors-term-' . $coauthor->user_nicename, 'ssl-alp' );
 	}
 
 	/**
@@ -659,7 +649,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		foreach ( $coauthors as &$author_name ) {
 			$author = get_user_by( 'login', $author_name );
 			$coauthor_objects[] = $author;
-			$term = $this->update_author_term( $author );
+			$term = $this->add_author_term( $author );
 			$author_name = $term->slug;
 		}
 
@@ -759,10 +749,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return false;
 		}
 
-        $can_edit_others_posts = $current_user->has_cap( 'edit_posts' );
-		$can_set_authors = $can_edit_others_posts ? $can_edit_others_posts : false;
-
-		return $can_set_authors;
+        return $current_user->has_cap( 'edit_others_posts' );
 	}
 
 	/**
@@ -893,10 +880,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * Get matching authors based on a search value
 	 */
 	public function search_authors( $search = '', $ignored_authors = array() ) {
-        // Since 2.7, we're searching against the term description for the fields
-		// instead of the user details. If the term is missing, we probably need to
-		// backfill with user details. Let's do this first... easier than running
-		// an upgrade script that could break on a lot of users
+        // search for author
 		$args = array(
 			'count_total' => false,
 			'search' => sprintf( '*%s*', $search ),
@@ -909,58 +893,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			'fields' => 'all_with_meta',
 		);
 
-		$found_users = get_users( $args );
-
-		foreach ( $found_users as $found_user ) {
-			$term = $this->get_author_term( $found_user );
-
-			if ( empty( $term ) || empty( $term->description ) ) {
-				$this->update_author_term( $found_user );
-			}
-		}
-
-		$args = array(
-			'search' => $search,
-			'get' => 'all',
-			'number' => 10,
-		);
-
-		add_filter( 'terms_clauses', array( $this, 'filter_terms_clauses' ) );
-		$found_terms = get_terms( 'ssl_alp_coauthor', $args );
-		remove_filter( 'terms_clauses', array( $this, 'filter_terms_clauses' ) );
-
-		if ( empty( $found_terms ) ) {
-			return array();
-		}
-
-		// get the co-author objects
-		$found_users = array();
-
-		foreach ( $found_terms as $found_term ) {
-			$found_user = get_user_by( 'login', $found_term->name );
-
-			if ( ! empty( $found_user ) ) {
-				$found_users[ $found_user->user_login ] = $found_user;
-			}
-		}
-
-		foreach ( $found_users as $key => $found_user ) {
-			if ( in_array( $found_user->user_login, $ignored_authors ) ) {
-				unset( $found_users[ $key ] );
-			}
-		}
-
-		return (array) $found_users;
-	}
-
-	/**
-	 * Modify get_terms() to LIKE against the term description instead of the
-     * term name
-	 */
-	function filter_terms_clauses( $pieces ) {
-		$pieces['where'] = str_replace( 't.name LIKE', 'tt.description LIKE', $pieces['where'] );
-
-		return $pieces;
+		return get_users( $args );
 	}
 
 	/**
@@ -1015,23 +948,15 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return;
 		}
 
-		$cache_key = 'ssl-alp-coauthors-term-' . $coauthor->user_login;
-
-		if ( false !== ( $term = wp_cache_get( $cache_key, 'ssl-alp' ) ) ) {
-			return $term;
-		}
-
 		$term = get_term_by( 'name', $coauthor->user_login, 'ssl_alp_coauthor' );
-
-		wp_cache_set( $cache_key, $term, 'ssl-alp' );
 
 		return $term;
 	}
 
 	/**
-	 * Update the author term for a given co-author
+	 * Add author term
 	 */
-	public function update_author_term( $coauthor ) {
+	public function add_author_term( $coauthor ) {
 		if ( is_int( $coauthor ) ) {
 			// get user by their id
 			$coauthor = get_user_by( 'id', $coauthor );
@@ -1041,37 +966,19 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return false;
 		}
 
-		// update the taxonomy term to include details about the user for searching
-		$search_values = array();
-
-		foreach ( $this->ajax_search_fields as $search_field ) {
-			$search_values[] = $coauthor->$search_field;
-		}
-
-		$term_description = implode( ' ', $search_values );
-
 		if ( $term = $this->get_author_term( $coauthor ) ) {
-			if ( $term->description != $term_description ) {
-				wp_update_term( $term->term_id, 'ssl_alp_coauthor', array( 'description' => $term_description ) );
-			}
+			// term already exists
 		} else {
-			$args = array(
-				'description'   => $term_description,
-			);
-
-			$new_term = wp_insert_term( $coauthor->user_login, 'ssl_alp_coauthor', $args );
+			$term = wp_insert_term( $coauthor->user_login, 'ssl_alp_coauthor' );
 		}
 
-		wp_cache_delete( 'ssl-alp-coauthors-term-' . $coauthor->user_nicename, 'ssl-alp' );
-
-		return $this->get_author_term( $coauthor );
+		return $term;
 	}
 
 	/**
 	 * Retrieve a list of coauthor terms for a single post.
 	 *
-	 * Grabs a correctly ordered list of authors for a single post, appropriately
-	 * cached because it requires `wp_get_object_terms()` to succeed.
+	 * Grabs a correctly ordered list of authors for a single post.
 	 */
 	public function get_coauthor_terms_for_post( $post = null ) {
 		$post = get_post( $post );
@@ -1080,25 +987,18 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return array();
 		}
 
-		$cache_key = 'ssl-alp-coauthors-post-' . $post->ID;
-		$coauthor_terms = wp_cache_get( $cache_key, 'ssl-alp' );
+		$coauthor_terms = wp_get_object_terms(
+			$post->ID,
+			'ssl_alp_coauthor',
+			array(
+				'orderby' => 'term_order',
+				'order' => 'ASC',
+			)
+		);
 
-		if ( false === $coauthor_terms ) {
-			$coauthor_terms = wp_get_object_terms(
-                $post->ID,
-                'ssl_alp_coauthor',
-                array(
-                    'orderby' => 'term_order',
-                    'order' => 'ASC',
-                )
-            );
-
-			// this usually happens if the taxonomy doesn't exist, which should never happen, but you never know.
-			if ( is_wp_error( $coauthor_terms ) ) {
-				return array();
-			}
-
-			wp_cache_set( $cache_key, $coauthor_terms, 'ssl-alp' );
+		// this usually happens if the taxonomy doesn't exist, which should never happen, but you never know.
+		if ( is_wp_error( $coauthor_terms ) ) {
+			return array();
 		}
 
 		return $coauthor_terms;
@@ -1145,27 +1045,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		return $post_has_changed;
-	}
-
-	/**
-	 * Callback to clear the cache on post save and post delete.
-	 */
-	public function clear_cache( $post_id ) {
-		wp_cache_delete( 'ssl-alp-coauthors-post-' . $post_id, 'ssl-alp' );
-	}
-
-	/**
-	 * Callback to clear the cache when an object's terms are changed.
-	 *
-	 * @param $post_id The Post ID.
-	 */
-	public function clear_cache_on_terms_set( $object_id, $terms, $tt_ids, $taxonomy, $append, $old_tt_ids ) {
-		if ( 'ssl_alp_coauthor' !== $taxonomy ) {
-            // we only care about the coauthors taxonomy
-			return;
-		}
-
-		wp_cache_delete( 'ssl-alp-coauthors-post-' . $object_id, 'ssl-alp' );
 	}
 
 	public function get_coauthors( $post = null ) {	
