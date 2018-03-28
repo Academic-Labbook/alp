@@ -54,7 +54,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		if ( $this->is_post_type_enabled( get_post_type() ) ) {
 			$data = add_query_arg(
 				array(
-					'action' => 'coauthors_ajax_suggest',
+					'action' => 'ssl_alp_coauthors_ajax_suggest',
 					'post_type' => rawurlencode( get_post_type() ),
 				),
 				wp_nonce_url( 'admin-ajax.php', 'ssl-alp-coauthors-search' )
@@ -102,6 +102,9 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$loader->add_action( 'save_post', $this, 'coauthors_update_post', 10, 2 );
 		// Filter to set the post_author field when wp_insert_post is called
 		$loader->add_filter( 'wp_insert_post_data', $this, 'coauthors_set_post_author_field', 10, 2 );
+
+		// auto-suggest via AJAX
+		$loader->add_action( 'wp_ajax_ssl_alp_coauthors_ajax_suggest', $this, 'ajax_suggest' );
 
 		// delete user terms from posts when a user is deleted
 		$loader->add_action( 'delete_user', $this, 'delete_user_action' );
@@ -419,7 +422,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	public function update_author_term_post_count( $term ) {
 		global $wpdb;
 
-		$coauthor = $this->get_user_by( 'login', $term->name );
+		$coauthor = get_user_by( 'login', $term->name );
 
 		if ( ! $coauthor ) {
 			return new WP_Error( 'missing-coauthor', __( 'No co-author exists for that term', 'ssl-alp' ) );

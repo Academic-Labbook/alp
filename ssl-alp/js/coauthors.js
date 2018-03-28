@@ -148,9 +148,13 @@ jQuery( document ).ready(function () {
 	 * @param string [optional] Name to be applied to the input box
 	 */
 	function coauthors_create_autosuggest( author_name, input_name ) {
-		if ( ! input_name ) input_name = 'coauthorsinput[]';
+		if ( ! input_name ) {
+			input_name = 'coauthorsinput[]';
+		}
 
 		var $co = jQuery( '<input/>' );
+
+		console.log(ssl_alp_coauthors_ajax_suggest_link);
 
 		$co.attr({
 			'class': 'coauthor-suggest'
