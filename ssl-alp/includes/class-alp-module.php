@@ -29,7 +29,7 @@ abstract class SSL_ALP_Module {
 		$this->register_hooks();
 
 		// register settings
-		$loader->add_action( 'admin_init', $this, 'register_settings' );
+		$loader->add_action( 'init', $this, 'register_settings' );
 		$loader->add_action( 'admin_init', $this, 'register_settings_fields' );
 
 		// enqueue styles and scripts
