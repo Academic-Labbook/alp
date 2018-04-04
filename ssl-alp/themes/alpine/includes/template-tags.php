@@ -251,7 +251,7 @@ if ( ! function_exists( 'ssl_alpine_the_revisions' ) ) :
 
 		$post = get_post( $post );
 
-		if ( ! post_type_supports( $post->post_type, 'ssl-alp-edit-summaries' ) ) {
+		if ( ! post_type_supports( $post->post_type, 'revisions' ) ) {
 			// post type not supported
 			return;
 		}
@@ -288,7 +288,7 @@ if ( ! function_exists( 'ssl_alpine_get_revisions' ) ) :
 		// get current post
 		$post = get_post( $post );
 
-		if  ( ! post_type_supports( $post->post_type, 'ssl-alp-edit-summaries' ) ) {
+		if  ( ! post_type_supports( $post->post_type, 'revisions' ) ) {
 			// post type not supported
 			return;
 		}
@@ -433,13 +433,37 @@ if ( ! function_exists( 'ssl_alpine_the_references' ) ) :
 
 		$post = get_post( $post );
 
-		if ( ! post_type_supports( $post->post_type, 'ssl-alp-crossreferences' ) ) {
+		if ( ! $ssl_alp->references->is_supported( $post ) ) {
 			// post type not supported
 			return;
 		}
 
 		$ref_to_posts = $ssl_alp->references->get_reference_to_posts( $post );
 		$ref_from_posts = $ssl_alp->references->get_reference_from_posts( $post );
+
+		// check user permissions to view
+		foreach ( $ref_to_posts as $key => $ref_to_post ) {
+			if ( 'post' === $ref_to_post->post_type ) {
+				$capability = 'read_post';
+			} elseif ( 'page' == $ref_to_post->post_type ) {
+				$capability = 'read_page';
+			}
+
+			if ( ! current_user_can( $capability, $ref_to_post->ID ) ) {
+				unset( $ref_to_posts[$key] );
+			}
+		}
+		foreach ( $ref_from_posts as $key => $ref_from_post ) {
+			if ( 'post' === $ref_from_post->post_type ) {
+				$capability = 'read_post';
+			} elseif ( 'page' == $ref_from_post->post_type ) {
+				$capability = 'read_page';
+			}
+
+			if ( ! current_user_can( $capability, $ref_from_post->ID ) ) {
+				unset( $ref_from_posts[$key] );
+			}
+		}
 
 		if ( ( ! is_array( $ref_to_posts ) || ! count( $ref_to_posts ) ) && ( ! is_array( $ref_from_posts ) || ! count( $ref_from_posts ) ) ) {
 			// no references

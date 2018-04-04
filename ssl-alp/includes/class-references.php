@@ -73,7 +73,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		$loader = $this->get_loader();
 
 		// extract references from saved posts
-		$loader->add_action( 'init', $this, 'create_crossreference_taxonomy' );
+		$loader->add_action( 'init', $this, 'create_crossreference_taxonomy', 20 ); // called after settings are registered
 		$loader->add_action( 'save_post', $this, 'extract_crossreferences', 10, 2 );
 
         // DOI shortcode
@@ -104,11 +104,6 @@ class SSL_ALP_References extends SSL_ALP_Module {
 				)
 			)
 		);
-
-		// add post type support
-		foreach ( array_keys( $this->supported_reference_post_types ) as $post_type ) {
-			add_post_type_support( $post_type, 'ssl-alp-crossreferences' );
-		}
 	}
 
 	/**
@@ -119,7 +114,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		if ( ! get_option( 'ssl_alp_enable_crossreferences' ) ) {
 			// cross-references are disabled
 			return;
-		} elseif ( ! post_type_supports( $post->post_type, 'ssl-alp-crossreferences' ) ) {
+		} elseif ( ! $this->is_supported( $post ) ) {
 			// post type not supported
 			return;
 		}
@@ -138,18 +133,13 @@ class SSL_ALP_References extends SSL_ALP_Module {
 			// attempt to find the post ID for the URL
 			$reference_id = url_to_postid( $url );
 
-			if ( $reference_id === 0 ) {
-				// invalid URL
-				continue;
-			}
-
 			$referenced_post = get_post( $reference_id );
 
 			if ( is_null( $referenced_post ) ) {
 				// invalid post - skip
 				continue;
 			} elseif ( ! $this->is_supported( $referenced_post ) ) {
-				// not supported for referencing
+				// target not supported for referencing
 				continue;
 			}
 
@@ -158,21 +148,22 @@ class SSL_ALP_References extends SSL_ALP_Module {
 			 */
 
 			// create "reference to" term
-			$ref_to_post_term_name = sprintf("reference-to-post-id-%d", $reference_id);
+			$ref_to_post_term_name = sprintf( 'reference-to-post-id-%d', $referenced_post->ID );
 
 			// add term name to list that will be associated with the post
-			$terms[$ref_to_post_term_name] = $reference_id;
+			$terms[$ref_to_post_term_name] = $referenced_post->ID;
 		}
 
 		// update post's reference taxonomy terms (replaces any existing terms)
 		wp_set_post_terms( $post->ID, array_keys( $terms ), 'ssl_alp_crossreference' );
 
 		// set internal term metadata
-		foreach ( $terms as $term_name => $post_id ) {
+		foreach ( $terms as $term_name => $referenced_post_id ) {
 			// get term
 			$term = get_term_by( 'name', $term_name, 'ssl_alp_crossreference' );
+
 			// add term metadata
-			update_term_meta( $term->term_id, "reference-to-post-id", $post_id );
+			update_term_meta( $term->term_id, "reference-to-post-id", $referenced_post_id );
 		}
 	}
 
@@ -284,16 +275,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 			$referenced_post = get_post( $post_id );
 
 			if ( ! is_null( $referenced_post ) ) {
-				// check permission
-				if ( 'post' === $referenced_post->post_type ) {
-					$capability = 'read_post';
-				} elseif ( 'page' == $referenced_post->post_type ) {
-					$capability = 'read_page';
-				}
-
-				if ( current_user_can( $capability, $post_id ) ) {
-					$posts[] = $referenced_post;
-				}
+				$posts[] = $referenced_post;
 			}
 		}
 
@@ -344,18 +326,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 			// get the post
 			$referenced_post = get_post( $post_id );
 
-			if ( ! is_null( $referenced_post ) ) {
-				// check permission
-				if ( 'post' === $referenced_post->post_type ) {
-					$capability = 'read_post';
-				} elseif ( 'page' == $referenced_post->post_type ) {
-					$capability = 'read_page';
-				}
-
-				if ( current_user_can( $capability, $post_id ) ) {
-					$posts[] = $referenced_post;
-				}
-			}
+			$posts[] = $referenced_post;
 		}
 
 		return $posts;
