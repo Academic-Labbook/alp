@@ -270,7 +270,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 
 		$posts = array();
 
-		if ( empty( $terms ) ) {
+		if ( ! is_array( $terms ) ) {
 			// no terms to get posts from
 			return $posts;
 		}
