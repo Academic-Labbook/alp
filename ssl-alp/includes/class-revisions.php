@@ -63,9 +63,6 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	public function register_hooks() {
 		$loader = $this->get_loader();
 
-         // register edit summary feature with posts and pages
-        $loader->add_action( 'init', $this, 'add_edit_summary_support' );
-
         // add edit summary box to post and page edit screens
         $loader->add_action( 'post_submitbox_misc_actions', $this, 'add_edit_summary_textbox' );
 
@@ -94,19 +91,6 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		$loader->add_action( 'widgets_init', $this, 'register_revisions_widget' );
 	}
 
-    /**
-	 * Add edit summary support to certain post types, so they can have
-	 * relevant tools added to their edit pages.
-	 */
-	public function add_edit_summary_support() {
-		// support any post type that uses revisions
-		foreach ( get_post_types() as $post_type ) {
-			if ( post_type_supports( $post_type, 'revisions' ) ) {
-				add_post_type_support( $post_type, 'ssl-alp-edit-summaries' );
-			}
-		}
-	}
-
     /*
 	 * Check if edit summaries are enabled for, and the user has permission to
 	 * view, the specified post.
@@ -119,7 +103,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			// this is a revision of another post type
 			// check the parent post
 			return $this->edit_summary_allowed( get_post( $post->post_parent ) );
-		} elseif  ( ! post_type_supports( $post->post_type, 'ssl-alp-edit-summaries' ) ) {
+		} elseif  ( ! post_type_supports( $post->post_type, 'revisions' ) ) {
 			// unsupported post type
 			return false;
 		}
@@ -378,7 +362,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	}
 
     public function unhide_revisions_meta_box( $hidden, $screen ) {
-		if ( ! post_type_supports( $screen->post_type, 'ssl-alp-edit-summaries' ) ) {
+		if ( ! post_type_supports( $screen->post_type, 'revisions' ) ) {
 			// return as-is
 			return $hidden;
 		}
@@ -408,7 +392,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		$number = absint( $number );
 
 		// get post types that support edit summaries, and filter for SQL
-		$supported_post_types = get_post_types_by_support( 'ssl-alp-edit-summaries' );
+		$supported_post_types = get_post_types_by_support( 'revisions' );
 		$supported_post_types = array_map( 'esc_sql', $supported_post_types );
 		$supported_types_clause = '"' . implode( '", "', $supported_post_types ) . '"';
 
