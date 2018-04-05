@@ -31,6 +31,23 @@ class CrossReferencesTest extends WP_UnitTestCase {
 				)
 			)
 		);
+
+		$this->page_1 = $this->factory->post->create_and_get(
+			array(
+				'post_content'	=>	'This contains no cross-references.',
+				'post_type'		=>	'page'
+			)
+		);
+
+		$this->page_2 = $this->factory->post->create_and_get(
+			array(
+				'post_content'	=>	sprintf(
+					'Cross reference to <a href="%s">post 1</a>.',
+					get_permalink( $this->post_1 )
+				),
+				'post_type'		=>	'page'
+			)
+		);
 	}
 
 	public function test_get_references() {
@@ -47,12 +64,10 @@ class CrossReferencesTest extends WP_UnitTestCase {
 			$ssl_alp->references->get_reference_to_posts( $this->post_1 ),
 			$ssl_alp->references->get_reference_to_posts( $this->post_1->ID )
 		);
-
 		$this->assertEquals(
 			$ssl_alp->references->get_reference_to_posts( $this->post_2 ),
 			$ssl_alp->references->get_reference_to_posts( $this->post_2->ID )
 		);
-
 		$this->assertEquals(
 			$ssl_alp->references->get_reference_to_posts( $this->post_3 ),
 			$ssl_alp->references->get_reference_to_posts( $this->post_3->ID )
@@ -66,12 +81,10 @@ class CrossReferencesTest extends WP_UnitTestCase {
 			$ssl_alp->references->get_reference_from_posts( $this->post_1 ),
 			$ssl_alp->references->get_reference_from_posts( $this->post_1->ID )
 		);
-
 		$this->assertEquals(
 			$ssl_alp->references->get_reference_from_posts( $this->post_2 ),
 			$ssl_alp->references->get_reference_from_posts( $this->post_2->ID )
 		);
-
 		$this->assertEquals(
 			$ssl_alp->references->get_reference_from_posts( $this->post_3 ),
 			$ssl_alp->references->get_reference_from_posts( $this->post_3->ID )
@@ -101,6 +114,18 @@ class CrossReferencesTest extends WP_UnitTestCase {
 			$ssl_alp->references->get_reference_to_posts( $this->post_3 ),
 			array( $this->post_1, $this->post_2 )
 		);
+
+		// page 1 references nothing
+		$this->assertEquals(
+			$ssl_alp->references->get_reference_to_posts( $this->page_1 ),
+			array()
+		);
+
+		// page 2 references post 1
+		$this->assertEquals(
+			$ssl_alp->references->get_reference_to_posts( $this->page_2 ),
+			array( $this->post_1 )
+		);
 	}
 
 	function test_references_from() {
@@ -109,10 +134,10 @@ class CrossReferencesTest extends WP_UnitTestCase {
 		// rebuild references
 		$ssl_alp->references->rebuild_references();
 
-		// post 1 referenced by 2 and 3
+		// post 1 referenced by posts 2 and 3 and page 2
 		$this->assertEqualSets(
 			$ssl_alp->references->get_reference_from_posts( $this->post_1 ),
-			array( $this->post_2, $this->post_3 )
+			array( $this->post_2, $this->post_3, $this->page_2 )
 		);
 
 		// post 2 referenced by post 3
@@ -124,6 +149,34 @@ class CrossReferencesTest extends WP_UnitTestCase {
 		// post 3 referenced by nothing
 		$this->assertEquals(
 			$ssl_alp->references->get_reference_from_posts( $this->post_3 ),
+			array()
+		);
+
+		// page 1 referenced by nothing
+		$this->assertEquals(
+			$ssl_alp->references->get_reference_from_posts( $this->page_1 ),
+			array()
+		);
+
+		// page 2 referenced by nothing
+		$this->assertEquals(
+			$ssl_alp->references->get_reference_from_posts( $this->page_2 ),
+			array()
+		);
+	}
+
+	function test_invalid_references() {
+		global $ssl_alp;
+
+		$post = $this->factory->post->create_and_get(
+			array(
+				'post_content'	=>	'This contains an <a href="https://google.com/">external reference</a>.'
+			)
+		);
+
+		// external reference shouldn't show up
+		$this->assertEquals(
+			$ssl_alp->references->get_reference_from_posts( $post ),
 			array()
 		);
 	}
