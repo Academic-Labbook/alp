@@ -4,50 +4,33 @@
  * Cross-references tests
  */
 class CrossReferencesTest extends WP_UnitTestCase {
-	protected static $_post_1;
-	protected static $_post_2;
-	protected static $_post_3;
-	protected $post_1;
-	protected $post_2;
-	protected $post_3;
-
-	public static function wpSetUpBeforeClass( $factory ) {
-		/**
-		 * create posts
-		 */
+	public function setUp() {		
+		parent::setUp();
 		
-		self::$_post_1 = $factory->post->create_and_get(
+		$this->post_1 = $this->factory->post->create_and_get(
 			array(
 				'post_content'	=>	'This contains no cross-references.'
 			)
 		);
 
-		self::$_post_2 = $factory->post->create_and_get(
+		$this->post_2 = $this->factory->post->create_and_get(
 			array(
 				'post_content'	=>	sprintf(
 					'Cross reference to <a href="%s">post 1</a>.',
-					get_permalink( self::$_post_1 )
+					get_permalink( $this->post_1 )
 				)
 			)
 		);
 
-		self::$_post_3 = $factory->post->create_and_get(
+		$this->post_3 = $this->factory->post->create_and_get(
 			array(
 				'post_content'	=>	sprintf(
 					'Cross reference to <a href="%s">post 1</a> and <a href="%s">post 2</a>.',
-					get_permalink( self::$_post_1 ),
-					get_permalink( self::$_post_2 )
+					get_permalink( $this->post_1 ),
+					get_permalink( $this->post_2 )
 				)
 			)
 		);
-	}
-
-	public function setUp() {		
-		parent::setUp();
-
-		$this->post_1 = clone self::$_post_1;
-		$this->post_2 = clone self::$_post_2;
-		$this->post_3 = clone self::$_post_3;
 	}
 
 	public function test_get_references() {

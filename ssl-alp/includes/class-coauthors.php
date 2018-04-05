@@ -94,8 +94,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 		// Action to set users when a post is saved
 		$loader->add_action( 'save_post', $this, 'coauthors_update_post', 10, 2 );
-		// Filter to set the post_author field when wp_insert_post is called
-		$loader->add_filter( 'wp_insert_post_data', $this, 'coauthors_set_post_author_field', 10, 2 );
 
 		// auto-suggest via AJAX
 		$loader->add_action( 'wp_ajax_ssl_alp_coauthors_ajax_suggest', $this, 'ajax_suggest' );
@@ -232,6 +230,26 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		return in_array( $post_type, $this->supported_post_types );
+	}
+
+	public function get_coauthor_term( $user ) {
+		if ( is_null( $user ) ) {
+			return false;
+		}
+
+		return get_term_by( 'name', $user->user_login, 'ssl_alp_coauthor' );
+	}
+
+	public function delete_coauthor_term( $user ) {
+		if ( is_null( $user ) ) {
+			return false;
+		}
+
+		// get the user's term
+		$term = $this->get_coauthor_term( $user );
+		
+		// delete user's term
+		wp_delete_term( $term->term_id, 'ssl_alp_coauthor' );
 	}
 
 	/**
@@ -531,7 +549,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$terms = array();
 		$coauthor = get_user_by( 'login', $author_name );
 
-		if ( $author_term = $this->get_author_term( $coauthor ) ) {
+		if ( $author_term = $this->get_coauthor_term( $coauthor ) ) {
 			$terms[] = $author_term;
 		}
 
@@ -592,42 +610,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Filters post data before saving to db to set post_author
-	 */
-	function coauthors_set_post_author_field( $data, $postarr ) {
-		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
-			// coauthors disabled
-			return $data;
-		}
-
-		if ( defined( 'DOING_AUTOSAVE' ) && ! DOING_AUTOSAVE ) {
-			return $data;
-		}
-
-		if ( ! $this->is_post_type_enabled( $data['post_type'] ) ) {
-			return $data;
-		}
-
-		// this action happens when a post is saved while editing a post
-		if ( isset( $_REQUEST['ssl-alp-coauthors-nonce'] ) && isset( $_POST['coauthors'] ) && is_array( $_POST['coauthors'] ) ) {
-			$author = sanitize_text_field( $_POST['coauthors'][0] );
-
-			if ( $author ) {
-				$author_data = get_user_by( 'login', $author );
-				$data['post_author'] = $author_data->ID;
-			}
-		}
-
-		// if for some reason we don't have the coauthors fields set, set the author to the current user
-		if ( ! isset( $data['post_author'] ) ) {
-			$user = wp_get_current_user();
-			$data['post_author'] = $user->ID;
-		}
-
-		return $data;
-	}
-
-	/**
 	 * Update a post's co-authors on the 'save_post' hook
 	 *
 	 * @param $post_ID
@@ -646,26 +628,51 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return;
 		}
 
-		if ( $this->current_user_can_set_authors( $post ) ) {
+		$coauthors = array();
+
+		if ( $this->current_user_can_set_authors( $post ) && isset( $_POST['ssl-alp-coauthors-nonce'] ) && isset( $_POST['coauthors'] ) ) {
+			// User is allowed to set authors, and the post has been updated using the post edit page.
+			// We will allow coauthors to be completely replaced by whatever is specified.
+
 			// check nonce
-			if ( isset( $_POST['ssl-alp-coauthors-nonce'] ) && isset( $_POST['coauthors'] ) ) {
-				check_admin_referer( 'ssl-alp-coauthors-edit', 'ssl-alp-coauthors-nonce' );
+			check_admin_referer( 'ssl-alp-coauthors-edit', 'ssl-alp-coauthors-nonce' );
 
-				$coauthors = (array) $_POST['coauthors'];
-				$coauthors = array_map( 'sanitize_text_field', $coauthors );
+			$posted_coauthor_names = (array) $_POST['coauthors'];
 
-				$this->set_coauthors( $post, $coauthors );
-			}
-		} else {
-			// if the user can't set authors and a co-author isn't currently set, we need to explicity set one
-			if ( ! $this->has_author_terms( $post_id ) ) {
-				$user = get_userdata( $post->post_author );
+			foreach ( $posted_coauthor_names as $posted_coauthor_name ) {
+				$posted_coauthor_name = sanitize_text_field( $posted_coauthor_name );
 
-				if ( $user ) {
-					$this->set_coauthors( $post, array( $user->user_login ) );
+				// get user object
+				$user = get_user_by( 'login', $posted_coauthor_name );
+
+				if ( is_object( $user ) ) {
+					$coauthors[] = $user;
 				}
 			}
+		} else {
+			// The post has been updated using quick edit or programmatically, or the user doesn't
+			// have capabilities to set authors. We will only allow the main author to be changed.
+
+			// get existing coauthors
+			$coauthors = $this->get_coauthors( $post );
+
+			// get post's primary author
+			$primary_author = get_userdata( $post->post_author );
+
+			if ( reset( $coauthors ) !== $primary_author ) {
+				// primary author is no longer first coauthor
+				
+				if ( in_array( $primary_author, $coauthors ) ) {
+					// delete author from current place in list
+					unset( $coauthors[ array_search( $primary_author, $coauthors ) ] );
+				}
+				
+				// add author to front
+				array_unshift( $coauthors, $primary_author );
+			}				
 		}
+		
+		$this->set_coauthors( $post, $coauthors );
 	}
 
 	function has_author_terms( $post_id ) {
@@ -677,64 +684,67 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	/**
 	 * Set one or more coauthors for a post
 	 */
-	public function set_coauthors( $post, $coauthors, $append = false ) {
+	public function set_coauthors( $post, $coauthors ) {
 		global $wpdb;
 
 		$post = get_post( $post );
 
-		// best way to persist order
-		if ( $append ) {
-			$existing_coauthor_names = wp_list_pluck( $this->get_coauthors( $post ), 'user_login' );
-		} else {
-			$existing_coauthor_names = array();
+		// get post's primary author
+		$primary_author = get_userdata( $post->post_author );
+
+		if ( ! is_array( $coauthors ) ) {
+			// invalid input
+			return;
 		}
 
-		// at least one co-author is always required
 		if ( empty( $coauthors ) ) {
-			$current_user = wp_get_current_user();
-			$coauthors = array( $current_user->user_login );
+			// no coauthors specified; this might be because the post has been created
+			// programmatically.
+			
+			// use post's primary author 
+			if ( is_object( $primary_author ) ) {
+				$coauthors[] = $primary_author;
+			}
 		}
 
-		// set the coauthors
-		$coauthors = array_unique( array_merge( $existing_coauthor_names, $coauthors ) );
-		$coauthor_objects = array();
-
-		foreach ( $coauthors as &$author_name ) {
-			$author = get_user_by( 'login', $author_name );
-			$coauthor_objects[] = $author;
+		// get coauthor objects and create their terms
+		foreach ( $coauthors as $coauthor ) {
+			if ( ! is_object( $coauthor ) ) {
+				// invalid user specified
+				// remove
+				unset( $coauthors[ array_search( $coauthor, $coauthors ) ] );
+			}
 			
 			// create author term if it doesn't exist
-			$this->add_author_term( $author );
+			$this->add_coauthor_term( $coauthor );
 		}
 
-		wp_set_post_terms( $post->ID, $coauthors, 'ssl_alp_coauthor', false );
+		$coauthor_terms = array_map( array( $this, 'get_coauthor_term' ), $coauthors );
 
-		// If the original post_author is no longer assigned,
-		// update to the first WP_User $coauthor
-		$post_author_user = get_user_by( 'id', $post->post_author );
+		// create list of term ids
+		$coauthor_term_ids = wp_list_pluck( $coauthor_terms, 'term_id' );
 
-		if ( empty( $post_author_user ) || ! in_array( $post_author_user->user_login, $coauthors ) ) {
-			foreach ( $coauthor_objects as $coauthor_object ) {
-				$new_author = $coauthor_object;
-				break;
-			}
+		wp_set_post_terms( $post->ID, $coauthor_term_ids, 'ssl_alp_coauthor', false );
 
-			if ( empty( $new_author ) ) {
-                // no WP_Users assigned to the post
-				return false;
-			}
+		if ( ! count( $coauthors ) ) {
+			// empty terms
+			// no point continuing
+			return;
+		}
+
+		// update primary author if no longer first
+		if ( reset( $coauthors ) !== $primary_author ) {
+			$new_author = reset( $coauthors );
 
 			$wpdb->update( $wpdb->posts, array( 'post_author' => $new_author->ID ), array( 'ID' => $post->ID ) );
 			clean_post_cache( $post->ID );
 		}
-
-		return true;
 	}
 
 	/**
 	 * Action taken when user is deleted.
 	 */
-	function delete_user_action( $delete_id, $reassign ) {
+	function delete_user_action( $delete_id, $reassign_id ) {
 		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
 			// coauthors disabled
 			return;
@@ -750,30 +760,95 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return;
 		}
 
-		if ( $reassign ) {
+		// supported post type as SQL list
+		$post_type_sql = implode( "', '", $this->supported_post_types );
+
+		if ( ! is_null( $reassign_id ) ) {
 			// user's posts are to be reassigned
 
 			// get user to reassign posts to
-			$reassign_user = get_user_by( 'id', $reassign );
+			$reassign_user = get_user_by( 'id', $reassign_id );
 
 			if ( is_object( $reassign_user ) ) {
-				// get post ids of deleted user
-				$post_ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_author = %d", $delete_id ) );
+				// WordPress Core handles reassigning primary author posts
+				// we reassign seconary (coauthored) posts here
+				
+				// get all posts user is author of
+				$coauthored_posts = $this->get_coauthor_posts( $delete_user );
 
-				if ( $post_ids ) {
-					foreach ( $post_ids as $post_id ) {
-						// set the reassigned coauthor
-						$this->set_coauthors( $post_id, array( $reassign_user->user_login ), true );
+				// get primary posts
+				$primary_post_ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_author = %d AND post_type IN ('$post_type_sql')", $delete_user->ID ) );
+				$primary_posts = array_filter( $primary_post_ids, 'get_post' );
+
+				// remove primary authored posts from list
+				$secondary_posts = array_diff( $coauthored_posts, $primary_posts );
+
+				if ( count( $secondary_posts ) ) {
+					foreach ( $secondary_posts as $secondary_post ) {
+						// get existing coauthors of this post
+						$coauthors = $this->get_coauthors( $secondary_post );
+
+						// reassign coauthor, preserving order
+						$coauthors[ array_search( $delete_user, $coauthors ) ] = $reassign_user;
+
+						// update
+						$this->set_coauthors( $secondary_post, $coauthors );
 					}
+				}
+			}
+		} else {
+			// users posts will not be reassigned, but we must make sure that their posts
+			// are not deleted where there are other authors
+
+			// get user's primary posts
+			$post_ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_author = %d AND post_type IN ('$post_type_sql')", $delete_user->ID ) );
+
+			foreach ( $post_ids as $post_id ) {
+				$post = get_post( $post_id );
+
+				// check if post has multiple coauthors
+				$coauthors = $this->get_coauthors( $post );
+
+				if ( count( $coauthors ) > 1 ) {
+					// remove the deleted user
+					unset( $coauthors[ array_search( $delete_user, $coauthors ) ] );
+
+					// set coauthors (this changes the primary author)
+					$this->set_coauthors( $post, $coauthors );
 				}
 			}
 		}
 
-		// get the user's term
-		$term = get_term_by( 'name', $delete_user->user_login, 'ssl_alp_coauthor' );
-		
 		// delete user's term
-		wp_delete_term( $term->term_id, 'ssl_alp_coauthor' );
+		$this->delete_coauthor_term( $delete_user );
+	}
+
+	public function get_coauthor_posts( $user ) {
+		$posts = array();
+
+		// find user term
+		$user_term = $this->get_coauthor_term( $user );
+
+		if ( ! $user_term ) {
+			// no term, so assume no posts
+			return $posts;
+		}
+
+		// get objects associated with term (assume everything is a post)
+		$term_objects = get_objects_in_term( $user_term->term_id, 'ssl_alp_coauthor' );
+
+		foreach ( $term_objects as $post_id ) {
+			// get_objects_in_term returns strings
+			$post_id = (int) $post_id;
+
+			$post = get_post( $post_id );
+
+			if ( ! is_null( $post ) ) {
+				$posts[] = $post;
+			}
+		}
+
+		return $posts;
 	}
 
 	/**
@@ -787,7 +862,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 		$user = get_userdata( $user_id );
 		$user = get_user_by( 'login', $user->user_login );
-		$term = $this->get_author_term( $user );
+		$term = $this->get_coauthor_term( $user );
 
 		// Only modify the count if the author already exists as a term
 		if ( $term && ! is_wp_error( $term ) ) {
@@ -1030,20 +1105,9 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Get the author term for a given co-author
-	 */
-	public function get_author_term( $coauthor ) {
-		if ( ! is_object( $coauthor ) ) {
-			return;
-		}
-
-		return get_term_by( 'name', $coauthor->user_login, 'ssl_alp_coauthor' );
-	}
-
-	/**
 	 * Add author term
 	 */
-	public function add_author_term( $coauthor ) {
+	public function add_coauthor_term( $coauthor ) {
 		if ( is_int( $coauthor ) ) {
 			// get user by their id
 			$coauthor = get_user_by( 'id', $coauthor );
@@ -1053,7 +1117,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return;
 		}
 
-		if ( ! $this->get_author_term( $coauthor ) ) {
+		if ( ! $this->get_coauthor_term( $coauthor ) ) {
 			// term doesn't yet exist
 			wp_insert_term( $coauthor->user_login, 'ssl_alp_coauthor' );
 		}
