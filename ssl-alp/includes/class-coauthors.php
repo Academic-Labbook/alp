@@ -70,16 +70,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	public function register_hooks() {
 		$loader = $this->get_loader();
 
-		// register the authors widget regardless of settings
+		// register the authors widget
 		$loader->add_action( 'widgets_init', $this, 'register_users_widget' );
 
-		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
-			// coauthors disabled; no point continuing
-			return;
-		}
-
 		// register authors taxonomy
-		$loader->add_action( 'init', $this, 'register_taxonomy', 100 );
+		$loader->add_action( 'init', $this, 'register_taxonomy' );
 
 		// remove author support
 		$loader->add_action( 'init', $this, 'remove_author_support' );
@@ -118,8 +113,8 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$loader->add_filter( 'user_has_cap', $this, 'filter_user_has_cap', 10, 3 );
 
 		// Handle the custom author meta box
-		$loader->add_action( 'add_meta_boxes', $this, 'add_coauthors_box' );
 		$loader->add_action( 'add_meta_boxes', $this, 'remove_authors_box' );
+		$loader->add_action( 'add_meta_boxes', $this, 'add_coauthors_box' );
 
 		// Make sure we've correctly set author data on author pages
 		$loader->add_filter( 'posts_selection', $this, 'fix_author_page' ); // use posts_selection since it's after WP_Query has built the request and before it's queried any posts
@@ -179,6 +174,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * Register the 'ssl_alp_coauthor' taxonomy and add post type support
 	 */
 	public function register_taxonomy() {
+		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
+			// coauthors disabled
+			return;
+		}
+
 		// Register new taxonomy so that we can store all of the relationships
 		$args = array(
 			'hierarchical'   	=> false,
@@ -202,6 +202,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * Remove author support (replaced by coauthor support)
 	 */
 	public function remove_author_support() {
+		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
+			// coauthors disabled
+			return;
+		}
+
 		foreach ( $this->supported_post_types as $post_type ) {
 			remove_post_type_support( $post_type, 'author' );
 		}
@@ -233,6 +238,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * Remove the standard post edit authors metabox (is replaced with coauthors box by add_coauthors_box)
 	 */
 	public function remove_authors_box() {
+		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
+			// coauthors disabled
+			return;
+		}
+
 		if ( $this->post_supports_coauthors() ) {
 			remove_meta_box( 'authordiv', get_post_type(), 'normal' );	
         }
@@ -242,6 +252,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * Add the coauthors metabox
 	 */
 	public function add_coauthors_box() {
+		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
+			// coauthors disabled
+			return;
+		}
+
 		if ( ! $this->post_supports_coauthors() || ! $this->current_user_can_set_authors() ) {
             return;
         }
@@ -308,6 +323,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * This is used to format the author names displayed in the admin post list
 	 */
 	function filter_term_name( $value, $term_id, $taxonomy, $context ) {
+		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
+			// coauthors disabled
+			return $value;
+		}
+
 		if ( 'display' !== $context ) {
 			// term not being displayed
 			return $value;
@@ -327,6 +347,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
      * provide our own
 	 */
 	function filter_manage_users_columns( $columns ) {
+		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
+			// coauthors disabled
+			return $columns;
+		}
+
 		$new_columns = array();
 
 		// unset and add our column while retaining the order of the columns
@@ -345,6 +370,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * Provide an accurate count when looking up the number of published posts for a user
 	 */
 	function filter_manage_users_custom_column( $value, $column_name, $user_id ) {
+		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
+			// coauthors disabled
+			return $value;
+		}
+
 		if ( 'ssl-alp-coauthors-post-count' != $column_name ) {
 			// not the column we want to modify
 			return $value;
@@ -423,6 +453,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * Modify the author query posts SQL to include posts co-authored
 	 */
 	function posts_join_filter( $join, $query ) {
+		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
+			// coauthors disabled
+			return $join;
+		}
+
 		global $wpdb;
 
 		if ( ! $query->is_author() ) {
@@ -463,6 +498,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * Modify the author query posts SQL to include posts co-authored
 	 */
 	function posts_where_filter( $where, $query ) {
+		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
+			// coauthors disabled
+			return $where;
+		}
+
 		global $wpdb;
 
 		if ( ! $query->is_author() ) {
@@ -526,6 +566,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * Modify the author query posts SQL to include posts co-authored
 	 */
 	function posts_groupby_filter( $groupby, $query ) {
+		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
+			// coauthors disabled
+			return $groupby;
+		}
+
 		global $wpdb;
 
 		if ( ! $query->is_author() ) {
@@ -550,6 +595,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * Filters post data before saving to db to set post_author
 	 */
 	function coauthors_set_post_author_field( $data, $postarr ) {
+		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
+			// coauthors disabled
+			return $data;
+		}
+
 		if ( defined( 'DOING_AUTOSAVE' ) && ! DOING_AUTOSAVE ) {
 			return $data;
 		}
@@ -583,6 +633,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * @param $post_ID
 	 */
 	function coauthors_update_post( $post_id, $post ) {
+		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
+			// coauthors disabled
+			return;
+		}
+
 		if ( defined( 'DOING_AUTOSAVE' ) && ! DOING_AUTOSAVE ) {
 			return;
 		}
@@ -681,6 +736,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * Action taken when user is deleted.
 	 */
 	function delete_user_action( $delete_id, $reassign ) {
+		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
+			// coauthors disabled
+			return;
+		}
+
 		global $wpdb;
 
 		// get user to be deleted
@@ -721,6 +781,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * Filter the count_users_posts() core function to include our correct count
 	 */
 	function filter_count_user_posts( $count, $user_id ) {
+		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
+			// coauthors disabled
+			return $count;
+		}
+
 		$user = get_userdata( $user_id );
 		$user = get_user_by( 'login', $user->user_login );
 		$term = $this->get_author_term( $user );
@@ -765,6 +830,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * the query_var is changed.
 	 */
 	public function fix_author_page() {
+		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
+			// coauthors disabled
+			return;
+		}
+
 		if ( ! is_author() ) {
 			// page is not an author page
 			return;
@@ -810,6 +880,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
      * Filter array of comment notification email addresses
      */
     public function filter_comment_notification_email_recipients( $recipients, $comment_id ) {
+		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
+			// coauthors disabled
+			return $recipients;
+		}
+
     	$comment = get_comment( $comment_id );
     	$post = get_post( $comment->comment_post_ID );
 
@@ -833,6 +908,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
      * Filter array of comment moderation email addresses
      */
     public function filter_comment_moderation_email_recipients( $recipients, $comment ) {
+		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
+			// coauthors disabled
+			return $recipients;
+		}
+
     	$comment = get_comment( $comment );
     	$post = get_post( $comment->comment_post_ID );
 
@@ -856,6 +936,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * Main function that handles search-as-you-type for adding authors
 	 */
 	public function ajax_suggest() {
+		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
+			// coauthors disabled
+			return;
+		}
+
 		if ( ! isset( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'ssl-alp-coauthors-search' ) ) {
 			exit();
 		}
@@ -900,6 +985,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * Allows coauthors to edit the post they're coauthors of
 	 */
 	function filter_user_has_cap( $allcaps, $caps, $args ) {
+		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
+			// coauthors disabled
+			return $allcaps;
+		}
+
 		$cap = $args[0];
 		$user_id = isset( $args[1] ) ? $args[1] : 0;
 		$post_id = isset( $args[2] ) ? $args[2] : 0;
@@ -948,9 +1038,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return;
 		}
 
-		$term = get_term_by( 'name', $coauthor->user_login, 'ssl_alp_coauthor' );
-
-		return $term;
+		return get_term_by( 'name', $coauthor->user_login, 'ssl_alp_coauthor' );
 	}
 
 	/**
@@ -1008,6 +1096,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * Check whether the coauthors for this post have changed, to determine whether to trigger a save.
 	 */
 	public function check_coauthors_have_changed( $post_has_changed, WP_Post $last_revision, WP_Post $post ) {
+		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
+			// coauthors disabled
+			return;
+		}
+
 		// skip when autosaving, as custom post data is annoyingly not included in $_POST during autosaves
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 			return $post_has_changed;
