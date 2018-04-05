@@ -106,10 +106,11 @@ The following list of plugins have been partialy adapted into ALP. All have been
 modified in some way (e.g. admin settings, class and setting namespaces, features
 added or removed, etc.), some more so than others. Some upstream bug fixes and
 reports have also been pushed back to these plugins and WordPress itself:
- - [Co-Authors Plus](https://wordpress.org/support/topic/two-bug-fixes-for-author-page/)
- - [wpDirAuth](https://wordpress.org/support/topic/overriding-cookie-expiry-for-directory-authenticated-users/)
- - [WordPress Core](https://core.trac.wordpress.org/ticket/43613)
- - [WordPress Core](https://core.trac.wordpress.org/ticket/43629)
+ - [1](https://wordpress.org/support/topic/two-bug-fixes-for-author-page/)
+ - [2](https://wordpress.org/support/topic/overriding-cookie-expiry-for-directory-authenticated-users/)
+ - [3](https://core.trac.wordpress.org/ticket/43613)
+ - [4](https://core.trac.wordpress.org/ticket/43629)
+ - [5](https://core.trac.wordpress.org/ticket/43705)
 
 ### Co-Authors Plus
 Authors: Mohammad Jangda, Daniel Bachhuber, Automattic, Shepherd Interactive, Mark Jaquith  
