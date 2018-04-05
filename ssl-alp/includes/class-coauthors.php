@@ -654,7 +654,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 				$coauthors = (array) $_POST['coauthors'];
 				$coauthors = array_map( 'sanitize_text_field', $coauthors );
 
-				$this->add_coauthors( $post, $coauthors );
+				$this->set_coauthors( $post, $coauthors );
 			}
 		} else {
 			// if the user can't set authors and a co-author isn't currently set, we need to explicity set one
@@ -662,7 +662,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 				$user = get_userdata( $post->post_author );
 
 				if ( $user ) {
-					$this->add_coauthors( $post, array( $user->user_login ) );
+					$this->set_coauthors( $post, array( $user->user_login ) );
 				}
 			}
 		}
@@ -677,13 +677,10 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	/**
 	 * Set one or more coauthors for a post
 	 */
-	public function add_coauthors( $post, $coauthors, $append = false ) {
+	public function set_coauthors( $post, $coauthors, $append = false ) {
 		global $wpdb;
 
 		$post = get_post( $post );
-
-		$insert = false;
-        $current_user = wp_get_current_user();
 
 		// best way to persist order
 		if ( $append ) {
@@ -694,6 +691,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 		// at least one co-author is always required
 		if ( empty( $coauthors ) ) {
+			$current_user = wp_get_current_user();
 			$coauthors = array( $current_user->user_login );
 		}
 
@@ -704,8 +702,9 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		foreach ( $coauthors as &$author_name ) {
 			$author = get_user_by( 'login', $author_name );
 			$coauthor_objects[] = $author;
-			$term = $this->add_author_term( $author );
-			$author_name = $term->slug;
+			
+			// create author term if it doesn't exist
+			$this->add_author_term( $author );
 		}
 
 		wp_set_post_terms( $post->ID, $coauthors, 'ssl_alp_coauthor', false );
@@ -764,7 +763,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 				if ( $post_ids ) {
 					foreach ( $post_ids as $post_id ) {
 						// set the reassigned coauthor
-						$this->add_coauthors( $post_id, array( $reassign_user->user_login ), true );
+						$this->set_coauthors( $post_id, array( $reassign_user->user_login ), true );
 					}
 				}
 			}
@@ -1051,16 +1050,13 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 		
 		if ( ! is_object( $coauthor ) ) {
-			return false;
+			return;
 		}
 
-		if ( $term = $this->get_author_term( $coauthor ) ) {
-			// term already exists
-		} else {
-			$term = wp_insert_term( $coauthor->user_login, 'ssl_alp_coauthor' );
+		if ( ! $this->get_author_term( $coauthor ) ) {
+			// term doesn't yet exist
+			wp_insert_term( $coauthor->user_login, 'ssl_alp_coauthor' );
 		}
-
-		return $term;
 	}
 
 	/**
