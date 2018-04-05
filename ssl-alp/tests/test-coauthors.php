@@ -428,4 +428,54 @@ class CoauthorsTest extends WP_UnitTestCase {
         // check term is also deleted
         $this->assertFalse( get_term_by( 'name', $new_user->user_login, 'ssl_alp_coauthor' ) );
     }
+
+    /**
+     * Test post counts including coauthored posts.
+     */
+    function test_post_counts() {
+        global $ssl_alp;
+
+        // users initially have 1 each
+        $this->assertEquals( count_user_posts( $this->user_1->ID), 1 );
+        $this->assertEquals( count_user_posts( $this->user_2->ID), 1 );
+        $this->assertEquals( count_user_posts( $this->user_3->ID), 1 );
+
+        // create a bunch of posts
+        $count = 10;
+        $post_ids = $this->factory->post->create_many( $count );
+
+        // set coauthors
+        foreach ( $post_ids as $post_id ) {
+            $ssl_alp->coauthors->set_coauthors(
+                $post_id,
+                array(
+                    $this->user_1,
+                    $this->user_2
+                )
+            );
+        }
+
+        // user 1 and 2 should have $count more posts
+        $this->assertEquals( count_user_posts( $this->user_1->ID), $count + 1 );
+        $this->assertEquals( count_user_posts( $this->user_2->ID), $count + 1 );
+        $this->assertEquals( count_user_posts( $this->user_3->ID), 1 );
+
+        // test our implementation of count_many_users_posts
+        $this->assertEquals(
+            array_values(
+                $ssl_alp->coauthors->count_many_users_posts(
+                    array(
+                        $this->user_1->ID,
+                        $this->user_2->ID,
+                        $this->user_3->ID
+                    )
+                )
+            ),
+            array(
+                $count + 1,
+                $count + 1,
+                1
+            )
+        );
+    }
 }

@@ -1004,7 +1004,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
     	}
 
     	return $recipients;
-    }
+	}
 
 	/**
 	 * Main function that handles search-as-you-type for adding authors
@@ -1271,6 +1271,36 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 		return false;
 	}
+
+	/**
+	 * Override default `count_many_users_posts` if coauthors are enabled
+	 */
+	public function count_many_users_posts( $user_ids ) {
+		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
+			// return standard counts
+			return count_many_users_posts( $user_ids );
+		}
+
+		/**
+		 * Unfortunately, WordPress doesn't provide a hook for overriding the
+		 * behaviour of count_many_users_posts, and so it cannot inject
+		 * coauthor posts. Instead, we just have to query it manually here.
+		 */
+		
+		// list of counts by user id
+		$counts = array();
+
+		foreach ( $user_ids as $user_id ) {
+			/**
+			 * Call coauthor class to get filtered counts. This tells the function that the
+			 * user currently has 0 posts, which is not usually true. This is fine, unless
+			 * for some reason the user's "count" metadata has not been updated.
+			 */
+			$counts[$user_id] = $this->filter_count_user_posts( 0, $user_id );
+		}
+
+		return $counts;
+	}
 }
 
 class SSL_ALP_Users extends WP_Widget {
@@ -1323,7 +1353,7 @@ class SSL_ALP_Users extends WP_Widget {
 
 			// get user post counts
 			$user_ids = array_map( create_function( '$user', 'return $user->ID;' ), $users );
-			$post_counts = $this->count_many_users_posts( $user_ids );
+			$post_counts = $ssl_alp->coauthors->count_many_users_posts( $user_ids );
 
 			if ( ! empty( $users ) ) {
 				// enqueue script to take the user to the author's page
@@ -1412,37 +1442,5 @@ class SSL_ALP_Users extends WP_Widget {
 		$instance['dropdown'] = ! empty( $new_instance['dropdown'] ) ? true : false;
 
 		return $instance;
-	}
-
-	/**
-	 * Override default `count_many_users_posts` if coauthors are enabled
-	 */
-	protected function count_many_users_posts( $user_ids ) {
-		global $ssl_alp;
-
-		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
-			// return standard counts
-			return count_many_users_posts( $user_ids );
-		}
-
-		/**
-		 * Unfortunately, WordPress doesn't provide a hook for overriding the
-		 * behaviour of count_many_users_posts, and so it cannot inject
-		 * coauthor posts. Instead, we just have to query it manually here.
-		 */
-		
-		// list of counts by user id
-		$counts = array();
-
-		foreach ( $user_ids as $user_id ) {
-			/**
-			 * Call coauthor class to get filtered counts. This tells the function that the
-			 * user currently has 0 posts, which is not usually true. This is fine, unless
-			 * for some reason the user's "count" metadata has not been updated.
-			 */
-			$counts[$user_id] = $ssl_alp->coauthors->filter_count_user_posts( 0, $user_id );
-		}
-
-		return $counts;
 	}
 }
