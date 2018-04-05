@@ -25,11 +25,8 @@ abstract class SSL_ALP_Module {
 	public function register() {
 		$loader = $this->get_loader();
 
-		// register hooks
-		$this->register_hooks();
-
 		// register settings
-		$loader->add_action( 'init', $this, 'register_settings' );
+		$loader->add_action( 'init', $this, 'register_settings', 5 ); // high priority
 		$loader->add_action( 'admin_init', $this, 'register_settings_fields' );
 
 		// enqueue styles and scripts
@@ -37,6 +34,9 @@ abstract class SSL_ALP_Module {
         $loader->add_action( 'wp_enqueue_scripts', $this, 'enqueue_scripts' );
         $loader->add_action( 'admin_enqueue_scripts', $this, 'enqueue_admin_styles' );
 		$loader->add_action( 'admin_enqueue_scripts', $this, 'enqueue_admin_scripts' );
+
+		// register hooks
+		$this->register_hooks();
 	}
 
 	/**
