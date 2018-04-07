@@ -78,9 +78,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 		// remove author support
 		$loader->add_action( 'init', $this, 'remove_author_support' );
-		
-		// filter the internal term name to display the coauthor name
-		$loader->add_filter( 'term_name', $this, 'filter_term_name', 10, 4 );
 
 		// hooks to modify the published post number count on the Users WP List Table
 		// these are required because the count_many_users_posts() function has no hooks
@@ -333,31 +330,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		<?php wp_nonce_field( 'ssl-alp-coauthors-edit', 'ssl-alp-coauthors-nonce' ); ?>
 
 		<?php
-	}
-
-	/**
-	 * Filter term name for display
-	 * 
-	 * This is used to format the author names displayed in the admin post list
-	 */
-	function filter_term_name( $value, $term_id, $taxonomy, $context ) {
-		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
-			// coauthors disabled
-			return $value;
-		}
-
-		if ( 'display' !== $context ) {
-			// term not being displayed
-			return $value;
-		} elseif ( 'ssl_alp_coauthor' !== $taxonomy ) {
-			// wrong taxonomy
-			return $value;
-		}
-
-		// term value is the user's login name
-		$user = get_user_by( 'login', $value );
-
-		return $user->display_name;
 	}
 
 	/**
