@@ -189,14 +189,11 @@ jQuery( document ).ready(function () {
 		author.email = jQuery.trim( vals[3] );
 		author.nicename = jQuery.trim( vals[4] );
 
-		if ( author.id == 'New' ) {
-			coauthors_new_author_display( name );
-		} else {
-			coauthors_add_coauthor( author, $this );
+		coauthors_add_coauthor( author, $this );
 
-			// Show the delete button if we now have more than one co-author
-			if ( jQuery( '#coauthors-list .coauthor-row .coauthor-tag' ).length > 1 )
-				jQuery( '#coauthors-list .coauthor-row .coauthors-author-options' ).removeClass( 'hidden' );
+		// show the delete button if we now have more than one coauthor
+		if ( jQuery( '#coauthors-list .coauthor-row .coauthor-tag' ).length > 1 ) {
+			jQuery( '#coauthors-list .coauthor-row .coauthors-author-options' ).removeClass( 'hidden' );
 		}
 	}
 
@@ -276,7 +273,7 @@ jQuery( document ).ready(function () {
 				'type': 'hidden',
 				'id': 'coauthors_hidden_input',
 				'name': 'coauthors[]',
-				'value': unescape( author.nicename )
+				'value': unescape( author.login )
 			});
 
 		return $input;
