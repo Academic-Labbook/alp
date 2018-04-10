@@ -982,7 +982,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Main function that handles search-as-you-type for adding authors
+	 * Handles search-as-you-type for adding authors
 	 */
 	public function ajax_suggest() {
 		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
@@ -997,6 +997,8 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		if ( empty( $_REQUEST['q'] ) ) {
 			exit();
 		}
+
+		error_log($_REQUEST['existing_authors']);
 
 		$search = sanitize_text_field( strtolower( $_REQUEST['q'] ) );
 		$ignore = array_map( 'sanitize_text_field', explode( ',', $_REQUEST['existing_authors'] ) );
@@ -1027,7 +1029,18 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			'fields' => 'all_with_meta',
 		);
 
-		return get_users( $args );
+		// get all authors
+		$authors = get_users( $args );
+
+		// filter out ignored ones
+		foreach ( $authors as $key => $author ) {
+			if ( in_array( $author->user_login, $ignored_authors ) ) {
+				// remove ignored author
+				unset( $authors[ $key ] );
+			}
+		}
+
+		return $authors;
 	}
 
 	/**
