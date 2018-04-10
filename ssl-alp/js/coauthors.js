@@ -22,13 +22,11 @@ jQuery( document ).ready(function () {
 	}
 
 	var coauthors_edit_onclick = function( event ) {
-		var $tag = jQuery( this );
-		var $co = $tag.prev();
+		var $author_span = jQuery( this );
+		var $input_box = $author_span.prev();
 
-		$tag.hide();
-		$co.show().focus();
-
-		$co.previousAuthor = $tag.text();
+		$author_span.hide();
+		$input_box.show().focus();
 	}
 
 	/*
@@ -37,60 +35,62 @@ jQuery( document ).ready(function () {
 	 * @param string Author Name
 	 * @param object The autosuggest input box
 	 */
-	function coauthors_save_coauthor( author, co ) {
+	function coauthors_save_coauthor( author, input_box ) {
 		// get sibling <span> and update
-		co.siblings( '.coauthor-tag' )
-			.html( author.name )
-			.append( coauthors_create_author_gravatar( author ) )
+		input_box.siblings( '.coauthor-tag' )
+			.html( author.display_name )
+			.append( coauthors_create_author_avatar( author ) )
 			.show();
 
 		// update the value of the hidden input
-		co.siblings( 'input[name="coauthors[]"]' ).val( author.nicename );
+		input_box.siblings( 'input[name="coauthors[]"]' ).val( author.login );
 	}
 
 	/*
-	 * Add coauthor
+	 * Add author to coauthor list.
+	 * 
 	 * @param string Author Name
 	 * @param object The autosuggest input box
 	 * @param boolean Initial set up or not?
 	 */
-	function coauthors_add_coauthor( author, co, init, count ) {
-		// check if editing
-		if ( co && co.siblings( '.coauthor-tag' ).length ) {
-			coauthors_save_coauthor( author, co );
+	function coauthors_add_coauthor( author, input_box, init, count ) {
+		if ( input_box && input_box.siblings( '.coauthor-tag' ).length ) {
+			// user is editing an existing author input box
+			coauthors_save_coauthor( author, input_box );
 		} else {
 			// not editing, so we create a new author entry
 			if ( count == 0 ) {
-				var co_name = ( count == 0 ) ? 'coauthors-main' : '';
+				var input_box_name = ( count == 0 ) ? 'coauthors-main' : '';
 			}
 
 			var options = { addDelete: true, addEdit: false };
 
 			// create autosuggest box and text tag
-			if ( ! co ) {
-				var co = coauthors_create_autosuggest( author.name, co_name );
+			if ( ! input_box ) {
+				var input_box = coauthors_create_autosuggest( author.display_name, input_box_name );
 			}
 
-			var tag = coauthors_create_author_tag( author );
+			var author_span = coauthors_create_author_tag( author );
 			var input = coauthors_create_author_hidden_input( author );
-			var $gravatar = coauthors_create_author_gravatar( author, 25 );
+			var $avatar = coauthors_create_author_avatar( author );
 
-			tag.append( $gravatar );
+			// add avatar to span
+			author_span.append( $avatar );
 
-			coauthors_add_to_table( co, tag, input, options );
+			coauthors_add_to_table( input_box, author_span, input, options );
 
 			if ( ! init ) {
 				// create new author-suggest and append it to a new row
-				var new_co = coauthors_create_autosuggest( '', false );
-				coauthors_add_to_table( new_co );
-				move_loading( new_co );
+				var new_input_box = coauthors_create_autosuggest( '', false );
+				coauthors_add_to_table( new_input_box );
+				move_loading( new_input_box );
 			}
 		}
 
-		co.bind( 'blur', coauthors_stop_editing );
+		input_box.bind( 'blur', coauthors_stop_editing );
 
 		// Set the value for the auto-suggest box to the Author's name and hide it
-		co.val( unescape( author.name ) )
+		input_box.val( unescape( author.display_name ) )
 			.hide()
 			.unbind( 'focus' );
 
@@ -103,17 +103,18 @@ jQuery( document ).ready(function () {
 	 * @param object Text tag
 	 * @param
 	 */
-	function coauthors_add_to_table( co, tag, input, options ) {
-		if ( co ) {
+	function coauthors_add_to_table( input_box, author_span, input, options ) {
+		if ( input_box ) {
+			// create div tag
 			var $div = jQuery( '<div/>' )
 						.addClass( 'suggest' )
 						.addClass( 'coauthor-row' )
-						.append( co )
-						.append( tag )
+						.append( input_box )
+						.append( author_span )
 						.append( input );
 
 			// add buttons to row
-			if ( tag ) {
+			if ( author_span ) {
 				coauthors_insert_author_edit_cells( $div, options );
 			}
 
@@ -126,10 +127,12 @@ jQuery( document ).ready(function () {
 	 * @param object The row to which the new author should be added
 	 */
 	function coauthors_insert_author_edit_cells( $div, options ) {
+		// create div tag
 		var $options = jQuery( '<div/>' )
-			.addClass( 'coauthors-author-options' );
+						.addClass( 'coauthors-author-options' );
 
 		if ( options.addDelete ) {
+			// create span tag
 			var delete_btn = jQuery( '<span/>' )
 								.addClass( 'delete-coauthor' )
 								.text( ssl_alp_coauthors_strings.delete_label )
@@ -143,7 +146,10 @@ jQuery( document ).ready(function () {
 	}
 
 	/*
-	 * Creates autosuggest input box
+	 * Create coauthor search box.
+	 * 
+	 * This is both the empty search box to add new authors, and existing ones.
+	 * 
 	 * @param string [optional] Name of the author
 	 * @param string [optional] Name to be applied to the input box
 	 */
@@ -152,44 +158,74 @@ jQuery( document ).ready(function () {
 			input_name = 'coauthorsinput[]';
 		}
 
-		var $co = jQuery( '<input/>' );
+		// create input tag
+		var $input_box = jQuery( '<input/>' );
 
-		$co.attr({
+		$input_box.attr({
 			'class': 'coauthor-suggest'
 			, 'name': input_name
 			})
 			.appendTo( $coauthors_div )
-			.suggest( ssl_alp_coauthors_ajax_suggest_link, {
-				onSelect: coauthors_autosuggest_select,
-				delay: 500
+			.autocomplete({
+				minChars: 1,
+				source: function( request, response ) {
+					// add existing authors to request
+					var existing_authors = jQuery( 'input[name="coauthors[]"]' ).map(function(){return jQuery( this ).val();}).get();
+
+					request.existing_authors = existing_authors.join( ',' );
+
+					jQuery.getJSON(
+						ssl_alp_coauthors_ajax_suggest_link,
+						request,
+						function ( data ) {
+							// process JSON data into drop-down list
+							// data includes "label" that is shown in the drop-down list
+							response(data);
+						}
+					);
+				},
+				select: function ( event, selection ) {
+					// author is the only item
+					author = selection.item;
+
+					// add selected author to list
+					coauthors_autosuggest_select( author, jQuery( this ) );
+
+					// tell JQuery that select has set a value
+					return false;
+				}
 			})
 			.keydown( coauthors_autosuggest_keydown );
 
-		if ( author_name ) {
-			$co.attr( 'value', unescape( author_name ) );
-		} else {
-			$co.attr( 'value', ssl_alp_coauthors_strings.search_box_text )
-				.focus( function() { $co.val( '' ) } )
-				.blur( function() { $co.val( ssl_alp_coauthors_strings.search_box_text ) } );
+			$input_box.autocomplete( "instance" )
+				._renderItem = function( ul, author ) {
+					// content to display in list item
+					var content = unescape( author.display_name );
+
+					var $author_span = jQuery( '<span></span>' )
+										.html( content )
+										.addClass( 'coauthor-suggest-item' );
+
+					var $list_item = $( "<li>" )
+										.append( $author_span )
+										.appendTo( ul );
+
+					return $list_item;
+				}
+
+		if ( ! author_name ) {
+			$input_box.attr( 'value', ssl_alp_coauthors_strings.search_box_text )
+				.focus( function() { $input_box.val( '' ) } )
+				.blur( function() { $input_box.val( ssl_alp_coauthors_strings.search_box_text ) } );
 		}
 
-		return $co;
+		return $input_box;
 	}
 
-	// Callback for when a user selects an author
-	function coauthors_autosuggest_select() {
-		$this = jQuery( this );
-
-		var vals = this.value.split( '|' );
-		var author = {}
-
-		author.id = jQuery.trim( vals[0] );
-		author.login = jQuery.trim( vals[1] );
-		author.name = jQuery.trim( vals[2] );
-		author.email = jQuery.trim( vals[3] );
-		author.nicename = jQuery.trim( vals[4] );
-
-		coauthors_add_coauthor( author, $this );
+	// callback for when a user selects an author
+	function coauthors_autosuggest_select( author, input_box ) {
+		// add author to list
+		coauthors_add_coauthor( author, input_box );
 
 		// show the delete button if we now have more than one coauthor
 		if ( jQuery( '#coauthors-list .coauthor-row .coauthor-tag' ).length > 1 ) {
@@ -205,17 +241,21 @@ jQuery( document ).ready(function () {
 	}
 
 	/*
-	 * Blur handler for autosuggest input box
+	 * Auto-suggest input box hider.
+	 * 
+	 * This hides the auto-suggest input box and instead shows the author <span>
+	 * once an edit has been finished.
+	 * 
 	 * @param event
 	 */
 	function coauthors_stop_editing( event ) {
-		var $co = jQuery( this );
-		var $tag = jQuery( $co.next() );
+		var $author_input_box = jQuery( this );
+		var $author_span = jQuery( $author_input_box.next() );
 
-		$co.attr( 'value', $tag.text() );
+		$author_input_box.attr( 'value', $author_span.text() );
 
-		$co.hide();
-		$tag.show();
+		$author_input_box.hide();
+		$author_span.show();
 	}
 
 	/*
@@ -223,8 +263,9 @@ jQuery( document ).ready(function () {
 	 * @param string Name of the author
 	 */
 	function coauthors_create_author_tag( author ) {
+		// create span tag
 		var $tag = jQuery( '<span></span>' )
-			.html( unescape( author.name ) )
+			.html( unescape( author.display_name ) )
 			.attr( 'title', ssl_alp_coauthors_strings.input_box_title )
 			.addClass( 'coauthor-tag' )
 			// Add Click event to edit
@@ -233,34 +274,14 @@ jQuery( document ).ready(function () {
 		return $tag;
 	}
 
-	function coauthors_create_author_gravatar( author, size ) {
-		var gravatar_link = get_gravatar_link( author.email, size );
-
-		var $gravatar = jQuery( '<img/>' )
+	function coauthors_create_author_avatar( author ) {
+		// create img tag
+		var $avatar = jQuery( '<img/>' )
 							.attr( 'alt', author.name )
-							.attr( 'src', gravatar_link )
-							.addClass( 'coauthor-gravatar' );
+							.attr( 'src', author.avatar )
+							.addClass( 'coauthor-avatar' );
 
-		return $gravatar;
-	}
-
-	// MD5 (Message-Digest Algorithm) by WebToolkit -- needed for gravatars
-    // http://www.webtoolkit.info/javascript-md5.html
-	function MD5(s){function L(k,d){return(k<<d)|(k>>>(32-d))}function K(G,k){var I,d,F,H,x;F=(G&2147483648);H=(k&2147483648);I=(G&1073741824);d=(k&1073741824);x=(G&1073741823)+(k&1073741823);if(I&d){return(x^2147483648^F^H)}if(I|d){if(x&1073741824){return(x^3221225472^F^H)}else{return(x^1073741824^F^H)}}else{return(x^F^H)}}function r(d,F,k){return(d&F)|((~d)&k)}function q(d,F,k){return(d&k)|(F&(~k))}function p(d,F,k){return(d^F^k)}function n(d,F,k){return(F^(d|(~k)))}function u(G,F,aa,Z,k,H,I){G=K(G,K(K(r(F,aa,Z),k),I));return K(L(G,H),F)}function f(G,F,aa,Z,k,H,I){G=K(G,K(K(q(F,aa,Z),k),I));return K(L(G,H),F)}function D(G,F,aa,Z,k,H,I){G=K(G,K(K(p(F,aa,Z),k),I));return K(L(G,H),F)}function t(G,F,aa,Z,k,H,I){G=K(G,K(K(n(F,aa,Z),k),I));return K(L(G,H),F)}function e(G){var Z;var F=G.length;var x=F+8;var k=(x-(x%64))/64;var I=(k+1)*16;var aa=Array(I-1);var d=0;var H=0;while(H<F){Z=(H-(H%4))/4;d=(H%4)*8;aa[Z]=(aa[Z]|(G.charCodeAt(H)<<d));H++}Z=(H-(H%4))/4;d=(H%4)*8;aa[Z]=aa[Z]|(128<<d);aa[I-2]=F<<3;aa[I-1]=F>>>29;return aa}function B(x){var k="",F="",G,d;for(d=0;d<=3;d++){G=(x>>>(d*8))&255;F="0"+G.toString(16);k=k+F.substr(F.length-2,2)}return k}function J(k){k=k.replace(/\r\n/g,"\n");var d="";for(var F=0;F<k.length;F++){var x=k.charCodeAt(F);if(x<128){d+=String.fromCharCode(x)}else{if((x>127)&&(x<2048)){d+=String.fromCharCode((x>>6)|192);d+=String.fromCharCode((x&63)|128)}else{d+=String.fromCharCode((x>>12)|224);d+=String.fromCharCode(((x>>6)&63)|128);d+=String.fromCharCode((x&63)|128)}}}return d}var C=Array();var P,h,E,v,g,Y,X,W,V;var S=7,Q=12,N=17,M=22;var A=5,z=9,y=14,w=20;var o=4,m=11,l=16,j=23;var U=6,T=10,R=15,O=21;s=J(s);C=e(s);Y=1732584193;X=4023233417;W=2562383102;V=271733878;for(P=0;P<C.length;P+=16){h=Y;E=X;v=W;g=V;Y=u(Y,X,W,V,C[P+0],S,3614090360);V=u(V,Y,X,W,C[P+1],Q,3905402710);W=u(W,V,Y,X,C[P+2],N,606105819);X=u(X,W,V,Y,C[P+3],M,3250441966);Y=u(Y,X,W,V,C[P+4],S,4118548399);V=u(V,Y,X,W,C[P+5],Q,1200080426);W=u(W,V,Y,X,C[P+6],N,2821735955);X=u(X,W,V,Y,C[P+7],M,4249261313);Y=u(Y,X,W,V,C[P+8],S,1770035416);V=u(V,Y,X,W,C[P+9],Q,2336552879);W=u(W,V,Y,X,C[P+10],N,4294925233);X=u(X,W,V,Y,C[P+11],M,2304563134);Y=u(Y,X,W,V,C[P+12],S,1804603682);V=u(V,Y,X,W,C[P+13],Q,4254626195);W=u(W,V,Y,X,C[P+14],N,2792965006);X=u(X,W,V,Y,C[P+15],M,1236535329);Y=f(Y,X,W,V,C[P+1],A,4129170786);V=f(V,Y,X,W,C[P+6],z,3225465664);W=f(W,V,Y,X,C[P+11],y,643717713);X=f(X,W,V,Y,C[P+0],w,3921069994);Y=f(Y,X,W,V,C[P+5],A,3593408605);V=f(V,Y,X,W,C[P+10],z,38016083);W=f(W,V,Y,X,C[P+15],y,3634488961);X=f(X,W,V,Y,C[P+4],w,3889429448);Y=f(Y,X,W,V,C[P+9],A,568446438);V=f(V,Y,X,W,C[P+14],z,3275163606);W=f(W,V,Y,X,C[P+3],y,4107603335);X=f(X,W,V,Y,C[P+8],w,1163531501);Y=f(Y,X,W,V,C[P+13],A,2850285829);V=f(V,Y,X,W,C[P+2],z,4243563512);W=f(W,V,Y,X,C[P+7],y,1735328473);X=f(X,W,V,Y,C[P+12],w,2368359562);Y=D(Y,X,W,V,C[P+5],o,4294588738);V=D(V,Y,X,W,C[P+8],m,2272392833);W=D(W,V,Y,X,C[P+11],l,1839030562);X=D(X,W,V,Y,C[P+14],j,4259657740);Y=D(Y,X,W,V,C[P+1],o,2763975236);V=D(V,Y,X,W,C[P+4],m,1272893353);W=D(W,V,Y,X,C[P+7],l,4139469664);X=D(X,W,V,Y,C[P+10],j,3200236656);Y=D(Y,X,W,V,C[P+13],o,681279174);V=D(V,Y,X,W,C[P+0],m,3936430074);W=D(W,V,Y,X,C[P+3],l,3572445317);X=D(X,W,V,Y,C[P+6],j,76029189);Y=D(Y,X,W,V,C[P+9],o,3654602809);V=D(V,Y,X,W,C[P+12],m,3873151461);W=D(W,V,Y,X,C[P+15],l,530742520);X=D(X,W,V,Y,C[P+2],j,3299628645);Y=t(Y,X,W,V,C[P+0],U,4096336452);V=t(V,Y,X,W,C[P+7],T,1126891415);W=t(W,V,Y,X,C[P+14],R,2878612391);X=t(X,W,V,Y,C[P+5],O,4237533241);Y=t(Y,X,W,V,C[P+12],U,1700485571);V=t(V,Y,X,W,C[P+3],T,2399980690);W=t(W,V,Y,X,C[P+10],R,4293915773);X=t(X,W,V,Y,C[P+1],O,2240044497);Y=t(Y,X,W,V,C[P+8],U,1873313359);V=t(V,Y,X,W,C[P+15],T,4264355552);W=t(W,V,Y,X,C[P+6],R,2734768916);X=t(X,W,V,Y,C[P+13],O,1309151649);Y=t(Y,X,W,V,C[P+4],U,4149444226);V=t(V,Y,X,W,C[P+11],T,3174756917);W=t(W,V,Y,X,C[P+2],R,718787259);X=t(X,W,V,Y,C[P+9],O,3951481745);Y=K(Y,h);X=K(X,E);W=K(W,v);V=K(V,g)}var i=B(Y)+B(X)+B(W)+B(V);return i.toLowerCase()};
-
-	// Adapted from http://www.deluxeblogtips.com/2010/04/get-gravatar-using-only-javascript.html
-	function get_gravatar_link( email, size ) {
-		var size = size || 80;
-
-		// need to check if page is secure or not
-		var gravatar_url = 'http://www.gravatar.com/avatar/';
-
-		if ( 'https:' == document.location.protocol ) {
-			// secure
-			gravatar_url =  'https://secure.gravatar.com/avatar/';
-		}
-
-		return gravatar_url + MD5( email ) + '.jpg?s=' + size;
+		return $avatar;
 	}
 
 	/*
@@ -351,13 +372,6 @@ jQuery( document ).ready(function () {
 	// show loading cursor for autocomplete ajax requests
 	jQuery( document ).ajaxSend(function( e, xhr, settings ) {
 		if ( settings.url.indexOf( ssl_alp_coauthors_ajax_suggest_link ) != -1 ) {
-			// Including existing authors on the AJAX suggest link
-			// allows us to filter them out of the search request
-			var existing_authors = jQuery( 'input[name="coauthors[]"]' ).map(function(){return jQuery( this ).val();}).get();
-
-			settings.url = settings.url.split( '&existing_authors' )[0];
-			settings.url += '&existing_authors=' + existing_authors.join( ',' );
-
 			show_loading();
 		}
 	});
@@ -374,17 +388,15 @@ jQuery( document ).ready(function () {
 
 		var $post_coauthor_logins = jQuery( 'input[name="coauthors[]"]' );
 		var $post_coauthor_names = jQuery( 'input[name="coauthorsinput[]"]' );
-		var $post_coauthor_emails = jQuery( 'input[name="coauthorsemails[]"]' );
-		var $post_coauthor_nicenames = jQuery( 'input[name="coauthorsnicenames[]"]' );
+		var $post_coauthor_avatars = jQuery( 'input[name="coauthorsavatar[]"]' );
 
 		var post_coauthors = [];
 
 		for ( var i = 0; i < $post_coauthor_logins.length; i++ ) {
 			post_coauthors.push({
 				login: $post_coauthor_logins[i].value,
-				name: $post_coauthor_names[i].value,
-				email: $post_coauthor_emails[i].value,
-				nicename: $post_coauthor_nicenames[i].value
+				display_name: $post_coauthor_names[i].value,
+				avatar: $post_coauthor_avatars[i].value
 			});
 		}
 

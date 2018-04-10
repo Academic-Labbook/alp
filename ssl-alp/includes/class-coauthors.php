@@ -38,7 +38,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return;
 		}
 
-		wp_enqueue_script( 'ssl-alp-coauthors-js', SSL_ALP_BASE_URL . 'js/coauthors.js', array( 'jquery', 'jquery-ui-sortable', 'suggest' ), $this->get_version(), true );
+		wp_enqueue_script( 'ssl-alp-coauthors-js', SSL_ALP_BASE_URL . 'js/coauthors.js', array( 'jquery', 'jquery-ui-sortable', 'jquery-ui-autocomplete' ), $this->get_version(), true );
 
 		$js_strings = array(
 			'edit_label' => __( 'Edit', 'ssl-alp' ),
@@ -290,6 +290,22 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
+	 * Get coauthor avatar HTML
+	 */
+	public function get_coauthor_avatar( $coauthor, $only_url = false ) {
+		if ( $only_url ) {
+			return get_avatar_url(
+				$coauthor->ID,
+				array(
+					'size'	=>	25
+				)
+			);
+		}
+
+		return get_avatar( $coauthor->ID, 25 );
+	}
+
+	/**
 	 * Callback for adding the custom author box
 	 */
 	public function coauthors_meta_box( $post ) {
@@ -307,12 +323,10 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 					$count++;
 					?>
 					<li>
-						<?php echo get_avatar( $coauthor->user_email, 25 ); ?>
 						<span id="<?php echo esc_attr( 'coauthor-readonly-' . $count ); ?>" class="coauthor-tag">
 							<input type="text" name="coauthorsinput[]" readonly="readonly" value="<?php echo esc_attr( $coauthor->display_name ); ?>" />
 							<input type="text" name="coauthors[]" value="<?php echo esc_attr( $coauthor->user_login ); ?>" />
-							<input type="text" name="coauthorsemails[]" value="<?php echo esc_attr( $coauthor->user_email ); ?>" />
-							<input type="text" name="coauthorsnicenames[]" value="<?php echo esc_attr( $coauthor->user_nicename ); ?>" />
+							<input type="text" name="coauthorsavatar[]" value="<?php echo $this->get_coauthor_avatar( $coauthor, true); ?>" />
 						</span>
 					</li>
 					<?php
@@ -991,23 +1005,35 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		if ( ! isset( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'ssl-alp-coauthors-search' ) ) {
+			// invalid/no nonce provided
 			exit();
 		}
 
-		if ( empty( $_REQUEST['q'] ) ) {
+		if ( empty( $_REQUEST['term'] ) ) {
+			// no JSON search query made
 			exit();
 		}
 
-		$search = sanitize_text_field( strtolower( $_REQUEST['q'] ) );
+		$search = sanitize_text_field( strtolower( $_REQUEST['term'] ) );
 		$ignore = array_map( 'sanitize_text_field', explode( ',', $_REQUEST['existing_authors'] ) );
 
 		$authors = $this->search_authors( $search, $ignore );
 
+		// JSON response
+		$response = array();
+
 		foreach ( $authors as $author ) {
-			echo esc_html( $author->ID . ' | ' . $author->user_login . ' | ' . $author->display_name . ' | ' . $author->user_email . ' | ' . $author->user_nicename ) . "\n";
+			// add author to JSON response
+			$response[] = array(
+				'id'			=>	$author->ID,
+				'login'			=>	$author->user_login,
+				'display_name'	=>	$author->display_name,
+				'avatar'		=>	$this->get_coauthor_avatar( $author, true )
+			);
 		}
 
-		exit();
+		// send client JSON, then exit
+		wp_send_json( $response );
 	}
 
 	/**
