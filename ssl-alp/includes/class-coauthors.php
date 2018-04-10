@@ -998,8 +998,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			exit();
 		}
 
-		error_log($_REQUEST['existing_authors']);
-
 		$search = sanitize_text_field( strtolower( $_REQUEST['q'] ) );
 		$ignore = array_map( 'sanitize_text_field', explode( ',', $_REQUEST['existing_authors'] ) );
 
