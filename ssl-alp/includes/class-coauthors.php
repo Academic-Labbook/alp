@@ -121,6 +121,9 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// filters to send comment notification/moderation emails to multiple authors
 		$loader->add_filter( 'comment_notification_recipients', $this, 'filter_comment_notification_email_recipients', 10, 2 );
 		$loader->add_filter( 'comment_moderation_recipients', $this, 'filter_comment_moderation_email_recipients', 10, 2 );
+
+		// filter the display of coauthor terms
+		$loader->add_filter( 'ssl_alp_coauthor_name', $this, 'filter_coauthor_term_display', 10, 3 );
 	}
 
     /**
@@ -1272,6 +1275,31 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		return $counts;
+	}
+
+	/**
+	 * Filter display of coauthor terms on e.g. admin post list
+	 */
+	public function filter_coauthor_term_display( $value, $term_id, $context ) {
+		if ( ! get_option( 'ssl_alp_multiple_authors' ) ) {
+			// don't modify
+			return $value;
+		} elseif ( 'display' !== $context ) {
+			// don't change non-display contexts
+			return $value;
+		}
+
+		$term = get_term_by( 'id', $term_id, 'ssl_alp_coauthor' );
+
+		// the term name is the user's login
+		$user = get_user_by( 'login', $term->name );
+
+		if ( is_null( $user ) ) {
+			// fall back to default
+			return $value;
+		}
+
+		return $user->display_name;
 	}
 }
 
