@@ -20,3 +20,5 @@ features may be removed or broken between updates.
 == Changelog ==
 = 0.1.0 =
  - Initial version.
+= 0.7.0 =
+ - First alpha release.
