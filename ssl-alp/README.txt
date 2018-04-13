@@ -22,3 +22,5 @@ features may be removed or broken between updates.
  - Initial version.
 = 0.7.0 =
  - First alpha release.
+= 0.7.1 =
+ - Fix activation/deactivation post type registration bug.
