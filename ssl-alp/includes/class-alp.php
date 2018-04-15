@@ -1,5 +1,10 @@
 <?php
 
+if ( ! defined( 'WPINC' ) ) {
+    // prevent direct access
+    exit;
+}
+
 /**
  * The main ALP class. From here, all of the plugin's functionality is
  * coordinated via calls to methods within this class and other "module"

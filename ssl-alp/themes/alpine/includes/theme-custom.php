@@ -5,6 +5,11 @@
  * @package ssl-alp
  */
 
+if ( ! defined( 'WPINC' ) ) {
+    // prevent direct access
+    exit;
+}
+
 if ( ! function_exists( 'ssl_alp_custom_content_classes' ) ) :
 	/**
 	 * Modify content classes.

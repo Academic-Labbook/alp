@@ -1,5 +1,10 @@
 <?php
 
+if ( ! defined( 'WPINC' ) ) {
+    // prevent direct access
+    exit;
+}
+
 /**
  * Fired during plugin deactivation.
  */

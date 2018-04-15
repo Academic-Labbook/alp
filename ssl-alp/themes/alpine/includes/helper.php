@@ -1,5 +1,10 @@
 <?php
 
+if ( ! defined( 'WPINC' ) ) {
+    // prevent direct access
+    exit;
+}
+
 /**
  * Render the site title for the selective refresh partial.
  *

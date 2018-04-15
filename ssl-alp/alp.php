@@ -12,6 +12,7 @@ License URI:  https://www.gnu.org/licenses/gpl-3.0.en.html
 */
 
 if ( ! defined( 'WPINC' ) ) {
+    // prevent direct access
     exit;
 }
 

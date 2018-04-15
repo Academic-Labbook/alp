@@ -5,6 +5,11 @@
  * @package ssl-alp
  */
 
+if ( ! defined( 'WPINC' ) ) {
+    // prevent direct access
+    exit;
+}
+
 if ( ! function_exists( 'ssl_alpine_get_post_date_html' ) ) :
 	/**
 	 * Format a post date

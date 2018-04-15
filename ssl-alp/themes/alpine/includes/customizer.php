@@ -5,6 +5,11 @@
  * @package ssl-alp
  */
 
+if ( ! defined( 'WPINC' ) ) {
+    // prevent direct access
+    exit;
+}
+
 /**
  * Add postMessage support for site title and description for the Theme Customizer.
  *

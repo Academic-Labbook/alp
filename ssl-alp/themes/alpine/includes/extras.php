@@ -7,6 +7,11 @@
  * @package ssl-alp
  */
 
+if ( ! defined( 'WPINC' ) ) {
+    // prevent direct access
+    exit;
+}
+
 /**
  * Get our wp_nav_menu() fallback, wp_page_menu(), to show a home link.
  *
