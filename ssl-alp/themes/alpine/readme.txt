@@ -2,7 +2,7 @@
 Contributors: Sean Leavey
 Requires at least: 4.9
 Tested up to: 4.9.4
-Stable tag: 0.7.1
+Stable tag: 0.7.2
 License: GNU General Public License v3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -22,6 +22,9 @@ Initial release.
 First alpha release.
 
 = 0.7.1 - 2018-04-13 =
+No theme changes.
+
+= 0.7.2 - 2018-04-15 =
 No theme changes.
 
 == Credits ==

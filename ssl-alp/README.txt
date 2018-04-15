@@ -24,3 +24,7 @@ features may be removed or broken between updates.
  - First alpha release.
 = 0.7.1 =
  - Fix activation/deactivation post type registration bug.
+= 0.7.2 =
+ - Fix incorrect function call regression in class-coauthors.php.
+ - Prevent direct access to scripts.
+ - Prevent directory listing.
