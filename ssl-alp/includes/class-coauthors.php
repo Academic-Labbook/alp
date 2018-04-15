@@ -928,7 +928,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			// override the authordata global with the requested author, in case the
 			// first post's primary author is not the requested author
 			$authordata = $author;
-			$term = $this->get_author_term( $authordata );
+			$term = $this->get_coauthor_term( $authordata );
 		}
 
 		if ( ( is_object( $authordata ) ) || ( ! empty( $term ) && $term->count ) ) {
