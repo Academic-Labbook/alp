@@ -89,7 +89,7 @@ class SSL_ALP_Authenticate extends SSL_ALP_Module {
 		// current page
         $page = $GLOBALS[ 'pagenow' ];
         
-		if ( in_array( $page, $this->excluded_pages, true ) ) {
+		if ( in_array( $page, self::$excluded_pages, true ) ) {
             // no authentication required
 			return null;
         }
