@@ -97,7 +97,7 @@ class SSL_ALP_Authenticate extends SSL_ALP_Module {
 		if ( 'admin-ajax.php' === $page ) {
             // this is an AJAX request
             // check if the action is allowed through without authentication
-            if ( isset( $_REQUEST[ 'action' ] ) && in_array( $_REQUEST[ 'action' ], $this->exclude_ajax_actions, false ) ) {
+            if ( isset( $_REQUEST[ 'action' ] ) && in_array( $_REQUEST[ 'action' ], self::$exclude_ajax_actions, false ) ) {
 				return null;
             }
             
