@@ -75,9 +75,20 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 		$role_conversion_unconfirmed = false;
 
 		// default completed action states
+		$alpine_active = false;
 		$override_core_settings_completed = false;
 		$role_conversion_completed = false;
 		$rebuild_references_completed = false;
+
+		/**
+		 * Check active theme
+		 */
+
+		$theme = wp_get_theme();
+		
+		if ( 'Alpine' == $theme->name || 'Alpine' == $theme->parent_theme ) {
+    		$alpine_active = true;
+		}
 
 		/**
 		 * Handle manage core settings form

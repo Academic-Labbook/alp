@@ -9,7 +9,7 @@
 <div class="notice notice-success">
 	<p><?php _e( 'Core settings changed.', 'ssl-alp' ); ?></p>
 </div>
-<?php endif;?>
+<?php endif; ?>
 <?php if ( $role_conversion_completed ): ?>
 <div class="notice notice-success">
 	<p><?php _e( 'User roles converted.', 'ssl-alp' ); ?></p>
@@ -23,10 +23,19 @@
 <div class="notice notice-success">
 	<p><?php _e( 'References rebuilt.', 'ssl-alp' ); ?></p>
 </div>
-<?php endif;?>
+<?php endif; ?>
 <div class="wrap">
 	<h2><?php _e('Academic Labbook Tools', 'ssl-alp'); ?></h2>
 	<div class="ssl-alp-tools-cards">
+		<span class="ssl-alp-tools-card">
+			<h2 class="title"><?php _e( 'Activate theme', 'ssl-alp' ); ?></h2>
+			<p><?php _e( 'The Academic Labbook Plugin is bundled with a theme, <em>Alpine</em>. This theme, or a child theme derived from it, must be active in order for most of the plugin\'s functionality to appear.', 'ssl-alp' ); ?></p>
+			<?php if ( $alpine_active ) : ?>
+			<p class="description"><?php _e( 'Alpine, or a child theme derived from it, is already active.', 'ssl-alp' ); ?></p>
+			<?php else : ?>
+			<p class="description"><?php _e( 'Alpine, or a child theme derived from it, is not active. Visit the <a href="themes.php">themes page</a> to activate it.', 'ssl-alp' ); ?></p>
+			<?php endif; ?>
+		</span>
 		<span class="ssl-alp-tools-card">
 			<h2 class="title"><?php _e( 'Optimise core WordPress settings for private labbook', 'ssl-alp' ); ?></h2>
 			<p><?php _e( 'This tool allows you to change core WordPress settings to make them appropriate for a private academic labbook. The presumption behind these setting changes is that you control access to the labbook and trust the users whom you grant access to.', 'ssl-alp' ); ?></p>
