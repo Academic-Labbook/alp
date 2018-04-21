@@ -160,6 +160,7 @@ class SSL_ALP {
 
 		// plugin settings
 		$this->loader->add_action( 'admin_init', $this, 'admin_settings_init' );
+		$this->loader->add_filter( 'plugin_action_links_' . SSL_ALP_BASE_NAME, $this, 'admin_plugin_settings_link' );
 
 		// register submodules
 		$this->core->register();
@@ -191,7 +192,7 @@ class SSL_ALP {
 			__( 'Academic Labbook Settings', 'ssl-alp' ),
 			__( 'Academic Labbook', 'ssl-alp' ),
 			'manage_options',
-			'ssl-alp-admin-options',
+			SSL_ALP_SETTINGS_MENU_SLUG,
 			array( $this, 'output_admin_settings_page' )
 		);
 	}
@@ -210,6 +211,28 @@ class SSL_ALP {
 		}
 
 		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/display.php';
+	}
+
+	/**
+	 * Show options page link on plugin list
+	 */
+	public function admin_plugin_settings_link( $links ) {
+		$settings_link = sprintf(
+			'<a href="%1$s">%2$s</a>',
+			menu_page_url( SSL_ALP_SETTINGS_MENU_SLUG, false ),
+			__( 'Settings' )
+		);
+
+		$tools_link = sprintf(
+			'<a href="%1$s">%2$s</a>',
+			menu_page_url( SSL_ALP_TOOLS_MENU_SLUG, false ),
+			__( 'Tools' )
+		);
+
+		// add to start of link list
+		array_unshift( $links, $settings_link, $tools_link );
+
+		return $links;
 	}
 
     /**

@@ -34,6 +34,14 @@ define( 'SSL_ALP_PLUGIN_NAME', 'Academic Labbook' );
 
 define( 'SSL_ALP_BASE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SSL_ALP_BASE_URL', plugin_dir_url( __FILE__ ) );
+define( 'SSL_ALP_BASE_NAME', plugin_basename( __FILE__ ) );
+
+/**
+ * Admin slugs
+ */
+
+define( 'SSL_ALP_SETTINGS_MENU_SLUG', 'ssl-alp-admin-options' );
+define( 'SSL_ALP_TOOLS_MENU_SLUG', 'ssl-alp-admin-tools' );
 
 /**
  * Default settings
