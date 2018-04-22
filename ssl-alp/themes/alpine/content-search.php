@@ -27,7 +27,10 @@
 	<div class="entry-summary">
 		<?php the_excerpt(); ?>
 	</div><!-- .entry-summary -->
-
-	<?php ssl_alpine_the_footer(); ?>
+	<?php if ( 'post' === get_post_type() ) : ?>
+	<footer class="entry-footer">
+		<?php ssl_alpine_the_footer(); ?>
+	</footer>
+	<?php endif; ?>
 	<?php endif; ?>
 </article><!-- #post-## -->

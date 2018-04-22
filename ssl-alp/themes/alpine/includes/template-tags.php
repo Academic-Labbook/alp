@@ -267,32 +267,26 @@ if ( ! function_exists( 'ssl_alpine_the_footer' ) ) :
 	 * handle it. It always uses the current post.
 	 */
 	function ssl_alpine_the_footer() {
-		echo '<footer class="entry-footer">';
+		/* translators: used between list items, there is a space after the comma. */
+		$categories_list = get_the_category_list( esc_html__( ', ', 'ssl-alp' ) );
+
+		if ( $categories_list ) {
+			printf(
+				'<span class="cat-links">%1$s%2$s</span>',
+				'<i class="fa fa-folder-open" aria-hidden="true"></i>',
+				$categories_list
+			);
+		}
+
+		/* translators: used between list items, there is a space after the comma. */
+		$tags_list = get_the_tag_list( '', esc_html__( ', ', 'ssl-alp' ) );
 		
-		if ( 'post' === get_post_type() ) {
-			// don't show category and tags on pages and other post types
-
-			/* translators: used between list items, there is a space after the comma. */
-			$categories_list = get_the_category_list( esc_html__( ', ', 'ssl-alp' ) );
-
-			if ( $categories_list ) {
-				printf(
-					'<span class="cat-links">%1$s%2$s</span>',
-					'<i class="fa fa-folder-open" aria-hidden="true"></i>',
-					$categories_list
-				);
-			}
-
-			/* translators: used between list items, there is a space after the comma. */
-			$tags_list = get_the_tag_list( '', esc_html__( ', ', 'ssl-alp' ) );
-			
-			if ( $tags_list ) {
-				printf(
-					'<span class="tags-links">%1$s%2$s</span>',
-					'<i class="fa fa-tags" aria-hidden="true"></i>',
-					$tags_list
-				);
-			}
+		if ( $tags_list ) {
+			printf(
+				'<span class="tags-links">%1$s%2$s</span>',
+				'<i class="fa fa-tags" aria-hidden="true"></i>',
+				$tags_list
+			);
 		}
 
 		if ( ! is_single() && ! post_password_required() && ( comments_open() || get_comments_number() ) ) {
@@ -304,8 +298,6 @@ if ( ! function_exists( 'ssl_alpine_the_footer' ) ) :
 				get_comments_number_text(esc_html__( 'Leave a comment', 'ssl-alp' ))
 			);
 		}
-		
-		echo '</footer><!-- .entry-footer -->';
 	}
 endif;
 

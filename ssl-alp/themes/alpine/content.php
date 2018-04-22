@@ -40,6 +40,8 @@
 		?>
 	</div><!-- .entry-content -->
 	<?php endif; ?>
-	<?php ssl_alpine_the_footer(); ?>
+	<footer class="entry-footer">
+		<?php ssl_alpine_the_footer(); ?>
+	</footer>
 	<?php endif; ?>
 </article><!-- #post-## -->

@@ -24,7 +24,9 @@
 			) );
 		?>
 	</div><!-- .entry-content -->
-	<?php ssl_alpine_the_footer(); ?>
+	<footer class="entry-footer">
+		<?php ssl_alpine_the_footer(); ?>
+	</footer>
 </article><!-- #post-## -->
 <?php ssl_alpine_the_references(); ?>
 <?php ssl_alpine_the_revisions(); ?>
