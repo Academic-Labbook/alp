@@ -283,7 +283,7 @@ if ( ! function_exists( 'ssl_alpine_the_footer' ) ) :
 		
 		if ( $tags_list ) {
 			printf(
-				'<span class="tags-links">%1$s%2$s</span>',
+				'<span class="tag-links">%1$s%2$s</span>',
 				'<i class="fa fa-tags" aria-hidden="true"></i>',
 				$tags_list
 			);

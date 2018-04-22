@@ -887,7 +887,7 @@ nav.pagination a.next .meta-nav{
 	margin-bottom: 10px;
 }
 
-span.cat-links a {
+span.cat-links a, span.tag-links a {
 	background-color: #F5DF44;
 	border-radius: 4px;
 	padding-left: 4px;
