@@ -5,7 +5,7 @@ if ( is_active_sidebar( 'ssl-alp-sidebar-standard' ) ) {
 } else {
 	/**
 	 * fall-back sidebar widgets for when the custom sidebar is not found
-	 * (shouldn't be needed, as the dynamic sidebar is created on theme activation)
+	 * (shouldn't be needed, as the dynamic sidebar is created at runtime)
 	 */
 
 	// search

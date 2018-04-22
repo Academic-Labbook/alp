@@ -1368,7 +1368,7 @@ class SSL_ALP_Widget_Users extends WP_Widget {
 		echo $args['before_widget'];
 
 		// default title
-		$title = isset( $instance['title'] ) ? $instance['title'] : esc_html__( 'Users' );
+		$title = ! empty( $instance['title'] ) ? $instance['title'] : esc_html__( 'Users' );
 
 		if ( ! empty( $title ) ) {
 			echo $args['before_title'] . apply_filters( 'widget_title', $title ) . $args['after_title'];
@@ -1456,7 +1456,7 @@ class SSL_ALP_Widget_Users extends WP_Widget {
 	 * @param array $instance The widget options
 	 */
 	public function form( $instance ) {
-		$title = ! empty( $instance['title'] ) ? $instance['title'] : esc_html__( 'Users' );
+		$title = ! empty( $instance['title'] ) ? $instance['title'] : '';
 		$dropdown = isset( $instance['dropdown'] ) ? (bool) $instance['dropdown'] : true;
 
 		?>

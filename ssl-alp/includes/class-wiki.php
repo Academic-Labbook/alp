@@ -373,7 +373,7 @@ class SSL_ALP_Widget_Contents extends WP_Widget {
 		echo $args['before_widget'];
 
 		// default title
-		$title = isset( $instance['title'] ) ? $instance['title'] : esc_html__( 'Contents', 'ssl-alp' );
+		$title = ! empty( $instance['title'] ) ? $instance['title'] : esc_html__( 'Contents', 'ssl-alp' );
 
 		if ( ! empty( $title ) ) {
 			echo $args['before_title'] . apply_filters( 'widget_title', $title ) . $args['after_title'];
@@ -397,7 +397,7 @@ class SSL_ALP_Widget_Contents extends WP_Widget {
 	 * @param array $instance The widget options
 	 */
 	public function form( $instance ) {
-		$title = ! empty( $instance['title'] ) ? $instance['title'] : esc_html__( 'Contents', 'ssl-alp' );
+		$title = ! empty( $instance['title'] ) ? $instance['title'] : '';
 		$max_levels = isset( $instance['max_levels'] ) ? absint( $instance['max_levels'] ) : self::DEFAULT_MAX_LEVELS;
 
 		?>
