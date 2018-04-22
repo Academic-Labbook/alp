@@ -1178,7 +1178,7 @@ body{
 	content: '\f0e5';
 }
 
-.widget_ssl_alp_revisions #recent-revisions-list li:before {
+.widget_ssl-alp-revisions #recent-revisions-list li:before {
 	content: '\f040'; /* pencil icon */
 }
 
