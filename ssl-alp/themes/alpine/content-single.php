@@ -34,23 +34,7 @@
 			) );
 		?>
 	</div><!-- .entry-content -->
-	<footer class="entry-footer">
-	<?php
-		/* translators: used between list items, there is a space after the comma */
-		$category_list = get_the_category_list( esc_html__( ', ', 'ssl-alp' ) );
-
-		/* translators: used between list items, there is a space after the comma */
-		$tag_list = get_the_tag_list( '', esc_html__( ', ', 'ssl-alp' ) );
-
-		if ( ! empty( $category_list ) ) {
-			echo '<span class="cat-links"><i class="fa fa-folder-open" aria-hidden="true"></i> ' . $category_list . '</span>';
-		}
-		
-		if ( ! empty( $tag_list ) ) {
-			echo '<span class="sl-tags"><i class="fa fa-tags" aria-hidden="true"></i> ' . $tag_list . '</span>';
-		}
-	?>
-	</footer><!-- .entry-footer -->
+	<?php ssl_alpine_the_footer(); ?>
 </article><!-- #post-## -->
 <?php ssl_alpine_the_references(); ?>
 <?php ssl_alpine_the_revisions(); ?>

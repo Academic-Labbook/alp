@@ -37,15 +37,6 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 	 * Register settings
 	 */
 	public function register_settings() {
-        register_setting(
-			'ssl-alp-admin-options',
-			'ssl_alp_disable_post_tags',
-			array(
-				'type'		=>	'boolean',
-				'default'	=>	true
-			)
-		);
-
 		register_setting(
 			'ssl-alp-admin-options',
 			'ssl_alp_disable_post_excerpts',
@@ -144,7 +135,6 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 		$loader->add_filter( 'wp_dashboard_setup', $this, 'remove_wp_dashboard_metaboxes' );
 
         // post meta stuff
-        $loader->add_action( 'init', $this, 'unregister_tags' );
         $loader->add_action( 'init', $this, 'disable_post_excerpts' );
 		$loader->add_action( 'init', $this, 'disable_post_trackbacks' );
 	}
@@ -263,17 +253,6 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 		remove_meta_box( 'dashboard_primary', 'dashboard', 'side' );
 		remove_meta_box( 'dashboard_secondary', 'dashboard', 'side' );
 	}
-
-    /**
-     * Disable tags on posts.
-     */
-    public function unregister_tags() {
-        if ( ! get_option( 'ssl_alp_disable_post_tags' ) ) {
-            return;
-        }
-
-        unregister_taxonomy_for_object_type( 'post_tag', 'post' );
-    }
 
     /**
      * Disable post excerpts

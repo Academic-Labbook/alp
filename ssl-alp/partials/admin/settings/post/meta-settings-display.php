@@ -1,11 +1,4 @@
 <p>
-    <label for="ssl_alp_disable_post_tags_checkbox">
-        <input type="checkbox" name="ssl_alp_disable_post_tags" id="ssl_alp_disable_post_tags_checkbox" value="1" <?php checked( get_option( 'ssl_alp_disable_post_tags' ) ); ?> />
-        <?php _e( 'Disable tags', 'ssl-alp' ); ?>
-    </label>
-</p>
-<p class="description"><?php _e( 'Tags are very similar to categories, but do not support hierarchies and are mainly useful for search engine optimisation on commercial sites.', 'ssl-alp' ); ?></p>
-<p>
     <label for="ssl_alp_disable_post_excerpts_checkbox">
         <input type="checkbox" name="ssl_alp_disable_post_excerpts" id="ssl_alp_disable_post_excerpts_checkbox" value="1" <?php checked( get_option( 'ssl_alp_disable_post_excerpts' ) ); ?> />
         <?php _e( 'Disable excerpts', 'ssl-alp' ); ?>

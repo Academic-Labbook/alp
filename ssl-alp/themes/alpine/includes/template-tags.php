@@ -117,7 +117,7 @@ if ( ! function_exists( 'ssl_alpine_the_post_meta' ) ) :
 
 		// post id and authors
 		printf(
-			'<div class="byline"><i class="fa fa-link"></i> %1$s&nbsp;&nbsp;%2$s</div>',
+			'<div class="byline"><i class="fa fa-link"></i>%1$s&nbsp;&nbsp;%2$s</div>',
 			$post->ID,
 			ssl_alpine_get_authors( $post )
 		);
@@ -236,10 +236,60 @@ if ( ! function_exists( 'ssl_alpine_format_author' ) ) :
 
 		if ( $icon ) {
 			// use fa-users when more than one user is defined
-			$author_html = '<i class="fa fa-user" aria-hidden="true"></i> ' . $author_html;
+			$author_html = '<i class="fa fa-user" aria-hidden="true"></i>' . $author_html;
 		}
 
 		return $author_html;
+	}
+endif;
+
+if ( ! function_exists( 'ssl_alpine_the_footer' ) ) :
+	/**
+	 * Prints the footer for the specified post.
+	 * 
+	 * Cannot specify a custom post id here, as `get_comments_number_text` can't
+	 * handle it. It always uses the current post.
+	 */
+	function ssl_alpine_the_footer() {
+		echo '<footer class="entry-footer">';
+		
+		if ( 'post' === get_post_type() ) {
+			// don't show category and tags on pages and other post types
+
+			/* translators: used between list items, there is a space after the comma. */
+			$categories_list = get_the_category_list( esc_html__( ', ', 'ssl-alp' ) );
+
+			if ( $categories_list ) {
+				printf(
+					'<span class="cat-links">%1$s%2$s</span>',
+					'<i class="fa fa-folder-open" aria-hidden="true"></i>',
+					$categories_list
+				);
+			}
+
+			/* translators: used between list items, there is a space after the comma. */
+			$tags_list = get_the_tag_list( '', esc_html__( ', ', 'ssl-alp' ) );
+			
+			if ( $tags_list ) {
+				printf(
+					'<span class="tags-links">%1$s%2$s</span>',
+					'<i class="fa fa-tags" aria-hidden="true"></i>',
+					$tags_list
+				);
+			}
+		}
+
+		if ( ! is_single() && ! post_password_required() && ( comments_open() || get_comments_number() ) ) {
+			// show comments link
+			printf(
+				'<span class="comments-link">%1$s<a href="%2$s">%3$s</a></span>',
+				'<i class="fa fa-comment" aria-hidden="true"></i>',
+				get_comments_link(),
+				get_comments_number_text(esc_html__( 'Leave a comment', 'ssl-alp' ))
+			);
+		}
+		
+		echo '</footer><!-- .entry-footer -->';
 	}
 endif;
 

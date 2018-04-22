@@ -16,7 +16,7 @@ Here are the features implemented so far...
  - TeX support in posts and pages
  - DOI and arXiv shortcode support
  - Disable certain post meta fields mostly suited to commercial sites, like
-   excerpts, trackbacks, tags, etc.
+   excerpts, trackbacks, etc.
  - Modifies pages to work more like a wiki:
    - Removes authors and dates
    - Displays a table of contents in the sidebar (generated from header elements)

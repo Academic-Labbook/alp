@@ -773,10 +773,6 @@ div#post-references ul li, div#post-revisions ul li {
 	margin-top: 5px;
 }
 
-.entry-meta .posted-on a {
-	margin-left: 5px;
-}
-
 .entry-header h1, .entry-header h2 {
 	margin: 0 0 0.25em 0;
 	font-weight: 400;
@@ -810,6 +806,11 @@ div.entry-revisions {
 
 .readmore .fa {
     margin-left: 5px;
+}
+
+/* space after icons */
+.fa {
+	margin-right: 5px;
 }
 
 h2 a, h3 a {
