@@ -82,7 +82,7 @@ class SSL_ALP_Wiki extends SSL_ALP_Module {
 	 * Register contents widget
 	 */
 	public function register_contents_widget() {
-		register_widget( 'SSL_ALP_Page_Contents' );
+		register_widget( 'SSL_ALP_Widget_Contents' );
 	}
 
 	/**
@@ -343,7 +343,7 @@ class SSL_ALP_Menu_Level {
 	}
 }
 
-class SSL_ALP_Page_Contents extends WP_Widget {
+class SSL_ALP_Widget_Contents extends WP_Widget {
 	/**
 	 * Default maximum number of levels to show in contents
 	 */
@@ -351,7 +351,7 @@ class SSL_ALP_Page_Contents extends WP_Widget {
 
 	public function __construct() {
 		parent::__construct(
-			'ssl_alp_page_contents_widget', // base ID
+			'ssl-alp-contents', // base ID
 			esc_html__( 'Page Contents', 'ssl-alp' ), // name
 			array(
 				'description' => __( "Current page contents", 'ssl-alp' )
@@ -372,8 +372,11 @@ class SSL_ALP_Page_Contents extends WP_Widget {
 
 		echo $args['before_widget'];
 
-		if ( ! empty( $instance['title'] ) ) {
-			echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title'];
+		// default title
+		$title = isset( $instance['title'] ) ? $instance['title'] : esc_html__( 'Contents', 'ssl-alp' );
+
+		if ( ! empty( $title ) ) {
+			echo $args['before_title'] . apply_filters( 'widget_title', $title ) . $args['after_title'];
 		}
 
 		$max_levels = ( ! empty( $instance['max_levels'] ) ) ? absint( $instance['max_levels'] ) : self::DEFAULT_MAX_LEVELS;

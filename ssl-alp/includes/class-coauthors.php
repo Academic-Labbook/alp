@@ -170,7 +170,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * Register users widget
 	 */
 	public function register_users_widget() {
-		register_widget( 'SSL_ALP_Users' );
+		register_widget( 'SSL_ALP_Widget_Users' );
 	}
 
 	/**
@@ -1345,10 +1345,10 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 }
 
-class SSL_ALP_Users extends WP_Widget {
+class SSL_ALP_Widget_Users extends WP_Widget {
 	public function __construct() {
 		parent::__construct(
-			'ssl_alp_users_widget', // base ID
+			'ssl-alp-users', // base ID
 			esc_html__( 'Users', 'ssl-alp' ), // name
 			array(
 				'description' => __( "A list of users and their post counts.", 'ssl-alp' )
@@ -1367,8 +1367,11 @@ class SSL_ALP_Users extends WP_Widget {
 
 		echo $args['before_widget'];
 
-		if ( ! empty( $instance['title'] ) ) {
-			echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title'];
+		// default title
+		$title = isset( $instance['title'] ) ? $instance['title'] : esc_html__( 'Users' );
+
+		if ( ! empty( $title ) ) {
+			echo $args['before_title'] . apply_filters( 'widget_title', $title ) . $args['after_title'];
 		}
 
 		// show dropdown by default

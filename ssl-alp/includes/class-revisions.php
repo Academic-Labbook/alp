@@ -384,7 +384,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * Register revisions widget
 	 */
 	public function register_revisions_widget() {
-		register_widget( 'SSL_ALP_Revisions_Widget' );
+		register_widget( 'SSL_ALP_Widget_Revisions' );
 	}
 
 	/**
@@ -438,13 +438,13 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	}
 }
 
-class SSL_ALP_Revisions_Widget extends WP_Widget {
+class SSL_ALP_Widget_Revisions extends WP_Widget {
 	const DEFAULT_NUMBER = 10;
 	const DEFAULT_GROUP = true;
 
 	public function __construct() {
 		parent::__construct(
-			'ssl_alp_revisions_widget', // base ID
+			'ssl-alp-revisions', // base ID
 			esc_html__( 'Recent Revisions', 'ssl-alp' ), // name
 			array(
 				'description' => __( "Your site's most recent revisions", 'ssl-alp' )
@@ -461,8 +461,11 @@ class SSL_ALP_Revisions_Widget extends WP_Widget {
 	public function widget( $args, $instance ) {
 		echo $args['before_widget'];
 
-		if ( ! empty( $instance['title'] ) ) {
-			echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title'];
+		// default title
+		$title = isset( $instance['title'] ) ? $instance['title'] : esc_html__( 'Recent Revisions', 'ssl-alp' );
+
+		if ( ! empty( $title ) ) {
+			echo $args['before_title'] . apply_filters( 'widget_title', $title ) . $args['after_title'];
 		}
 
 		// number of revisions to display

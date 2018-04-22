@@ -12,7 +12,7 @@ class SSL_ALP_Activator {
 	/**
 	 * Activate plugin.
 	 */
-	public static function activate() {
+	public function activate() {
         
 	}
 }

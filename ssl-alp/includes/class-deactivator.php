@@ -12,7 +12,7 @@ class SSL_ALP_Deactivator {
 	/**
 	 * Deactivate plugin.
 	 */
-	public static function deactivate() {
+	public function deactivate() {
 		
 	}
 }

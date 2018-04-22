@@ -1149,7 +1149,7 @@ body{
     padding: 1.5em;
 }
 
-.widget-title {
+.widgettitle {
     color: #353535;
     font-size: 110%;
     margin-bottom: 0.5em;
@@ -1178,7 +1178,7 @@ body{
 	content: '\f0e5';
 }
 
-.widget_ssl_alp_revisions_widget #recent-revisions-list li:before {
+.widget_ssl_alp_revisions #recent-revisions-list li:before {
 	content: '\f040'; /* pencil icon */
 }
 
