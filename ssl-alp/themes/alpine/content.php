@@ -8,16 +8,7 @@
 ?>
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 	<header class="entry-header">
-		<?php
-		the_title(
-			sprintf(
-				'<h2 class="entry-title"><a href="%2$s" class="%1$s" rel="bookmark" >',
-				( 'status' === get_post_format() ) ? "status-post-title" : "", // add icon class for status updates
-				esc_url( get_permalink() )
-			),
-			'</a></h2>'
-		);
-		?>
+		<?php ssl_alpine_the_post_title(); ?>
 		<?php if ( 'post' === get_post_type() ) : ?>
 		<div class="entry-meta">
 			<?php ssl_alpine_the_post_meta(); ?>

@@ -10,6 +10,22 @@ if ( ! defined( 'WPINC' ) ) {
     exit;
 }
 
+if ( ! function_exists( 'ssl_alpine_the_post_title' ) ) :
+	/**
+	 * Print the post title
+	 */
+	function ssl_alpine_the_post_title( $post = null ) {
+		$post = get_post( $post );
+
+		printf(
+			'<h2 class="entry-title"><a href="%1$s" class="%2$s" rel="bookmark" >%3$s</a></h2>',
+			esc_url( get_permalink( $post ) ),
+			( 'status' === get_post_format( $post ) ) ? "status-post-title" : "", // icon class for status updates
+			get_the_title( $post )
+		);
+	}
+endif;
+
 if ( ! function_exists( 'ssl_alpine_get_post_date_html' ) ) :
 	/**
 	 * Format a post date
