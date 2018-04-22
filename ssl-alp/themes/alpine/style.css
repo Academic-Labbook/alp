@@ -725,6 +725,9 @@ div#post-references ul li, div#post-revisions ul li {
 	margin-right: 15px;
 	clear: both;
 	color: #0b789c;	
+	border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+    padding: 1em 1.5em;
+    position: relative;
 }
 
 .single .byline, .group-blog .byline {
@@ -738,12 +741,6 @@ div#post-references ul li, div#post-revisions ul li {
 .page-links {
 	clear: both;
 	margin: 0 0 1.5em;
-}
-
-.entry-header {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
-    padding: 1em 1.5em;
-    position: relative;
 }
 
 .entry-summary {
@@ -782,8 +779,6 @@ div#post-references ul li, div#post-revisions ul li {
 
 .entry-header h2 {
 	float: left;
-	width: 89%;
-	max-width: 89%;
 	clear: none;
 }
 
