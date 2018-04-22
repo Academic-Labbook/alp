@@ -245,26 +245,6 @@ function ssl_alp_customize_register( $wp_customize ) {
 			'priority' => 120,
 		)
 	);
-
-	// "go to top" setting
-	$wp_customize->add_setting(
-		'ssl_alp_options[go_to_top]',
-		array(
-			'default'           => $ssl_alp_default_options['go_to_top'],
-			'capability'        => 'edit_theme_options',
-			'sanitize_callback' => 'ssl_alp_sanitize_checkbox',
-		)
-	);
-
-	$wp_customize->add_control(
-		'ssl_alp_options[go_to_top]',
-		array(
-			'label'    => __( 'Enable "Go To Top" button', 'ssl-alp' ),
-			'section'  => 'ssl_alp_footer_options',
-			'type'     => 'checkbox',
-			'priority' => 130,
-		)
-	);
 }
 
 add_action( 'customize_register', 'ssl_alp_customize_register' );

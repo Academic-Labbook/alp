@@ -55,8 +55,7 @@ if ( ! function_exists( 'ssl_alp_get_theme_option_defaults' ) ) :
 			'excerpt_length'               => 55, // WordPress default
 			'pagination_type'              => 'default',
 			'copyright_text'               => '',
-			'powered_by'                   => true,
-			'go_to_top'                    => true,
+			'powered_by'                   => true
 		);
 	}
 endif;

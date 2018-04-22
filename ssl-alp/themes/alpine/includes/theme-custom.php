@@ -104,23 +104,3 @@ if ( ! function_exists( 'ssl_alp_excerpt_readmore' ) ) :
 endif;
 
 add_filter( 'excerpt_more', 'ssl_alp_excerpt_readmore' );
-
-if ( ! function_exists( 'ssl_alp_add_go_to_top' ) ) :
-	/**
-	 * Add go to top icon.
-	 *
-	 * @since 1.0.0
-	 */
-	function ssl_alp_add_go_to_top() {
-
-		$go_to_top = ssl_alp_get_option( 'go_to_top' );
-
-		if ( true !== $go_to_top ) {
-			return;
-		}
-
-		echo '<a href="#" class="scrollup" id="btn-scrollup"><span class="fa-stack"> <i class="fa fa-square fa-stack-2x" aria-hidden="true"></i><i class="fa fa-angle-up fa-stack-1x fa-inverse" aria-hidden="true"></i></span><span class="screen-reader-text">' . __( 'Go to top', 'ssl-alp' ) . '</span></a>';
-	}
-endif;
-
-add_action( 'wp_footer', 'ssl_alp_add_go_to_top' );
