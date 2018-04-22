@@ -37,6 +37,13 @@ define( 'SSL_ALP_BASE_URL', plugin_dir_url( __FILE__ ) );
 define( 'SSL_ALP_BASE_NAME', plugin_basename( __FILE__ ) );
 
 /**
+ * Theme directory
+ */
+
+// must be absolute
+define( 'SSL_ALP_THEME_DIR', SSL_ALP_BASE_DIR . 'themes' );
+
+/**
  * Admin slugs
  */
 
@@ -63,13 +70,13 @@ require_once SSL_ALP_BASE_DIR . 'includes/class-deactivator.php';
 
 // register hooks
 register_activation_hook( __FILE__, array( 'SSL_ALP_Activator', 'activate' ) );
-register_activation_hook( __FILE__, array( 'SSL_ALP_Deactivator', 'deactivate' ) );
+register_deactivation_hook( __FILE__, array( 'SSL_ALP_Deactivator', 'deactivate' ) );
 
 /**
  * Add theme directory provided by this plugin
  */
 
-register_theme_directory( SSL_ALP_BASE_DIR . 'themes' );
+register_theme_directory( SSL_ALP_THEME_DIR );
 
 /**
  * Core plugin class used to load modules.
