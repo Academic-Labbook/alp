@@ -108,12 +108,12 @@ class SSL_ALP {
 		$this->auth = new SSL_ALP_Authenticate( $this );
 
 		/**
-		 * Wiki functionality
+		 * Page wiki functionality
 		 */
 
-		require_once SSL_ALP_BASE_DIR . 'includes/class-wiki.php';
+		require_once SSL_ALP_BASE_DIR . 'includes/class-pages.php';
 
-		$this->wiki = new SSL_ALP_Wiki( $this );
+		$this->pages = new SSL_ALP_Pages( $this );
 
 		/**
 		 * coauthor functionality
@@ -166,7 +166,7 @@ class SSL_ALP {
 		$this->core->register();
 		$this->tools->register();
 		$this->auth->register();
-		$this->wiki->register();
+		$this->pages->register();
 		$this->coauthors->register();
 		$this->revisions->register();
 		$this->references->register();

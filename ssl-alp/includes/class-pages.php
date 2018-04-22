@@ -6,9 +6,9 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Wiki functionality
+ * Page wiki functionality
  */
-class SSL_ALP_Wiki extends SSL_ALP_Module {
+class SSL_ALP_Pages extends SSL_ALP_Module {
 	/**
 	 * Register hooks
 	 */
