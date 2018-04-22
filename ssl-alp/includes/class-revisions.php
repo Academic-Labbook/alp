@@ -534,10 +534,10 @@ class SSL_ALP_Widget_Revisions extends WP_Widget {
 				// check if there are extra revisions from this author for this post
 				if ( $revision->repeats > 0 ) {
 					$extra_revisions = sprintf(
-						' (<span title="%s">+%d</span>)',
-						/* translators: 1: number of additional revisions made by this author */
-						sprintf( __( '%1$s additional edits', 'ssl-alp' ), $revision->repeats ),
-						$revision->repeats
+						' (<span title="%s">+%s</span>)',
+						/* translators: %s: number of additional revisions made by this author */
+						sprintf( _n( '%s additional edit', '%s additional edits', $revision->repeats, 'ssl-alp' ), number_format_i18n( $revision->repeats ) ),
+						number_format_i18n( $revision->repeats )
 					);
 				} else {
 					$extra_revisions = "";
