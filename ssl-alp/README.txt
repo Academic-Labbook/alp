@@ -28,3 +28,9 @@ features may be removed or broken between updates.
  - Fix incorrect function call regression in class-coauthors.php.
  - Prevent direct access to scripts.
  - Prevent directory listing.
+= 0.7.3 =
+ - Remove option to disable tags.
+ - Add settings and tools page links to plugin page.
+ - Fix bug with additional edit counts in revisions widget.
+ - Theme tweaks.
+ - Internal naming changes.
