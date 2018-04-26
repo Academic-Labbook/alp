@@ -675,12 +675,23 @@ div#post-references ul li, div#post-revisions ul li {
 }
 
 .entry-header {
-	margin-right: 15px;
 	clear: both;
 	color: #0b789c;	
 	border-bottom: 1px solid rgba(0, 0, 0, 0.07);
     padding: 1em 1.5em;
     position: relative;
+}
+
+/* permalink, default invisible */
+a.entry-link, a.entry-section-link {
+	float: right;
+	margin-left: 5px;
+	display: none;
+}
+
+/* display permalink when hovering over title */
+.entry-title:hover a.entry-link, .entry-section:hover a.entry-section-link {
+	display: inline;
 }
 
 .single .byline, .group-blog .byline {
@@ -731,7 +742,6 @@ div#post-references ul li, div#post-revisions ul li {
 }
 
 .entry-header h2 {
-	float: left;
 	clear: none;
 }
 

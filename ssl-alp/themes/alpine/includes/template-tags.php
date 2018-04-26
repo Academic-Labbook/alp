@@ -14,14 +14,33 @@ if ( ! function_exists( 'ssl_alpine_the_post_title' ) ) :
 	/**
 	 * Print the post title
 	 */
-	function ssl_alpine_the_post_title( $post = null ) {
+	function ssl_alpine_the_post_title( $post = null, $url = true, $anchor = false ) {
 		$post = get_post( $post );
+		$title = get_the_title( $post );
+		$permalink = esc_url( get_permalink( $post ) );
 
+		if ( $url ) {
+			// wrap title in its permalink
+			$title = sprintf(
+				'<a href="%1$s" class="%2$s" rel="bookmark" >%3$s</a>',
+				$permalink,
+				( 'status' === get_post_format( $post ) ) ? "status-post-title" : "", // icon class for status updates
+				$title
+			);
+		}
+
+		if ( $anchor ) {
+			// add hover anchor with permalink
+			$title .= sprintf(
+				'<a class="entry-link" href="%1$s"><i class="fa fa-link"></i></a>',
+				$permalink
+			);
+		}
+
+		// output header tag
 		printf(
-			'<h2 class="entry-title"><a href="%1$s" class="%2$s" rel="bookmark" >%3$s</a></h2>',
-			esc_url( get_permalink( $post ) ),
-			( 'status' === get_post_format( $post ) ) ? "status-post-title" : "", // icon class for status updates
-			get_the_title( $post )
+			'<h2 class="entry-title">%1$s</h2>',
+			$title
 		);
 	}
 endif;
