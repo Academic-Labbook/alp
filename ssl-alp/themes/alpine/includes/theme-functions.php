@@ -25,14 +25,14 @@ if ( ! function_exists( 'ssl_alp_get_option' ) ) :
 			return;
 		}
 
-		$default = ( isset( $ssl_alp_default_options[ $key ] ) ) ? $ssl_alp_default_options[ $key ] : '';
+		$default = ( array_key_exists( $key, $ssl_alp_default_options ) ) ? $ssl_alp_default_options[ $key ] : '';
 
 		$theme_options = get_theme_mod( 'ssl_alp_options', $ssl_alp_default_options );
 		$theme_options = array_merge( $ssl_alp_default_options, $theme_options );
 
 		$value = '';
 
-		if ( isset( $theme_options[ $key ] ) ) {
+		if ( array_key_exists( $key, $theme_options ) ) {
 			$value = $theme_options[ $key ];
 		}
 
@@ -49,6 +49,7 @@ if ( ! function_exists( 'ssl_alp_get_theme_option_defaults' ) ) :
 	function ssl_alp_get_theme_option_defaults() {
 		return array(
 			'site_layout'                  => 'content-sidebar',
+			'page_specific_sidebar'		   => true,
 			'content_layout'               => 'excerpt',
 			'read_more_text'               => esc_html__( 'Read more', 'ssl-alp' ),
 			'search_placeholder'           => esc_html__( 'Search...', 'ssl-alp' ),

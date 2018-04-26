@@ -191,6 +191,26 @@ function ssl_alp_customize_register( $wp_customize ) {
 		)
 	);
 
+	// page sidebar setting
+	$wp_customize->add_setting(
+		'ssl_alp_options[page_specific_sidebar]',
+		array(
+			'default'           => $ssl_alp_default_options['page_specific_sidebar'],
+			'capability'        => 'edit_theme_options',
+			'sanitize_callback' => 'ssl_alp_sanitize_checkbox',
+		)
+	);
+
+	$wp_customize->add_control(
+		'ssl_alp_options[page_specific_sidebar]',
+		array(
+			'label'    => __( 'Show different sidebar on pages', 'ssl-alp' ),
+			'section'  => 'ssl_alpine_sidebar_options',
+			'type'     => 'checkbox',
+			'priority' => 130,
+		)
+	);
+
 	/**
 	 * Footer section
 	 */

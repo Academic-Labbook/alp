@@ -107,16 +107,18 @@ if ( ! function_exists( 'ssl_alp_widgets_init' ) ) :
 			'after_title'   => '</h3>',
 		) );
 
-		// sidebar for pages, intended to show contents
-		register_sidebar( array(
-			'name'          => __( 'Page Sidebar', 'ssl-alp' ),
-			'id'            => 'ssl-alp-sidebar-page',
-			'description'   => __( 'This is the sidebar appearing on pages. This is intended to hold the page contents widget.', 'ssl-alp' ),
-			'before_widget' => '<aside id="%1$s" class="widget clearfix %2$s">',
-			'after_widget'  => '</aside>',
-			'before_title'  => '<h3 class="widgettitle">',
-			'after_title'   => '</h3>',
-		) );
+		if ( ssl_alp_get_option( 'page_specific_sidebar' ) ) {
+			// sidebar for pages, intended to show contents
+			register_sidebar( array(
+				'name'          => __( 'Page Sidebar', 'ssl-alp' ),
+				'id'            => 'ssl-alp-sidebar-page',
+				'description'   => __( 'This is the sidebar appearing on pages. This is intended to hold the page contents widget.', 'ssl-alp' ),
+				'before_widget' => '<aside id="%1$s" class="widget clearfix %2$s">',
+				'after_widget'  => '</aside>',
+				'before_title'  => '<h3 class="widgettitle">',
+				'after_title'   => '</h3>',
+			) );
+		}
 	}
 endif;
 
