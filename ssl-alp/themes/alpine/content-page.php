@@ -9,7 +9,7 @@
 
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 	<header class="entry-header">
-		<?php ssl_alpine_the_post_title( $post, false, true ); ?>
+		<?php ssl_alpine_the_post_title( $post, false, false, true ); ?>
 		<div class="entry-meta">
 			<?php ssl_alpine_the_page_meta(); ?>
 		</div><!-- .entry-meta -->

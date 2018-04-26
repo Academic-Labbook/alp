@@ -14,24 +14,42 @@ if ( ! function_exists( 'ssl_alpine_the_post_title' ) ) :
 	/**
 	 * Print the post title
 	 */
-	function ssl_alpine_the_post_title( $post = null, $url = true, $anchor = false ) {
+	function ssl_alpine_the_post_title( $post = null, $url = true, $icon = true, $anchor = false ) {
 		$post = get_post( $post );
 		$title = get_the_title( $post );
 		$permalink = esc_url( get_permalink( $post ) );
 
+		$html = '';
+
+		if ( $icon ) {
+			// display icon, if present
+			if ( 'status' === get_post_format( $post ) ) {
+				$icon_class = 'fa fa-info-circle';
+			} else {
+				// don't show icon
+				$icon_class = '';
+			}
+
+			if ( ! empty( $icon_class ) ) {
+				$html .= sprintf( '<i class="%1$s"></i>', $icon_class );
+			}
+		}
+
 		if ( $url ) {
 			// wrap title in its permalink
-			$title = sprintf(
-				'<a href="%1$s" class="%2$s" rel="bookmark" >%3$s</a>',
+			$html .= sprintf(
+				'<a href="%1$s" rel="bookmark" >%2$s</a>',
 				$permalink,
-				( 'status' === get_post_format( $post ) ) ? "status-post-title" : "", // icon class for status updates
 				$title
 			);
+		} else {
+			// just display title
+			$html .= $title;
 		}
 
 		if ( $anchor ) {
 			// add hover anchor with permalink
-			$title .= sprintf(
+			$html .= sprintf(
 				'<a class="entry-link" href="%1$s"><i class="fa fa-link"></i></a>',
 				$permalink
 			);
@@ -40,7 +58,7 @@ if ( ! function_exists( 'ssl_alpine_the_post_title' ) ) :
 		// output header tag
 		printf(
 			'<h2 class="entry-title">%1$s</h2>',
-			$title
+			$html
 		);
 	}
 endif;
@@ -283,7 +301,7 @@ if ( ! function_exists( 'ssl_alpine_format_author' ) ) :
 
 			// wrap author in link to their posts
 			$author_html = sprintf(
-				'<span class="author vcard"><a class="url fn n" href="%1$s">%2$s</a></span>',
+				'<span class="author vcard"><a href="%1$s">%2$s</a></span>',
 				$author_url,
 				$author_html
 			);
