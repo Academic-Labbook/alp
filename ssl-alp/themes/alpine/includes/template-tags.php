@@ -230,10 +230,13 @@ if ( ! function_exists( 'ssl_alpine_get_authors' ) ) :
 		$author_html = array();
 
 		foreach ( $authors as $author ) {
-			$author_html[] = ssl_alpine_format_author( $author, $url, $icon );
+			$author_html[] = ssl_alpine_format_author( $author, $url );
 		}
 
 		if ( count( $author_html ) > 1 ) {
+			// multiple authors
+			$icon_class = 'fa fa-users';
+
 			// get delimiters
 			if ( is_null( $delimiter_between ) ) {
 				$delimiter_between = _x( ', ', 'delimiter between coauthors except last', 'ssl-alp' );
@@ -248,10 +251,23 @@ if ( ! function_exists( 'ssl_alpine_get_authors' ) ) :
 			// implode author list
 			$author_html = implode( __( ', ', 'ssl-alp' ), $author_html ) . $delimiter_between_last . $last_author;
 		} else {
+			// single author
+			$icon_class = 'fa fa-user';
+
 			$author_html = $author_html[0];
 		}
 
-		return $author_html;
+		if ( $icon ) {
+			$icon = sprintf( '<i class="%1$s" aria-hidden="true"></i>', $icon_class );
+		} else {
+			$icon = '';
+		}
+
+		return sprintf(
+			'<span class="authors">%1$s%2$s</span>',
+			$icon,
+			$author_html
+		);
 	}
 endif;
 
@@ -259,19 +275,18 @@ if ( ! function_exists( 'ssl_alpine_format_author' ) ) :
 	/**
 	 * Gets formatted author name
 	 */
-	function ssl_alpine_format_author( $author, $icon = true, $url = true ) {
+	function ssl_alpine_format_author( $author, $url = true ) {
 		$author_html = $author->display_name;
 
 		if ( $url ) {
 			$author_url = esc_url( get_author_posts_url( $author->ID ) );
 
 			// wrap author in link to their posts
-			$author_html = sprintf( '<span class="author vcard"><a class="url fn n" href="%1$s">%2$s</a></span>', $author_url, $author_html );
-		}
-
-		if ( $icon ) {
-			// use fa-users when more than one user is defined
-			$author_html = '<i class="fa fa-user" aria-hidden="true"></i>' . $author_html;
+			$author_html = sprintf(
+				'<span class="author vcard"><a class="url fn n" href="%1$s">%2$s</a></span>',
+				$author_url,
+				$author_html
+			);
 		}
 
 		return $author_html;
