@@ -28,6 +28,7 @@ Here are the features implemented so far...
      - Recent revisions widget for sidebar
    - Shows reference widget under posts/pages showing cross-references to/from other posts/pages
    - Optionally display institute logo and icon
+   - Optionally shows contents on page sidebars
  - Optionally changes user roles:
    - *Administrator* is unchanged
    - *Editor* is renamed *Researcher*

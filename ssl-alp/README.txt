@@ -34,3 +34,5 @@ features may be removed or broken between updates.
  - Fix bug with additional edit counts in revisions widget.
  - Theme tweaks.
  - Internal naming changes.
+= 0.7.4 =
+ - Theme tweaks.
