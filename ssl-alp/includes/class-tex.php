@@ -18,9 +18,13 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 	 * Register the stylesheets.
 	 */
 	public function enqueue_styles() {
-		$css_url = esc_url( get_option( 'ssl_alp_katex_css_url' ) );
+		$css_url = esc_url( $this->get_css_url() );
 
 		wp_enqueue_style( 'ssl-alp-katex', $css_url, array(), SSL_ALP_KATEX_VERSION );
+	}
+
+	public function enqueue_admin_scripts() {
+		wp_enqueue_script( 'ssl-alp-tex-settings-js', SSL_ALP_BASE_URL . 'js/admin-tex.js', array( 'jquery' ), $this->get_version(), true );
 	}
 
 	/**
@@ -33,6 +37,15 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 			array(
 				'type'		=>	'boolean',
 				'default'	=>	true
+			)
+		);
+
+        register_setting(
+			'ssl-alp-admin-options',
+			'ssl_alp_tex_custom_urls',
+			array(
+				'type'		=>	'boolean',
+				'default'	=>	false
 			)
 		);
 
@@ -130,7 +143,7 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 		return sprintf(
 			'<span class="%1$s" data-display="%2$s">%3$s</span>',
 			implode( ' ', $classes ),
-			($display_block) ? "true" : "false",
+			$display_block ? "true" : "false",
 			htmlspecialchars( html_entity_decode( $content ) )
 		);
 	}
@@ -149,10 +162,40 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 		}
 
 		// JavaScript and CSS URLs
-		$js_url = esc_url( get_option( 'ssl_alp_katex_js_url' ) );
+		$js_url = esc_url( $this->get_js_url() );
 
 		// enqueue scripts
 		wp_enqueue_script( 'ssl-alp-katex', $js_url, array(), SSL_ALP_KATEX_VERSION );
 		wp_enqueue_script( 'ssl-alp-katex-render', SSL_ALP_BASE_URL . 'js/katex.js', array(), SSL_ALP_KATEX_VERSION );
+	}
+
+	/**
+	 * Get KaTeX JavaScript library URL
+	 */
+	protected function get_js_url() {
+		if ( get_option( 'ssl_alp_tex_custom_urls' ) ) {
+			// use custom URL
+			$url = get_option( 'ssl_alp_katex_js_url' );
+		} else {
+			// use default URL
+			$url = SSL_ALP_DEFAULT_KATEX_JS_URL;
+		}
+
+		return $url;
+	}
+
+	/**
+	 * Get KaTeX CSS URL
+	 */
+	protected function get_css_url() {
+		if ( get_option( 'ssl_alp_tex_custom_urls' ) ) {
+			// use custom URL
+			$url = get_option( 'ssl_alp_katex_css_url' );
+		} else {
+			// use default URL
+			$url = SSL_ALP_DEFAULT_KATEX_CSS_URL;
+		}
+
+		return $url;
 	}
 }
