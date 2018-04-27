@@ -24,7 +24,11 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 	}
 
 	public function enqueue_admin_scripts() {
-		wp_enqueue_script( 'ssl-alp-tex-settings-js', SSL_ALP_BASE_URL . 'js/admin-tex.js', array( 'jquery' ), $this->get_version(), true );
+		$screen = get_current_screen();
+		
+		if ( 'settings_page_ssl-alp-admin-options' === $screen->id ) {
+			wp_enqueue_script( 'ssl-alp-tex-settings-js', SSL_ALP_BASE_URL . 'js/admin-tex.js', array( 'jquery' ), $this->get_version(), true );
+		}
 	}
 
 	/**
