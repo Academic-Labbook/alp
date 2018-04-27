@@ -43,7 +43,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return;
 		}
 
-		wp_enqueue_script( 'ssl-alp-coauthors-js', SSL_ALP_BASE_URL . 'js/coauthors.js', array( 'jquery', 'jquery-ui-sortable', 'jquery-ui-autocomplete' ), $this->get_version(), true );
+		wp_enqueue_script( 'ssl-alp-coauthors-js', SSL_ALP_BASE_URL . 'js/admin-coauthors.js', array( 'jquery', 'jquery-ui-sortable', 'jquery-ui-autocomplete' ), $this->get_version(), true );
 
 		$js_strings = array(
 			'edit_label' => __( 'Edit', 'ssl-alp' ),
