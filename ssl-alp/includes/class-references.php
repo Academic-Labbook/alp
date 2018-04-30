@@ -33,7 +33,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 
         register_setting(
 			SSL_ALP_SITE_SETTINGS_PAGE,
-			'ssl_alp_doi_shortcode',
+			'ssl_alp_enable_doi_shortcode',
 			array(
 				'type'		=>	'boolean',
 				'default'	=>	true
@@ -42,7 +42,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 
 		register_setting(
 			SSL_ALP_SITE_SETTINGS_PAGE,
-			'ssl_alp_arxiv_shortcode',
+			'ssl_alp_enable_arxiv_shortcode',
 			array(
 				'type'		=>	'boolean',
 				'default'	=>	true
@@ -197,7 +197,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	}
 
     public function add_doi_shortcode() {
-        if ( ! get_option( 'ssl_alp_doi_shortcode' ) ) {
+        if ( ! get_option( 'ssl_alp_enable_doi_shortcode' ) ) {
 			// DOI shortcodes disabled
             return;
         }
@@ -245,7 +245,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	}
 
 	public function add_arxiv_shortcode() {
-        if ( ! get_option( 'ssl_alp_arxiv_shortcode' ) ) {
+        if ( ! get_option( 'ssl_alp_enable_arxiv_shortcode' ) ) {
 			// arXiv shortcodes disabled
             return;
         }

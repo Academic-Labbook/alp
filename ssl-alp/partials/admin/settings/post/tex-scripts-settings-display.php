@@ -1,7 +1,7 @@
 <fieldset>
     <legend class="screen-reader-text"><span><?php _e( 'Custom KaTeX URLs', 'ssl-alp' ); ?></span></legend>
-    <label for="ssl_alp_tex_custom_urls_checkbox">
-        <input name="ssl_alp_tex_custom_urls" type="checkbox" id="ssl_alp_tex_custom_urls_checkbox" value="1" <?php checked( get_site_option( 'ssl_alp_tex_custom_urls' ) ); ?> />
+    <label for="ssl_alp_tex_use_custom_urls_checkbox">
+        <input name="ssl_alp_tex_use_custom_urls" type="checkbox" id="ssl_alp_tex_use_custom_urls_checkbox" value="1" <?php checked( get_site_option( 'ssl_alp_tex_use_custom_urls' ) ); ?> />
         <?php _e( 'Use custom KaTeX JavaScript and CSS script URLs', 'ssl-alp' ); ?>
         <p class="description"><?php _e( 'When enabled, the URLs specified below will be loaded on posts containing mathematics instead of the defaults.', 'ssl-alp' ); ?></p>
     </label>

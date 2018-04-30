@@ -176,7 +176,7 @@ if ( ! function_exists( 'ssl_alpine_the_post_meta' ) ) :
 		);
 
 		if ( is_plugin_active( SSL_ALP_BASE_NAME ) ) {
-			if ( get_option( 'ssl_alp_post_edit_summaries' ) ) {
+			if ( get_option( 'ssl_alp_enable_post_edit_summaries' ) ) {
 				$revision_count = ssl_alpine_get_revision_count();
 
 				if ( $revision_count > 0 ) {
@@ -238,7 +238,7 @@ if ( ! function_exists( 'ssl_alpine_get_authors' ) ) :
 
 		$post = get_post( $post );
 
-		if ( is_plugin_active( SSL_ALP_BASE_NAME ) && get_option( 'ssl_alp_multiple_authors' ) ) {
+		if ( is_plugin_active( SSL_ALP_BASE_NAME ) && get_option( 'ssl_alp_allow_multiple_authors' ) ) {
 			$authors = $ssl_alp->coauthors->get_coauthors( $post );
 		} else {
 			// fall back to the_author if plugin is disabled
@@ -360,7 +360,7 @@ if ( ! function_exists( 'ssl_alpine_the_revisions' ) ) :
 	function ssl_alpine_the_revisions( $post = null ) {
 		if ( ! is_plugin_active( SSL_ALP_BASE_NAME ) ) {
 			return;
-		} elseif ( ! get_option( 'ssl_alp_post_edit_summaries' ) ) {
+		} elseif ( ! get_option( 'ssl_alp_enable_post_edit_summaries' ) ) {
 			return;
 		}
 
@@ -396,7 +396,7 @@ if ( ! function_exists( 'ssl_alpine_get_revisions' ) ) :
 	function ssl_alpine_get_revisions( $post = null ) {
 		if ( ! is_plugin_active( SSL_ALP_BASE_NAME ) ) {
 			return;
-		} elseif ( ! get_option( 'ssl_alp_post_edit_summaries' ) ) {
+		} elseif ( ! get_option( 'ssl_alp_enable_post_edit_summaries' ) ) {
 			return;
 		}
 
@@ -428,7 +428,7 @@ if ( ! function_exists( 'ssl_alpine_get_revision_description' ) ) :
 	function ssl_alpine_get_revision_description( $revision ) {
 		if ( ! is_plugin_active( SSL_ALP_BASE_NAME ) ) {
 			return;
-		} elseif ( ! get_option( 'ssl_alp_post_edit_summaries' ) ) {
+		} elseif ( ! get_option( 'ssl_alp_enable_post_edit_summaries' ) ) {
 			return;
 		}
 

@@ -15,7 +15,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	public function register_settings() {
 		register_setting(
 			SSL_ALP_SITE_SETTINGS_PAGE,
- 			'ssl_alp_post_edit_summaries',
+ 			'ssl_alp_enable_post_edit_summaries',
  			array(
  				'type'		=>	'boolean',
  				'default'	=>	true
@@ -24,7 +24,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		register_setting(
 			SSL_ALP_SITE_SETTINGS_PAGE,
-			'ssl_alp_page_edit_summaries',
+			'ssl_alp_enable_page_edit_summaries',
 			array(
 				'type'		=>	'boolean',
 				'default'	=>	true

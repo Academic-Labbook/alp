@@ -1,7 +1,7 @@
 (function( $ ) {
     'use strict';
 
-    var $checkbox = $( "#ssl_alp_tex_custom_urls_checkbox" );
+    var $checkbox = $( "#ssl_alp_tex_use_custom_urls_checkbox" );
     var $js_textbox = $( "#ssl_alp_katex_js_url_textbox" );
     var $css_textbox = $( "#ssl_alp_katex_css_url_textbox" );
 

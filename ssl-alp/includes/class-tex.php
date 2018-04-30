@@ -39,7 +39,7 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 	public function register_settings() {
         register_setting(
 			SSL_ALP_SITE_SETTINGS_PAGE,
-			'ssl_alp_tex_enabled',
+			'ssl_alp_enable_tex',
 			array(
 				'type'		=>	'boolean',
 				'default'	=>	true
@@ -48,7 +48,7 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 
         register_setting(
 			SSL_ALP_NETWORK_SETTINGS_PAGE,
-			'ssl_alp_tex_custom_urls',
+			'ssl_alp_tex_use_custom_urls',
 			array(
 				'type'		=>	'boolean',
 				'default'	=>	false
@@ -130,7 +130,7 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 	 * Add TeX shortcodes to editor
 	 */
 	public function add_tex_shortcode() {
-        if ( ! get_option( 'ssl_alp_tex_enabled' ) ) {
+        if ( ! get_option( 'ssl_alp_enable_tex' ) ) {
             return;
         }
 
@@ -192,7 +192,7 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 	 * Get KaTeX JavaScript library URL
 	 */
 	protected function get_js_url() {
-		if ( get_site_option( 'ssl_alp_tex_custom_urls' ) ) {
+		if ( get_site_option( 'ssl_alp_tex_use_custom_urls' ) ) {
 			// use custom URL
 			$url = get_site_option( 'ssl_alp_katex_js_url' );
 		} else {
@@ -207,7 +207,7 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 	 * Get KaTeX CSS URL
 	 */
 	protected function get_css_url() {
-		if ( get_site_option( 'ssl_alp_tex_custom_urls' ) ) {
+		if ( get_site_option( 'ssl_alp_tex_use_custom_urls' ) ) {
 			// use custom URL
 			$url = get_site_option( 'ssl_alp_katex_css_url' );
 		} else {
