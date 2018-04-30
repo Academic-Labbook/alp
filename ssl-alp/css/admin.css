@@ -5,13 +5,10 @@
 div.ssl-alp-misc-pub-edit-summary:before {
     /* copied from .misc-pub-post-status */
     font: 400 20px/1 dashicons;
-    speak: none;
     display: inline-block;
     margin-left: -1px;
     padding-right: 3px;
     vertical-align: top;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
     color: #82878c;
     content: "\f464"; /* pencil icon */
 }
@@ -37,11 +34,13 @@ div.ssl-alp-tools-cards {
     width: 100%;
 }
 
-span.ssl-alp-tools-card {
+div.ssl-alp-tools-card {
     position: relative;
+    clear: both;
     float: left;
     outline: 0;
-    width: 550px;
+    min-width: 400px;
+    max-width: 800px;
     margin: 20px 10px 0 10px;
     padding: .7em 2em 1em;
     border: 1px solid #e5e5e5;

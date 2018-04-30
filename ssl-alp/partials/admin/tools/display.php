@@ -6,28 +6,28 @@
 ?>
 
 <?php if ( $override_core_settings_completed ): ?>
-<div class="notice notice-success">
+<div class="notice notice-success is-dismissible">
 	<p><?php _e( 'Core settings changed.', 'ssl-alp' ); ?></p>
 </div>
 <?php endif; ?>
 <?php if ( $role_conversion_completed ): ?>
-<div class="notice notice-success">
+<div class="notice notice-success is-dismissible">
 	<p><?php _e( 'User roles converted.', 'ssl-alp' ); ?></p>
 </div>
 <?php elseif ( $role_conversion_unconfirmed ): ?>
-<div class="notice notice-error">
+<div class="notice notice-error is-dismissible">
 	<p><?php _e( 'Please click the confirmation checkbox below.', 'ssl-alp' ); ?></p>
 </div>
 <?php endif; ?>
 <?php if ( $rebuild_references_completed ): ?>
-<div class="notice notice-success">
+<div class="notice notice-success is-dismissible">
 	<p><?php _e( 'References rebuilt.', 'ssl-alp' ); ?></p>
 </div>
 <?php endif; ?>
 <div class="wrap">
 	<h2><?php _e('Academic Labbook Tools', 'ssl-alp'); ?></h2>
 	<div class="ssl-alp-tools-cards">
-		<span class="ssl-alp-tools-card">
+		<div class="ssl-alp-tools-card">
 			<h2 class="title"><?php _e( 'Activate theme', 'ssl-alp' ); ?></h2>
 			<p><?php _e( 'The Academic Labbook Plugin is bundled with a theme, <em>Alpine</em>. This theme, or a child theme derived from it, must be active in order for most of the plugin\'s functionality to appear.', 'ssl-alp' ); ?></p>
 			<?php if ( $alpine_active ) : ?>
@@ -35,8 +35,8 @@
 			<?php else : ?>
 			<p class="description"><?php _e( 'Alpine, or a child theme derived from it, is not active. Visit the <a href="themes.php">themes page</a> to activate it.', 'ssl-alp' ); ?></p>
 			<?php endif; ?>
-		</span>
-		<span class="ssl-alp-tools-card">
+		</div>
+		<div class="ssl-alp-tools-card">
 			<h2 class="title"><?php _e( 'Optimise core WordPress settings for private labbook', 'ssl-alp' ); ?></h2>
 			<p><?php _e( 'This tool allows you to change core WordPress settings to make them appropriate for a private academic labbook. The presumption behind these setting changes is that you control access to the labbook and trust the users whom you grant access to.', 'ssl-alp' ); ?></p>
 			<table class="widefat fixed striped ssl-alp-builtin-settings" cellspacing="0">
@@ -110,8 +110,8 @@
 			<?php elseif ( ! $require_login ) : ?>
 			<p class="description"><?php _e( sprintf( 'The <a href="options-general.php?page=ssl-alp-admin-options">%1$s</a> setting is not enabled. Please enable it first before running this tool.', __( ' Require login to access site', 'ssl-alp' ) ), 'ssl-alp' ); ?></p>
 			<?php endif; ?>
-		</span>
-		<span class="ssl-alp-tools-card">
+		</div>
+		<div class="ssl-alp-tools-card">
 			<h2 class="title"><?php _e( 'Convert user roles', 'ssl-alp' ); ?></h2>
 			<p><?php _e( 'This tool will convert the default WordPress user roles into roles more suitable for an academic labbook.', 'ssl-alp' ); ?></p>
 			<ul>
@@ -138,8 +138,8 @@
 			<?php else : ?>
 			<p class="description"><?php _e( 'User roles are not currently set to WordPress defaults, and so cannot be converted.', 'ssl-alp' ); ?></p>
 			<?php endif; ?>
-		</span>
-		<span class="ssl-alp-tools-card">
+		</div>
+		<div class="ssl-alp-tools-card">
 			<h2 class="title"><?php _e( 'Rebuild cross-references', 'ssl-alp' ); ?></h2>
 			<p><?php _e( 'This tool will rebuild the cross-references related to each published post and page. This is useful for extracting cross-references from posts or pages created or edited during any time in which the cross-references feature was disabled, and from posts or pages created before the plugin was installed or activated.', 'ssl-alp' ); ?></p>
 			<form method="post" action="">
@@ -152,6 +152,6 @@
 			<?php if ( ! $references_enabled ) : ?>
 			<p class="description"><?php _e( 'Cross-references are disabled. To enable them, go to <a href="options-general.php?page=ssl-alp-admin-options">this settings page</a>.', 'ssl-alp' ); ?></p>
 			<?php endif; ?>
-		</span>
+		</div>
 	</div>
 </div>
