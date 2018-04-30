@@ -1131,22 +1131,35 @@ body {
     margin-left: 15px;
 }
 
-.widget ul li a:before {
+/* default list style type for widgets */
+.widget ul li:before {
 	font-family: 'FontAwesome';
-	content: '\f105';
+	content: '\f105'; /* arrow-right */
 	margin: 0 5px 0 -15px;
 	color: #0b789c;
 }
 
-.widget_recent_comments #recentcomments li:before {
-	content: '\f0e5';
+/* table of contents widget moves :before selector to a elements */
+.widget + .widget_ssl-alp-contents ul li:before {
+	content: none; /* remove icon */
 }
 
-.widget_ssl-alp-revisions #recent-revisions-list li:before {
-	content: '\f040'; /* pencil icon */
+.widget + .widget_ssl-alp-contents ul li a:before {
+	font-family: 'FontAwesome';
+	content: '\f105'; /* arrow-right */
+	margin: 0 5px 0 -15px;
+	color: #0b789c;
 }
 
-.nav-links i.fa{
+.widget + .widget_ssl-alp-revisions li:before {
+	content: '\f040'; /* pencil */
+}
+
+.widget + .widget_recent_comments li:before {
+	content: '\f0e5'; /* question */
+}
+
+.nav-links i.fa {
 	color: #0b789c;
 }
 
