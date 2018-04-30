@@ -39,7 +39,10 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * Register admin scripts
 	 */
 	public function enqueue_admin_scripts() {
-		if ( ! $this->post_supports_coauthors() || ! $this->current_user_can_set_authors() ) {
+		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
+			// coauthors disabled
+			return;
+		} elseif ( ! $this->post_supports_coauthors() || ! $this->current_user_can_set_authors() ) {
 			return;
 		}
 
