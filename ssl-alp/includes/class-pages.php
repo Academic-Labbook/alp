@@ -443,8 +443,13 @@ class SSL_ALP_Widget_Contents extends WP_Widget {
 		return true;
 	}
 
-	protected function the_contents( $max_levels ) {
+	protected function the_contents( $max_levels = null ) {
 		global $ssl_alp_page_toc;
+
+		if ( is_null( $max_levels ) || ! is_int( $max_levels ) ) {
+			// default max levels
+			$max_levels = self::DEFAULT_MAX_LEVELS;
+		}
 
 		// call recursive menu printer
 		$this->_content_list( $ssl_alp_page_toc, $max_levels );
