@@ -70,10 +70,12 @@ define( 'SSL_ALP_ARXIV_BASE_URL', 'https://arxiv.org/abs/' );
 // import classes
 require_once SSL_ALP_BASE_DIR . 'includes/class-activator.php';
 require_once SSL_ALP_BASE_DIR . 'includes/class-deactivator.php';
+require_once SSL_ALP_BASE_DIR . 'includes/class-uninstaller.php';
 
 // register hooks
 register_activation_hook( __FILE__, array( 'SSL_ALP_Activator', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'SSL_ALP_Deactivator', 'deactivate' ) );
+register_uninstall_hook( __FILE__, array( 'SSL_ALP_Uninstaller', 'uninstall' ) );
 
 /**
  * Add theme directory provided by this plugin
