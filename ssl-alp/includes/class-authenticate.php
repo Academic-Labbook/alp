@@ -29,7 +29,7 @@ class SSL_ALP_Authenticate extends SSL_ALP_Module {
 	 */
 	public function register_settings() {
         register_setting(
-            'ssl-alp-admin-options',
+            SSL_ALP_SITE_SETTINGS_PAGE,
             'ssl_alp_require_login',
             array(
                 'type'		=>	'boolean',
@@ -126,14 +126,14 @@ class SSL_ALP_Authenticate extends SSL_ALP_Module {
             nocache_headers();
             
             // redirect to the login URL
-			wp_redirect(
+            wp_safe_redirect(
                 // don't force password entry for network users that aren't members here yet
 				wp_login_url( $_SERVER[ 'REQUEST_URI' ], is_multisite() ),
-				$status = 302 // "Found" redirect
+				302 // "Found" redirect
             );
             
-            // wp_redirect doesn't exit on its own
-			exit();
+            // wp_safe_redirect doesn't exit on its own
+			exit;
 		}
     }
 

@@ -38,7 +38,7 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 	 */
 	public function register_settings() {
 		register_setting(
-			'ssl-alp-admin-options',
+			SSL_ALP_SITE_SETTINGS_PAGE,
 			'ssl_alp_disable_post_excerpts',
 			array(
 				'type'		=>	'boolean',
@@ -47,7 +47,7 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 		);
 
 		register_setting(
-			'ssl-alp-admin-options',
+			SSL_ALP_SITE_SETTINGS_PAGE,
 			'ssl_alp_disable_post_trackbacks',
 			array(
 				'type'		=>	'boolean',
@@ -56,7 +56,7 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 		);
 
 		register_setting(
-			'ssl-alp-admin-options',
+			SSL_ALP_NETWORK_SETTINGS_PAGE,
 			'ssl_alp_additional_media_types',
 			array(
 				'type'		=>	'string',
@@ -78,7 +78,7 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 			'ssl_alp_access_settings', // id
 			__( 'Access', 'ssl-alp' ), // title
 			array( $this, 'access_settings_callback' ), // callback
-			'ssl-alp-admin-options', // page
+			SSL_ALP_SITE_SETTINGS_PAGE, // page
 			'ssl_alp_site_settings_section' // section
 		);
 
@@ -90,7 +90,7 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 			'ssl_alp_category_settings', // id
 			__( 'Meta', 'ssl-alp' ), // title
 			array( $this, 'meta_settings_callback' ), // callback
-			'ssl-alp-admin-options', // page
+			SSL_ALP_SITE_SETTINGS_PAGE, // page
 			'ssl_alp_post_settings_section' // section
 		);
 
@@ -102,7 +102,7 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 			'ssl_alp_category_settings', // id
 			__( 'Additional media types', 'ssl-alp' ), // title
 			array( $this, 'media_types_settings_callback' ), // callback
-			'ssl-alp-admin-options', // page
+			SSL_ALP_NETWORK_SETTINGS_PAGE, // page
 			'ssl_alp_media_settings_section' // section
 		);
     }
@@ -190,7 +190,7 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 				// return original value
 				// ideally WordPress would pass the original value to this function call, but
 				// it doesn't (https://github.com/WordPress/WordPress/blob/4848a09b3593b639bd9c3ccfcd6038e90adf5866/wp-includes/option.php#L2114)
-				return get_option( 'ssl_alp_additional_media_types' );
+				return get_site_option( 'ssl_alp_additional_media_types', '' );
 			}
 		}
 
@@ -219,9 +219,9 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 
 	public function filter_mime_types( $media_types ) {
 		// get extra media types defined in the plugin settings
-		$extra_media_types = get_option( 'ssl_alp_additional_media_types' );
+		$extra_media_types = get_site_option( 'ssl_alp_additional_media_types' );
 
-		if ( empty( $extra_media_types) || ! is_array( $extra_media_types ) ) {
+		if ( ! $extra_media_types || ! is_array( $extra_media_types ) ) {
 			// nothing to add
 			return $media_types;
 		}

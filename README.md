@@ -59,23 +59,31 @@ Some ideas pondered for the future:
      - Add entries to reference widget
 
 ## Requirements
+
+### WordPress
 In general, you should use the latest version of WordPress 4.x as that's the
 branch that will be supported. With auto-updates to WordPress Core, this is
 easy. The pending 2018 arrival of WordPress 5 may complicate matters, especially
 surrounding Gutenberg (see below). It is likely that WordPress 4.9 will be
 supported for a short while after 5.0 is released, but not for many months.
 
+It is desirable, but not required, to use WordPress in [multisite](https://codex.wordpress.org/Create_A_Network)
+mode. This exposes additional options to network administrators to control upload
+media (MIME) types and custom script paths.
+
+### PHP
 The plugin has only been tested on PHP7. You must have the [DOM extension](http://www.php.net/manual/en/book.dom.php) installed in order for the page
 table of contents lists to work. You also cannot use PHP via CGI if you wish
 to make the site private but still have syndication feeds available to the user.
 
+### Clients
 Your users should use up-to-date browsers. The theme bundled with ALP (Alpine)
 uses CSS Grid, which is only available in recent versions (i.e. within the last
-year or two) of the most popular browsers. The [browsers that don't support CSS Grid](https://caniuse.com/#feat=css-grid)
+two years) of the most popular browsers. The [browsers that don't support CSS Grid](https://caniuse.com/#feat=css-grid)
 represent only around 5% of global usage as of March 2018. This project is not
 concerned about losing sales from users running out of date browsers!
 
-### Gutenberg
+## Gutenberg
 WordPress 5.0 will introduce a new editor interface called [Gutenberg](https://wordpress.org/gutenberg/).
 This does not show some of the custom interface additions that ALP makes to the
 standard editor, but it is not anticipated that support for these additions will

@@ -136,7 +136,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 */
 	public function register_settings() {
         register_setting(
-			'ssl-alp-admin-options',
+			SSL_ALP_SITE_SETTINGS_PAGE,
 			'ssl_alp_multiple_authors',
 			array(
 				'type'		=>	'boolean',
@@ -157,7 +157,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			'ssl_alp_author_settings',
 			__( 'Authors', 'ssl-alp' ),
 			array( $this, 'author_settings_callback' ),
-			'ssl-alp-admin-options',
+			SSL_ALP_SITE_SETTINGS_PAGE,
 			'ssl_alp_post_settings_section'
 		);
 	}

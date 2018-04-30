@@ -2,8 +2,7 @@
     <?php _e( 'Allow the following media types to be uploaded using the media manager in addition to the <a href="https://codex.wordpress.org/Function_Reference/get_allowed_mime_types#Default_allowed_mime_types">WordPress defaults</a>:', 'ssl-alp' ); ?>
 </label>
 <?php
-$ssl_alp_media_types = get_option( 'ssl_alp_additional_media_types' );
-
+$ssl_alp_media_types = get_site_option( 'ssl_alp_additional_media_types' );
 $ssl_alp_media_lines = array();
 
 if ( is_array( $ssl_alp_media_types ) ) {

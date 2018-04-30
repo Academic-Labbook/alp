@@ -53,7 +53,7 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 			__( 'Academic Labbook Tools', 'ssl-alp' ),
 			__( 'Academic Labbook', 'ssl-alp' ),
 			'manage_options',
-			SSL_ALP_TOOLS_MENU_SLUG,
+			SSL_ALP_SITE_TOOLS_MENU_SLUG,
 			array( $this, 'output_admin_tools_page' )
 		);
     }

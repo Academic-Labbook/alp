@@ -14,7 +14,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 */
 	public function register_settings() {
 		register_setting(
- 			'ssl-alp-admin-options',
+			SSL_ALP_SITE_SETTINGS_PAGE,
  			'ssl_alp_post_edit_summaries',
  			array(
  				'type'		=>	'boolean',
@@ -23,7 +23,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
  		);
 
 		register_setting(
-			'ssl-alp-admin-options',
+			SSL_ALP_SITE_SETTINGS_PAGE,
 			'ssl_alp_page_edit_summaries',
 			array(
 				'type'		=>	'boolean',
@@ -32,7 +32,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		);
 
 		register_setting(
-			'ssl-alp-admin-options',
+			SSL_ALP_SITE_SETTINGS_PAGE,
 			'ssl_alp_edit_summary_max_length',
 			array(
 				'type'		=>	'integer',
@@ -53,7 +53,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			'ssl_alp_edit_summary_settings',
 			__( 'Revisions', 'ssl-alp' ),
 			array( $this, 'revisions_settings_callback' ),
-			'ssl-alp-admin-options',
+			SSL_ALP_SITE_SETTINGS_PAGE,
 			'ssl_alp_post_settings_section'
 		);
     }

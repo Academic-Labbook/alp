@@ -23,7 +23,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	 */
 	public function register_settings() {
         register_setting(
-			'ssl-alp-admin-options',
+			SSL_ALP_SITE_SETTINGS_PAGE,
 			'ssl_alp_enable_crossreferences',
 			array(
 				'type'		=>	'boolean',
@@ -32,7 +32,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		);
 
         register_setting(
-			'ssl-alp-admin-options',
+			SSL_ALP_SITE_SETTINGS_PAGE,
 			'ssl_alp_doi_shortcode',
 			array(
 				'type'		=>	'boolean',
@@ -41,7 +41,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		);
 
 		register_setting(
-			'ssl-alp-admin-options',
+			SSL_ALP_SITE_SETTINGS_PAGE,
 			'ssl_alp_arxiv_shortcode',
 			array(
 				'type'		=>	'boolean',
@@ -62,7 +62,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 			'ssl_alp_reference_settings',
 			__( 'References', 'ssl-alp' ),
 			array( $this, 'reference_settings_callback' ),
-			'ssl-alp-admin-options',
+			SSL_ALP_SITE_SETTINGS_PAGE,
 			'ssl_alp_post_settings_section'
 		);
     }

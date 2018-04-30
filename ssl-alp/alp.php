@@ -47,8 +47,11 @@ define( 'SSL_ALP_THEME_DIR', SSL_ALP_BASE_DIR . 'themes' );
  * Admin slugs
  */
 
-define( 'SSL_ALP_SETTINGS_MENU_SLUG', 'ssl-alp-admin-options' );
-define( 'SSL_ALP_TOOLS_MENU_SLUG', 'ssl-alp-admin-tools' );
+define( 'SSL_ALP_SITE_SETTINGS_PAGE', 'ssl-alp-admin-options' );
+define( 'SSL_ALP_NETWORK_SETTINGS_PAGE', 'ssl-alp-network-admin-options' );
+define( 'SSL_ALP_SITE_SETTINGS_MENU_SLUG', 'ssl-alp-site-options' );
+define( 'SSL_ALP_NETWORK_SETTINGS_MENU_SLUG', 'ssl-alp-network-options' );
+define( 'SSL_ALP_SITE_TOOLS_MENU_SLUG', 'ssl-alp-admin-tools' );
 
 /**
  * Default settings
