@@ -286,13 +286,14 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			return;
 		}
 
-		$post_id  = $revision->post_parent;
+		$post_id = $revision->post_parent;
 
 		// save revisioned meta field
 		// get edit summary from revision's parent
 		$edit_summary = get_post_meta( $post_id, 'edit_summary', true );
 
-		if ( 0 !== sizeof( $edit_summary ) && is_array( $edit_summary ) ) {				/*
+		if ( 0 !== sizeof( $edit_summary ) && is_array( $edit_summary ) ) {
+			/*
 			 * Add parent's custom meta data to revision
 			 *
 			 * Use the underlying add_metadata() function instead of
@@ -347,11 +348,18 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			// no or invalid nonce
 			return;
 		}
+		
+		if ( array_key_exists( 'ssl_alp_revision_post_edit_summary', $_POST ) ) {
+			// sanitise edit summary input
+			$message = sanitize_text_field( $_POST['ssl_alp_revision_post_edit_summary'] );
+		} else {
+			// no edit summary provided
+			$message = '';
+		}
 
-		// sanitise edit summary input
-		$message = sanitize_text_field( $_POST['ssl_alp_revision_post_edit_summary'] );
 		// limit length
-		$max = get_option( 'ssl_alp_edit_summary_max_length', 100 );
+		$max = get_option( 'ssl_alp_edit_summary_max_length' );
+
 		if ( strlen( $message ) > $max ) {
 			$message = substr( $message, 0, $max );
 		}
