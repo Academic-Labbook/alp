@@ -713,7 +713,15 @@ if ( ! function_exists( 'ssl_alpine_get_revision_count' ) ) :
 			)
 		);
 
-		return count( $revisions );
+		$count = count( $revisions );
+
+		if ( $count <= 0 ) {
+			// no posts found
+			return 0;
+		} else {
+			// subtract 1 to exclude the original post
+			return count( $revisions ) - 1;
+		}
 	}
 endif;
 
