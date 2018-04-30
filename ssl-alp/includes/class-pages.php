@@ -93,6 +93,9 @@ class SSL_ALP_Pages extends SSL_ALP_Module {
 		// variable to store contents for widget
 		global $ssl_alp_page_toc;
 
+		// reset contents
+		$ssl_alp_page_toc = '';
+
 		if ( ! is_page() ) {
 			// don't need to generate contents
 			return $page_content;
@@ -151,7 +154,10 @@ class SSL_ALP_Pages extends SSL_ALP_Module {
 
 		if ( count( libxml_get_errors() ) ) {
 			// there were parser errors
-			error_log( sprintf( 'SSL_ALP parser errors: %s', print_r( libxml_get_errors(), true ) ) );
+			//error_log( sprintf( 'SSL_ALP parser errors: %s', print_r( libxml_get_errors(), true ) ) );
+
+			// clear errors
+			libxml_clear_errors();
 
 			// return content without building a table of contents
 			return $page_content;
