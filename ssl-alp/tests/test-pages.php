@@ -37,7 +37,32 @@ class PagesTest extends WP_UnitTestCase {
                 'post_type'     =>  'page',
                 'post_status'   =>  'publish'
 			)
-		);
+        );
+        
+		$this->post_4 = $this->factory->post->create_and_get(
+			array(
+                'post_content'	=>	'
+                    <h1>First section header</h1>
+                    <h3>Third section header</h3>
+                    <h5>Fifth section header</h5>
+                ',
+                'post_type'     =>  'page',
+                'post_status'   =>  'publish'
+			)
+        );
+        
+        // unbalanced header tags
+		$this->post_5 = $this->factory->post->create_and_get(
+			array(
+                'post_content'	=>	'
+                    <h1>First section header</h2>
+                    <h3>Third section header</h4>
+                    <h5>Fifth section header</h6>
+                ',
+                'post_type'     =>  'page',
+                'post_status'   =>  'publish'
+			)
+        );
     }
 
     /**
@@ -74,6 +99,29 @@ EOF;
 
         $this->go_to_post( $this->post_3 );
         $this->assertEquals( strip_ws( $expected_3 ), strip_ws( get_echo( 'the_content' ) ) );
+
+        // should handle skipped h tags
+        $expected_4 = <<<EOF
+<h1 id="first-section-header">First section header</h1>
+<h3 id="third-section-header">Third section header</h3>
+<h5 id="fifth-section-header">Fifth section header</h5>
+EOF;
+
+        $this->go_to_post( $this->post_4 );
+        $this->assertEquals( strip_ws( $expected_4 ), strip_ws( get_echo( 'the_content' ) ) );
+    }
+    
+    public function test_invalid_header_tags() {
+        global $ssl_alp_page_toc;
+        
+        // invalid h tags should result in unchanged content
+        $expected_5 = $this->post_5->post_content;
+
+        $this->go_to_post( $this->post_5 );
+        $this->assertEquals( strip_ws( $expected_5 ), strip_ws( get_echo( 'the_content' ) ) );
+
+        // and empty contents
+        $this->assertEmpty( $ssl_alp_page_toc );
     }
 
     private function get_contents_widget_output( $post, $max_levels = null ) {
@@ -123,17 +171,17 @@ Contents
 <ul>
     <li>
         <a href="#first-section-header">First section header</a>
-    </li>
-    <ul>
-        <li>
-            <a href="#second-section-header">Second section header</a>
-        </li>
         <ul>
             <li>
-                <a href="#third-section-header">Third section header</a>
+                <a href="#second-section-header">Second section header</a>
+                <ul>
+                    <li>
+                        <a href="#third-section-header">Third section header</a>
+                    </li>
+                </ul>
             </li>
         </ul>
-    </ul>
+    </li>
 </ul>
 EOF;
         // bunch up expected
@@ -146,17 +194,17 @@ Contents
 <ul>
     <li>
         <a href="#already-defined">First section header</a>
-    </li>
-    <ul>
-        <li>
-            <a href="#second-section-header">Second section header</a>
-        </li>
         <ul>
             <li>
-                <a href="#third-section-header">Third section header</a>
+                <a href="#second-section-header">Second section header</a>
+                <ul>
+                    <li>
+                        <a href="#third-section-header">Third section header</a>
+                    </li>
+                </ul>
             </li>
         </ul>
-    </ul>
+    </li>
 </ul>
 EOF;
         // bunch up expected

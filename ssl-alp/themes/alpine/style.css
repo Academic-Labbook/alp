@@ -1123,7 +1123,7 @@ body {
     margin-top: 0;
 }
 
-/* remove standard bullet points (replaced later with arrows by .widget li:before) */
+/* remove standard bullet points */
 .widget ul {
 	list-style-type: none;
     margin: 0;
@@ -1131,7 +1131,7 @@ body {
     margin-left: 15px;
 }
 
-.widget li:before {
+.widget ul li a:before {
 	font-family: 'FontAwesome';
 	content: '\f105';
 	margin: 0 5px 0 -15px;

@@ -467,29 +467,27 @@ class SSL_ALP_Widget_Contents extends WP_Widget {
 			return;
 		}
 
-		if ( ! $contents->is_root ) {
-			$menu_data = $contents->get_menu_data();
+		$menu_data = $contents->get_menu_data();
 
-			if ( is_array( $menu_data ) ) {	
-				echo '<li>';
-
-				printf(
-					'<a href="#%1$s">%2$s</a>',
-					esc_html( $menu_data['id'] ),
-					esc_html( $menu_data['title'] )
-				);
-
-				echo '</li>';
-			}
+		if ( is_array( $menu_data ) ) {
+			printf(
+				'<a href="#%1$s">%2$s</a>',
+				esc_html( $menu_data['id'] ),
+				esc_html( $menu_data['title'] )
+			);
 		}
 
 		$children = $contents->get_child_menus();
 
-		foreach ( $children as $child ) {
+		if ( count( $children ) ) {
 			echo '<ul>';
 
-			// show sublevel
-			$this->_content_list( $child, $max_levels - 1 );
+			foreach ( $children as $child ) {
+				// show sublevel
+				echo '<li>';
+				$this->_content_list( $child, $max_levels - 1 );
+				echo '</li>';
+			}
 
 			echo '</ul>';
 		}
