@@ -431,6 +431,12 @@ class SSL_ALP_Widget_Contents extends WP_Widget {
 		$instance['title'] = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
 		$instance['max_levels'] = absint( $new_instance['max_levels'] );
 
+		if ( $instance[ 'max_levels' ] < 1 ) {
+			$instance[ 'max_levels' ] = 1;
+		} elseif ( $instance[ 'max_levels' ] > 6 ) {
+			$instance[ 'max_levels' ] = 6;
+		}
+
 		return $instance;
 	}
 
@@ -477,19 +483,23 @@ class SSL_ALP_Widget_Contents extends WP_Widget {
 			);
 		}
 
-		$children = $contents->get_child_menus();
+		if ( $max_levels > 0 ) {
+			// next level still visible
+			// get children
+			$children = $contents->get_child_menus();
 
-		if ( count( $children ) ) {
-			echo '<ul>';
+			if ( count( $children ) ) {
+				echo '<ul>';
 
-			foreach ( $children as $child ) {
-				// show sublevel
-				echo '<li>';
-				$this->_content_list( $child, $max_levels - 1 );
-				echo '</li>';
+				foreach ( $children as $child ) {
+					// show sublevel
+					echo '<li>';
+					$this->_content_list( $child, $max_levels - 1 );
+					echo '</li>';
+				}
+
+				echo '</ul>';
 			}
-
-			echo '</ul>';
 		}
 	}
 }
