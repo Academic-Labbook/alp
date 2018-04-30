@@ -3,7 +3,7 @@
 /*
 Plugin Name:  Academic Labbook Plugin
 Plugin URI:   https://alp.attackllama.com/
-Description:  Turn WordPress into a collaborative academic notebook.
+Description:  Turn WordPress into a collaborative academic labbook.
 Version:      0.7.4
 Author:       Sean Leavey
 Author URI:   https://attackllama.com/
