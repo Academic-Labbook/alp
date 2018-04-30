@@ -206,12 +206,42 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	}
 
 	public function doi_shortcode_hook( $atts, $content ) {
+		// defaults
+		$atts = shortcode_atts(
+			array(
+				'id'	=>	''
+			),
+			$atts
+		);
+
 		$content = sanitize_text_field( $content );
 
-		// DOI URL
-		$url = SSL_ALP_DOI_BASE_URL . $content;
+		if ( empty( $atts[ 'id' ] ) ) {
+			// no id defined
+			$url = '';
 
-		return '<a href="' . $url . '">doi:' . $content . '</a>';
+			if ( empty( $content ) ) {
+				// nothing to do
+				return '';
+			}
+		} else {
+			// DOI URL
+			$url = SSL_ALP_DOI_BASE_URL . $atts[ 'id' ];
+		}
+
+		if ( empty( $content ) ) {
+			// use DOI
+			$content = sprintf(
+				'doi:%1$s',
+				$atts[ 'id' ]
+			);
+		}
+
+		return sprintf(
+			'<a href="%1$s">%2$s</a>',
+			$url,
+			$content
+		);
 	}
 
 	public function add_arxiv_shortcode() {
@@ -224,12 +254,42 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	}
 
 	public function arxiv_shortcode_hook( $atts, $content ) {
+		// defaults
+		$atts = shortcode_atts(
+			array(
+				'id'	=>	''
+			),
+			$atts
+		);
+
 		$content = sanitize_text_field( $content );
 
-		// arXiv URL
-		$url = SSL_ALP_ARXIV_BASE_URL . $content;
+		if ( empty( $atts[ 'id' ] ) ) {
+			// no id defined
+			$url = '';
 
-		return '<a href="' . $url . '">arXiv:' . $content . '</a>';
+			if ( empty( $content ) ) {
+				// nothing to do
+				return '';
+			}
+		} else {
+			// DOI URL
+			$url = SSL_ALP_ARXIV_BASE_URL . $atts[ 'id' ];
+		}
+
+		if ( empty( $content ) ) {
+			// use DOI
+			$content = sprintf(
+				'arxiv:%1$s',
+				$atts[ 'id' ]
+			);
+		}
+
+		return sprintf(
+			'<a href="%1$s">%2$s</a>',
+			$url,
+			$content
+		);
 	}
 
 	/**
