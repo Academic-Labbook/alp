@@ -95,7 +95,7 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 		 */
 
 		// check if core settings are all overridden
-		$core_settings_overridden = $this->_core_settings_overriden();
+		$core_settings_overridden = $this->core_settings_overridden();
 
 		// require login setting
 		$require_login = get_option( 'ssl_alp_require_login' );
@@ -108,12 +108,12 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 				check_admin_referer( 'ssl-alp-manage-core-settings', 'ssl_alp_manage_core_settings_nonce' );
 
 				// do action
-				$this->_override_core_settings();
+				$this->override_core_settings();
 
 				$override_core_settings_completed = true;
 
 				// update override flag
-				$core_settings_overridden = $this->_core_settings_overriden();
+				$core_settings_overridden = $this->core_settings_overridden();
 			}
 		}
 
@@ -122,10 +122,10 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 		 */
 
 		// check if user roles can be changed
-		$roles_convertable = $this->_roles_are_default();
+		$roles_convertable = $this->roles_are_default();
 
 		// check if user roles have been changed already
-		$roles_converted = $this->_roles_converted();
+		$roles_converted = $this->roles_converted();
 
 		if ( $roles_convertable && ! $roles_converted ) {
 			if ( array_key_exists( 'ssl_alp_convert_role_submitted', $_POST ) && (bool) $_POST['ssl_alp_convert_role_submitted'] ) {
@@ -137,12 +137,12 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 				// check they checked the checkbox
 				if ( array_key_exists( 'ssl_alp_convert_role_confirm', $_POST ) && (bool) $_POST['ssl_alp_convert_role_confirm'] ) {
 					// do action
-					$this->_convert_roles();
+					$this->convert_roles();
 
 					$role_conversion_completed = true;
 
 					// update roles changed flag
-					$roles_converted = $this->_roles_converted();
+					$roles_converted = $this->roles_converted();
 				} else {
 					$role_conversion_unconfirmed = true;
 				}
@@ -164,7 +164,7 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 				check_admin_referer( 'ssl-alp-rebuild-references', 'ssl_alp_rebuild_references_nonce' );
 
 				// do action
-				$this->_rebuild_references();
+				$this->rebuild_references();
 
 				$rebuild_references_completed = true;
 			}
@@ -176,7 +176,7 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 	/**
 	 * Checks if the overrideable settings are already overriden
 	 */
-	private function _core_settings_overriden() {
+	public function core_settings_overridden() {
 		$current_settings = array_map( 'get_option', array_keys( $this->overrideable_settings ) );
 
 		return $current_settings == array_values( $this->overrideable_settings );
@@ -185,7 +185,7 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 	/**
 	 * Overrides core settings to ALP recommended defaults
 	 */
-	private function _override_core_settings() {
+	public function override_core_settings() {
 		foreach ( $this->overrideable_settings as $setting => $value ) {
 			update_option( $setting, $value );
 		}
@@ -193,9 +193,9 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 
 	/**
 	 * Checks if the user roles defined in this WordPress installation are set to their
-	 * defaults, and therefore changeable by the _change_user_roles() tool.
+	 * defaults, and therefore changeable by the convert_user_roles() function.
 	 */
-	private function _roles_are_default() {
+	public function roles_are_default() {
 		global $wp_roles;
 
 		// default role names
@@ -215,7 +215,7 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 	/**
 	 * Checks if the user roles have been converted already to the ALP varieties
 	 */
-	private function _roles_converted() {
+	public function roles_converted() {
 		global $wp_roles;
 
 		// if there is no difference between the WP_Roles settings and the custom ALP roles,
@@ -226,7 +226,7 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 	/**
 	 * Changes the default user roles.
 	 */
-	private function _convert_roles() {
+	public function convert_roles() {
 		// first of all, create the new roles
 		$this->_create_role_copy( 'researcher', 'Researcher', 'editor' );
 		$this->_create_role_copy( 'intern', 'Intern', 'author' );
@@ -285,7 +285,7 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 	/**
 	 * Rebuild post/page references
 	 */
-	private function _rebuild_references() {
+	private function rebuild_references() {
 		global $ssl_alp;
 
 		// pass call to reference object
