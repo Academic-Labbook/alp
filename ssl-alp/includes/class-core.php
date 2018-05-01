@@ -158,6 +158,11 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 		$valid_types = array();
 
 		foreach ( $media_types as $media_type ) {
+			if ( empty( $media_type ) ) {
+				// skip empty line
+				continue;
+			}
+
 			$matches = null;
 
 			if ( preg_match( $this->media_type_regex, $media_type, $matches ) ) {

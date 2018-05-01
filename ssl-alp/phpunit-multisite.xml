@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <phpunit
-    bootstrap="bootstrap.php"
+    bootstrap="tests/bootstrap.php"
     backupGlobals="false"
-    colors="false"
+    colors="true"
     convertErrorsToExceptions="true"
     convertNoticesToExceptions="true"
     convertWarningsToExceptions="true">
