@@ -36,6 +36,22 @@ class CoauthorsTest extends WP_UnitTestCase {
         );
     }
 
+    /**
+     * Checks the specified user id is deleted. For single sites,
+     * the user is checked to be deleted. For multisite, the user
+     * is checked to no longer be a member of the current blog.
+     * 
+     * This essentially checks the behaviour of `wp_delete_user` in
+     * each case.
+     */
+    private function check_user_deleted( $user_id ) {
+        if ( is_multisite() ) {
+            $this->assertFalse( is_user_member_of_blog( $user_id ) );
+        } else {
+            $this->assertFalse( get_user_by( 'id', $user_id ) );
+        }
+    }
+
 	function test_coauthors() {
         global $ssl_alp;
 
@@ -285,8 +301,37 @@ class CoauthorsTest extends WP_UnitTestCase {
         // delete user
         wp_delete_user( $this->user_1->ID );
 
+        // user should be deleted
+        $this->check_user_deleted( $this->user_1->ID );
+
         // updated post should be null
         $this->assertNull( get_post( $this->post_1->ID ) );
+    }
+
+    /**
+     * Check that deleting a user that is the primary author of a post with no other
+     * authors, when reassigning the author's posts to another user, does not delete
+     * that post.
+     */
+    function test_coauthor_delete_user_with_sole_author_post_with_reassign() {
+        global $ssl_alp;
+
+        // delete user, reassigning to user 2
+        wp_delete_user( $this->user_1->ID, $this->user_2->ID );
+
+        // user should be deleted
+        $this->check_user_deleted( $this->user_1->ID );
+
+        // post should have user 2 as author
+        $this->assertEquals(
+            $ssl_alp->coauthors->get_coauthors( get_post( $this->post_1->ID ) ),
+            array(
+                $this->user_2
+            )
+        );
+
+        // post should retain its original publication status
+        $this->assertEquals( get_post( $this->post_1->ID)->post_status, $this->post_1->post_status );
     }
 
     /**
@@ -309,6 +354,9 @@ class CoauthorsTest extends WP_UnitTestCase {
         // delete user
         wp_delete_user( $this->user_1->ID );
 
+        // user should be deleted
+        $this->check_user_deleted( $this->user_1->ID );
+
         // get updated post object
         $post = get_post( $this->post_1->ID );
 
@@ -328,6 +376,110 @@ class CoauthorsTest extends WP_UnitTestCase {
 
         // check term is also deleted
         $this->assertFalse( get_term_by( 'name', $this->user_1->user_login, 'ssl_alp_coauthor' ) );
+    }
+
+    /**
+     * Check that deleting a user that is a primary author of a post with multiple authors
+     * doesn't also delete that post, when the user's posts are reassigned.
+     * 
+     * In this case, the reassigned user is not a coauthor of the post so they should just
+     * replace the deleted user's place in the coauthor list.
+     */
+    function test_coauthor_delete_user_that_is_primary_author_of_multi_author_post_with_reassign() {
+        global $ssl_alp;
+
+        $new_user = $this->factory->user->create_and_get();
+        $reassign_user = $this->factory->user->create_and_get();
+
+        // set coauthors
+        $ssl_alp->coauthors->set_coauthors(
+            $this->post_3,
+            array(
+                $new_user,
+                $this->user_1,
+                $this->user_2
+            )
+        );
+
+        // delete user, reassigning their posts to other user
+        wp_delete_user( $new_user->ID, $reassign_user->ID );
+
+        // user should be deleted
+        $this->check_user_deleted( $new_user->ID );
+
+        // refresh post object
+        $post = get_post( $this->post_3->ID );
+
+        // check the primary author was changed
+        $this->assertEquals( $post->post_author, $reassign_user->ID );
+
+        // check user is deleted from coauthors
+        $this->assertEquals(
+            $ssl_alp->coauthors->get_coauthors( $post ),
+            array(
+                $reassign_user,
+                $this->user_1,
+                $this->user_2
+            )
+        );
+
+        // check post wasn't trashed
+        $this->assertEquals( $post->post_status, 'publish' );
+
+        // check term is also deleted
+        $this->assertFalse( get_term_by( 'name', $new_user->user_login, 'ssl_alp_coauthor' ) );
+    }
+
+    /**
+     * Check that deleting a user that is a primary author of a post with multiple authors
+     * doesn't also delete that post, when the user's posts are reassigned.
+     * 
+     * In this case, the reassigned user is a coauthor of the post, but with lower position
+     * than the deleted user, so they should replace the deleted user's place in the coauthor
+     * list.
+     */
+    function test_coauthor_delete_user_that_is_primary_author_of_multi_author_post_with_reassign_existing_user() {
+        global $ssl_alp;
+
+        $new_user = $this->factory->user->create_and_get();
+        $reassign_user = $this->factory->user->create_and_get();
+
+        // set coauthors
+        $ssl_alp->coauthors->set_coauthors(
+            $this->post_3,
+            array(
+                $new_user,
+                $this->user_1,
+                $reassign_user
+            )
+        );
+
+        // delete user, reassigning their posts to other user
+        wp_delete_user( $new_user->ID, $reassign_user->ID );
+
+        // user should be deleted
+        $this->check_user_deleted( $new_user->ID );
+
+        // refresh post object
+        $post = get_post( $this->post_3->ID );
+
+        // check the primary author was changed
+        $this->assertEquals( $post->post_author, $reassign_user->ID );
+
+        // check user is deleted from coauthors
+        $this->assertEquals(
+            $ssl_alp->coauthors->get_coauthors( $post ),
+            array(
+                $reassign_user,
+                $this->user_1
+            )
+        );
+
+        // check post wasn't trashed
+        $this->assertEquals( $post->post_status, 'publish' );
+
+        // check term is also deleted
+        $this->assertFalse( get_term_by( 'name', $new_user->user_login, 'ssl_alp_coauthor' ) );
     }
 
     /**
@@ -353,6 +505,9 @@ class CoauthorsTest extends WP_UnitTestCase {
         // delete user
         wp_delete_user( $new_user->ID );
 
+        // user should be deleted
+        $this->check_user_deleted( $new_user->ID );
+
         // refresh post object
         $post = get_post( $this->post_1->ID );
 
@@ -377,9 +532,10 @@ class CoauthorsTest extends WP_UnitTestCase {
 
     /**
      * Check that deleting a user that is a secondary author of a post with multiple authors
-     * doesn't also delete that post, when the user's posts are reassigned. It should just
-     * change the post to remove the author and add the reassigned author, and leave the
-     * primary author untouched.
+     * doesn't also delete that post, when the user's posts are reassigned.
+     * 
+     * In this case, the reassigned user is not a coauthor of the post so they should just
+     * replace the deleted user's place in the coauthor list.
      */
     function test_coauthor_delete_user_that_is_secondary_author_of_multi_author_post_with_reassign() {
         global $ssl_alp;
@@ -400,15 +556,126 @@ class CoauthorsTest extends WP_UnitTestCase {
         // delete user, reassigning their posts to other user
         wp_delete_user( $new_user->ID, $reassign_user->ID );
 
+        // user should be deleted
+        $this->check_user_deleted( $new_user->ID );
+
         // refresh post object
-        $post = get_post( $this->post_1->ID );
+        $post = get_post( $this->post_3->ID );
 
         // check the primary author wasn't changed
         $this->assertEquals( $post->post_author, $this->user_1->ID );
 
         // check user is deleted from coauthors
         $this->assertEquals(
-            $ssl_alp->coauthors->get_coauthors( $this->post_3 ),
+            $ssl_alp->coauthors->get_coauthors( $post ),
+            array(
+                $this->user_1,
+                $reassign_user,
+                $this->user_2
+            )
+        );
+
+        // check post wasn't trashed
+        $this->assertEquals( $post->post_status, 'publish' );
+
+        // check term is also deleted
+        $this->assertFalse( get_term_by( 'name', $new_user->user_login, 'ssl_alp_coauthor' ) );
+    }
+
+    /**
+     * Check that deleting a user that is a secondary author of a post with multiple authors
+     * doesn't also delete that post, when the user's posts are reassigned.
+     * 
+     * In this case, the reassigned user is a coauthor of the post, but with lower position
+     * than the deleted user, so they should replace the deleted user's place in the coauthor
+     * list.
+     */
+    function test_coauthor_delete_user_that_is_secondary_author_of_multi_author_post_with_reassign_lower() {
+        global $ssl_alp;
+
+        $new_user = $this->factory->user->create_and_get();
+        $reassign_user = $this->factory->user->create_and_get();
+
+        // set coauthors
+        $ssl_alp->coauthors->set_coauthors(
+            $this->post_3,
+            array(
+                $this->user_1,
+                $new_user,
+                $this->user_2,
+                $reassign_user
+            )
+        );
+
+        // delete user, reassigning their posts to other user
+        wp_delete_user( $new_user->ID, $reassign_user->ID );
+
+        // user should be deleted
+        $this->check_user_deleted( $new_user->ID );
+
+        // refresh post object
+        $post = get_post( $this->post_3->ID );
+
+        // check the primary author wasn't changed
+        $this->assertEquals( $post->post_author, $this->user_1->ID );
+
+        // check user is deleted from coauthors
+        $this->assertEquals(
+            $ssl_alp->coauthors->get_coauthors( $post ),
+            array(
+                $this->user_1,
+                $reassign_user,
+                $this->user_2
+            )
+        );
+
+        // check post wasn't trashed
+        $this->assertEquals( $post->post_status, 'publish' );
+
+        // check term is also deleted
+        $this->assertFalse( get_term_by( 'name', $new_user->user_login, 'ssl_alp_coauthor' ) );
+    }
+
+    /**
+     * Check that deleting a user that is a secondary author of a post with multiple authors
+     * doesn't also delete that post, when the user's posts are reassigned.
+     * 
+     * In this case, the reassigned user is a coauthor of the post, but with higher position
+     * than the deleted user, so they should stay in their current position and the deleted
+     * user should just be removed from the coauthors list.
+     */
+    function test_coauthor_delete_user_that_is_secondary_author_of_multi_author_post_with_reassign_higher() {
+        global $ssl_alp;
+
+        $new_user = $this->factory->user->create_and_get();
+        $reassign_user = $this->factory->user->create_and_get();
+
+        // set coauthors
+        $ssl_alp->coauthors->set_coauthors(
+            $this->post_3,
+            array(
+                $this->user_1,
+                $reassign_user,
+                $this->user_2,
+                $new_user
+            )
+        );
+
+        // delete user, reassigning their posts to other user
+        wp_delete_user( $new_user->ID, $reassign_user->ID );
+
+        // user should be deleted
+        $this->check_user_deleted( $new_user->ID );
+
+        // refresh post object
+        $post = get_post( $this->post_3->ID );
+
+        // check the primary author wasn't changed
+        $this->assertEquals( $post->post_author, $this->user_1->ID );
+
+        // check user is deleted from coauthors
+        $this->assertEquals(
+            $ssl_alp->coauthors->get_coauthors( $post ),
             array(
                 $this->user_1,
                 $reassign_user,

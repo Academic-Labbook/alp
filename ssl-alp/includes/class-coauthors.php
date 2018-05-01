@@ -743,6 +743,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * posts instead of `wp_delete_user`. Since this plugin disables (single) author
 	 * support for posts, it must delete posts here instead of leaving it to
 	 * `wp_delete_user`.
+	 * 
+	 * When reassigning a user, the deleted user is replaced with the reassign user in the
+	 * deleted user's posts if they are either not already a coauthor of each post, or are
+	 * a coauthor with lower position than the deleted user. If the reassigned user has a
+	 * higher position, they are left in that position.
 	 */
 	function delete_user_action( $delete_id, $reassign_id ) {
 		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
@@ -795,30 +800,37 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			// get user to reassign posts to
 			$reassign_user = get_user_by( 'id', $reassign_id );
 
-			if ( is_object( $reassign_user ) ) {
-				// WordPress Core handles reassigning primary author posts
-				// we reassign seconary (coauthored) posts here
-				
+			if ( is_object( $reassign_user ) ) {				
 				// get all posts user is author of
 				$coauthored_posts = $this->get_coauthor_posts( $delete_user );
 
-				// get primary posts
-				$primary_post_ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_author = %d AND post_type IN ('$post_type_sql')", $delete_user->ID ) );
-				$primary_posts = array_filter( $primary_post_ids, 'get_post' );
-
-				// remove primary authored posts from list
-				$secondary_posts = array_diff( $coauthored_posts, $primary_posts );
-
-				if ( count( $secondary_posts ) ) {
-					foreach ( $secondary_posts as $secondary_post ) {
+				if ( count( $coauthored_posts ) ) {
+					foreach ( $coauthored_posts as $coauthored_post ) {						
 						// get existing coauthors of this post
-						$coauthors = $this->get_coauthors( $secondary_post );
+						$coauthors = $this->get_coauthors( $coauthored_post );
 
-						// reassign coauthor, preserving order
-						$coauthors[ array_search( $delete_user, $coauthors ) ] = $reassign_user;
+						// get indices of users in coauthor list
+						$delete_user_key = array_search( $delete_user, $coauthors );
+						$reassign_user_key = array_search( $reassign_user, $coauthors );
+
+						if ( $reassign_user_key ) {
+							// reassign user is already a coauthor
+							if ( $reassign_user_key < $delete_user_key ) {
+								// reassign user is higher placed than delete user,
+								// so leave them where they are and delete the deleted user
+								unset( $coauthors[ $delete_user_key ] );
+							} else {
+								// bump reassign user up to higher position
+								unset( $coauthors[ $reassign_user_key] );
+								$coauthors[ $delete_user_key ] = $reassign_user;
+							}
+						} else {
+							// change coauthor to reassigned user in place
+							$coauthors[ $delete_user_key ] = $reassign_user;
+						}
 
 						// update
-						$this->set_coauthors( $secondary_post, $coauthors );
+						$this->set_coauthors( $coauthored_post, $coauthors );
 					}
 				}
 			}
