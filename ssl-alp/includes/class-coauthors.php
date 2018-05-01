@@ -739,7 +739,10 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Action taken when user is deleted.
+	 * Action taken when user is deleted. This function does the deleting/reassigning of
+	 * posts instead of `wp_delete_user`. Since this plugin disables (single) author
+	 * support for posts, it must delete posts here instead of leaving it to
+	 * `wp_delete_user`.
 	 */
 	function delete_user_action( $delete_id, $reassign_id ) {
 		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
@@ -760,7 +763,33 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// supported post type as SQL list
 		$post_type_sql = implode( "', '", $this->supported_post_types );
 
-		if ( ! is_null( $reassign_id ) ) {
+		if ( is_null( $reassign_id ) ) {
+			// users posts will not be reassigned, but we must make sure that their posts
+			// are not deleted where there are other authors
+
+			// get user's primary posts (bypass coauthor filtering)
+			$post_ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_author = %d AND post_type IN ('$post_type_sql')", $delete_user->ID ) );
+
+			if ( $post_ids ) {
+				foreach ( $post_ids as $post_id ) {
+					$post = get_post( $post_id );
+
+					// check if post has multiple coauthors
+					$coauthors = $this->get_coauthors( $post );
+
+					if ( count( $coauthors ) > 1 ) {
+						// this post has multiple authors; remove the deleted user
+						unset( $coauthors[ array_search( $delete_user, $coauthors ) ] );
+
+						// set coauthors (this changes the primary author)
+						$this->set_coauthors( $post, $coauthors );
+					} else {
+						// this post only has the author being deleted
+						wp_delete_post( $post_id );
+					}
+				}
+			}
+		} else {
 			// user's posts are to be reassigned
 
 			// get user to reassign posts to
@@ -791,27 +820,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 						// update
 						$this->set_coauthors( $secondary_post, $coauthors );
 					}
-				}
-			}
-		} else {
-			// users posts will not be reassigned, but we must make sure that their posts
-			// are not deleted where there are other authors
-
-			// get user's primary posts
-			$post_ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_author = %d AND post_type IN ('$post_type_sql')", $delete_user->ID ) );
-
-			foreach ( $post_ids as $post_id ) {
-				$post = get_post( $post_id );
-
-				// check if post has multiple coauthors
-				$coauthors = $this->get_coauthors( $post );
-
-				if ( count( $coauthors ) > 1 ) {
-					// remove the deleted user
-					unset( $coauthors[ array_search( $delete_user, $coauthors ) ] );
-
-					// set coauthors (this changes the primary author)
-					$this->set_coauthors( $post, $coauthors );
 				}
 			}
 		}

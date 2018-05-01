@@ -14,4 +14,9 @@
 			<directory prefix="test-" suffix=".php">./tests/</directory>
 		</testsuite>
 	</testsuites>
+    <groups>
+		<exclude>
+			<group>ms-excluded</group>
+		</exclude>
+	</groups>
 </phpunit>

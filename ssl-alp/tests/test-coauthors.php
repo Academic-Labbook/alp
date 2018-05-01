@@ -285,14 +285,8 @@ class CoauthorsTest extends WP_UnitTestCase {
         // delete user
         wp_delete_user( $this->user_1->ID );
 
-        // get updated post object
-        $post = get_post( $this->post_1->ID );
-
-        // post should have no coauthors
-        $this->assertEquals( $ssl_alp->coauthors->get_coauthors( $post ), array() );
-
-        // user's post should be trashed
-        $this->assertEquals( $post->post_status, 'trash' );
+        // updated post should be null
+        $this->assertNull( get_post( $this->post_1->ID ) );
     }
 
     /**
