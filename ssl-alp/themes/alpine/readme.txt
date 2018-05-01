@@ -37,6 +37,9 @@ No theme changes.
  - Fix bug with post display icon on entry title
  - Add setting to control whether to show different sidebar on pages
 
+= 0.7.5 - 2018-05-01 =
+ - CSS and JavaScript tweaks
+
 == Credits ==
 * Theme based on Simple Life https://wordpress.org/themes/simple-life/, by Nilambar
   Sharma, [GPLv3 or later](http://www.gnu.org/licenses/gpl-3.0.html); Simple
