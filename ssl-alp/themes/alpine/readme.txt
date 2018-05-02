@@ -2,7 +2,7 @@
 Contributors: Sean Leavey
 Requires at least: 4.9
 Tested up to: 4.9.4
-Stable tag: 0.7.6
+Stable tag: 0.7.7
 License: GNU General Public License v3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -41,6 +41,9 @@ No theme changes.
  - CSS and JavaScript tweaks
 
 = 0.7.6 - 2018-05-02 =
+No theme changes.
+
+= 0.7.7 - 2018-05-03 =
 No theme changes.
 
 == Credits ==

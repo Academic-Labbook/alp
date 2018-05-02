@@ -47,3 +47,6 @@ features may be removed or broken between updates.
 = 0.7.6 =
  - Fix bug with coauthor delete on multisite
  - New automated tests
+= 0.7.7 =
+ - Fix bug with coauthor JavaScript on Safari
+ - New automated tests
