@@ -4,6 +4,13 @@
  * Cross-references tests
  */
 class CrossReferencesTest extends WP_UnitTestCase {
+	protected static $editor_id;
+
+	public static function wpSetUpBeforeClass( $factory ) {
+		// create editor
+		self::$editor_id = $factory->user->create( array( 'role' => 'editor' ) );
+	}
+
 	public function setUp() {		
 		parent::setUp();
 		
@@ -50,7 +57,7 @@ class CrossReferencesTest extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_get_references() {
+	public function test_references() {
 		global $ssl_alp;
 
 		// rebuild references
@@ -178,6 +185,96 @@ class CrossReferencesTest extends WP_UnitTestCase {
 		$this->assertEquals(
 			$ssl_alp->references->get_reference_from_posts( $post ),
 			array()
+		);
+	}
+
+	function test_multi_reference() {
+		global $ssl_alp;
+
+		$post = $this->factory->post->create_and_get(
+			array(
+				'post_content'	=>	sprintf(
+					'Reference to <a href="%1$s">post 1</a>, and <a href="%1$s">again</a>; reference to <a href="%2$s">post 2</a>, and <a href="%2$s">again</a>',
+					get_permalink( $this->post_1 ),
+					get_permalink( $this->post_2 )
+				)
+			)
+		);
+
+		// reference should only show up once for each post
+		$this->assertEquals(
+			$ssl_alp->references->get_reference_to_posts( $post ),
+			array( $this->post_1, $this->post_2 )
+		);
+	}
+
+	function test_references_after_edit() {
+		global $ssl_alp;
+
+		// needed to allow editing
+		wp_set_current_user( self::$editor_id );
+
+		// create post
+		$post = $this->factory->post->create_and_get(
+			array(
+				'post_content'	=>	'Empty.'
+			)
+		);
+
+		// no references
+		$this->assertEquals(
+			$ssl_alp->references->get_reference_from_posts( $post ),
+			array()
+		);
+
+		// edit post to add reference
+		edit_post(
+			array(
+				'post_ID'		=>	$post->ID,
+				'content'		=>	sprintf(
+					'This is a <a href="%1$s">link</a>, and <a href="%2$s">another</a>.',
+					get_permalink( $this->post_1 ),
+					get_permalink( $this->post_2 )
+				)
+			)
+		);
+
+		// reference should show up
+		$this->assertEquals(
+			$ssl_alp->references->get_reference_to_posts( $post ),
+			array( $this->post_1, $this->post_2 )
+		);
+	}
+
+	function test_self_reference() {
+		global $ssl_alp;
+
+		// needed to allow editing
+		wp_set_current_user( self::$editor_id );
+
+		// create post
+		$post = $this->factory->post->create_and_get(
+			array(
+				'post_content'	=>	'Empty.'
+			)
+		);
+
+		// edit post to add self-reference
+		edit_post(
+			array(
+				'post_ID'		=>	$post->ID,
+				'content'		=>	sprintf(
+					'This is a <a href="%1$s">link</a> to myself. This is a <a href="%2$s">link</a> to another.',
+					get_permalink( $post ),
+					get_permalink( $this->post_1 )
+				)
+			)
+		);
+
+		// self reference shouldn't show up, but other reference should
+		$this->assertEquals(
+			$ssl_alp->references->get_reference_to_posts( $post ),
+			array( $this->post_1 )
 		);
 	}
 }
