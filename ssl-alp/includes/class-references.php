@@ -124,12 +124,8 @@ class SSL_ALP_References extends SSL_ALP_Module {
 			return;
 		}
 
-		// parse post content
-		// this is required in order for shortcodes to be processed into URLs
-		$content = do_shortcode( $post->post_content );
-
 		// find URLs in post content
-		$urls = wp_extract_urls( $content );
+		$urls = wp_extract_urls( $post->post_content );
 
 		// terms to set
 		$terms = array();
@@ -146,6 +142,9 @@ class SSL_ALP_References extends SSL_ALP_Module {
 			} elseif ( ! $this->is_supported( $referenced_post ) ) {
 				// target not supported for referencing
 				continue;
+			} elseif ( $referenced_post->ID == $post_id ) {
+				// self-reference
+				continue;
 			}
 
 			/*
@@ -156,7 +155,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 			$ref_to_post_term_name = sprintf( 'reference-to-post-id-%d', $referenced_post->ID );
 
 			// add term name to list that will be associated with the post
-			$terms[$ref_to_post_term_name] = $referenced_post->ID;
+			$terms[ $ref_to_post_term_name ] = $referenced_post->ID;
 		}
 
 		// update post's reference taxonomy terms (replaces any existing terms)
