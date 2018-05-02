@@ -206,7 +206,7 @@ jQuery( document ).ready(function () {
 										.html( content )
 										.addClass( 'coauthor-suggest-item' );
 
-					var $list_item = $( "<li>" )
+					var $list_item = jQuery( "<li>" )
 										.append( $author_span )
 										.appendTo( ul );
 
@@ -346,8 +346,8 @@ jQuery( document ).ready(function () {
 		move_loading( new_co );
 
 		// make co-authors sortable so an editor can control the order of the authors
-		jQuery( '#coauthors-edit' ).ready(function( $ ) {
-			$( '#coauthors-list' ).sortable({
+		jQuery( '#coauthors-edit' ).ready(function() {
+			jQuery( '#coauthors-list' ).sortable({
 				axis: 'y',
 				handle: '.coauthor-tag',
 				placeholder: 'ui-state-highlight',
