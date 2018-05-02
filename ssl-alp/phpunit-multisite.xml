@@ -17,6 +17,8 @@
     <groups>
 		<exclude>
 			<group>ms-excluded</group>
+			<group>alp-role-permissions</group>
+			<group>alp-role-convert</group>
 		</exclude>
 	</groups>
 </phpunit>

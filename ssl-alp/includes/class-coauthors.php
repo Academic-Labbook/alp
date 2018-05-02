@@ -550,8 +550,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			$terms[] = $author_term;
 		}
 
-		$maybe_both_query = '$1 OR';
-
 		if ( ! empty( $terms ) ) {
 			$terms_implode = '';
 			$this->having_terms = '';
@@ -693,6 +691,9 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			// invalid input
 			return;
 		}
+
+		// deduplicate
+		$coauthors = array_unique( $coauthors, SORT_REGULAR );
 
 		if ( empty( $coauthors ) ) {
 			// no coauthors specified; this might be because the post has been created
@@ -1098,50 +1099,55 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	/**
 	 * Allows coauthors to edit the post they're coauthors of
 	 */
-	function filter_user_has_cap( $allcaps, $caps, $args ) {
+	function filter_user_has_cap( $all_capabilities, $unused, $args ) {
 		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
 			// coauthors disabled
-			return $allcaps;
+			return $all_capabilities;
 		}
 
-		$cap = $args[0];
+		$requested_capability = $args[0];
 		$user_id = isset( $args[1] ) ? $args[1] : 0;
 		$post_id = isset( $args[2] ) ? $args[2] : 0;
 
-		$obj = get_post_type_object( get_post_type( $post_id ) );
+		$post_type = get_post_type_object( get_post_type( $post_id ) );
 
-		if ( ! $obj || 'revision' == $obj->name ) {
-			return $allcaps;
+		if ( ! $post_type || 'revision' == $post_type->name ) {
+			return $all_capabilities;
 		}
 
-		$caps_to_modify = array(
-			$obj->cap->edit_post,
+		$unfiltered_capabilities = array(
+			$post_type->cap->edit_post,
 			'edit_post', // Need to filter this too, unfortunately: http://core.trac.wordpress.org/ticket/22415
-			$obj->cap->edit_others_posts, // This as well: http://core.trac.wordpress.org/ticket/22417
+			$post_type->cap->edit_others_posts, // This as well: http://core.trac.wordpress.org/ticket/22417
 		);
 
-		if ( ! in_array( $cap, $caps_to_modify ) ) {
-			return $allcaps;
-		}
-
-		// We won't be doing any modification if they aren't already a co-author on the post
-		if ( ! is_user_logged_in() || ! $this->is_coauthor_for_post( $user_id, $post_id ) ) {
-			return $allcaps;
+		if ( ! in_array( $requested_capability, $unfiltered_capabilities ) ) {
+			// capability is not one we want to change
+			// this is the case if the user is a researcher or admin, for example
+			// (they can already edit other posts)
+			return $all_capabilities;
+		} elseif ( ! is_user_logged_in() || ! $this->is_coauthor_for_post( $user_id, $post_id ) ) {
+			// user isn't coauthor of the specified post
+			return $all_capabilities;
 		}
 
 		$current_user = wp_get_current_user();
+		$post_status = get_post_status( $post_id );
 
-		if ( 'publish' == get_post_status( $post_id ) &&
-			( isset( $obj->cap->edit_published_posts ) && ! empty( $current_user->allcaps[ $obj->cap->edit_published_posts ] ) ) ) {
-			$allcaps[ $obj->cap->edit_published_posts ] = true;
-		} elseif ( 'private' == get_post_status( $post_id ) &&
-			( isset( $obj->cap->edit_private_posts ) && ! empty( $current_user->allcaps[ $obj->cap->edit_private_posts ] ) ) ) {
-			$allcaps[ $obj->cap->edit_private_posts ] = true;
+		if ( 'publish' == $post_status &&
+			( isset( $post_type->cap->edit_published_posts ) && ! empty( $current_user->all_capabilities[ $post_type->cap->edit_published_posts ] ) ) ) {
+			// allow edit of published posts for this call
+			$all_capabilities[ $post_type->cap->edit_published_posts ] = true;
+		} elseif ( 'private' == $post_status &&
+			( isset( $post_type->cap->edit_private_posts ) && ! empty( $current_user->all_capabilities[ $post_type->cap->edit_private_posts ] ) ) ) {
+			// allow edit of private posts for this call
+			$all_capabilities[ $post_type->cap->edit_private_posts ] = true;
 		}
 
-		$allcaps[ $obj->cap->edit_others_posts ] = true;
+		// allow edit of others posts for this call
+		$all_capabilities[ $post_type->cap->edit_others_posts ] = true;
 
-		return $allcaps;
+		return $all_capabilities;
 	}
 
 	/**

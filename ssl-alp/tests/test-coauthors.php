@@ -4,6 +4,18 @@
  * Coauthors tests
  */
 class CoauthorsTest extends WP_UnitTestCase {
+	protected static $contributor_ids;
+	protected static $author_ids;
+	protected static $editor_ids;
+    protected static $admin_ids;
+    
+	public static function wpSetUpBeforeClass( $factory ) {
+        self::$contributor_ids = $factory->user->create_many( 2, array( 'role' => 'contributor' ) );
+		self::$author_ids = $factory->user->create_many( 2, array( 'role' => 'author' ) );
+		self::$editor_ids = $factory->user->create_many( 2, array( 'role' => 'editor' ) );
+		self::$admin_ids = $factory->user->create_many( 2, array( 'role' => 'administrator' ) );
+	}
+
     function setUp() {
         parent::setUp();
 
@@ -738,5 +750,123 @@ class CoauthorsTest extends WP_UnitTestCase {
                 1
             )
         );
+    }
+
+    /**
+     * Test $user_id_editor editing a post created by $user_id_author
+     * 
+     * `edit_post` raises a WPDieException if the user can't edit the post,
+     * otherwise this function returns true.
+     */
+    private function _do_test_edit_post( $user_id_author, $user_id_editor ) {        
+        // create post as author user
+        wp_set_current_user( $user_id_author );
+        $post = $this->factory->post->create_and_get();
+
+        // edit post as editor user
+        wp_set_current_user( $user_id_editor );
+		edit_post(
+			array(
+				'post_ID'		=>	$post->ID,
+				'content'		=>	'New content.'
+			)
+        );
+        
+        return true;
+    }
+
+    /**
+     * @expectedException WPDieException
+     */
+    function test_contributor_edit_own_post() {
+        // contributors can't edit their own posts
+        $this->_do_test_edit_post( self::$contributor_ids[0], self::$contributor_ids[0] );
+    }
+
+    function test_edit_own_post() {
+        // authors, editors and admins can edit their own posts
+        $this->assertTrue( $this->_do_test_edit_post( self::$author_ids[0], self::$author_ids[0] ) );
+        $this->assertTrue( $this->_do_test_edit_post( self::$editor_ids[0], self::$editor_ids[0] ) );
+        $this->assertTrue( $this->_do_test_edit_post( self::$admin_ids[0], self::$admin_ids[0] ) );
+    }
+
+    /**
+     * @expectedException WPDieException
+     */
+    function test_contributor_edit_other_post_1() {
+        // contributors can't edit other contributors' posts
+        $this->_do_test_edit_post( self::$contributor_ids[0], self::$contributor_ids[1] );
+    }
+
+    /**
+     * @expectedException WPDieException
+     */
+    function test_contributor_edit_other_post_2() {
+        // contributors can't edit authors' posts
+        $this->_do_test_edit_post( self::$author_ids[0], self::$contributor_ids[1] );
+    }
+
+    /**
+     * @expectedException WPDieException
+     */
+    function test_contributor_edit_other_post_3() {
+        // contributors can't edit editors' posts
+        $this->_do_test_edit_post( self::$editor_ids[0], self::$contributor_ids[1] );
+    }
+
+    /**
+     * @expectedException WPDieException
+     */
+    function test_contributor_edit_other_post_4() {
+        // contributors can't edit admins' posts
+        $this->_do_test_edit_post( self::$admin_ids[0], self::$contributor_ids[1] );
+    }
+
+    /**
+     * @expectedException WPDieException
+     */
+    function test_author_edit_other_post_1() {
+        // authors can't edit contributors' posts
+        $this->_do_test_edit_post( self::$contributor_ids[0], self::$author_ids[1] );
+    }
+
+    /**
+     * @expectedException WPDieException
+     */
+    function test_author_edit_other_post_2() {
+        // authors can't edit other authors' posts
+        $this->_do_test_edit_post( self::$author_ids[0], self::$author_ids[1] );
+    }
+
+    /**
+     * @expectedException WPDieException
+     */
+    function test_author_edit_other_post_3() {
+        // authors can't edit editors' posts
+        $this->_do_test_edit_post( self::$editor_ids[0], self::$author_ids[1] );
+    }
+
+    /**
+     * @expectedException WPDieException
+     */
+    function test_author_edit_other_post_4() {
+        // authors can't edit admins' posts
+        $this->_do_test_edit_post( self::$admin_ids[0], self::$author_ids[1] );
+    }
+
+    function test_editor_edit_other_post() {
+        // editors can edit others' posts
+        $this->assertTrue( $this->_do_test_edit_post( self::$contributor_ids[0], self::$editor_ids[1] ) );
+        $this->assertTrue( $this->_do_test_edit_post( self::$author_ids[0], self::$editor_ids[1] ) );
+        $this->assertTrue( $this->_do_test_edit_post( self::$editor_ids[0], self::$editor_ids[1] ) );
+        $this->assertTrue( $this->_do_test_edit_post( self::$admin_ids[0], self::$editor_ids[1] ) );
+    }
+
+    function test_admin_edit_other_post() {
+        // admins can edit others' posts
+        $this->assertTrue( $this->_do_test_edit_post( self::$contributor_ids[0], self::$admin_ids[1] ) );
+        $this->assertTrue( $this->_do_test_edit_post( self::$author_ids[0], self::$admin_ids[1] ) );
+        $this->assertTrue( $this->_do_test_edit_post( self::$editor_ids[0], self::$admin_ids[1] ) );
+        $this->assertTrue( $this->_do_test_edit_post( self::$admin_ids[0], self::$admin_ids[1] ) );
     }
 }

@@ -196,7 +196,7 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 	 * defaults, and therefore changeable by the convert_user_roles() function.
 	 */
 	public function roles_are_default() {
-		global $wp_roles;
+		$roles = wp_roles();
 
 		// default role names
 		// see populate_roles() in wp-admin/includes/schema.php
@@ -209,18 +209,18 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 		);
 
 		// if the WP_Roles settings are the same as above, the default roles are present
-		return array_keys( $wp_roles->role_names ) == $default_role_names;
+		return array_keys( $roles->role_names ) == $default_role_names;
 	}
 
 	/**
 	 * Checks if the user roles have been converted already to the ALP varieties
 	 */
 	public function roles_converted() {
-		global $wp_roles;
+		$roles = wp_roles();
 
 		// if there is no difference between the WP_Roles settings and the custom ALP roles,
 		// they must have been converted already
-		return empty( array_diff( array_keys( $wp_roles->role_names ), array_values( $this->alp_user_roles ) ) );
+		return empty( array_diff( array_keys( $roles->role_names ), array_values( $this->alp_user_roles ) ) );
 	}
 
 	/**
