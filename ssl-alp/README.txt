@@ -44,3 +44,6 @@ features may be removed or broken between updates.
  - Fix JavaScript bug
  - Add uninstaller
  - Add page and tools tests
+= 0.7.6 =
+ - Fix bug with coauthor delete on multisite
+ - New automated tests

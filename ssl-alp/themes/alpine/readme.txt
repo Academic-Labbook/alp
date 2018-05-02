@@ -2,7 +2,7 @@
 Contributors: Sean Leavey
 Requires at least: 4.9
 Tested up to: 4.9.4
-Stable tag: 0.7.4
+Stable tag: 0.7.6
 License: GNU General Public License v3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -39,6 +39,9 @@ No theme changes.
 
 = 0.7.5 - 2018-05-01 =
  - CSS and JavaScript tweaks
+
+= 0.7.6 - 2018-05-02 =
+No theme changes.
 
 == Credits ==
 * Theme based on Simple Life https://wordpress.org/themes/simple-life/, by Nilambar
