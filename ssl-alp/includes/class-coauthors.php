@@ -489,19 +489,12 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return $join;
 		}
 
-		// check to see that JOIN hasn't already been added
-		$term_relationship_join = " LEFT JOIN {$wpdb->term_relationships} ON ({$wpdb->posts}.ID = {$wpdb->term_relationships}.object_id)";
+		$term_relationship_join = " LEFT JOIN {$wpdb->term_relationships} AS tr1 ON ({$wpdb->posts}.ID = tr1.object_id)";
 
-		$term_taxonomy_join  = " INNER JOIN {$wpdb->term_relationships} AS tr1 ON ({$wpdb->posts}.ID = tr1.object_id)";
-		$term_taxonomy_join .= " INNER JOIN {$wpdb->term_taxonomy} ON ( tr1.term_taxonomy_id = {$wpdb->term_taxonomy}.term_taxonomy_id )";
+		$term_taxonomy_join = " LEFT JOIN {$wpdb->term_taxonomy} ON ( tr1.term_taxonomy_id = {$wpdb->term_taxonomy}.term_taxonomy_id )";
 
-		if ( false === strpos( $join, trim( $term_relationship_join ) ) ) {
-			$join .= $term_relationship_join;
-		}
-
-		if ( false === strpos( $join, trim( $term_taxonomy_join ) ) ) {
-			$join .= str_replace( 'INNER JOIN', 'LEFT JOIN', $term_taxonomy_join );
-		}
+		$join .= $term_relationship_join;
+		$join .= $term_taxonomy_join;
 
 		return $join;
 	}
