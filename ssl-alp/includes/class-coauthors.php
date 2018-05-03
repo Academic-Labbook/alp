@@ -952,7 +952,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			$term = $this->get_coauthor_term( $authordata );
 		}
 
-		if ( ( is_object( $authordata ) ) || ( ! empty( $term ) && $term->count ) ) {
+		if ( ( is_object( $authordata ) ) || ( ! empty( $term ) ) ) {
 			// update the query to the requested author
 			$wp_query->queried_object = $authordata;
 			$wp_query->queried_object_id = $authordata->ID;

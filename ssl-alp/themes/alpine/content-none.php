@@ -18,6 +18,8 @@
 		<?php elseif ( is_search() ) : ?>
 		<p><?php esc_html_e( 'Nothing matched your search terms. Please try again with some different keywords.', 'ssl-alp' ); ?></p>
 		<?php get_search_form(); ?>
+		<?php elseif ( is_author() ) : ?>
+		<p><?php esc_html_e( 'This author has no posts.', 'ssl-alp' ); ?></p>
 		<?php else : ?>
 		<p><?php esc_html_e( 'It seems we can&rsquo;t find what you&rsquo;re looking for. Perhaps searching can help.', 'ssl-alp' ); ?></p>
 		<?php get_search_form(); ?>
