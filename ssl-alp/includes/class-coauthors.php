@@ -612,7 +612,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return;
 		}
 
-		if ( defined( 'DOING_AUTOSAVE' ) && ! DOING_AUTOSAVE ) {
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 			return;
 		}
 
