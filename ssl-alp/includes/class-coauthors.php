@@ -490,16 +490,13 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		// check to see that JOIN hasn't already been added
-		$term_relationship_inner_join = " INNER JOIN {$wpdb->term_relationships} ON ({$wpdb->posts}.ID = {$wpdb->term_relationships}.object_id)";
-		$term_relationship_left_join = " LEFT JOIN {$wpdb->term_relationships} ON ({$wpdb->posts}.ID = {$wpdb->term_relationships}.object_id)";
+		$term_relationship_join = " LEFT JOIN {$wpdb->term_relationships} ON ({$wpdb->posts}.ID = {$wpdb->term_relationships}.object_id)";
 
 		$term_taxonomy_join  = " INNER JOIN {$wpdb->term_relationships} AS tr1 ON ({$wpdb->posts}.ID = tr1.object_id)";
 		$term_taxonomy_join .= " INNER JOIN {$wpdb->term_taxonomy} ON ( tr1.term_taxonomy_id = {$wpdb->term_taxonomy}.term_taxonomy_id )";
 
-		// 4.6+ uses a LEFT JOIN for taxonomy queries so we need to check for both
-		if ( false === strpos( $join, trim( $term_relationship_inner_join ) )
-			&& false === strpos( $join, trim( $term_relationship_left_join ) ) ) {
-			$join .= $term_relationship_left_join;
+		if ( false === strpos( $join, trim( $term_relationship_join ) ) ) {
+			$join .= $term_relationship_join;
 		}
 
 		if ( false === strpos( $join, trim( $term_taxonomy_join ) ) ) {
@@ -917,7 +914,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 *
 	 * If the author does have posts, it doesn't matter that they're not an author.
 	 *
-	 * Alternatively, on an author archive, if the first story has coauthors and
+	 * Alternatively, on an author page, if the first story has coauthors and
 	 * the first author is NOT the same as the author for the archive,
 	 * the query_var is changed.
 	 */
