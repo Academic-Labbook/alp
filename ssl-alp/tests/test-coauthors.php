@@ -108,6 +108,25 @@ class CoauthorsTest extends WP_UnitTestCase {
         );
     }
     
+	public function test_add_coauthor_updates_post_author() {
+        global $ssl_alp;
+        
+        // override post 1's author
+		$ssl_alp->coauthors->set_coauthors(
+            $this->post_1,
+            array(
+                $this->user_2,
+                $this->user_3
+            )
+        );
+
+        // refresh post
+        $post = get_post( $this->post_1->ID );
+
+        // WordPress core author should have changed to first in above list
+		$this->assertEquals( $post->post_author, $this->user_2->ID );
+	}
+
     function test_coauthor_order() {
         global $ssl_alp;
 
