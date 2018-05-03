@@ -753,6 +753,58 @@ class CoauthorsTest extends WP_UnitTestCase {
     }
 
     /**
+     * Check the reported number of coauthored posts by an author agrees with the
+     * actual amount
+     */
+    function test_reported_count_vs_actual_count() {
+        global $ssl_alp;
+
+        // create new user
+        $user = $this->factory->user->create_and_get();
+
+        // create posts as $user
+        wp_set_current_user( $user->ID );
+        $this->factory->post->create_many( 5 );
+
+        // create posts as other user
+        wp_set_current_user( $this->user_1->ID );
+        $post_ids = $this->factory->post->create_many( 5 );
+
+        // set $user to be coauthor
+        foreach ( $post_ids as $post_id ) {
+            $ssl_alp->coauthors->set_coauthors(
+                get_post( $post_id ),
+                array(
+                    $this->user_1,
+                    $user
+                )
+            );
+        }
+
+        // create posts as other user
+        wp_set_current_user( $this->user_2->ID );
+        $post_ids = $this->factory->post->create_many( 5 );
+
+        // set $user to be coauthor
+        foreach ( $post_ids as $post_id ) {
+            $ssl_alp->coauthors->set_coauthors(
+                get_post( $post_id ),
+                array(
+                    $this->user_1,
+                    $this->user_2,
+                    $user
+                )
+            );
+        }
+
+        // check filter reports correct count
+        $this->assertEquals( 15, count_user_posts( $user->ID ) );
+
+        // check manually get correct count
+        $this->assertEquals( 15, count( $ssl_alp->coauthors->get_coauthor_posts( $user ) ) );
+    }
+
+    /**
      * Test $user_id_editor editing a post created by $user_id_author
      * 
      * `edit_post` raises a WPDieException if the user can't edit the post,

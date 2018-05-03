@@ -860,7 +860,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Filter the count_users_posts() core function to include our correct count
+	 * Filter the count_user_posts() core function to include our correct count
 	 */
 	function filter_count_user_posts( $count, $user_id ) {
 		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
