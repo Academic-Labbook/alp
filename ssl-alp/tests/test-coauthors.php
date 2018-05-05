@@ -823,6 +823,63 @@ class CoauthorsTest extends WP_UnitTestCase {
         $this->assertEquals( 15, count( $ssl_alp->coauthors->get_coauthor_posts( $user ) ) );
     }
 
+    function test_author_page_posts() {
+        global $ssl_alp;
+
+        $user_1 = $this->factory->user->create_and_get();
+        $user_2 = $this->factory->user->create_and_get();
+        $user_3 = $this->factory->user->create_and_get();
+
+        // create a bunch of posts
+        $post_ids = $this->factory->post->create_many( 5 );
+
+        // set coauthors
+        foreach ( $post_ids as $post_id ) {
+            $ssl_alp->coauthors->set_coauthors(
+                $post_id,
+                array(
+                    $user_1,
+                    $user_2
+                )
+            );
+        }
+
+        // extra post for user 1 with no coauthors
+        $post_1 = $this->factory->post->create_and_get(
+            array(
+                'post_author'   =>  $user_1->ID
+            )
+        );
+
+        $post_ids[] = $post_1->ID;
+
+        // user 1 should have 6
+        $this->go_to( get_author_posts_url( $user_1->ID ) );
+        $this->assertEquals( $this->count_posts(), 6 );
+
+        // user 2 should have 5
+        $this->go_to( get_author_posts_url( $user_2->ID ) );
+        $this->assertEquals( $this->count_posts(), 5 );
+
+        // user 3 should have 0
+        $this->go_to( get_author_posts_url( $user_3->ID ) );
+        $this->assertEquals( $this->count_posts(), 0 );
+    }
+
+    /**
+     * Counts posts in the loop
+     */
+    private function count_posts() {
+        $count = 0;
+
+        while( have_posts() ) {
+            the_post();
+            $count++;
+        }
+
+        return $count;
+    }
+
     /**
      * Test $user_id_editor editing a post created by $user_id_author
      * 
