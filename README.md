@@ -113,13 +113,15 @@ licenced plugins and themes. The code specific to this plugin was authored by
 
 The following list of plugins have been partialy adapted into ALP. All have been
 modified in some way (e.g. admin settings, class and setting namespaces, features
-added or removed, etc.), some more so than others. Some upstream bug fixes and
-reports have also been pushed back to these plugins and WordPress itself:
- - [1](https://wordpress.org/support/topic/two-bug-fixes-for-author-page/)
- - [2](https://wordpress.org/support/topic/overriding-cookie-expiry-for-directory-authenticated-users/)
- - [3](https://core.trac.wordpress.org/ticket/43613)
- - [4](https://core.trac.wordpress.org/ticket/43629)
- - [5](https://core.trac.wordpress.org/ticket/43705)
+added or removed, etc.), some more so than others. Some upstream bug reports and
+fixes have also been pushed back to these plugins and WordPress itself:
+[1](https://wordpress.org/support/topic/two-bug-fixes-for-author-page/),
+[2](https://wordpress.org/support/topic/overriding-cookie-expiry-for-directory-authenticated-users/),
+[3](https://core.trac.wordpress.org/ticket/43613),
+[4](https://core.trac.wordpress.org/ticket/43629),
+[5](https://core.trac.wordpress.org/ticket/43705),
+[6](https://github.com/Automattic/Co-Authors-Plus/pull/441#issuecomment-386415103)
+[7](https://github.com/Automattic/Co-Authors-Plus/pull/457#issuecomment-386429553)
 
 ### Co-Authors Plus
 Authors: Mohammad Jangda, Daniel Bachhuber, Automattic, Shepherd Interactive, Mark Jaquith  
@@ -136,14 +138,14 @@ These plugins inspired parts of the design of ALP's revisions feature, but the c
 is not particularly based on either one.
 
 ### WP-KaTeX
-Author: Andrew Sun
+Author: Andrew Sun  
 Link: [WP-KaTeX](https://wordpress.org/plugins/wp-katex/)
 
 The JavaScript function used to enable KaTeX rendering for particular elements was adapted
 in ALP.
 
 ### Authenticator
-Authors: Inpsyde GmbH
+Authors: Inpsyde GmbH  
 Link: [Authenticator](https://wordpress.org/plugins/authenticator/)
 
 The core authentication code, and the feed HTTP authenticator, have been adapted. The special
