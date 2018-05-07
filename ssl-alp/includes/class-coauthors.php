@@ -1019,6 +1019,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			array(
 				'methods'   => WP_REST_Server::READABLE,
 				'callback'  => array( $this, 'rest_coauthor_autosuggest' ),
+				'permission_callback' => array( $this, 'rest_coauthor_autosuggest_permission_check' ),
 				'args'      => array(
 					'term'  => array(
 						'required' 			=> true,
@@ -1086,6 +1087,16 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 				'suggestions'	=> $suggestions
 			)
 		 );
+	}
+
+	/**
+	 * Check current user has permission to list coauthors
+	 * 
+	 * Ideally something like `list_users` capability would be used here,
+	 * but that's only available to administrators
+	 */
+	public function rest_coauthor_autosuggest_permission_check() {
+		return current_user_can( 'edit_posts' );
 	}
 
 	/**
