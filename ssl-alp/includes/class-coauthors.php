@@ -63,7 +63,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 				'rest',
 				array(
 					'api_nonce' => wp_create_nonce( 'wp_rest' ),
-					'api_autosuggest_endpoint'   => site_url( '/wp-json/' . SSL_ALP_REST_ROUTE . '/autosuggest' )
+					'api_autosuggest_endpoint'   => get_rest_url( null, SSL_ALP_REST_ROUTE . '/autosuggest' )
 				)
 			);
 		}
