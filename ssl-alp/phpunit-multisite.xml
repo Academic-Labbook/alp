@@ -11,7 +11,7 @@
     </php>
 	<testsuites>
 		<testsuite>
-			<directory prefix="test-" suffix=".php">./tests/</directory>
+			<directory prefix="test-" suffix=".php">tests/unit</directory>
 		</testsuite>
 	</testsuites>
     <groups>
