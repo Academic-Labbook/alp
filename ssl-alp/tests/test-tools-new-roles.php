@@ -2,63 +2,103 @@
 
 /**
  * Tools tests using new roles defined by ALP
- * 
- * Must be run independently, as it changes the roles in the database, which affect
- * other tests.
- * 
- * @group alp-role-convert
  */
 class ToolsTestNewRoles extends WP_UnitTestCase {
-    protected static $admin;
-    protected static $editor;
-    protected static $author;
-    protected static $contributor;
-    protected static $subscriber;
+    protected $admin;
+    protected $editor;
+    protected $author;
+    protected $contributor;
+    protected $subscriber;
 
-	public static function wpSetUpBeforeClass( $factory ) {
+    protected $role_key;
+    protected $default_roles;
+
+    public function setUp() {
         global $ssl_alp;
+
+        parent::setUp();
 
         /**
          * create a user in each default role
          */
 
-        self::$admin = $factory->user->create_and_get(
+        $this->admin = $this->factory->user->create_and_get(
             array(
                 'role'  =>  'administrator'
             )
         );
 
-        self::$editor = $factory->user->create_and_get(
+        $this->editor = $this->factory->user->create_and_get(
             array(
                 'role'  =>  'editor'
             )
         );
 
-        self::$author = $factory->user->create_and_get(
+        $this->author = $this->factory->user->create_and_get(
             array(
                 'role'  =>  'author'
             )
         );
 
-        self::$contributor = $factory->user->create_and_get(
+        $this->contributor = $this->factory->user->create_and_get(
             array(
                 'role'  =>  'contributor'
             )
         );
 
-        self::$subscriber = $factory->user->create_and_get(
+        $this->subscriber = $this->factory->user->create_and_get(
             array(
                 'role'  =>  'subscriber'
             )
         );
 
+        $this->convert_roles();
+    }
+
+    public function tearDown() {
+        $this->reset_roles();
+
+        parent::tearDown();
+    }
+
+    /**
+     * Convert user roles for the tests in this class.
+     * 
+     * This only works when the current blog is the one being tested.
+     */
+    private function convert_roles() {
+        global $wpdb, $ssl_alp;
+
+        // role settings name in options table
+        $this->role_key = $wpdb->get_blog_prefix( get_current_blog_id() ) . 'user_roles';
+
+        // copy current roles
+        $this->default_roles = get_option( $this->role_key );
+
         // convert roles
         $ssl_alp->tools->convert_roles();
-	}
-
-    function setUp() {
-        parent::setUp();
     }
+
+    /**
+     * Reset changes made to roles
+     */
+    private function reset_roles() {
+        update_option( $this->role_key, $this->default_roles );
+
+        // refresh loaded roles
+        self::flush_roles();
+    }
+
+    /**
+     * From WordPress core's user/capabilities.php tests
+     */
+	private static function flush_roles() {
+		// we want to make sure we're testing against the db, not just in-memory data
+		// this will flush everything and reload it from the db
+		unset( $GLOBALS['wp_user_roles'] );
+		global $wp_roles;
+		$wp_roles = new WP_Roles();
+	}
 
 	function test_new_roles() {
         global $ssl_alp;
@@ -68,11 +108,11 @@ class ToolsTestNewRoles extends WP_UnitTestCase {
          */
 
         // refresh users
-        $admin = get_user_by( 'id', self::$admin->ID );
-        $editor = get_user_by( 'id', self::$editor->ID );
-        $author = get_user_by( 'id', self::$author->ID );
-        $contributor = get_user_by( 'id', self::$contributor->ID );
-        $subscriber = get_user_by( 'id', self::$subscriber->ID );
+        $admin = get_user_by( 'id', $this->admin->ID );
+        $editor = get_user_by( 'id', $this->editor->ID );
+        $author = get_user_by( 'id', $this->author->ID );
+        $contributor = get_user_by( 'id', $this->contributor->ID );
+        $subscriber = get_user_by( 'id', $this->subscriber->ID );
 
         // administrator unchanged
         $this->assertEquals( $admin->roles, array( 'administrator' ) );
