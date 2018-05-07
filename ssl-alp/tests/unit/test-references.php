@@ -4,13 +4,6 @@
  * Cross-references tests
  */
 class CrossReferencesTest extends WP_UnitTestCase {
-	protected static $editor_id;
-
-	public static function wpSetUpBeforeClass( $factory ) {
-		// create editor
-		self::$editor_id = $factory->user->create( array( 'role' => 'editor' ) );
-	}
-
 	public function setUp() {		
 		parent::setUp();
 		
@@ -211,8 +204,10 @@ class CrossReferencesTest extends WP_UnitTestCase {
 	function test_references_after_edit() {
 		global $ssl_alp;
 
+		$editor = $this->factory->user->create( array( 'role' => 'editor' ) );
+
 		// needed to allow editing
-		wp_set_current_user( self::$editor_id );
+		wp_set_current_user( $editor );
 
 		// create post
 		$post = $this->factory->post->create_and_get(
@@ -249,8 +244,10 @@ class CrossReferencesTest extends WP_UnitTestCase {
 	function test_self_reference() {
 		global $ssl_alp;
 
+		$editor = $this->factory->user->create( array( 'role' => 'editor' ) );
+
 		// needed to allow editing
-		wp_set_current_user( self::$editor_id );
+		wp_set_current_user( $editor );
 
 		// create post
 		$post = $this->factory->post->create_and_get(
