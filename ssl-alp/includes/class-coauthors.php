@@ -1081,14 +1081,14 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
         // search for author
 		$args = array(
 			'count_total' => false,
-			'search' => sprintf( '*%s*', $search ),
-			'search_fields' => array(
-				'ID',
-				'display_name',
-				'user_email',
+			'search' => sprintf( '*%s*', esc_attr( $search ) ),
+			'search_columns' => array(
 				'user_login',
+				'display_name',
+				'first_name',
+				'last_name'
 			),
-			'fields' => 'all_with_meta',
+			'fields' => 'all_with_meta'
 		);
 
 		// get all authors
