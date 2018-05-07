@@ -14,11 +14,17 @@ class ToolsTest extends WP_UnitTestCase {
         // by default, theme not active
         $this->assertNotEquals( wp_get_theme()->name, 'Alpine' );
 
+        // backup current theme
+        $previous_theme = get_stylesheet();
+
         // change theme
         switch_theme( 'Alpine' );
 
         // check theme now active
         $this->assertEquals( wp_get_theme()->name, 'Alpine' );
+
+        // change back to default theme
+        switch_theme( $previous_theme );
     }
 
     function test_override_core_settings() {
