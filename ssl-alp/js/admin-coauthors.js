@@ -246,12 +246,16 @@ jQuery( document ).ready(function () {
 	// highlight in bold any occurances of `term` in `content`
 	function highlight_search_term( content, term ) {
 		// case insensitive regular expression
-		var expression = new RegExp( "(" + term + ")", 'i' );
+		var expression = new RegExp( "(" + escape_regex( term ) + ")", 'gi' );
 		
 		return content.replace(
 			expression,
-			"<strong>$1</strong>"
+			"<strong>$&</strong>"
 		);
+	}
+
+	function escape_regex( str ) {
+		return str.replace( /([.*+?^=!:${}()|\[\]\/\\])/g , "\\$1" );
 	}
 
 	// callback for when a user selects an author
