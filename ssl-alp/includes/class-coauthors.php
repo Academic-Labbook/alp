@@ -49,26 +49,23 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		wp_enqueue_script( 'ssl-alp-coauthors-js', SSL_ALP_BASE_URL . 'js/admin-coauthors.js', array( 'jquery', 'jquery-ui-sortable', 'jquery-ui-autocomplete' ), $this->get_version(), true );
 
 		$js_strings = array(
-			'edit_label' => __( 'Edit', 'ssl-alp' ),
 			'delete_label' => __( 'Remove', 'ssl-alp' ),
-			'confirm_delete' => __( 'Are you sure you want to remove this author?', 'ssl-alp' ),
 			'input_box_title' => __( 'Click to change this author, or drag to change their position', 'ssl-alp' ),
 			'search_box_text' => __( 'Search for an author', 'ssl-alp' ),
-			'help_text' => __( 'Click on an author to change them. Drag to change their order. Click on <strong>Remove</strong> to remove them.', 'ssl-alp' ),
 		);
 
 		wp_localize_script( 'ssl-alp-coauthors-js', 'ssl_alp_coauthors_strings', $js_strings );
 
 		if ( $this->is_post_type_enabled( get_post_type() ) ) {
-			$data = add_query_arg(
+			// create REST JavaScript variable
+			wp_localize_script(
+				'ssl-alp-coauthors-js',
+				'rest',
 				array(
-					'action' => 'ssl_alp_coauthors_ajax_suggest',
-					'post_type' => rawurlencode( get_post_type() ),
-				),
-				wp_nonce_url( 'admin-ajax.php', 'ssl-alp-coauthors-search' )
+					'api_nonce' => wp_create_nonce( 'wp_rest' ),
+					'api_autosuggest_endpoint'   => site_url( '/wp-json/' . SSL_ALP_REST_ROUTE . '/autosuggest' )
+				)
 			);
-
-			wp_localize_script( 'ssl-alp-coauthors-js', 'ssl_alp_coauthors_ajax_suggest_link', $data );
 		}
 	}
 
@@ -100,8 +97,8 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// Action to set users when a post is saved
 		$loader->add_action( 'save_post', $this, 'coauthors_update_post', 10, 2 );
 
-		// auto-suggest via AJAX
-		$loader->add_action( 'wp_ajax_ssl_alp_coauthors_ajax_suggest', $this, 'ajax_suggest' );
+		// register REST endpoint for AJAX coauthor autosuggest
+		$loader->add_action( 'rest_api_init', $this, 'rest_autosuggest_endpoint' );
 
 		// delete user terms from posts when a user is deleted
 		$loader->add_action( 'delete_user', $this, 'delete_user_action', 10, 2 );
@@ -1014,36 +1011,59 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
     	return $recipients;
 	}
 
+	public function rest_autosuggest_endpoint() {	
+		// register route
+		register_rest_route(
+			SSL_ALP_REST_ROUTE,
+			'/autosuggest',
+			array(
+				'methods'   => 'POST',
+				'callback'  => array( $this, 'rest_coauthor_autosuggest' ),
+				'args'      => array(
+					'term'  => array(
+						'required' 			=> true,
+						//'validate_callback'	=>	'' // function to validate input
+						'sanitize_callback'	=> 'sanitize_text_field'
+					),
+					'existing_coauthors'	=> array(
+						'required'			=> true,
+						'sanitize_callback'	=> 'sanitize_text_field'
+					)
+				)
+			)
+		);
+	}
+
 	/**
 	 * Handles search-as-you-type for adding authors
 	 */
-	public function ajax_suggest() {
+	public function rest_coauthor_autosuggest( WP_REST_Request $request ) {
 		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
 			// coauthors disabled
-			return;
+			return new WP_Error(
+				'ssl_alp_coauthors_disabled',
+				// no translation needed; internal error message
+				'Coauthor feature disabled',
+				array(
+					'status'	=>	501 // HTTO not implemented code
+				)
+			);
 		}
 
-		if ( ! isset( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'ssl-alp-coauthors-search' ) ) {
-			// invalid/no nonce provided
-			exit();
-		}
+		$params = $request->get_params();
 
-		if ( empty( $_REQUEST['term'] ) ) {
-			// no JSON search query made
-			exit();
-		}
+		$search = strtolower( $params['term'] );
+		$ignore = explode( ',', $params['existing_coauthors'] );
 
-		$search = sanitize_text_field( strtolower( $_REQUEST['term'] ) );
-		$ignore = array_map( 'sanitize_text_field', explode( ',', $_REQUEST['existing_authors'] ) );
-
+		// search for authors, ignoring any already present
 		$authors = $this->search_authors( $search, $ignore );
 
-		// JSON response
-		$response = array();
+		// suggested authors
+		$author_suggestions = array();
 
 		foreach ( $authors as $author ) {
-			// add author to JSON response
-			$response[] = array(
+			// add author to response
+			$author_suggestions[] = array(
 				'id'			=>	$author->ID,
 				'login'			=>	$author->user_login,
 				'display_name'	=>	$author->display_name,
@@ -1051,8 +1071,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			);
 		}
 
-		// send client JSON, then exit
-		wp_send_json( $response );
+		return new WP_REST_Response( $author_suggestions );
 	}
 
 	/**

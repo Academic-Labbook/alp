@@ -101,20 +101,14 @@
 
 #coauthors-loading {
 	margin: 10px 0px 5px 10px;
+	float: left;
 }
 
-#coauthors-readonly {
-
-}
-
+/* hidden block containing article coauthors on page load */
 #coauthors-readonly ul {
 	list-style: none;
 	padding: 0;
 	margin: 0;
-}
-
-#coauthors-readonly ul li {
-
 }
 
 #coauthors-readonly ul li .avatar {

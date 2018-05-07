@@ -7,7 +7,8 @@ jQuery( document ).ready(function () {
 		return coauthors_delete( this );
 	};
 
-	var $coauthors_loading;
+	// default hidden loading animation
+	var $coauthors_loading = jQuery( '<span id="ajax-loading"></span>' );
 
 	function coauthors_delete( elem ) {
 		var $coauthor_row = jQuery( elem ).closest( '.coauthor-row' );
@@ -170,19 +171,36 @@ jQuery( document ).ready(function () {
 				minChars: 1,
 				source: function( request, response ) {
 					// add existing authors to request
-					var existing_authors = jQuery( 'input[name="coauthors[]"]' ).map(function(){return jQuery( this ).val();}).get();
+					var existing_coauthors = jQuery( 'input[name="coauthors[]"]' ).map(function(){return jQuery( this ).val();}).get();
+					existing_coauthors = existing_coauthors.join( ',' );
 
-					request.existing_authors = existing_authors.join( ',' );
+					jQuery.ajax({
+						type: 'POST',
+						url: rest.api_autosuggest_endpoint,
+						data: {
+							term: request.term,
+							existing_coauthors: existing_coauthors
+						},
+						beforeSend: function ( xhr ) {
+							// set WordPress nonce header
+							xhr.setRequestHeader( 'X-WP-Nonce', rest.api_nonce );
 
-					jQuery.getJSON(
-						ssl_alp_coauthors_ajax_suggest_link,
-						request,
-						function ( data ) {
+							// show loading animation
+							show_loading();
+						},
+						complete: function () {
+							// hide loading animation
+							hide_loading();
+						},
+						success: function ( data ) {
+							// parse response as JSON
+							var data = jQuery.parseJSON( JSON.stringify( data ) );
+
 							// process JSON data into drop-down list
 							// data includes "label" that is shown in the drop-down list
-							response(data);
+							response( data );
 						}
-					);
+					});
 				},
 				select: function ( event, selection ) {
 					// author is the only item
@@ -342,7 +360,7 @@ jQuery( document ).ready(function () {
 		var new_co = coauthors_create_autosuggest( '', false );
 		coauthors_add_to_table( new_co );
 
-		$coauthors_loading = jQuery( '#ajax-loading' ).clone().attr( 'id', 'coauthors-loading' );
+		$coauthors_loading = jQuery( '#publishing-action .spinner' ).clone().attr( 'id', 'coauthors-loading' );
 		move_loading( new_co );
 
 		// make co-authors sortable so an editor can control the order of the authors
@@ -368,20 +386,6 @@ jQuery( document ).ready(function () {
 	function move_loading( $input ) {
 		$coauthors_loading.insertAfter( $input );
 	}
-
-	// show loading cursor for autocomplete ajax requests
-	jQuery( document ).ajaxSend(function( e, xhr, settings ) {
-		if ( settings.url.indexOf( ssl_alp_coauthors_ajax_suggest_link ) != -1 ) {
-			show_loading();
-		}
-	});
-
-	// hide loading cursor when autocomplete ajax requests are finished
-	jQuery( document ).ajaxComplete(function( e, xhr, settings ) {
-		if ( settings.url.indexOf( ssl_alp_coauthors_ajax_suggest_link ) != -1 ) {
-			hide_loading();
-		}
-	});
 
 	if ( 'post-php' == adminpage || 'post-new-php' == adminpage ) {
 		// this is the full edit page

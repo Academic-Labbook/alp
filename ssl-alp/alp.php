@@ -54,6 +54,12 @@ define( 'SSL_ALP_NETWORK_SETTINGS_MENU_SLUG', 'ssl-alp-network-options' );
 define( 'SSL_ALP_SITE_TOOLS_MENU_SLUG', 'ssl-alp-admin-tools' );
 
 /**
+ * REST namespace
+ */
+
+define( 'SSL_ALP_REST_ROUTE', 'ssl-alp/v1' );
+
+/**
  * Default settings
  */
 
