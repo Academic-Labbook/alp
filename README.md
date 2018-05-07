@@ -120,8 +120,9 @@ fixes have also been pushed back to these plugins and WordPress itself:
 [3](https://core.trac.wordpress.org/ticket/43613),
 [4](https://core.trac.wordpress.org/ticket/43629),
 [5](https://core.trac.wordpress.org/ticket/43705),
-[6](https://github.com/Automattic/Co-Authors-Plus/pull/441#issuecomment-386415103)
-[7](https://github.com/Automattic/Co-Authors-Plus/pull/457#issuecomment-386429553)
+[6](https://github.com/Automattic/Co-Authors-Plus/pull/441#issuecomment-386415103),
+[7](https://github.com/Automattic/Co-Authors-Plus/pull/457#issuecomment-386429553),
+[8](https://github.com/Automattic/Co-Authors-Plus/issues/513)
 
 ### Co-Authors Plus
 Authors: Mohammad Jangda, Daniel Bachhuber, Automattic, Shepherd Interactive, Mark Jaquith  
