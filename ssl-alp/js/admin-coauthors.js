@@ -220,6 +220,9 @@ jQuery( document ).ready(function () {
 					// content to display in list item
 					var content = unescape( author.display_name );
 
+					// highlight search term
+					content = highlight_search_term( content, this.term );
+
 					var $author_span = jQuery( '<span></span>' )
 										.html( content )
 										.addClass( 'coauthor-suggest-item' );
@@ -238,6 +241,17 @@ jQuery( document ).ready(function () {
 		}
 
 		return $input_box;
+	}
+
+	// highlight in bold any occurances of `term` in `content`
+	function highlight_search_term( content, term ) {
+		// case insensitive regular expression
+		var expression = new RegExp( "(" + term + ")", 'i' );
+		
+		return content.replace(
+			expression,
+			"<strong>$1</strong>"
+		);
 	}
 
 	// callback for when a user selects an author
