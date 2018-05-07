@@ -175,7 +175,7 @@ jQuery( document ).ready(function () {
 					existing_coauthors = existing_coauthors.join( ',' );
 
 					jQuery.ajax({
-						type: 'POST',
+						type: 'GET',
 						url: rest.api_autosuggest_endpoint,
 						data: {
 							term: request.term,

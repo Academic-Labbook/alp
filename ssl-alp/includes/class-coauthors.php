@@ -1017,7 +1017,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			SSL_ALP_REST_ROUTE,
 			'/autosuggest',
 			array(
-				'methods'   => 'POST',
+				'methods'   => WP_REST_Server::READABLE,
 				'callback'  => array( $this, 'rest_coauthor_autosuggest' ),
 				'args'      => array(
 					'term'  => array(
