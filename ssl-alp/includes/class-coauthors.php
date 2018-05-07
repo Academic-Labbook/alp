@@ -1026,7 +1026,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 						'sanitize_callback'	=> 'sanitize_text_field'
 					),
 					'existing_coauthors'	=> array(
-						'required'			=> true,
+						'required'			=> false,
 						'sanitize_callback'	=> 'sanitize_text_field'
 					)
 				)
@@ -1053,7 +1053,12 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$params = $request->get_params();
 
 		$search = strtolower( $params['term'] );
-		$ignore = explode( ',', $params['existing_coauthors'] );
+
+		if ( array_key_exists( 'existing_coauthors', $params ) ) {
+			$ignore = explode( ',', $params['existing_coauthors'] );
+		} else {
+			$ignore = array();
+		}
 
 		// search for authors, ignoring any already present
 		$authors = $this->search_authors( $search, $ignore );
