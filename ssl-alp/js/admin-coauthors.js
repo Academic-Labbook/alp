@@ -198,7 +198,7 @@ jQuery( document ).ready(function () {
 
 							// process JSON data into drop-down list
 							// data includes "label" that is shown in the drop-down list
-							response( data );
+							response( data.suggestions );
 						}
 					});
 				},

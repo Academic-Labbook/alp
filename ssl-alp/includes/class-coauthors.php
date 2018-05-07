@@ -1060,15 +1060,20 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			$ignore = array();
 		}
 
-		// search for authors, ignoring any already present
-		$authors = $this->search_authors( $search, $ignore );
+		if ( ! empty( $search ) ) {
+			// search for authors, ignoring any already present
+			$authors = $this->search_authors( $search, $ignore );
+		} else {
+			// no search term specified; prevent returning all authors
+			$authors = array();
+		}
 
 		// suggested authors
-		$author_suggestions = array();
+		$suggestions = array();
 
 		foreach ( $authors as $author ) {
 			// add author to response
-			$author_suggestions[] = array(
+			$suggestions[] = array(
 				'id'			=>	$author->ID,
 				'login'			=>	$author->user_login,
 				'display_name'	=>	$author->display_name,
@@ -1076,7 +1081,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			);
 		}
 
-		return new WP_REST_Response( $author_suggestions );
+		return new WP_REST_Response(
+			array(
+				'suggestions'	=> $suggestions
+			)
+		 );
 	}
 
 	/**
