@@ -1084,9 +1084,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			'search' => sprintf( '*%s*', esc_attr( $search ) ),
 			'search_columns' => array(
 				'user_login',
-				'display_name',
-				'first_name',
-				'last_name'
+				'display_name'
 			),
 			'fields' => 'all_with_meta'
 		);
