@@ -108,7 +108,7 @@ class CoauthorsTest extends WP_UnitTestCase {
         );
     }
 
-    function test_add_same_coauthor_to_post() {
+    function test_add_same_coauthor_to_post__author_id_arg() {
         global $ssl_alp;
 
         // set duplicate users to post
@@ -122,7 +122,38 @@ class CoauthorsTest extends WP_UnitTestCase {
 
         $query = new WP_Query(
             array(
-			    'author' => $this->user_1->ID,
+			    'author' => $this->user_1->ID
+            )
+        );
+        
+        // check user query
+		$this->assertEquals( 1, count( $query->posts ) );
+        $this->assertEquals( $this->post_1->ID, $query->posts[ 0 ]->ID );
+        
+        // check get_coauthors
+        $this->assertEquals(
+            $ssl_alp->coauthors->get_coauthors( $this->post_1 ),
+            array(
+                $this->user_1
+            )
+        );
+    }
+
+    function test_add_same_coauthor_to_post__author_name_arg() {
+        global $ssl_alp;
+
+        // set duplicate users to post
+        $ssl_alp->coauthors->set_coauthors(
+            $this->post_1,
+            array(
+                $this->user_1,
+                $this->user_1
+            )
+        );
+
+        $query = new WP_Query(
+            array(
+			    'author_name' => $this->user_1->user_login
             )
         );
         
@@ -139,6 +170,48 @@ class CoauthorsTest extends WP_UnitTestCase {
         );
     }
     
+	public function test__author_name_arg_plus_tax_query__user_is_post_author() {
+        global $ssl_alp;
+        
+        $ssl_alp->coauthors->set_coauthors( $this->post_1->ID, array( $this->user_1->user_login ) );
+        
+        wp_set_post_terms( $this->post_1->ID, 'test', 'post_tag' );
+        
+		$query = new WP_Query(
+            array(
+			    'author_name' => $this->user_1->user_login,
+			    'tag' => 'test',
+            )
+        );
+
+		$this->assertEquals( 1, count( $query->posts ) );
+		$this->assertEquals( $this->post_1->ID, $query->posts[ 0 ]->ID );
+    }
+    
+	public function tests__author_name_arg_plus_tax_query__is_coauthor() {
+        global $ssl_alp;
+
+		$ssl_alp->coauthors->set_coauthors(
+            $this->post_1->ID,
+            array(
+                $this->user_1,
+                $this->user_2
+            )
+        );
+
+        wp_set_post_terms( $this->post_1->ID, 'test', 'post_tag' );
+        
+		$query = new WP_Query(
+            array(
+			    'author_name' => $this->user_2->user_login,
+			    'tag' => 'test',
+            )
+        );
+
+		$this->assertEquals( 1, count( $query->posts ) );
+		$this->assertEquals( $this->post_1->ID, $query->posts[ 0 ]->ID );
+	}
+
 	function test_add_coauthor_updates_post_author() {
         global $ssl_alp;
         
