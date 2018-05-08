@@ -122,7 +122,8 @@ fixes have also been pushed back to these plugins and WordPress itself:
 [5](https://core.trac.wordpress.org/ticket/43705),
 [6](https://github.com/Automattic/Co-Authors-Plus/pull/441#issuecomment-386415103),
 [7](https://github.com/Automattic/Co-Authors-Plus/pull/457#issuecomment-386429553),
-[8](https://github.com/Automattic/Co-Authors-Plus/issues/513)
+[8](https://github.com/Automattic/Co-Authors-Plus/issues/513),
+[9](https://github.com/Automattic/Co-Authors-Plus/issues/514)
 
 ### Co-Authors Plus
 Authors: Mohammad Jangda, Daniel Bachhuber, Automattic, Shepherd Interactive, Mark Jaquith  
