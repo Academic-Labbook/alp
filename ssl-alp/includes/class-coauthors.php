@@ -518,20 +518,28 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		if ( $query->get( 'author_name' ) ) {
-			$author_name = sanitize_title( $query->get( 'author_name' ) );
-		} else {
-			$author_data = get_userdata( $query->get( 'author' ) );
+			// author_name is actually user_nicename
+			$author_nicename = $query->get( 'author_name' );
 
-			if ( is_object( $author_data ) ) {
-				$author_name = $author_data->user_login;
-			} else {
+			if ( is_null( $author_nicename ) ) {
 				// no author defined
 				return $where;
 			}
+
+			// user_nicename == slug
+			$coauthor = get_user_by( 'slug', $author_nicename );
+		} else {
+			$author_data = get_userdata( $query->get( 'author' ) );
+
+			if ( ! is_object( $author_data ) ) {
+				// no author defined
+				return $where;
+			}
+			
+			$coauthor = get_user_by( 'login', $author_data->user_login );
 		}
 
 		$terms = array();
-		$coauthor = get_user_by( 'login', $author_name );
 
 		if ( $author_term = $this->get_coauthor_term( $coauthor ) ) {
 			$terms[] = $author_term;
