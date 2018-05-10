@@ -24,6 +24,11 @@
 	<p><?php _e( 'References rebuilt.', 'ssl-alp' ); ?></p>
 </div>
 <?php endif; ?>
+<?php if ( $rebuild_coauthors_completed ): ?>
+<div class="notice notice-success is-dismissible">
+	<p><?php _e( 'Coauthor terms rebuilt.', 'ssl-alp' ); ?></p>
+</div>
+<?php endif; ?>
 <div class="wrap">
 	<h2><?php _e('Academic Labbook Tools', 'ssl-alp'); ?></h2>
 	<div class="ssl-alp-tools-cards">
@@ -151,6 +156,20 @@
 			</form>
 			<?php if ( ! $references_enabled ) : ?>
 			<p class="description"><?php _e( 'Cross-references are disabled. To enable them, go to <a href="options-general.php?page=ssl-alp-admin-options">this settings page</a>.', 'ssl-alp' ); ?></p>
+			<?php endif; ?>
+		</div>
+		<div class="ssl-alp-tools-card">
+			<h2 class="title"><?php _e( 'Rebuild coauthor terms', 'ssl-alp' ); ?></h2>
+			<p><?php _e( 'This tool will rebuild the coauthor terms used to allow the setting of multiple authors for posts. This tool is intended to be run on sites which had users before the Academic Labbook Plugin was installed, allowing these users to be chosen as coauthors on posts.', 'ssl-alp' ); ?></p>
+			<form method="post" action="">
+				<input type="hidden" name="ssl_alp_rebuild_coauthors_submitted" value="1"/>
+				<p class="submit">
+					<input name="submit" id="submit" class="button button-primary" value="<?php _e( 'Rebuild Coauthor Terms', 'ssl-alp' ); ?>" type="submit"<?php if ( ! $coauthors_enabled ) : ?> disabled<?php endif; ?>/>
+				</p>
+				<?php wp_nonce_field( 'ssl-alp-rebuild-coauthors', 'ssl_alp_rebuild_coauthors_nonce' ); ?>
+			</form>
+			<?php if ( ! $coauthors_enabled ) : ?>
+			<p class="description"><?php _e( 'Coauthors are disabled. To enable them, go to <a href="options-general.php?page=ssl-alp-admin-options">this settings page</a>.', 'ssl-alp' ); ?></p>
 			<?php endif; ?>
 		</div>
 	</div>

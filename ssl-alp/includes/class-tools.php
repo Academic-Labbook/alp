@@ -79,6 +79,7 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 		$override_core_settings_completed = false;
 		$role_conversion_completed = false;
 		$rebuild_references_completed = false;
+		$rebuild_coauthors_completed = false;
 
 		/**
 		 * Check active theme
@@ -167,6 +168,27 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 				$this->rebuild_references();
 
 				$rebuild_references_completed = true;
+			}
+		}
+
+		/**
+		 * Handle rebuild coauthors
+		 */
+
+		// check if coauthors are enabled
+		$coauthors_enabled = get_option( 'ssl_alp_allow_multiple_authors' );
+
+		if ( $coauthors_enabled ) {
+			if ( array_key_exists( 'ssl_alp_rebuild_coauthors_submitted', $_POST ) && (bool) $_POST['ssl_alp_rebuild_coauthors_submitted'] ) {
+				// user has submitted the form
+
+				// verify the nonce
+				check_admin_referer( 'ssl-alp-rebuild-coauthors', 'ssl_alp_rebuild_coauthors_nonce' );
+
+				// do action
+				$this->rebuild_coauthors();
+
+				$rebuild_coauthors_completed = true;
 			}
 		}
 
@@ -290,5 +312,15 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 
 		// pass call to reference object
 		return $ssl_alp->references->rebuild_references();
+	}
+
+	/**
+	 * Rebuild coauthor terms
+	 */
+	private function rebuild_coauthors() {
+		global $ssl_alp;
+
+		// pass call to reference object
+		return $ssl_alp->coauthors->rebuild_coauthors();
 	}
 }

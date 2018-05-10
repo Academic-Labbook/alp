@@ -282,14 +282,8 @@ class CoauthorsTest extends WP_UnitTestCase {
         $user_1 = $this->factory->user->create_and_get();
         $user_2 = $this->factory->user->create_and_get();
         
-        // add term by user id
-        $this->assertFalse( get_term_by( 'name', $user_1->user_login, 'ssl_alp_coauthor' ) );
-        $ssl_alp->coauthors->add_coauthor_term( $user_1->ID );
+        // terms are created during user creation
         $this->assertInstanceOf( 'WP_Term', get_term_by( 'name', $user_1->user_login, 'ssl_alp_coauthor' ) );
-        
-        // add term by user object
-        $this->assertFalse( get_term_by( 'name', $user_2->user_login, 'ssl_alp_coauthor' ) );
-        $ssl_alp->coauthors->add_coauthor_term( $user_2 );
         $this->assertInstanceOf( 'WP_Term', get_term_by( 'name', $user_2->user_login, 'ssl_alp_coauthor' ) );
     }
 
