@@ -38,6 +38,8 @@ Here are the features implemented so far...
    - *Excluded* is added (for keeping ex-users' posts, comments, etc. on record but not giving them access)
  - Hides some WordPress branding and news
  - Supports custom media (MIME) upload types
+ - Is `update_count_callback` now used in `register_taxonomy`?
+   - https://core.trac.wordpress.org/ticket/40436
 
 ## Future ideas
 Some ideas pondered for the future:
