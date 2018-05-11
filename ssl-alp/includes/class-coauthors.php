@@ -39,9 +39,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$loader->add_filter( 'manage_users_columns', $this, 'filter_manage_users_columns' );
 		$loader->add_filter( 'manage_users_custom_column', $this, 'filter_manage_users_custom_column', 10, 3 );
 
-		// change order of coauthor terms on admin post list, block editor, etc.
-		$loader->add_filter( 'get_the_terms', $this, 'filter_get_the_terms', 10, 3 );
-
 		// change order of coauthor terms on classic editor
 		$loader->add_filter( 'terms_to_edit', $this, 'filter_terms_to_edit', 10, 2 );
 
@@ -136,6 +133,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			'rewrite'        		=> false,
 			'public'         		=> false,
 			'sort'           		=> true, // remember order terms are added to posts
+			'args'					=> array(
+											 // default arguments used by `wp_get_object_terms`
+											 // see https://core.trac.wordpress.org/ticket/40496
+									   		'orderby' => 'term_order'
+									   ),
 			'show_ui'        		=> true, // show selector on edit page
 			'show_in_menu'			=> false, // disable term edit page
 			'show_in_rest'			=> true, // needed for block editor support
@@ -258,31 +260,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		foreach ( $users as $user ) {
 			$this->add_coauthor_term( $user->ID );
 		}
-	}
-
-	/**
-	 * Filter terms shown in admin post list and other places
-	 */
-	public function filter_get_the_terms( $terms, $post_id, $taxonomy ) {
-		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
-			// coauthors disabled
-			return $terms;
-		}
-
-		if ( $taxonomy !== 'ssl_alp_coauthor' ) {
-			// not our taxonomy
-			return $terms;
-		}
-
-		// get terms in order
-		return wp_get_object_terms(
-			$post_id,
-			'ssl_alp_coauthor',
-			array(
-				'orderby'	=>	'term_order',
-				'order'		=>	'ASC'
-			)
-		);
 	}
 
 	/**
