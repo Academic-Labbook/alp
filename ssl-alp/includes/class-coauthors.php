@@ -39,9 +39,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$loader->add_filter( 'manage_users_columns', $this, 'filter_manage_users_columns' );
 		$loader->add_filter( 'manage_users_custom_column', $this, 'filter_manage_users_custom_column', 10, 3 );
 
-		// change order of coauthor terms on classic editor
-		$loader->add_filter( 'terms_to_edit', $this, 'filter_terms_to_edit', 10, 2 );
-
 		// Include coauthored posts in post counts.
 		// Unfortunately, this doesn't filter results retrieved with `count_many_users_posts`, which
 		// also doesn't have hooks to allow filtering; therefore know that this filter doesn't catch
