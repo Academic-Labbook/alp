@@ -276,7 +276,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 */
 	public function save_revisioned_meta_fields( $revision_id ) {
 		// skip when autosaving, as custom post data is noted included in $_POST during autosaves (annoying)
-		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		if ( wp_is_post_autosave( $revision_id ) ) {
 			return;
 		}
 
@@ -309,7 +309,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 */
 	public function check_revisioned_meta_fields_have_changed( $post_has_changed, WP_Post $last_revision, WP_Post $post ) {
 		// skip when autosaving, as custom post data is annoyingly not included in $_POST during autosaves
-		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		if ( wp_is_post_autosave( $post ) ) {
 			return $post_has_changed;
 		}
 
@@ -340,7 +340,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 */
 	public function save_post_edit_summary( $post_id, $post ) {
 		// skip when autosaving, as custom post data is noted included in $_POST during autosaves (annoying)
-		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		if ( wp_is_post_autosave( $post ) ) {
 			return;
 		} elseif ( ! $this->edit_summary_allowed( $post ) ) {
 			return;

@@ -585,7 +585,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return;
 		}
 
-		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		if ( wp_is_post_autosave( $post ) ) {
 			return;
 		}
 
