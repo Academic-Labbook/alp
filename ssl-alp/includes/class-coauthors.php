@@ -50,8 +50,8 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$loader->add_filter( 'posts_join', $this, 'posts_join_filter', 10, 2 );
 		$loader->add_filter( 'posts_groupby', $this, 'posts_groupby_filter', 10, 2 );
 
-		// check coauthors when a post is saved
-		$loader->add_action( 'save_post', $this, 'coauthors_save_post', 10, 2 );
+		// check author when a post is saved
+		$loader->add_action( 'save_post', $this, 'check_post_author', 10, 2 );
 
 		// delete user terms from posts when a user is deleted
 		$loader->add_action( 'delete_user', $this, 'delete_user_action', 10, 2 );
@@ -147,7 +147,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Remove author support (replaced by coauthor support)
+	 * Remove author support (replaced by coauthor support).
 	 */
 	public function remove_author_support() {
 		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
@@ -156,6 +156,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		foreach ( $this->supported_post_types as $post_type ) {
+			/**
+			 * Note that because author support is removed here, `delete_user_action`
+			 * must handle additional work. If the call below is altered, so too must
+			 * `delete_user_action` be.
+			 */
 			remove_post_type_support( $post_type, 'author' );
 		}
 	}
@@ -569,7 +574,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Check coauthor presence when a post is saved.
+	 * Check author when a post is saved.
 	 * 
 	 * This primarily checks that WordPress core's post author is consistent
 	 * with the coauthor order. If a post is edited to move the post author
@@ -579,7 +584,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * This also sets the current user as the author in the coauthor meta box
 	 * when a new post is being written.
 	 */
-	function coauthors_save_post( $post_id, $post ) {
+	function check_post_author( $post_id, $post ) {
 		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
 			// coauthors disabled
 			return;
@@ -593,13 +598,15 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return;
 		}
 
-		// update coauthors
-		// `set_coauthors` will check if the primary author has changed
-		$this->set_coauthors( $post, $this->get_coauthors( $post ) );
+		// get updated coauthors
+		$coauthors = $this->get_coauthors( $post );
+		
+		$this->set_coauthors( $post, $coauthors );
 	}
 
 	/**
-	 * Set one or more coauthors for a post
+	 * Set one or more coauthors for a post. The first specified coauthor is set as
+	 * the post's primary author.
 	 */
 	public function set_coauthors( $post, $coauthors ) {
 		global $wpdb;
@@ -631,10 +638,10 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 				// invalid user specified
 				// remove
 				unset( $coauthors[ array_search( $coauthor, $coauthors ) ] );
+			} else {			
+				// create author term if it doesn't exist
+				$this->add_coauthor_term( $coauthor );
 			}
-			
-			// create author term if it doesn't exist
-			$this->add_coauthor_term( $coauthor );
 		}
 
 		// create list of term ids
@@ -644,8 +651,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// update post's coauthors
 		wp_set_post_terms( $post->ID, $coauthor_term_ids, 'ssl_alp_coauthor', false );
 
-		if ( ! count( $coauthors ) ) {
-			// empty terms
+		if ( empty( $coauthors ) ) {
 			// no point continuing
 			return;
 		}

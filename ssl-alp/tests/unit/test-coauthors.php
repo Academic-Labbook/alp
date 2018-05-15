@@ -389,11 +389,10 @@ class CoauthorsTest extends WP_UnitTestCase {
     }
 
     /**
-     * Check that programmatically changing post primary authors works. The coauthors
-     * should not be removed, just the order changed. Only if post data is detected
-     * should coauthors be completely replaced.
+     * Setting the post author the "normal" way should not work; the only way to set
+     * post authors should be via `set_coauthors`.
      */
-    function test_update_post_author_programmatic() {
+    function test_update_post_author_programmatically_does_nothing() {
         global $ssl_alp;
 
         // set post 2's author to user 1
@@ -407,16 +406,12 @@ class CoauthorsTest extends WP_UnitTestCase {
         // refresh post object
         $post = get_post( $this->post_2->ID );
 
-        // post should now have user 1 as primary author
-        $this->assertEquals( $post->post_author, $this->user_1->ID );
+        // post should still be set to what it was before
+        $this->assertEquals( $post->post_author, $this->user_2->ID );
 
-        // the coauthors should be flipped
+        // the coauthor should be the same
         $this->assertEquals(
-            $ssl_alp->coauthors->get_coauthors( $post ),
-            array(
-                $this->user_1,
-                $this->user_2
-            )
+            $ssl_alp->coauthors->get_coauthors( $post ), array( $this->user_2 )
         );
     }
 
