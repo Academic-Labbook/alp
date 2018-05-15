@@ -31,8 +31,8 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$loader->add_action( 'init', $this, 'remove_author_support' );
 
 		// create user term when user is created or updated
-		$loader->add_action( 'user_register', $this, 'add_coauthor_term', 10, 1 );
-		$loader->add_action( 'profile_update', $this, 'add_coauthor_term', 10, 1 );
+		$loader->add_action( 'user_register', $this, 'get_coauthor_term', 10, 1 );
+		$loader->add_action( 'profile_update', $this, 'get_coauthor_term', 10, 1 );
 
 		// hooks to modify the published post number count on the Users WP List Table
 		// these are required because the count_many_users_posts() function has no hooks
@@ -192,9 +192,9 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Add author term
+	 * Get coauthor term. Creates it if it doesn't yet exist.
 	 */
-	public function add_coauthor_term( $coauthor ) {
+	public function get_coauthor_term( $coauthor ) {
 		if ( is_int( $coauthor ) ) {
 			// get user by their id
 			$coauthor = get_user_by( 'id', $coauthor );
@@ -255,7 +255,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$users = get_users();
 
 		foreach ( $users as $user ) {
-			$this->add_coauthor_term( $user->ID );
+			$this->get_coauthor_term( $user->ID );
 		}
 	}
 
@@ -569,7 +569,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Check coauthor presence when a post is saved.
+	 * Check coauthor presence after a post is saved.
 	 * 
 	 * This primarily checks that WordPress core's post author is consistent
 	 * with the coauthor order. If a post is edited to move the post author
@@ -611,7 +611,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return;
 		}
 
-		// use post's primary author
+		// get post's primary author
 		$primary_author = get_user_by( 'id', $post->post_author );
 
 		// deduplicate
@@ -634,7 +634,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			}
 			
 			// create author term if it doesn't exist
-			$this->add_coauthor_term( $coauthor );
+			$this->get_coauthor_term( $coauthor );
 		}
 
 		// create list of term ids
