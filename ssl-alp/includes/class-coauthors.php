@@ -65,8 +65,8 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$loader->add_filter( 'user_has_cap', $this, 'filter_user_has_cap', 10, 3 );
 
 		// make sure we've correctly set author data on author pages
-		$loader->add_filter( 'posts_selection', $this, 'fix_author_page' ); // use posts_selection since it's after WP_Query has built the request and before it's queried any posts
-		$loader->add_action( 'the_post', $this, 'fix_author_page' );
+		$loader->add_action( 'posts_selection', $this, 'fix_author_page', 10, 0 ); // use posts_selection since it's after WP_Query has built the request and before it's queried any posts
+		$loader->add_filter( 'the_author', $this, 'fix_author_page_filter', 10, 1 );
 
 		// filters to send comment notification/moderation emails to multiple authors
 		$loader->add_filter( 'comment_notification_recipients', $this, 'filter_comment_notification_email_recipients', 10, 2 );
@@ -871,6 +871,8 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * the query_var is changed.
 	 */
 	public function fix_author_page() {
+		global $wp_query, $authordata;
+
 		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
 			// coauthors disabled
 			return;
@@ -889,13 +891,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			$author = get_user_by( 'id', $author_id );
 		} elseif ( isset( $author_name ) ) {
 			// get author by specified name
-			$author = get_user_by( 'login', $author_name );
+			$author = get_user_by( 'slug', $author_name );
 		} else {
 			// no query variable was specified; not much we can do
 			return;
 		}
-
-		global $wp_query, $authordata;
 
 		if ( is_object( $author ) ) {
 			// override the authordata global with the requested author, in case the
@@ -915,6 +915,23 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			$wp_query->is_archive = false;
 			$wp_query->is_404 = false;
 		}
+	}
+
+	public function fix_author_page_filter( $author_name ) {
+		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
+			// coauthors disabled
+			return $author_name;
+		}
+
+		if ( ! is_author() ) {
+			// page is not an author page
+			return $author_name;
+		}
+
+		global $wp_query;
+
+		// set author from query
+		return $wp_query->queried_object->display_name;
 	}
 
     /**

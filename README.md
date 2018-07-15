@@ -126,9 +126,10 @@ fixes have also been pushed back to these plugins and WordPress itself:
 [7](https://github.com/Automattic/Co-Authors-Plus/pull/457#issuecomment-386429553),
 [8](https://github.com/Automattic/Co-Authors-Plus/issues/513),
 [9](https://github.com/Automattic/Co-Authors-Plus/issues/514),
-[10](https://github.com/WordPress/gutenberg/issues/6688),
-[11](https://github.com/WordPress/gutenberg/issues/6703),
-[12](https://github.com/WordPress/gutenberg/issues/6704)
+[10](https://github.com/Automattic/Co-Authors-Plus/issues/562)
+[11](https://github.com/WordPress/gutenberg/issues/6688),
+[12](https://github.com/WordPress/gutenberg/issues/6703),
+[13](https://github.com/WordPress/gutenberg/issues/6704)
 
 ### Co-Authors Plus
 Authors: Mohammad Jangda, Daniel Bachhuber, Automattic, Shepherd Interactive, Mark Jaquith  
