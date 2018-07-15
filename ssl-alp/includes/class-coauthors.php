@@ -30,6 +30,9 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// remove single author support from supported post types
 		$loader->add_action( 'init', $this, 'remove_author_support' );
 
+		// stop deletion of user's posts when their account is deleted (this is handled separately by `delete_user_action`)
+		$loader->add_filter( 'post_types_to_delete_with_user', $this, 'filter_post_types_to_delete_with_user' );
+
 		// create user term when user is created or updated
 		$loader->add_action( 'user_register', $this, 'add_coauthor_term', 10, 1 );
 		$loader->add_action( 'profile_update', $this, 'add_coauthor_term', 10, 1 );
@@ -53,8 +56,10 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// check author when a post is saved
 		$loader->add_action( 'save_post', $this, 'check_post_author', 10, 2 );
 
-		// delete user terms from posts when a user is deleted
+		// delete or reassign user terms from posts when a user is deleted on a single site installation
 		$loader->add_action( 'delete_user', $this, 'delete_user_action', 10, 2 );
+		// delete or reassign user terms from posts when a user is deleted on a network site installation
+		$loader->add_action( 'remove_user_from_blog', $this, 'remove_user_from_blog', 10, 3 );
 
 		// filter to allow coauthors to edit posts
 		$loader->add_filter( 'user_has_cap', $this, 'filter_user_has_cap', 10, 3 );
@@ -163,6 +168,14 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			 */
 			remove_post_type_support( $post_type, 'author' );
 		}
+	}
+
+	/**
+	 * Filter post types to delete with user
+	 */
+	public function filter_post_types_to_delete_with_user( $types ) {
+		// remove supported post types as we manually handle their deletion with users
+		return array_diff( $types, $this->supported_post_types );
 	}
 
 	/**
@@ -676,7 +689,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * a coauthor with lower position than the deleted user. If the reassigned user has a
 	 * higher position, they are left in that position.
 	 */
-	function delete_user_action( $delete_id, $reassign_id ) {
+	function delete_user_action( $delete_id, $reassign_id = null ) {
 		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
 			// coauthors disabled
 			return;
@@ -716,7 +729,12 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 						// set coauthors (this changes the primary author)
 						$this->set_coauthors( $post, $coauthors );
 					} else {
-						// this post only has the author being deleted
+						// this post only has one author, who is the user being deleted
+						// remove them as author
+						$wpdb->update( $wpdb->posts, array( 'post_author' => null ), array( 'ID' => $post_id ) );
+						clean_post_cache( $post_id );
+						
+						// delete (or trash, if enabled) the post
 						wp_delete_post( $post_id );
 					}
 				}
@@ -765,6 +783,32 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 		// delete user's term
 		$this->delete_coauthor_term( $delete_user );
+	}
+
+	/**
+	 * Fires when a user is removed from a blog on a network installation.
+	 */
+	public function remove_user_from_blog( $remove_id, $blog_id ) {
+		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
+			// coauthors disabled
+			return;
+		}
+
+		// annoyingly, $reassign_id is not passed to this call, so detect it from the post data
+		if ( ! empty( $_POST['blog'] ) && is_array( $_POST['blog'] ) ) {
+			// post data from `dodelete` case in `wp-admin/network/users.php` is present
+
+			// array of blog ids to respective reassign users
+			$reassign_users = $_POST['blog'][$remove_id];
+
+			// get reassign user for this blog
+			$reassign_id = $reassign_users[$blog_id];
+		} else {
+			$reassign_id = null;
+		}
+
+		// reassign posts
+		$this->delete_user_action( $remove_id, $reassign_id );
 	}
 
 	public function get_coauthor_posts( $user ) {
