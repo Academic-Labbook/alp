@@ -251,41 +251,49 @@ if ( ! function_exists( 'ssl_alpine_get_authors' ) ) :
 			$author_html[] = ssl_alpine_format_author( $author, $url );
 		}
 
-		if ( count( $author_html ) > 1 ) {
-			// multiple authors
-			$icon_class = 'fa fa-users';
-
-			// get delimiters
-			if ( is_null( $delimiter_between ) ) {
-				$delimiter_between = _x( ', ', 'delimiter between coauthors except last', 'ssl-alp' );
-			}
-			if ( is_null( $delimiter_between_last ) ) {
-				$delimiter_between_last = _x( ' and ', 'delimiter between last two coauthors', 'ssl-alp' );
-			}
-
-			// pop last author off
-			$last_author = array_pop( $author_html );
-
-			// implode author list
-			$author_html = implode( __( ', ', 'ssl-alp' ), $author_html ) . $delimiter_between_last . $last_author;
+		if ( ! count( $author_html ) ) {
+			// no authors
+			$author_list_html = "";
 		} else {
-			// single author
-			$icon_class = 'fa fa-user';
+			if ( count( $author_html ) > 1 ) {
+				// multiple authors
+				$icon_class = 'fa fa-users';
 
-			$author_html = $author_html[0];
+				// get delimiters
+				if ( is_null( $delimiter_between ) ) {
+					$delimiter_between = _x( ', ', 'delimiter between coauthors except last', 'ssl-alp' );
+				}
+				if ( is_null( $delimiter_between_last ) ) {
+					$delimiter_between_last = _x( ' and ', 'delimiter between last two coauthors', 'ssl-alp' );
+				}
+
+				// pop last author off
+				$last_author = array_pop( $author_html );
+
+				// implode author list
+				$author_list_html = implode( __( ', ', 'ssl-alp' ), $author_html ) . $delimiter_between_last . $last_author;
+			} else {
+				// single author
+				$icon_class = 'fa fa-user';
+
+				$author_list_html = $author_html[0];
+			}
+
+			if ( $icon ) {
+				$icon = sprintf( '<i class="%1$s" aria-hidden="true"></i>', $icon_class );
+			} else {
+				$icon = '';
+			}
+	
+			// add icon and author span
+			$author_list_html = sprintf(
+				'<span class="authors">%1$s%2$s</span>',
+				$icon,
+				$author_list_html
+			);
 		}
 
-		if ( $icon ) {
-			$icon = sprintf( '<i class="%1$s" aria-hidden="true"></i>', $icon_class );
-		} else {
-			$icon = '';
-		}
-
-		return sprintf(
-			'<span class="authors">%1$s%2$s</span>',
-			$icon,
-			$author_html
-		);
+		return $author_list_html;
 	}
 endif;
 
