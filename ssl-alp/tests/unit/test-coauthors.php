@@ -1043,6 +1043,63 @@ class CoauthorsTest extends WP_UnitTestCase {
     }*/
 
     /**
+     * Test that renaming a user doesn't also rename their corresponding terms.
+     * 
+     * The username is constant
+     */
+    public function test_rename_user_doesnt_rename_coauthor_terms() {
+        global $ssl_alp;
+
+        $user_1 = $this->factory->user->create_and_get();
+        $user_2 = $this->factory->user->create_and_get();
+
+        // add a bunch of coauthored posts for user 1
+        $this->factory->post->create_many(
+            5,
+            array(
+			    'post_author'     => $user_1->ID,
+			    'post_status'     => 'publish',
+			    'post_type'       => 'post',
+            )
+        );
+
+        // get existing user term
+        $user_1_old_term = $ssl_alp->coauthors->get_coauthor_term( $user_1 );
+
+        // term name should be the display name
+        $this->assertEquals( $user_1_old_term->name, $user_1->display_name );
+
+        // user 1 should have 5 posts, user 2 should have none
+        $this->assertEquals( count_user_posts( $user_1->ID), 5 );
+        $this->assertEquals( count_user_posts( $user_2->ID), 0 );
+
+        // rename user 1
+        wp_update_user(
+            array(
+                'ID'    =>  $user_1->ID,
+                // note: user_login cannot be altered, even if it is specified here
+                'user_nicename' =>  'updated_user_1',
+                'display_name'  =>  'display',
+                'first_name'    =>  'first',
+                'last_name'     =>  'last'
+            )
+        );
+
+        // refresh user object
+        $user_1 = get_user_by( 'id', $user_1->ID );
+
+        // get new user term
+        $user_1_new_term = $ssl_alp->coauthors->get_coauthor_term( $user_1 );
+
+        // term name should be the new display name
+        $this->assertEquals( $user_1_new_term->name, 'display' );
+
+        // users should still have same number of posts
+        $this->assertEquals( count_user_posts( $user_1->ID), 5 );
+        $this->assertEquals( count_user_posts( $user_2->ID), 0 );
+    }
+
+    /**
      * Test $user_id_editor editing a post created by $user_id_author
      * 
      * `edit_post` raises a WPDieException if the user can't edit the post,
