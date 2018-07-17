@@ -43,7 +43,6 @@ Here are the features implemented so far...
 
 ## Future ideas
 Some ideas pondered for the future:
- - Outreach pages: share some posts/pages publicly.
  - Labbook theme
    - Display author, edited posts and recent comments widgets by default
    - Top bar for linking to other network sites?
@@ -54,11 +53,8 @@ Some ideas pondered for the future:
  - Advanced search:
    - Search within PDFs etc.
    - Advanced search page with options to search by revision, etc.
- - Shortcodes for linking to Git/SVN commits and other archives
- - Offline download, e.g. [Simply Static](https://wordpress.org/plugins/simply-static/)
- - LSC-specific extensions:
-   - DCC shortcodes
-     - Add entries to reference widget
+ - Gutenberg block for linking to Git/SVN commits and other archives
+ - Gutenberg block for DOI and arXiv references
 
 ## Requirements
 

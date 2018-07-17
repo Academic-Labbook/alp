@@ -30,24 +30,6 @@ class SSL_ALP_References extends SSL_ALP_Module {
 				'default'	=>	true
 			)
 		);
-
-        register_setting(
-			SSL_ALP_SITE_SETTINGS_PAGE,
-			'ssl_alp_enable_doi_shortcode',
-			array(
-				'type'		=>	'boolean',
-				'default'	=>	true
-			)
-		);
-
-		register_setting(
-			SSL_ALP_SITE_SETTINGS_PAGE,
-			'ssl_alp_enable_arxiv_shortcode',
-			array(
-				'type'		=>	'boolean',
-				'default'	=>	true
-			)
-		);
 	}
 
     /**
@@ -80,12 +62,6 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		// extract references from saved posts
 		$loader->add_action( 'init', $this, 'create_crossreference_taxonomy', 20 ); // called after settings are registered
 		$loader->add_action( 'save_post', $this, 'extract_crossreferences', 10, 2 );
-
-        // DOI shortcode
-		$loader->add_action( 'init', $this, 'add_doi_shortcode' );
-
-		// arXiv shortcode
-		$loader->add_action( 'init', $this, 'add_arxiv_shortcode' );
 	}
 
 	public function create_crossreference_taxonomy() {
@@ -193,102 +169,6 @@ class SSL_ALP_References extends SSL_ALP_Module {
 
 		// values of supported_reference_post_types specifies whether to show date
 		return (bool) $this->supported_reference_post_types[$post->post_type];
-	}
-
-    public function add_doi_shortcode() {
-        if ( ! get_option( 'ssl_alp_enable_doi_shortcode' ) ) {
-			// DOI shortcodes disabled
-            return;
-        }
-
-		add_shortcode( 'doi', array( $this, 'doi_shortcode_hook' ) );
-	}
-
-	public function doi_shortcode_hook( $atts, $content ) {
-		// defaults
-		$atts = shortcode_atts(
-			array(
-				'id'	=>	''
-			),
-			$atts
-		);
-
-		$content = sanitize_text_field( $content );
-
-		if ( empty( $atts[ 'id' ] ) ) {
-			// no id defined
-			$url = '';
-
-			if ( empty( $content ) ) {
-				// nothing to do
-				return '';
-			}
-		} else {
-			// DOI URL
-			$url = SSL_ALP_DOI_BASE_URL . $atts[ 'id' ];
-		}
-
-		if ( empty( $content ) ) {
-			// use DOI
-			$content = sprintf(
-				'doi:%1$s',
-				$atts[ 'id' ]
-			);
-		}
-
-		return sprintf(
-			'<a href="%1$s">%2$s</a>',
-			$url,
-			$content
-		);
-	}
-
-	public function add_arxiv_shortcode() {
-        if ( ! get_option( 'ssl_alp_enable_arxiv_shortcode' ) ) {
-			// arXiv shortcodes disabled
-            return;
-        }
-
-		add_shortcode( 'arxiv', array( $this, 'arxiv_shortcode_hook' ) );
-	}
-
-	public function arxiv_shortcode_hook( $atts, $content ) {
-		// defaults
-		$atts = shortcode_atts(
-			array(
-				'id'	=>	''
-			),
-			$atts
-		);
-
-		$content = sanitize_text_field( $content );
-
-		if ( empty( $atts[ 'id' ] ) ) {
-			// no id defined
-			$url = '';
-
-			if ( empty( $content ) ) {
-				// nothing to do
-				return '';
-			}
-		} else {
-			// DOI URL
-			$url = SSL_ALP_ARXIV_BASE_URL . $atts[ 'id' ];
-		}
-
-		if ( empty( $content ) ) {
-			// use DOI
-			$content = sprintf(
-				'arxiv:%1$s',
-				$atts[ 'id' ]
-			);
-		}
-
-		return sprintf(
-			'<a href="%1$s">%2$s</a>',
-			$url,
-			$content
-		);
 	}
 
 	/**

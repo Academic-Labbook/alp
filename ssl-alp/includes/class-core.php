@@ -280,13 +280,4 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 
         remove_post_type_support( 'post', 'trackbacks' );
     }
-
-	/**
-	 * Process shortcodes on content
-	 * 
-	 * Used for adding shortcodes to excerpts.
-	 */
-	public function do_shortcode( $content ) {
-		return do_shortcode( $content );
-	}
 }
