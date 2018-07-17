@@ -1167,7 +1167,6 @@ body {
 footer#colophon {
     background-color: #32698b;
     color: #ffffff;
-    min-height: 50px;
     text-align: center;
     padding: 1em;
 }
@@ -1206,8 +1205,16 @@ footer#colophon a{
 	text-decoration: none;
 }
 
-#copyright-wrap{
-	margin-bottom: 10px;
+footer #imprint-left {
+	float: left;
+}
+
+footer #imprint-right {
+	float: right;
+}
+
+footer .separator {
+	padding: 0 10px 0 10px;
 }
 
 .page-header {

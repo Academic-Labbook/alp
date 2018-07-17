@@ -30,16 +30,26 @@
 			<?php echo $footer_nav; ?>
 		</nav>
 		<?php endif ?>
-		<?php if ( ! empty( ssl_alp_get_option( 'copyright_text' ) ) ) : ?>
-		<div id="copyright-wrap">
-			<div class="copyright-text"><?php echo wp_kses_post( ssl_alp_get_option( 'copyright_text' ) ); ?></div>
+		<div id="imprint-left">
+			<?php if ( ! empty( ssl_alp_get_option( 'copyright_text' ) ) ) : ?>
+			<span id="copyright"><?php echo wp_kses_post( ssl_alp_get_option( 'copyright_text' ) ); ?></span>
+			<?php endif ?>
+			<?php if ( ! empty( ssl_alp_get_option( 'copyright_text' ) ) && ! empty( get_privacy_policy_url() ) ) : ?>
+			<span class="separator" role="separator" aria-hidden="true">|</span>
+			<?php endif; ?>
+			<?php if ( ! empty( get_privacy_policy_url() ) ): ?>
+			<span id="privacy-policy">
+				<?php the_privacy_policy_link(); ?>
+			</span>
+			<?php endif; ?>
 		</div>
-		<?php endif ?>
-		<?php if ( true === ssl_alp_get_option( 'powered_by' ) ) : ?>
-		<div class="site-info" id="powered-by-wrap">
-			<a href="<?php echo esc_url( __( 'https://alp.attackllama.com/', 'ssl-alp' ) ); ?>"><?php printf( esc_html__( 'Powered by %s', 'ssl-alp' ), 'Academic Labbook Plugin for WordPress' ); ?></a>
-		</div><!-- .site-info -->
-		<?php endif ?>
+		<div id="imprint-right">
+			<?php if ( true === ssl_alp_get_option( 'powered_by' ) ) : ?>
+			<span id="powered-by">
+				<a href="<?php echo esc_url( __( 'https://alp.attackllama.com/', 'ssl-alp' ) ); ?>"><?php printf( esc_html__( 'Powered by %s', 'ssl-alp' ), 'Academic Labbook Plugin for WordPress' ); ?></a>
+			</span><!-- .site-info -->
+			<?php endif ?>
+		</div>
 	</footer><!-- #colophon -->
 </div><!-- #page -->
 
