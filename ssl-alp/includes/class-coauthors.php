@@ -44,6 +44,9 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$loader->add_filter( 'manage_users_columns', $this, 'filter_manage_users_columns' );
 		$loader->add_filter( 'manage_users_custom_column', $this, 'filter_manage_users_custom_column', 10, 3 );
 
+		// override the default "Mine" filter on the admin post list
+		$loader->add_filter( 'views_edit-post', $this, 'filter_edit_post_views', 10, 1 );
+
 		// Include coauthored posts in post counts.
 		// Unfortunately, this doesn't filter results retrieved with `count_many_users_posts`, which
 		// also doesn't have hooks to allow filtering; therefore know that this filter doesn't catch
@@ -409,6 +412,57 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
+	 * Filter the views listed on the admin post list to add a "Mine" view
+	 */
+	function filter_edit_post_views( $views ) {
+		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
+			// coauthors disabled
+			return $views;
+		}
+
+		// current user
+		$user = wp_get_current_user();
+
+		// get current user's coauthor term slug
+		$coauthor_slug = $this->get_coauthor_term_slug( $user );
+
+		// build URL arguments
+		$mine_args = array(
+			'taxonomy'	=> 'ssl_alp_coauthor',
+			'term'		=>	$coauthor_slug
+		);
+
+		// check if the current page is the "Mine" view
+		if ( ! empty( $_REQUEST['taxonomy'] ) && $_REQUEST['taxonomy'] === 'ssl_alp_coauthor' && ! empty( $_REQUEST['term'] ) && $_REQUEST['term'] == $coauthor_slug ) {
+			$class = ' class="current"';
+		} else {
+			$class = '';
+		}
+
+		// flip views
+		$views = array_reverse( $views );
+		// get "All" view off end
+		$all_view = array_pop( $views );
+
+		// add "Mine" view to end
+		$views['mine'] = sprintf(
+			'<a%s href="%s">%s (%s)</a>',
+			$class,
+			esc_url( add_query_arg( array_map( 'rawurlencode', $mine_args ), admin_url( 'edit.php' ) ) ),
+			__( 'Mine', 'ssl_alp' ),
+			$this->get_user_post_count( $user )
+		);
+
+		// add "All" view to end, and stop it from showing up if "Mine" is enabled
+		$views['all'] = str_replace( $class, '', $all_view );
+
+		// flip back round
+		$views = array_reverse( $views );
+
+		return $views;
+	}
+
+	/**
 	 * When we update the terms at all, we should update the published post
      * count for each author
 	 */
@@ -467,16 +521,14 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return $count;
 		}
 
-		$user = get_userdata( $user_id );
-		$user = get_user_by( 'login', $user->user_login );
-		$term = $this->get_coauthor_term( $user );
+		$real_count = $this->get_user_post_count( $user_id );
 
-		// Only modify the count if the author already exists as a term
-		if ( $term && ! is_wp_error( $term ) ) {
-			$count = $term->count;
+		if ( is_null( $real_count ) ) {
+			// use default
+			$real_count = $count;
 		}
 
-		return $count;
+		return $real_count;
 	}
 
 	/**
@@ -870,6 +922,27 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		return $posts;
 	}
 
+	public function get_user_post_count( $user ) {
+		if ( is_int( $user ) ) {
+			// get user by their id
+			$user = get_user_by( 'id', $user );
+		}
+		
+		if ( ! is_object( $user ) ) {
+			return null;
+		}
+		
+		// find user term
+		$user_term = $this->get_coauthor_term( $user );
+
+		if ( ! $user_term ) {
+			// no term
+			return null;
+		}
+
+		return $user_term->count;
+	}
+
 	/**
 	 * Checks to see if the current user can set authors or not
 	 */
@@ -1195,12 +1268,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$counts = array();
 
 		foreach ( $user_ids as $user_id ) {
-			/**
-			 * Call coauthor class to get filtered counts. This tells the function that the
-			 * user currently has 0 posts, which is not usually true. This is fine, unless
-			 * for some reason the user's "count" metadata has not been updated.
-			 */
-			$counts[$user_id] = $this->filter_count_user_posts( 0, $user_id );
+			$counts[$user_id] = $this->get_user_post_count( intval( $user_id ) );
 		}
 
 		return $counts;
