@@ -147,6 +147,7 @@
 		<div class="ssl-alp-tools-card">
 			<h2 class="title"><?php _e( 'Rebuild cross-references', 'ssl-alp' ); ?></h2>
 			<p><?php _e( 'This tool will rebuild the cross-references related to each published post and page. This is useful for extracting cross-references from posts or pages created or edited during any time in which the cross-references feature was disabled, and from posts or pages created before the plugin was installed or activated.', 'ssl-alp' ); ?></p>
+			<p class="description"><?php echo sprintf( __( 'Note: this tool may take a long time to execute on large sites. Due to server configuration settings, the execution may time out. You may instead wish to run this tool via <a href="%s">WP-CLI</a>.', 'ssl-alp' ), esc_url( "https://wp-cli.org/" ) ); ?></p>
 			<form method="post" action="">
 				<input type="hidden" name="ssl_alp_rebuild_references_submitted" value="1"/>
 				<p class="submit">

@@ -180,6 +180,9 @@ class SSL_ALP_References extends SSL_ALP_Module {
 			return;
 		}
 
+		// allow unlimited execution
+		ini_set( 'max_execution_time', 0 );
+
 		foreach ( array_keys( $this->supported_reference_post_types ) as $post_type ) {
 			$posts = get_posts(
 				array( 
