@@ -1,4 +1,6 @@
 # ALP - Academic Labbook Plugin
+[![Build Status](https://travis-ci.com/SeanDS/alp.svg?branch=master)](https://travis-ci.com/SeanDS/alp)
+
 ALP leverages the powerful WordPress platform to provide an academic
 labbook/logbook fit for purpose. It's free, open source, and attempts to be
 minimally invasive on the core WordPress functionality, which should allow you
@@ -125,14 +127,14 @@ fixes have also been pushed back to these plugins and WordPress itself:
 [10](https://github.com/Automattic/Co-Authors-Plus/issues/562)
 [11](https://github.com/WordPress/gutenberg/issues/6688),
 [12](https://github.com/WordPress/gutenberg/issues/6703),
-[13](https://github.com/WordPress/gutenberg/issues/6704)
+[13](https://github.com/WordPress/gutenberg/issues/6704),
+[14](https://github.com/WordPress/gutenberg/issues/8032)
 
 ### Co-Authors Plus
 Authors: Mohammad Jangda, Daniel Bachhuber, Automattic, Shepherd Interactive, Mark Jaquith  
 Link: [Co-Authors Plus](https://wordpress.org/plugins/co-authors-plus/)
 
-Most of the architecture of this plugin has been adapted for ALP, but some features have
-been changed (such as email alerts) or removed (such as the guest author feature).
+This plugin was originally adapted with light changes but has since been heavily modified.
 
 ### WP-Post-Meta-Revisions and Revision Notes
 Authors: Adam Silverstein, Helen Hou-Sandí  
