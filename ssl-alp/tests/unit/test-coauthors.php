@@ -41,6 +41,16 @@ class CoauthorsTest extends WP_UnitTestCase {
         return $post;
     }
 
+    private function create_many_coauthor_posts( $count, $author, $coauthors = array() ) {
+        $posts = array();
+
+        for ( $i = 0; $i < $count; $i++ ) {
+            $posts[] = $this->create_coauthor_post( $author, $coauthors );
+        }
+
+        return $posts;
+    }
+
     /**
      * Counts posts in the loop
      */
@@ -857,156 +867,131 @@ class CoauthorsTest extends WP_UnitTestCase {
         $this->assertFalse( $ssl_alp->coauthors->get_coauthor_term( $user_4 ) );
     }
 
-    // /**
-    //  * Test post counts including coauthored posts.
-    //  */
-    // function test_post_counts() {
-    //     global $ssl_alp;
+    /**
+     * Test post counts including coauthored posts.
+     */
+    function test_post_counts() {
+        global $ssl_alp;
 
-    //     // users initially have 1 each
-    //     $this->assertEquals( count_user_posts( $this->user_1->ID), 1 );
-    //     $this->assertEquals( count_user_posts( $this->user_2->ID), 1 );
-    //     $this->assertEquals( count_user_posts( $this->user_3->ID), 1 );
+        $user_1 = $this->factory->user->create_and_get();
+        $user_2 = $this->factory->user->create_and_get();
+        $user_3 = $this->factory->user->create_and_get();
+        $post_1 = $this->create_coauthor_post( $user_1, array( $user_1 ) );
+        $post_2 = $this->create_coauthor_post( $user_2, array( $user_2 ) );
+        $post_3 = $this->create_coauthor_post( $user_3, array( $user_3 ) );
 
-    //     // create a bunch of posts
-    //     $count = 10;
-    //     $post_ids = $this->factory->post->create_many( $count );
+        // users initially have 1 each
+        $this->assertEquals( count_user_posts( $user_1->ID), 1 );
+        $this->assertEquals( count_user_posts( $user_2->ID), 1 );
+        $this->assertEquals( count_user_posts( $user_3->ID), 1 );
 
-    //     // set coauthors
-    //     foreach ( $post_ids as $post_id ) {
-    //         $ssl_alp->coauthors->set_coauthors(
-    //             $post_id,
-    //             array(
-    //                 $this->user_1,
-    //                 $this->user_2
-    //             )
-    //         );
-    //     }
+        // create a bunch of posts
+        $count = 10;
+        $post_ids = $this->factory->post->create_many( $count );
 
-    //     // user 1 and 2 should have $count more posts
-    //     $this->assertEquals( count_user_posts( $this->user_1->ID), $count + 1 );
-    //     $this->assertEquals( count_user_posts( $this->user_2->ID), $count + 1 );
-    //     $this->assertEquals( count_user_posts( $this->user_3->ID), 1 );
+        // set coauthors
+        foreach ( $post_ids as $post_id ) {
+            $ssl_alp->coauthors->set_coauthors(
+                $post_id,
+                array(
+                    $user_1,
+                    $user_2
+                )
+            );
+        }
 
-    //     // test our implementation of count_many_users_posts
-    //     $this->assertEquals(
-    //         array_values(
-    //             $ssl_alp->coauthors->count_many_users_posts(
-    //                 array(
-    //                     $this->user_1->ID,
-    //                     $this->user_2->ID,
-    //                     $this->user_3->ID
-    //                 )
-    //             )
-    //         ),
-    //         array(
-    //             $count + 1,
-    //             $count + 1,
-    //             1
-    //         )
-    //     );
-    // }
+        // user 1 and 2 should have $count more posts
+        $this->assertEquals( count_user_posts( $user_1->ID), $count + 1 );
+        $this->assertEquals( count_user_posts( $user_2->ID), $count + 1 );
+        $this->assertEquals( count_user_posts( $user_3->ID), 1 );
 
-    // /**
-    //  * Check the reported number of coauthored posts by an author agrees with the
-    //  * actual amount
-    //  */
-    // function test_reported_count_vs_actual_count() {
-    //     global $ssl_alp;
+        // test our implementation of count_many_users_posts
+        $this->assertEquals(
+            array_values(
+                $ssl_alp->coauthors->count_many_users_posts(
+                    array(
+                        $user_1->ID,
+                        $user_2->ID,
+                        $user_3->ID
+                    )
+                )
+            ),
+            array(
+                $count + 1,
+                $count + 1,
+                1
+            )
+        );
+    }
 
-    //     // create new user
-    //     $user = $this->factory->user->create_and_get();
+    /**
+     * Check the reported number of coauthored posts by an author agrees with the
+     * actual amount
+     */
+    function test_reported_count_vs_actual_count() {
+        global $ssl_alp;
 
-    //     // create posts as $user
-    //     wp_set_current_user( $user->ID );
-    //     $this->factory->post->create_many( 5 );
+        $user_1 = $this->factory->user->create_and_get();
+        $user_2 = $this->factory->user->create_and_get();
 
-    //     // create posts as other user
-    //     wp_set_current_user( $this->user_1->ID );
-    //     $post_ids = $this->factory->post->create_many( 5 );
+        // create posts as user 1
+        $this->create_many_coauthor_posts( 5, $user_1, array( $user_1 ) );
 
-    //     // set $user to be coauthor
-    //     foreach ( $post_ids as $post_id ) {
-    //         $ssl_alp->coauthors->set_coauthors(
-    //             get_post( $post_id ),
-    //             array(
-    //                 $this->user_1,
-    //                 $user
-    //             )
-    //         );
-    //     }
+        // create posts as other user
+        $posts = $this->create_many_coauthor_posts( 5, $user_2, array( $user_2 ) );
 
-    //     // create posts as other user
-    //     wp_set_current_user( $this->user_2->ID );
-    //     $post_ids = $this->factory->post->create_many( 5 );
+        // set user 1 as a coauthor on user 2's posts
+        foreach ( $posts as $post ) {
+            $ssl_alp->coauthors->set_coauthors(
+                $post,
+                array(
+                    $user_2,
+                    $user_1
+                )
+            );
+        }
 
-    //     // set $user to be coauthor
-    //     foreach ( $post_ids as $post_id ) {
-    //         $ssl_alp->coauthors->set_coauthors(
-    //             get_post( $post_id ),
-    //             array(
-    //                 $this->user_1,
-    //                 $this->user_2,
-    //                 $user
-    //             )
-    //         );
-    //     }
+        // check filter reports correct count
+        $this->assertEquals( 10, count_user_posts( $user_1->ID ) );
+        $this->assertEquals( 5, count_user_posts( $user_2->ID ) );
 
-    //     // check filter reports correct count
-    //     $this->assertEquals( 15, count_user_posts( $user->ID ) );
+        // check manually get correct count
+        $this->assertEquals( 10, count( $ssl_alp->coauthors->get_coauthor_posts( $user_1 ) ) );
+        $this->assertEquals( 5, count( $ssl_alp->coauthors->get_coauthor_posts( $user_2 ) ) );
+    }
 
-    //     // check manually get correct count
-    //     $this->assertEquals( 15, count( $ssl_alp->coauthors->get_coauthor_posts( $user ) ) );
-    // }
+    // doesn't work on network sites - WP_Query object isn't a user post query for some reason (it works
+    // for single sites...)
+    /*
+    function test_author_page_posts() {
+        global $ssl_alp;
 
-    // /* doesn't work on network sites - WP_Query object isn't a user post query for some reason (it works
-    //    for single sites...)
-    // function test_author_page_posts() {
-    //     global $ssl_alp;
+        $user_1 = $this->factory->user->create_and_get();
+        $user_2 = $this->factory->user->create_and_get();
+        $user_3 = $this->factory->user->create_and_get();
 
-    //     $user_1 = $this->factory->user->create_and_get();
-    //     $user_2 = $this->factory->user->create_and_get();
-    //     $user_3 = $this->factory->user->create_and_get();
+        // create a bunch of posts
+        $posts = $this->create_many_coauthor_posts( 5, $user_1, array( $user_1, $user_2 ) );
 
-    //     // create a bunch of posts
-    //     $post_ids = $this->factory->post->create_many( 5 );
+        // extra post for user 1 with no coauthors
+        $posts[] = $this->create_coauthor_post( $user_1, array( $user_1 ) );
 
-    //     // set coauthors
-    //     foreach ( $post_ids as $post_id ) {
-    //         $ssl_alp->coauthors->set_coauthors(
-    //             $post_id,
-    //             array(
-    //                 $user_1,
-    //                 $user_2
-    //             )
-    //         );
-    //     }
+        // user 1 should have 6
+        $this->go_to( get_author_posts_url( $user_1->ID ) );
 
-    //     // extra post for user 1 with no coauthors
-    //     $post_1 = $this->factory->post->create_and_get(
-    //         array(
-    //             'post_author'   =>  $user_1->ID
-    //         )
-    //     );
+        log_message( have_posts() ? "has posts" : "no posts" );
+        //log_message( $wp_query->posts );
 
-    //     $post_ids[] = $post_1->ID;
+        $this->assertEquals( $this->count_posts(), 6 );
 
-    //     // user 1 should have 6
-    //     $this->go_to( get_author_posts_url( $user_1->ID ) );
+        // user 2 should have 5
+        $this->go_to( get_author_posts_url( $user_2->ID ) );
+        $this->assertEquals( $this->count_posts(), 5 );
 
-    //     log_message( have_posts() ? "has posts" : "no posts" );
-    //     log_message( $wp_query->posts );
-
-    //     $this->assertEquals( $this->count_posts(), 6 );
-
-    //     // user 2 should have 5
-    //     $this->go_to( get_author_posts_url( $user_2->ID ) );
-    //     $this->assertEquals( $this->count_posts(), 5 );
-
-    //     // user 3 should have 0
-    //     $this->go_to( get_author_posts_url( $user_3->ID ) );
-    //     $this->assertEquals( $this->count_posts(), 0 );
-    // }*/
+        // user 3 should have 0
+        $this->go_to( get_author_posts_url( $user_3->ID ) );
+        $this->assertEquals( $this->count_posts(), 0 );
+    }*/
 
     /**
      * Test that renaming a user also renames their corresponding term.
@@ -1017,16 +1002,8 @@ class CoauthorsTest extends WP_UnitTestCase {
         $user_1 = $this->factory->user->create_and_get();
         $user_2 = $this->factory->user->create_and_get();
 
-        // NEEDS TO USE create_coauthor_post
         // add a bunch of coauthored posts for user 1
-        $this->factory->post->create_many(
-            5,
-            array(
-			    'post_author'     => $user_1->ID,
-			    'post_status'     => 'publish',
-			    'post_type'       => 'post',
-            )
-        );
+        $this->create_many_coauthor_posts( 5, $user_1, array( $user_1 ) );
 
         // get existing user term
         $user_1_old_term = $ssl_alp->coauthors->get_coauthor_term( $user_1 );
