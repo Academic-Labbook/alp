@@ -401,8 +401,8 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 		if ( $post_count > 0 ) {
 			$value .= sprintf(
-				'<a href="edit.php?author_name=%1$s" title="%2$s" class="edit">%3$d</a>',
-				$user->user_nicename,
+				'<a href="edit.php?taxonomy=ssl_alp_coauthor&amp;term=%1$s" title="%2$s" class="edit">%3$d</a>',
+				$this->get_coauthor_term_slug( $user ),
 				esc_attr__( 'View posts by this author', 'ssl-alp' ),
 				$post_count
 			);
