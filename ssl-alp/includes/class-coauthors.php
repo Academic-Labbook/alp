@@ -58,8 +58,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$loader->add_filter( 'posts_join', $this, 'posts_join_filter', 10, 2 );
 		$loader->add_filter( 'posts_groupby', $this, 'posts_groupby_filter', 10, 2 );
 
-		// check author when a post is saved
-		$loader->add_action( 'save_post', $this, 'check_post_author', 10, 2 );
+		// set the current user as the default coauthor on new drafts
+		$loader->add_action( 'save_post', $this, 'add_user_to_draft', 10, 2 );
+
+		// check and if necessary update the primary author when post coauthor terms are set
+		$loader->add_action( 'set_object_terms', $this, 'check_post_author', 10, 6 );
 
 		// delete or reassign user terms from posts when a user is deleted on a single site installation
 		$loader->add_action( 'delete_user', $this, 'delete_user_action', 10, 2 );
@@ -446,7 +449,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 		// add "Mine" view to end
 		$views['mine'] = sprintf(
-			'<a%s href="%s">%s (%s)</a>',
+			'<a%s href="%s">%s <span class="count">(%s)</span></a>',
 			$class,
 			esc_url( add_query_arg( array_map( 'rawurlencode', $mine_args ), admin_url( 'edit.php' ) ) ),
 			__( 'Mine', 'ssl_alp' ),
@@ -670,21 +673,56 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Check author when a post is saved.
-	 * 
-	 * This primarily checks that WordPress core's post author is consistent
-	 * with the coauthor order. If a post is edited to move the post author
-	 * to a non-first coauthor position, this function changes the post
-	 * author to whoever is now first.
-	 * 
-	 * This also sets the current user as the author in the coauthor meta box
-	 * when a new post is being written.
+	 * Checks if the specified post is an autodraft, i.e. a new post.
 	 */
-	function check_post_author( $post_id, $post ) {
+	private function is_post_autodraft( $post ) { 
+    	return $post->post_status === "auto-draft";
+	}
+
+	/**
+	 * Set the current user as the author in the coauthor meta box when a new post draft
+	 * is created.
+	 */
+	function add_user_to_draft( $post_id, $post ) {
 		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
 			// coauthors disabled
 			return;
 		}
+
+		if ( ! $this->is_post_autodraft( $post ) ) {
+			// not a draft
+			return;
+		} elseif ( ! $this->post_supports_coauthors( $post ) ) {
+			return;
+		}
+		
+		// get updated coauthors
+		$coauthors = array( wp_get_current_user() );
+		
+		$this->set_coauthors( $post, $coauthors );
+	}
+
+	/**
+	 * Check and if necessary update the primary author when post coauthor terms are set.
+	 * 
+	 * This checks that WordPress core's post author is consistent with the coauthor order.
+	 * If a post is edited to move the post author to a non-first coauthor position, this
+	 * function changes the post author to whoever is now first.
+	 */
+	function check_post_author( $post_id, $term_ids, $tt_ids, $taxonomy, $append, $old_tt_ids ) {
+		global $wpdb;
+
+		if ( $taxonomy !== "ssl_alp_coauthor" ) {
+			return;
+		}
+
+		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
+			// coauthors disabled
+			return;
+		}
+
+		// get post
+		$post = get_post( $post_id );
 
 		if ( wp_is_post_autosave( $post ) ) {
 			return;
@@ -693,11 +731,72 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		if ( ! $this->post_supports_coauthors( $post ) ) {
 			return;
 		}
-
-		// get updated coauthors
-		$coauthors = $this->get_coauthors( $post );
 		
-		$this->set_coauthors( $post, $coauthors );
+		// get post's previous author (the post's author in the database row)
+		$existing_primary_author = get_user_by( 'id', $post->post_author );
+
+		$terms = array();
+
+		foreach ($term_ids as $term_id) {
+			$terms[] = get_term( $term_id, "ssl_alp_coauthor" );
+		}
+
+		$first_term = reset( $terms );
+
+		if ( empty( $terms ) || is_wp_error( $first_term ) ) {
+			// empty terms - remove the author
+			$new_primary_author_id = 0;
+		} else {
+			$new_primary_author = $this->get_user_from_coauthor_term( $first_term );
+			$new_primary_author_id = $new_primary_author->ID;
+
+			if ( ! empty( $existing_primary_author ) && $existing_primary_author->ID === $new_primary_author_id ) {
+				// primary author hasn't changed
+				return;
+			}
+		}
+
+		// update primary author
+		$wpdb->update( $wpdb->posts, array( 'post_author' => $new_primary_author_id ), array( 'ID' => $post->ID ) );
+		clean_post_cache( $post->ID );
+	}
+
+	public function get_coauthors( $post = null ) {	
+		$post = get_post( $post );
+	
+		if ( is_null( $post ) ) {
+			// no post
+			return;
+		}
+	
+		// empty coauthors list
+		$coauthors = array();
+	
+		// get this post's terms
+		$coauthor_terms = $this->get_coauthor_terms_for_post( $post );
+	
+		if ( is_array( $coauthor_terms ) && ! empty( $coauthor_terms ) ) {
+			// this post has coauthors
+			foreach ( $coauthor_terms as $coauthor_term ) {
+				$post_author = $this->get_user_from_coauthor_term( $coauthor_term );
+				
+				// in case the user has been deleted while plugin was deactivated
+				if ( ! empty( $post_author ) ) {
+					$coauthors[] = $post_author;
+				}
+			}
+		}
+
+		// get the post's primary author
+		$post_author = get_user_by( 'id', $post->post_author );
+	
+		// try to ensure at least the post's primary author is in the list of coauthors
+		if ( ! empty( $post_author ) && ! in_array( $post_author, $coauthors ) ) {
+			// post primary author exists but isn't listed as a coauthor, so add them to the start of the coauthors array
+			array_unshift( $coauthors, $post_author );
+		}
+	
+		return $coauthors;
 	}
 
 	/**
@@ -714,29 +813,18 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return;
 		}
 
-		// use post's primary author
-		$primary_author = get_user_by( 'id', $post->post_author );
+		// get post's previous author (the post's author in the database row)
+		$existing_primary_author = get_user_by( 'id', $post->post_author );
 
 		// deduplicate
 		$coauthors = array_unique( $coauthors, SORT_REGULAR );
 
-		if ( empty( $coauthors ) ) {
-			// no coauthors specified; this might be because the post has been created
-			// programmatically, or is a new post
-			if ( $primary_author ) {
-				$coauthors[] = $primary_author;
-			}
-		}
-
-		// get coauthor objects and create their terms
+		// remove invalid coauthors
 		foreach ( $coauthors as $coauthor ) {
 			if ( ! is_object( $coauthor ) ) {
 				// invalid user specified
 				// remove
 				unset( $coauthors[ array_search( $coauthor, $coauthors ) ] );
-			} else {			
-				// create author term if it doesn't exist
-				$this->add_coauthor_term( $coauthor );
 			}
 		}
 
@@ -746,19 +834,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 		// update post's coauthors
 		wp_set_post_terms( $post->ID, $coauthor_term_ids, 'ssl_alp_coauthor', false );
-
-		if ( empty( $coauthors ) ) {
-			// no point continuing
-			return;
-		}
-
-		// update primary author if no longer first
-		if ( reset( $coauthors ) !== $primary_author ) {
-			$new_author = reset( $coauthors );
-
-			$wpdb->update( $wpdb->posts, array( 'post_author' => $new_author->ID ), array( 'ID' => $post->ID ) );
-			clean_post_cache( $post->ID );
-		}
 	}
 
 	/**
@@ -901,8 +976,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$user_term = $this->get_coauthor_term( $user );
 
 		if ( ! $user_term ) {
-			// no term, so assume no posts
-			return $posts;
+			return null;
 		}
 
 		// get objects associated with term (assume everything is a post)
@@ -1175,42 +1249,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		return $coauthor_terms;
-	}
-
-	public function get_coauthors( $post = null ) {	
-		$post = get_post( $post );
-	
-		if ( is_null( $post ) ) {
-			// no post
-			return;
-		}
-	
-		// empty coauthors list
-		$coauthors = array();
-	
-		// get this post's terms
-		$coauthor_terms = $this->get_coauthor_terms_for_post( $post );
-	
-		if ( is_array( $coauthor_terms ) && ! empty( $coauthor_terms ) ) {
-			// this post has coauthors
-			foreach ( $coauthor_terms as $coauthor_term ) {
-				$post_author = $this->get_user_from_coauthor_term( $coauthor_term );
-				
-				// in case the user has been deleted while plugin was deactivated
-				if ( ! empty( $post_author ) ) {
-					$coauthors[] = $post_author;
-				}
-			}
-		} else {
-			// there aren't coauthors, so get the post's only author
-			$post_author = get_userdata( $post->post_author );
-	
-			if ( ! empty( $post_author ) ) {
-				$coauthors[] = $post_author;
-			}
-		}
-	
-		return $coauthors;
 	}
 
 	/**

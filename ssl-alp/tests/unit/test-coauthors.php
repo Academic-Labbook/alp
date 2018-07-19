@@ -16,36 +16,29 @@ class CoauthorsTest extends WP_UnitTestCase {
 		self::$admin_ids = $factory->user->create_many( 2, array( 'role' => 'administrator' ) );
 	}
 
-    function setUp() {
-        parent::setUp();
+    private function create_coauthor_post( $author, $coauthors = array() ) {
+        global $ssl_alp;
 
-        $this->user_1 = $this->factory->user->create_and_get();
-        $this->user_2 = $this->factory->user->create_and_get();
-        $this->user_3 = $this->factory->user->create_and_get();
+        $terms = array();
 
-        $this->post_1 = $this->factory->post->create_and_get(
+        foreach ( $coauthors as $coauthor ) {
+            $terms[] = intval( $ssl_alp->coauthors->get_coauthor_term( $coauthor )->term_id );
+        }
+
+        // cannot set taxonomy before post creation
+        $post = $this->factory->post->create_and_get(
             array(
-			    'post_author'     => $this->user_1->ID,
-			    'post_status'     => 'publish',
-			    'post_type'       => 'post',
+                'post_author'     => $author->ID,
+                'post_status'     => 'publish',
+                'post_type'       => 'post'
             )
         );
 
-        $this->post_2 = $this->factory->post->create_and_get(
-            array(
-			    'post_author'     => $this->user_2->ID,
-			    'post_status'     => 'publish',
-			    'post_type'       => 'post',
-            )
-        );
+        if ( ! empty( $terms ) ) {
+            wp_set_post_terms( $post->ID, $terms, "ssl_alp_coauthor" );
+        }
 
-        $this->post_3 = $this->factory->post->create_and_get(
-            array(
-			    'post_author'     => $this->user_3->ID,
-			    'post_status'     => 'publish',
-			    'post_type'       => 'post',
-            )
-        );
+        return $post;
     }
 
     /**
@@ -138,46 +131,96 @@ class CoauthorsTest extends WP_UnitTestCase {
         }
     }
 
-	function test_coauthors() {
+	function test_get_coauthors() {
         global $ssl_alp;
 
-        // default posts should have no secondary author
+        $user = $this->factory->user->create_and_get();
+        $post = $this->create_coauthor_post($user, array( $user ) );
+
         $this->assertEquals(
-            $ssl_alp->coauthors->get_coauthors( $this->post_1 ),
+            $ssl_alp->coauthors->get_coauthors( $post ),
             array(
-                $this->user_1
+                $user
             )
         );
+    }
+
+    /**
+     * Coauthor list should still include primary author even if no coauthors were explicitly set.
+     */
+	function test_get_coauthors_no_term_set() {
+        global $ssl_alp;
+
+        $user = $this->factory->user->create_and_get();
+        $post = $this->create_coauthor_post( $user );
+
         $this->assertEquals(
-            $ssl_alp->coauthors->get_coauthors( $this->post_2 ),
+            $ssl_alp->coauthors->get_coauthors( $post ),
             array(
-                $this->user_2
+                $user
             )
         );
-        $this->assertEquals(
-            $ssl_alp->coauthors->get_coauthors( $this->post_3 ),
-            array(
-                $this->user_3
-            )
-        );
+    }
+
+    function test_set_coauthors() {
+        global $ssl_alp;
+
+        $user_1 = $this->factory->user->create_and_get();
+        $user_2 = $this->factory->user->create_and_get();
+        $user_3 = $this->factory->user->create_and_get();
+
+        $post = $post = $this->create_coauthor_post($user_1 );
 
         // set coauthors
         $ssl_alp->coauthors->set_coauthors(
-            get_post( $this->post_2 ),
+            $post,
             array(
-                $this->user_1,
-                $this->user_2,
-                $this->user_3
+                $user_1,
+                $user_2,
+                $user_3
             )
         );
 
-        // check coauthors are now present
+        // check coauthors
 		$this->assertEqualSets(
-            $ssl_alp->coauthors->get_coauthors( $this->post_2 ),
+            $ssl_alp->coauthors->get_coauthors( $post ),
             array(
-                $this->user_1,
-                $this->user_2,
-                $this->user_3
+                $user_1,
+                $user_2,
+                $user_3
+            )
+        );
+    }
+
+    /**
+     * Setting coauthors overwrites existing coauthors
+     */
+    function test_set_coauthors_overwriting_existing_coauthors() {
+        global $ssl_alp;
+
+        $user_1 = $this->factory->user->create_and_get();
+        $user_2 = $this->factory->user->create_and_get();
+        $user_3 = $this->factory->user->create_and_get();
+
+        $post = $this->create_coauthor_post($user_1, array( $user_1 ) );
+
+        // set coauthors
+        $ssl_alp->coauthors->set_coauthors(
+            $post,
+            array(
+                $user_1,
+                $user_2,
+                $user_3
+            )
+        );
+
+        // check coauthors
+		$this->assertEqualSets(
+            $ssl_alp->coauthors->get_coauthors( $post ),
+            array(
+                $user_1,
+                $user_2,
+                $user_3
             )
         );
     }
@@ -185,30 +228,33 @@ class CoauthorsTest extends WP_UnitTestCase {
     function test_add_same_coauthor_to_post__author_id_arg() {
         global $ssl_alp;
 
+        $user = $this->factory->user->create_and_get();
+        $post = $this->create_coauthor_post($user, array( $user ) );
+
         // set duplicate users to post
         $ssl_alp->coauthors->set_coauthors(
-            $this->post_1,
+            $post,
             array(
-                $this->user_1,
-                $this->user_1
+                $user,
+                $user
             )
         );
 
         $query = new WP_Query(
             array(
-			    'author' => $this->user_1->ID
+			    'author' => $user->ID
             )
         );
         
         // check user query
 		$this->assertEquals( 1, count( $query->posts ) );
-        $this->assertEquals( $this->post_1->ID, $query->posts[ 0 ]->ID );
+        $this->assertEquals( $post->ID, $query->posts[ 0 ]->ID );
         
         // check get_coauthors
         $this->assertEquals(
-            $ssl_alp->coauthors->get_coauthors( $this->post_1 ),
+            $ssl_alp->coauthors->get_coauthors( $post ),
             array(
-                $this->user_1
+                $user
             )
         );
     }
@@ -216,147 +262,167 @@ class CoauthorsTest extends WP_UnitTestCase {
     function test_add_same_coauthor_to_post__author_name_arg() {
         global $ssl_alp;
 
+        $user = $this->factory->user->create_and_get();
+        $post = $this->create_coauthor_post($user, array( $user ) );
+
         // set duplicate users to post
         $ssl_alp->coauthors->set_coauthors(
-            $this->post_1,
+            $post,
             array(
-                $this->user_1,
-                $this->user_1
+                $user,
+                $user
             )
         );
 
         $query = new WP_Query(
             array(
-			    'author_name' => $this->user_1->user_login
+			    'author_name' => $user->user_login
             )
         );
         
         // check user query
 		$this->assertEquals( 1, count( $query->posts ) );
-        $this->assertEquals( $this->post_1->ID, $query->posts[ 0 ]->ID );
+        $this->assertEquals( $post->ID, $query->posts[ 0 ]->ID );
         
         // check get_coauthors
         $this->assertEquals(
-            $ssl_alp->coauthors->get_coauthors( $this->post_1 ),
+            $ssl_alp->coauthors->get_coauthors( $post ),
             array(
-                $this->user_1
+                $user
             )
         );
     }
     
 	public function test__author_name_arg_plus_tax_query__user_is_post_author() {
         global $ssl_alp;
+
+        $user = $this->factory->user->create_and_get();
+        $post = $this->create_coauthor_post($user, array( $user ) );
         
-        $ssl_alp->coauthors->set_coauthors( $this->post_1->ID, array( $this->user_1->user_login ) );
+        $ssl_alp->coauthors->set_coauthors( $post, array( $user ) );
         
-        wp_set_post_terms( $this->post_1->ID, 'test', 'post_tag' );
+        wp_set_post_terms( $post->ID, 'test', 'post_tag' );
         
 		$query = new WP_Query(
             array(
-			    'author_name' => $this->user_1->user_login,
+			    'author_name' => $user->user_login,
 			    'tag' => 'test',
             )
         );
 
 		$this->assertEquals( 1, count( $query->posts ) );
-		$this->assertEquals( $this->post_1->ID, $query->posts[ 0 ]->ID );
+		$this->assertEquals( $post->ID, $query->posts[ 0 ]->ID );
     }
     
 	public function tests__author_name_arg_plus_tax_query__is_coauthor() {
         global $ssl_alp;
 
+        $user_1 = $this->factory->user->create_and_get();
+        $user_2 = $this->factory->user->create_and_get();
+        $post = $this->create_coauthor_post($user_1, array( $user_1 ) );
+
 		$ssl_alp->coauthors->set_coauthors(
-            $this->post_1->ID,
+            $post->ID,
             array(
-                $this->user_1,
-                $this->user_2
+                $user_1,
+                $user_2
             )
         );
 
-        wp_set_post_terms( $this->post_1->ID, 'test', 'post_tag' );
+        wp_set_post_terms( $post->ID, 'test', 'post_tag' );
         
 		$query = new WP_Query(
             array(
-			    'author_name' => $this->user_2->user_login,
+			    'author_name' => $user_2->user_login,
 			    'tag' => 'test',
             )
         );
 
 		$this->assertEquals( 1, count( $query->posts ) );
-		$this->assertEquals( $this->post_1->ID, $query->posts[ 0 ]->ID );
+		$this->assertEquals( $post->ID, $query->posts[ 0 ]->ID );
 	}
 
 	function test_add_coauthor_updates_post_author() {
         global $ssl_alp;
-        
+
+        $user_1 = $this->factory->user->create_and_get();
+        $user_2 = $this->factory->user->create_and_get();
+        $user_3 = $this->factory->user->create_and_get();
+        $post = $this->create_coauthor_post($user_1, array( $user_1 ) );
+
         // override post 1's author
 		$ssl_alp->coauthors->set_coauthors(
-            $this->post_1,
+            $post,
             array(
-                $this->user_2,
-                $this->user_3
+                $user_2,
+                $user_3
             )
         );
 
         // refresh post
-        $post = get_post( $this->post_1->ID );
+        $post = get_post( $post->ID );
 
         // WordPress core author should have changed to first in above list
-		$this->assertEquals( $post->post_author, $this->user_2->ID );
+		$this->assertEquals( $post->post_author, $user_2->ID );
 	}
 
     function test_coauthor_order() {
         global $ssl_alp;
 
-        // add coauthors
+        $user_1 = $this->factory->user->create_and_get();
+        $user_2 = $this->factory->user->create_and_get();
+        $user_3 = $this->factory->user->create_and_get();
+        $post = $this->create_coauthor_post($user_1, array( $user_1 ) );
+
+        // set coauthors
         $ssl_alp->coauthors->set_coauthors(
-            get_post( $this->post_1 ),
+            get_post( $post ),
             array(
-                $this->user_1,
-                $this->user_2,
-                $this->user_3
+                $user_1,
+                $user_2,
+                $user_3
             )
         );
 
         // check order (use assertEquals to check order)
         $this->assertEquals(
-            $ssl_alp->coauthors->get_coauthors( $this->post_1 ),
+            $ssl_alp->coauthors->get_coauthors( $post ),
             array(
-                $this->user_1,
-                $this->user_2,
-                $this->user_3
+                $user_1,
+                $user_2,
+                $user_3
             )
         );
 
         // change order
         $ssl_alp->coauthors->set_coauthors(
-            get_post( $this->post_1 ),
+            get_post( $post ),
             array(
-                $this->user_3,
-                $this->user_2,
-                $this->user_1
+                $user_3,
+                $user_2,
+                $user_1
             )
         );
 
         // check order (use assertEquals to check order)
         $this->assertEquals(
-            $ssl_alp->coauthors->get_coauthors( $this->post_1 ),
+            $ssl_alp->coauthors->get_coauthors( $post ),
             array(
-                $this->user_3,
-                $this->user_2,
-                $this->user_1
+                $user_3,
+                $user_2,
+                $user_1
             )
         );
     }
 
-    function test_coauthor_terms() {
+    function test_coauthor_terms_created_when_user_created() {
         global $ssl_alp;
 
-        // create new users without terms
+        // create new users
         $user_1 = $this->factory->user->create_and_get();
         $user_2 = $this->factory->user->create_and_get();
         
-        // terms are created during user creation
+        // check terms were created
         $this->assertInstanceOf( 'WP_Term', $ssl_alp->coauthors->get_coauthor_term( $user_1 ) );
         $this->assertInstanceOf( 'WP_Term', $ssl_alp->coauthors->get_coauthor_term( $user_2 ) );
     }
@@ -367,68 +433,37 @@ class CoauthorsTest extends WP_UnitTestCase {
     function test_get_coauthor_posts() {
         global $ssl_alp;
 
-        /**
-         * check users' own posts, i.e. post 1 -> user 1, post 2 -> user 2, etc.
-         */
+        $user_1 = $this->factory->user->create_and_get(array('display_name' => 'ssl user 1'));
+        $user_2 = $this->factory->user->create_and_get(array('display_name' => 'ssl user 2'));
+        $user_3 = $this->factory->user->create_and_get(array('display_name' => 'ssl user 3'));
+        $post_1 = $this->create_coauthor_post( $user_1, array( $user_1 ) );
+        $post_2 = $this->create_coauthor_post( $user_2, array( $user_2 ) );
+        $post_3 = $this->create_coauthor_post( $user_3, array( $user_3 ) );
+        $post_4 = $this->create_coauthor_post( $user_1, array( $user_1, $user_2 ) );
+        $post_5 = $this->create_coauthor_post( $user_1, array( $user_1, $user_3 ) );
+        $post_6 = $this->create_coauthor_post( $user_1, array( $user_1, $user_2, $user_3 ) );
 
-        // check they are primary author
-        $this->assertEquals( $this->post_1->post_author, $this->user_1->ID );
-        $this->assertEquals( $this->post_2->post_author, $this->user_2->ID );
-        $this->assertEquals( $this->post_3->post_author, $this->user_3->ID );
-
-        // check coauthor lists
+        // user 1
         $this->assertEquals(
-            $ssl_alp->coauthors->get_coauthor_posts( $this->user_1 ),
+            $ssl_alp->coauthors->get_coauthor_posts( $user_1 ),
             array(
-                $this->post_1
+                $post_1, $post_4, $post_5, $post_6
             )
         );
+
+        // user 2
         $this->assertEquals(
-            $ssl_alp->coauthors->get_coauthor_posts( $this->user_2 ),
+            $ssl_alp->coauthors->get_coauthor_posts( $user_2 ),
             array(
-                $this->post_2
+                $post_2, $post_4, $post_6
             )
         );
+
+        // user 3
         $this->assertEquals(
-            $ssl_alp->coauthors->get_coauthor_posts( $this->user_3 ),
+            $ssl_alp->coauthors->get_coauthor_posts( $user_3 ),
             array(
-                $this->post_3
-            )
-        );
-
-        /**
-         * add coauthors
-         */
-
-        // add all authors to post 1
-        $ssl_alp->coauthors->set_coauthors(
-            get_post( $this->post_1 ),
-            array(
-                $this->user_1,
-                $this->user_2,
-                $this->user_3
-            )
-        );
-
-        // refresh post object
-        $post = get_post( $this->post_1->ID );
-
-        // primary author shouldn't have changed
-        $this->assertEquals( $post->post_author, $this->user_1->ID );
-
-        // users 2 and 3 should now be authors of post 1 as well
-        $this->assertEqualSets(
-            $ssl_alp->coauthors->get_coauthor_posts( $this->user_2 ),
-            array(
-                $post,
-                $this->post_2
-            )
-        );
-        $this->assertEqualSets(
-            $ssl_alp->coauthors->get_coauthor_posts( $this->user_3 ),
-            array(
-                $post,
-                $this->post_3
+                $post_3, $post_5, $post_6
             )
         );
     }
@@ -436,56 +471,34 @@ class CoauthorsTest extends WP_UnitTestCase {
     /**
      * Check that changing the only author of a post works.
      */
-    function test_update_post_coauthors_remove_primary_author() {
+    function test_update_post_remove_primary_coauthor() {
         global $ssl_alp;
+
+        $user_1 = $this->factory->user->create_and_get();
+        $user_2 = $this->factory->user->create_and_get();
+        $post_1 = $this->create_coauthor_post( $user_1, array( $user_1 ) );
+        $post_2 = $this->create_coauthor_post( $user_2, array( $user_2 ) );
 
         // set post 2's coauthors to only user 1 (removes user 2)
         $ssl_alp->coauthors->set_coauthors(
-            $this->post_2,
+            $post_2,
             array(
-                $this->user_1
+                $user_1
             )
         );
 
         // refresh post object
-        $post = get_post( $this->post_2->ID );
+        $post_2 = get_post( $post_2->ID );
 
         // post should now have user 1 as primary author
-        $this->assertEquals( $post->post_author, $this->user_1->ID );
+        $this->assertEquals( $post_2->post_author, $user_1->ID );
 
         // and user 1 should be sole coauthor
         $this->assertEquals(
-            $ssl_alp->coauthors->get_coauthors( $post ),
+            $ssl_alp->coauthors->get_coauthors( $post_1 ),
             array(
-                $this->user_1
+                $user_1
             )
-        );
-    }
-
-    /**
-     * Setting the post author the "normal" way should not work; the only way to set
-     * post authors should be via `set_coauthors`.
-     */
-    function test_update_post_author_programmatically_does_nothing() {
-        global $ssl_alp;
-
-        // set post 2's author to user 1
-        wp_update_post(
-            array(
-                'ID'            =>  $this->post_2->ID,
-                'post_author'   =>  $this->user_1->ID
-            )
-        );
-
-        // refresh post object
-        $post = get_post( $this->post_2->ID );
-
-        // post should still be set to what it was before
-        $this->assertEquals( $post->post_author, $this->user_2->ID );
-
-        // the coauthor should be the same
-        $this->assertEquals(
-            $ssl_alp->coauthors->get_coauthors( $post ), array( $this->user_2 )
         );
     }
 
@@ -496,14 +509,17 @@ class CoauthorsTest extends WP_UnitTestCase {
     function test_coauthor_delete_user_with_sole_author_post() {
         global $ssl_alp;
 
-        // user 1 is sole author of post 1
-        $post_id = $this->post_1->ID;
+        $user = $this->factory->user->create_and_get();
+        $post = $this->create_coauthor_post( $user, array( $user ) );
+
+        // copy post id
+        $post_id = $post->ID;
 
         // delete user
-        $this->ssl_delete_user( $this->user_1->ID );
+        $this->ssl_delete_user( $user->ID );
 
         // user should be deleted
-        $this->check_user_deleted( $this->user_1->ID );
+        $this->check_user_deleted( $user->ID );
 
         // updated post should be trash
         $this->assertEquals( get_post( $post_id )->post_status, 'trash' );
@@ -517,22 +533,26 @@ class CoauthorsTest extends WP_UnitTestCase {
     function test_coauthor_delete_user_with_sole_author_post_with_reassign() {
         global $ssl_alp;
 
+        $user_1 = $this->factory->user->create_and_get();
+        $user_2 = $this->factory->user->create_and_get();
+        $post = $this->create_coauthor_post( $user_1, array( $user_1 ) );
+
         // delete user, reassigning to user 2
-        $this->ssl_delete_user( $this->user_1->ID, $this->user_2->ID );
+        $this->ssl_delete_user( $user_1->ID, $user_2->ID );
 
         // user should be deleted
-        $this->check_user_deleted( $this->user_1->ID );
+        $this->check_user_deleted( $user_1->ID );
 
         // post should have user 2 as author
         $this->assertEquals(
-            $ssl_alp->coauthors->get_coauthors( get_post( $this->post_1->ID ) ),
+            $ssl_alp->coauthors->get_coauthors( get_post( $post->ID ) ),
             array(
-                $this->user_2
+                $user_2
             )
         );
 
         // post should retain its original publication status
-        $this->assertEquals( get_post( $this->post_1->ID)->post_status, $this->post_1->post_status );
+        $this->assertEquals( get_post( $post->ID)->post_status, $post->post_status );
     }
 
     /**
@@ -543,32 +563,27 @@ class CoauthorsTest extends WP_UnitTestCase {
     function test_coauthor_delete_user_that_is_primary_author_of_multi_author_post() {
         global $ssl_alp;
 
-        // add coauthors
-        $ssl_alp->coauthors->set_coauthors(
-            get_post( $this->post_1 ),
-            array(
-                $this->user_1,
-                $this->user_2
-            )
-        );
+        $user_1 = $this->factory->user->create_and_get();
+        $user_2 = $this->factory->user->create_and_get();
+        $post = $this->create_coauthor_post( $user_1, array( $user_1, $user_2 ) );
 
         // delete user
-        $this->ssl_delete_user( $this->user_1->ID );
+        $this->ssl_delete_user( $user_1->ID );
 
         // user should be deleted
-        $this->check_user_deleted( $this->user_1->ID );
+        $this->check_user_deleted( $user_1->ID );
 
         // get updated post object
-        $post = get_post( $this->post_1->ID );
+        $post = get_post( $post->ID );
 
         // check the primary author was changed
-        $this->assertEquals( $post->post_author, $this->user_2->ID );
+        $this->assertEquals( $post->post_author, $user_2->ID );
 
         // post should have only user 2 as coauthor
         $this->assertEquals(
             $ssl_alp->coauthors->get_coauthors( $post ),
             array(
-                $this->user_2
+                $user_2
             )
         );
 
@@ -576,7 +591,7 @@ class CoauthorsTest extends WP_UnitTestCase {
         $this->assertEquals( $post->post_status, 'publish' );
 
         // check term is also deleted
-        $this->assertFalse( $ssl_alp->coauthors->get_coauthor_term( $this->user_1 ) );
+        $this->assertFalse( $ssl_alp->coauthors->get_coauthor_term( $user_1 ) );
     }
 
     /**
@@ -589,38 +604,29 @@ class CoauthorsTest extends WP_UnitTestCase {
     function test_coauthor_delete_user_that_is_primary_author_of_multi_author_post_with_reassign() {
         global $ssl_alp;
 
-        $new_user = $this->factory->user->create_and_get();
-        $reassign_user = $this->factory->user->create_and_get();
-
-        // set coauthors
-        $ssl_alp->coauthors->set_coauthors(
-            $this->post_3,
-            array(
-                $new_user,
-                $this->user_1,
-                $this->user_2
-            )
-        );
+        $user_1 = $this->factory->user->create_and_get();
+        $user_2 = $this->factory->user->create_and_get();
+        $user_3 = $this->factory->user->create_and_get();
+        $post = $this->create_coauthor_post( $user_1, array( $user_1, $user_2 ) );
 
         // delete user, reassigning their posts to other user
-        $this->ssl_delete_user( $new_user->ID, $reassign_user->ID );
+        $this->ssl_delete_user( $user_1->ID, $user_3->ID );
 
         // user should be deleted
-        $this->check_user_deleted( $new_user->ID );
+        $this->check_user_deleted( $user_1->ID );
 
         // refresh post object
-        $post = get_post( $this->post_3->ID );
+        $post = get_post( $post->ID );
 
         // check the primary author was changed
-        $this->assertEquals( $post->post_author, $reassign_user->ID );
+        $this->assertEquals( $post->post_author, $user_3->ID );
 
         // check user is deleted from coauthors
         $this->assertEquals(
             $ssl_alp->coauthors->get_coauthors( $post ),
             array(
-                $reassign_user,
-                $this->user_1,
-                $this->user_2
+                $user_3,
+                $user_2
             )
         );
 
@@ -628,7 +634,7 @@ class CoauthorsTest extends WP_UnitTestCase {
         $this->assertEquals( $post->post_status, 'publish' );
 
         // check term is also deleted
-        $this->assertFalse( $ssl_alp->coauthors->get_coauthor_term( $new_user ) );
+        $this->assertFalse( $ssl_alp->coauthors->get_coauthor_term( $user_1 ) );
     }
 
     /**
@@ -642,37 +648,29 @@ class CoauthorsTest extends WP_UnitTestCase {
     function test_coauthor_delete_user_that_is_primary_author_of_multi_author_post_with_reassign_existing_user() {
         global $ssl_alp;
 
-        $new_user = $this->factory->user->create_and_get();
-        $reassign_user = $this->factory->user->create_and_get();
-
-        // set coauthors
-        $ssl_alp->coauthors->set_coauthors(
-            $this->post_3,
-            array(
-                $new_user,
-                $this->user_1,
-                $reassign_user
-            )
-        );
+        $user_1 = $this->factory->user->create_and_get();
+        $user_2 = $this->factory->user->create_and_get();
+        $user_3 = $this->factory->user->create_and_get();
+        $post = $this->create_coauthor_post( $user_1, array( $user_1, $user_2, $user_3 ) );
 
         // delete user, reassigning their posts to other user
-        $this->ssl_delete_user( $new_user->ID, $reassign_user->ID );
+        $this->ssl_delete_user( $user_1->ID, $user_2->ID );
 
         // user should be deleted
-        $this->check_user_deleted( $new_user->ID );
+        $this->check_user_deleted( $user_1->ID );
 
         // refresh post object
-        $post = get_post( $this->post_3->ID );
+        $post = get_post( $post->ID );
 
         // check the primary author was changed
-        $this->assertEquals( $post->post_author, $reassign_user->ID );
+        $this->assertEquals( $post->post_author, $user_2->ID );
 
         // check user is deleted from coauthors
         $this->assertEquals(
             $ssl_alp->coauthors->get_coauthors( $post ),
             array(
-                $reassign_user,
-                $this->user_1
+                $user_2,
+                $user_3
             )
         );
 
@@ -680,7 +678,7 @@ class CoauthorsTest extends WP_UnitTestCase {
         $this->assertEquals( $post->post_status, 'publish' );
 
         // check term is also deleted
-        $this->assertFalse( $ssl_alp->coauthors->get_coauthor_term( $new_user ) );
+        $this->assertFalse( $ssl_alp->coauthors->get_coauthor_term( $user_1 ) );
     }
 
     /**
@@ -691,36 +689,29 @@ class CoauthorsTest extends WP_UnitTestCase {
     function test_coauthor_delete_user_that_is_secondary_author_of_multi_author_post() {
         global $ssl_alp;
 
-        $new_user = $this->factory->user->create_and_get();
-
-        // set coauthors
-        $ssl_alp->coauthors->set_coauthors(
-            get_post( $this->post_1 ),
-            array(
-                $this->user_1,
-                $this->user_2,
-                $new_user
-            )
-        );
+        $user_1 = $this->factory->user->create_and_get();
+        $user_2 = $this->factory->user->create_and_get();
+        $user_3 = $this->factory->user->create_and_get();
+        $post = $this->create_coauthor_post( $user_1, array( $user_1, $user_2, $user_3 ) );
 
         // delete user
-        $this->ssl_delete_user( $new_user->ID );
+        $this->ssl_delete_user( $user_2->ID );
 
         // user should be deleted
-        $this->check_user_deleted( $new_user->ID );
+        $this->check_user_deleted( $user_2->ID );
 
         // refresh post object
-        $post = get_post( $this->post_1->ID );
+        $post = get_post( $post->ID );
 
         // check the primary author wasn't changed
-        $this->assertEquals( $post->post_author, $this->user_1->ID );
+        $this->assertEquals( $post->post_author, $user_1->ID );
 
         // check user is deleted from coauthors
         $this->assertEquals(
             $ssl_alp->coauthors->get_coauthors( $post ),
             array(
-                $this->user_1,
-                $this->user_2
+                $user_1,
+                $user_3
             )
         );
 
@@ -728,7 +719,7 @@ class CoauthorsTest extends WP_UnitTestCase {
         $this->assertEquals( $post->post_status, 'publish' );
 
         // check term is also deleted
-        $this->assertFalse( $ssl_alp->coauthors->get_coauthor_term( $new_user ) );
+        $this->assertFalse( $ssl_alp->coauthors->get_coauthor_term( $user_2 ) );
     }
 
     /**
@@ -741,38 +732,29 @@ class CoauthorsTest extends WP_UnitTestCase {
     function test_coauthor_delete_user_that_is_secondary_author_of_multi_author_post_with_reassign() {
         global $ssl_alp;
 
-        $new_user = $this->factory->user->create_and_get();
-        $reassign_user = $this->factory->user->create_and_get();
-
-        // set coauthors
-        $ssl_alp->coauthors->set_coauthors(
-            $this->post_3,
-            array(
-                $this->user_1,
-                $new_user,
-                $this->user_2
-            )
-        );
+        $user_1 = $this->factory->user->create_and_get();
+        $user_2 = $this->factory->user->create_and_get();
+        $user_3 = $this->factory->user->create_and_get();
+        $post = $this->create_coauthor_post( $user_1, array( $user_1, $user_2 ) );
 
         // delete user, reassigning their posts to other user
-        $this->ssl_delete_user( $new_user->ID, $reassign_user->ID );
+        $this->ssl_delete_user( $user_2->ID, $user_3->ID );
 
         // user should be deleted
-        $this->check_user_deleted( $new_user->ID );
+        $this->check_user_deleted( $user_2->ID );
 
         // refresh post object
-        $post = get_post( $this->post_3->ID );
+        $post = get_post( $post->ID );
 
         // check the primary author wasn't changed
-        $this->assertEquals( $post->post_author, $this->user_1->ID );
+        $this->assertEquals( $post->post_author, $user_1->ID );
 
         // check user is deleted from coauthors
         $this->assertEquals(
             $ssl_alp->coauthors->get_coauthors( $post ),
             array(
-                $this->user_1,
-                $reassign_user,
-                $this->user_2
+                $user_1,
+                $user_3
             )
         );
 
@@ -780,7 +762,7 @@ class CoauthorsTest extends WP_UnitTestCase {
         $this->assertEquals( $post->post_status, 'publish' );
 
         // check term is also deleted
-        $this->assertFalse( $ssl_alp->coauthors->get_coauthor_term( $new_user ) );
+        $this->assertFalse( $ssl_alp->coauthors->get_coauthor_term( $user_2 ) );
     }
 
     /**
@@ -794,39 +776,31 @@ class CoauthorsTest extends WP_UnitTestCase {
     function test_coauthor_delete_user_that_is_secondary_author_of_multi_author_post_with_reassign_lower() {
         global $ssl_alp;
 
-        $new_user = $this->factory->user->create_and_get();
-        $reassign_user = $this->factory->user->create_and_get();
-
-        // set coauthors
-        $ssl_alp->coauthors->set_coauthors(
-            $this->post_3,
-            array(
-                $this->user_1,
-                $new_user,
-                $this->user_2,
-                $reassign_user
-            )
-        );
+        $user_1 = $this->factory->user->create_and_get();
+        $user_2 = $this->factory->user->create_and_get();
+        $user_3 = $this->factory->user->create_and_get();
+        $user_4 = $this->factory->user->create_and_get();
+        $post = $this->create_coauthor_post( $user_1, array( $user_1, $user_2, $user_3, $user_4 ) );
 
         // delete user, reassigning their posts to other user
-        $this->ssl_delete_user( $new_user->ID, $reassign_user->ID );
+        $this->ssl_delete_user( $user_2->ID, $user_4->ID );
 
         // user should be deleted
-        $this->check_user_deleted( $new_user->ID );
+        $this->check_user_deleted( $user_2->ID );
 
         // refresh post object
-        $post = get_post( $this->post_3->ID );
+        $post = get_post( $post->ID );
 
         // check the primary author wasn't changed
-        $this->assertEquals( $post->post_author, $this->user_1->ID );
+        $this->assertEquals( $post->post_author, $user_1->ID );
 
         // check user is deleted from coauthors
         $this->assertEquals(
             $ssl_alp->coauthors->get_coauthors( $post ),
             array(
-                $this->user_1,
-                $reassign_user,
-                $this->user_2
+                $user_1,
+                $user_4,
+                $user_3
             )
         );
 
@@ -834,7 +808,7 @@ class CoauthorsTest extends WP_UnitTestCase {
         $this->assertEquals( $post->post_status, 'publish' );
 
         // check term is also deleted
-        $this->assertFalse( $ssl_alp->coauthors->get_coauthor_term( $new_user ) );
+        $this->assertFalse( $ssl_alp->coauthors->get_coauthor_term( $user_2 ) );
     }
 
     /**
@@ -848,39 +822,31 @@ class CoauthorsTest extends WP_UnitTestCase {
     function test_coauthor_delete_user_that_is_secondary_author_of_multi_author_post_with_reassign_higher() {
         global $ssl_alp;
 
-        $new_user = $this->factory->user->create_and_get();
-        $reassign_user = $this->factory->user->create_and_get();
-
-        // set coauthors
-        $ssl_alp->coauthors->set_coauthors(
-            $this->post_3,
-            array(
-                $this->user_1,
-                $reassign_user,
-                $this->user_2,
-                $new_user
-            )
-        );
+        $user_1 = $this->factory->user->create_and_get();
+        $user_2 = $this->factory->user->create_and_get();
+        $user_3 = $this->factory->user->create_and_get();
+        $user_4 = $this->factory->user->create_and_get();
+        $post = $this->create_coauthor_post( $user_1, array( $user_1, $user_2, $user_3, $user_4 ) );
 
         // delete user, reassigning their posts to other user
-        $this->ssl_delete_user( $new_user->ID, $reassign_user->ID );
+        $this->ssl_delete_user( $user_4->ID, $user_2->ID );
 
         // user should be deleted
-        $this->check_user_deleted( $new_user->ID );
+        $this->check_user_deleted( $user_4->ID );
 
         // refresh post object
-        $post = get_post( $this->post_3->ID );
+        $post = get_post( $post->ID );
 
         // check the primary author wasn't changed
-        $this->assertEquals( $post->post_author, $this->user_1->ID );
+        $this->assertEquals( $post->post_author, $user_1->ID );
 
         // check user is deleted from coauthors
         $this->assertEquals(
             $ssl_alp->coauthors->get_coauthors( $post ),
             array(
-                $this->user_1,
-                $reassign_user,
-                $this->user_2
+                $user_1,
+                $user_2,
+                $user_3
             )
         );
 
@@ -888,171 +854,170 @@ class CoauthorsTest extends WP_UnitTestCase {
         $this->assertEquals( $post->post_status, 'publish' );
 
         // check term is also deleted
-        $this->assertFalse( $ssl_alp->coauthors->get_coauthor_term( $new_user ) );
+        $this->assertFalse( $ssl_alp->coauthors->get_coauthor_term( $user_4 ) );
     }
+
+    // /**
+    //  * Test post counts including coauthored posts.
+    //  */
+    // function test_post_counts() {
+    //     global $ssl_alp;
+
+    //     // users initially have 1 each
+    //     $this->assertEquals( count_user_posts( $this->user_1->ID), 1 );
+    //     $this->assertEquals( count_user_posts( $this->user_2->ID), 1 );
+    //     $this->assertEquals( count_user_posts( $this->user_3->ID), 1 );
+
+    //     // create a bunch of posts
+    //     $count = 10;
+    //     $post_ids = $this->factory->post->create_many( $count );
+
+    //     // set coauthors
+    //     foreach ( $post_ids as $post_id ) {
+    //         $ssl_alp->coauthors->set_coauthors(
+    //             $post_id,
+    //             array(
+    //                 $this->user_1,
+    //                 $this->user_2
+    //             )
+    //         );
+    //     }
+
+    //     // user 1 and 2 should have $count more posts
+    //     $this->assertEquals( count_user_posts( $this->user_1->ID), $count + 1 );
+    //     $this->assertEquals( count_user_posts( $this->user_2->ID), $count + 1 );
+    //     $this->assertEquals( count_user_posts( $this->user_3->ID), 1 );
+
+    //     // test our implementation of count_many_users_posts
+    //     $this->assertEquals(
+    //         array_values(
+    //             $ssl_alp->coauthors->count_many_users_posts(
+    //                 array(
+    //                     $this->user_1->ID,
+    //                     $this->user_2->ID,
+    //                     $this->user_3->ID
+    //                 )
+    //             )
+    //         ),
+    //         array(
+    //             $count + 1,
+    //             $count + 1,
+    //             1
+    //         )
+    //     );
+    // }
+
+    // /**
+    //  * Check the reported number of coauthored posts by an author agrees with the
+    //  * actual amount
+    //  */
+    // function test_reported_count_vs_actual_count() {
+    //     global $ssl_alp;
+
+    //     // create new user
+    //     $user = $this->factory->user->create_and_get();
+
+    //     // create posts as $user
+    //     wp_set_current_user( $user->ID );
+    //     $this->factory->post->create_many( 5 );
+
+    //     // create posts as other user
+    //     wp_set_current_user( $this->user_1->ID );
+    //     $post_ids = $this->factory->post->create_many( 5 );
+
+    //     // set $user to be coauthor
+    //     foreach ( $post_ids as $post_id ) {
+    //         $ssl_alp->coauthors->set_coauthors(
+    //             get_post( $post_id ),
+    //             array(
+    //                 $this->user_1,
+    //                 $user
+    //             )
+    //         );
+    //     }
+
+    //     // create posts as other user
+    //     wp_set_current_user( $this->user_2->ID );
+    //     $post_ids = $this->factory->post->create_many( 5 );
+
+    //     // set $user to be coauthor
+    //     foreach ( $post_ids as $post_id ) {
+    //         $ssl_alp->coauthors->set_coauthors(
+    //             get_post( $post_id ),
+    //             array(
+    //                 $this->user_1,
+    //                 $this->user_2,
+    //                 $user
+    //             )
+    //         );
+    //     }
+
+    //     // check filter reports correct count
+    //     $this->assertEquals( 15, count_user_posts( $user->ID ) );
+
+    //     // check manually get correct count
+    //     $this->assertEquals( 15, count( $ssl_alp->coauthors->get_coauthor_posts( $user ) ) );
+    // }
+
+    // /* doesn't work on network sites - WP_Query object isn't a user post query for some reason (it works
+    //    for single sites...)
+    // function test_author_page_posts() {
+    //     global $ssl_alp;
+
+    //     $user_1 = $this->factory->user->create_and_get();
+    //     $user_2 = $this->factory->user->create_and_get();
+    //     $user_3 = $this->factory->user->create_and_get();
+
+    //     // create a bunch of posts
+    //     $post_ids = $this->factory->post->create_many( 5 );
+
+    //     // set coauthors
+    //     foreach ( $post_ids as $post_id ) {
+    //         $ssl_alp->coauthors->set_coauthors(
+    //             $post_id,
+    //             array(
+    //                 $user_1,
+    //                 $user_2
+    //             )
+    //         );
+    //     }
+
+    //     // extra post for user 1 with no coauthors
+    //     $post_1 = $this->factory->post->create_and_get(
+    //         array(
+    //             'post_author'   =>  $user_1->ID
+    //         )
+    //     );
+
+    //     $post_ids[] = $post_1->ID;
+
+    //     // user 1 should have 6
+    //     $this->go_to( get_author_posts_url( $user_1->ID ) );
+
+    //     log_message( have_posts() ? "has posts" : "no posts" );
+    //     log_message( $wp_query->posts );
+
+    //     $this->assertEquals( $this->count_posts(), 6 );
+
+    //     // user 2 should have 5
+    //     $this->go_to( get_author_posts_url( $user_2->ID ) );
+    //     $this->assertEquals( $this->count_posts(), 5 );
+
+    //     // user 3 should have 0
+    //     $this->go_to( get_author_posts_url( $user_3->ID ) );
+    //     $this->assertEquals( $this->count_posts(), 0 );
+    // }*/
 
     /**
-     * Test post counts including coauthored posts.
+     * Test that renaming a user also renames their corresponding term.
      */
-    function test_post_counts() {
-        global $ssl_alp;
-
-        // users initially have 1 each
-        $this->assertEquals( count_user_posts( $this->user_1->ID), 1 );
-        $this->assertEquals( count_user_posts( $this->user_2->ID), 1 );
-        $this->assertEquals( count_user_posts( $this->user_3->ID), 1 );
-
-        // create a bunch of posts
-        $count = 10;
-        $post_ids = $this->factory->post->create_many( $count );
-
-        // set coauthors
-        foreach ( $post_ids as $post_id ) {
-            $ssl_alp->coauthors->set_coauthors(
-                $post_id,
-                array(
-                    $this->user_1,
-                    $this->user_2
-                )
-            );
-        }
-
-        // user 1 and 2 should have $count more posts
-        $this->assertEquals( count_user_posts( $this->user_1->ID), $count + 1 );
-        $this->assertEquals( count_user_posts( $this->user_2->ID), $count + 1 );
-        $this->assertEquals( count_user_posts( $this->user_3->ID), 1 );
-
-        // test our implementation of count_many_users_posts
-        $this->assertEquals(
-            array_values(
-                $ssl_alp->coauthors->count_many_users_posts(
-                    array(
-                        $this->user_1->ID,
-                        $this->user_2->ID,
-                        $this->user_3->ID
-                    )
-                )
-            ),
-            array(
-                $count + 1,
-                $count + 1,
-                1
-            )
-        );
-    }
-
-    /**
-     * Check the reported number of coauthored posts by an author agrees with the
-     * actual amount
-     */
-    function test_reported_count_vs_actual_count() {
-        global $ssl_alp;
-
-        // create new user
-        $user = $this->factory->user->create_and_get();
-
-        // create posts as $user
-        wp_set_current_user( $user->ID );
-        $this->factory->post->create_many( 5 );
-
-        // create posts as other user
-        wp_set_current_user( $this->user_1->ID );
-        $post_ids = $this->factory->post->create_many( 5 );
-
-        // set $user to be coauthor
-        foreach ( $post_ids as $post_id ) {
-            $ssl_alp->coauthors->set_coauthors(
-                get_post( $post_id ),
-                array(
-                    $this->user_1,
-                    $user
-                )
-            );
-        }
-
-        // create posts as other user
-        wp_set_current_user( $this->user_2->ID );
-        $post_ids = $this->factory->post->create_many( 5 );
-
-        // set $user to be coauthor
-        foreach ( $post_ids as $post_id ) {
-            $ssl_alp->coauthors->set_coauthors(
-                get_post( $post_id ),
-                array(
-                    $this->user_1,
-                    $this->user_2,
-                    $user
-                )
-            );
-        }
-
-        // check filter reports correct count
-        $this->assertEquals( 15, count_user_posts( $user->ID ) );
-
-        // check manually get correct count
-        $this->assertEquals( 15, count( $ssl_alp->coauthors->get_coauthor_posts( $user ) ) );
-    }
-
-    /* doesn't work on network sites - WP_Query object isn't a user post query for some reason (it works
-       for single sites...)
-    function test_author_page_posts() {
+    public function test_rename_user_renames_coauthor_terms() {
         global $ssl_alp;
 
         $user_1 = $this->factory->user->create_and_get();
         $user_2 = $this->factory->user->create_and_get();
-        $user_3 = $this->factory->user->create_and_get();
 
-        // create a bunch of posts
-        $post_ids = $this->factory->post->create_many( 5 );
-
-        // set coauthors
-        foreach ( $post_ids as $post_id ) {
-            $ssl_alp->coauthors->set_coauthors(
-                $post_id,
-                array(
-                    $user_1,
-                    $user_2
-                )
-            );
-        }
-
-        // extra post for user 1 with no coauthors
-        $post_1 = $this->factory->post->create_and_get(
-            array(
-                'post_author'   =>  $user_1->ID
-            )
-        );
-
-        $post_ids[] = $post_1->ID;
-
-        // user 1 should have 6
-        $this->go_to( get_author_posts_url( $user_1->ID ) );
-
-        log_message( have_posts() ? "has posts" : "no posts" );
-        log_message( $wp_query->posts );
-
-        $this->assertEquals( $this->count_posts(), 6 );
-
-        // user 2 should have 5
-        $this->go_to( get_author_posts_url( $user_2->ID ) );
-        $this->assertEquals( $this->count_posts(), 5 );
-
-        // user 3 should have 0
-        $this->go_to( get_author_posts_url( $user_3->ID ) );
-        $this->assertEquals( $this->count_posts(), 0 );
-    }*/
-
-    /**
-     * Test that renaming a user doesn't also rename their corresponding terms.
-     * 
-     * The username is constant
-     */
-    public function test_rename_user_doesnt_rename_coauthor_terms() {
-        global $ssl_alp;
-
-        $user_1 = $this->factory->user->create_and_get();
-        $user_2 = $this->factory->user->create_and_get();
-
+        // NEEDS TO USE create_coauthor_post
         // add a bunch of coauthored posts for user 1
         $this->factory->post->create_many(
             5,
