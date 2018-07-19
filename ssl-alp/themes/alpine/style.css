@@ -554,7 +554,7 @@ a:hover, a:active {
 /*--------------------------------------------------------------
 7.0 Alignments
 --------------------------------------------------------------*/
-.wp-post-image{
+.wp-post-image {
 	margin-bottom: 8px;
 }
 
@@ -846,6 +846,10 @@ span.cat-links a, span.tag-links a {
 	border-radius: 4px;
 	padding-left: 4px;
 	padding-right: 4px;
+}
+
+.error-404 {
+	text-align: center;
 }
 
 /*--------------------------------------------------------------
@@ -1245,5 +1249,5 @@ header#masthead{
 }
 
 body.search-no-results .page-content {
-  margin: 0 10px 10px 10px;
+  	margin: 0 10px 10px 10px;
 }
