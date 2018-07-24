@@ -34,19 +34,27 @@ features may be removed or broken between updates.
 = 0.7.4 =
  - Theme tweaks.
 = 0.7.5 =
- - Move media type settings to network admin
- - Move KaTeX custom script path control to network admin
- - Setting page tweaks
- - Change behaviour of [doi] and [arxiv] shortcodes
- - Fix bug with generated table of contents HTML
- - Show real revision count on posts (one less than before)
- - Rename settings for consistency
- - Fix JavaScript bug
- - Add uninstaller
- - Add page and tools tests
+ - Move media type settings to network admin.
+ - Move KaTeX custom script path control to network admin.
+ - Setting page tweaks.
+ - Change behaviour of [doi] and [arxiv] shortcodes.
+ - Fix bug with generated table of contents HTML.
+ - Show real revision count on posts (one less than before).
+ - Rename settings for consistency.
+ - Fix JavaScript bug.
+ - Add uninstaller.
+ - Add page and tools tests.
 = 0.7.6 =
- - Fix bug with coauthor delete on multisite
- - New automated tests
+ - Fix bug with coauthor delete on multisite.
+ - New automated tests.
 = 0.7.7 =
- - Fix bug with coauthor JavaScript on Safari
- - New automated tests
+ - Fix bug with coauthor JavaScript on Safari.
+ - New automated tests.
+= 0.8.0 =
+ - Coauthors are now selected using a tag-like taxonomy selector on
+   the post edit page, meaning that custom JavaScript is no longer
+   required.
+ - Removed [arxiv] and [doi] shortcode support in anticipation of a
+   Gutenberg block to be added later.
+ - New automated tests.
+ - Theme tweaks.

@@ -1,8 +1,8 @@
 === Alpine ===
 Contributors: Sean Leavey
-Requires at least: 4.9
-Tested up to: 4.9.4
-Stable tag: 0.7.7
+Requires at least: 4.9.7
+Tested up to: 4.9.7
+Stable tag: 0.8.0
 License: GNU General Public License v3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -45,6 +45,10 @@ No theme changes.
 
 = 0.7.7 - 2018-05-03 =
 No theme changes.
+
+= 0.8.0 - 2018-07-24 =
+ - Add message for empty author archive pages
+ - Add footer link to privacy policy
 
 == Credits ==
 * Theme based on Simple Life https://wordpress.org/themes/simple-life/, by Nilambar
