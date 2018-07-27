@@ -91,6 +91,6 @@ class RevisionsTest extends WP_UnitTestCase {
         $this->assertEquals( 'Second edit message.', $revision_meta[0]['message'] );
 
         // restore previous user
-        wp_set_current_user( $previous_user );
+        wp_set_current_user( $previous_user->ID );
 	}
 }
