@@ -426,6 +426,14 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// current user
 		$user = wp_get_current_user();
 
+		// get post count
+		$post_count = $this->get_user_post_count( $user );
+
+		if ( is_null( $post_count ) ) {
+			// user has no posts
+			$post_count = 0;
+		}
+
 		// get current user's coauthor term slug
 		$coauthor_slug = $this->get_coauthor_term_slug( $user );
 
@@ -453,7 +461,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			$class,
 			esc_url( add_query_arg( array_map( 'rawurlencode', $mine_args ), admin_url( 'edit.php' ) ) ),
 			__( 'Mine', 'ssl_alp' ),
-			$this->get_user_post_count( $user )
+			$post_count
 		);
 
 		// add "All" view to end, and stop it from showing up if "Mine" is enabled
