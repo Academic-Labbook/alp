@@ -345,7 +345,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		// get edit summary from revision's parent
 		$edit_summary = get_post_meta( $post_id, 'ssl_alp_edit_summary', true );
 
-		if ( 0 !== sizeof( $edit_summary ) && is_array( $edit_summary ) ) {
+		if ( is_array( $edit_summary ) && count( $edit_summary ) ) {
 			/*
 			 * Add parent's custom meta data to revision
 			 *
