@@ -130,7 +130,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * Register post meta field for edit summaries
 	 */
 	public function register_edit_summary_post_meta() {
-		register_meta( 'post', 'edit_summary', array(
+		register_meta( 'post', 'ssl_alp_edit_summary', array(
 			'show_in_rest'		=>	true,
 			'sanitize_callback'	=>	array( $this, 'sanitize_edit_summary' )
 		) );
@@ -216,7 +216,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		}
 
 		// get the stored meta value from the revision
-		$revision_meta = get_post_meta( $revision->ID, 'edit_summary', true );
+		$revision_meta = get_post_meta( $revision->ID, 'ssl_alp_edit_summary', true );
 
 		if ( empty( $revision_meta ) || ! is_array( $revision_meta ) ) {
 			// empty or invalid
@@ -256,7 +256,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		}
 
 		// get revision edit summary
-		$revision_meta = get_post_meta( $revision->ID, 'edit_summary', true );
+		$revision_meta = get_post_meta( $revision->ID, 'ssl_alp_edit_summary', true );
 
 		if ( empty( $revision_meta ) || ! is_array( $revision_meta ) ) {
 			// empty or invalid
@@ -288,10 +288,10 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		delete_post_meta( $post_id, 'edit_summary' );
 
 		// get the stored meta value from the revision we are reverting to
-		$target_revision_meta = get_post_meta( $revision_id, 'edit_summary', true );
+		$target_revision_meta = get_post_meta( $revision_id, 'ssl_alp_edit_summary', true );
 
 		// add revision's meta value to parent
-		add_post_meta( $post_id, 'edit_summary', $target_revision_meta );
+		add_post_meta( $post_id, 'ssl_alp_edit_summary', $target_revision_meta );
 
 		// get latest revisions, so we can change the latest's revision flag
 		$latest_revisions = wp_get_post_revisions( $post_id,
@@ -319,7 +319,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		* update_meta() to ensure metadata is updated on the revision post
 		* and not its parent.
 		*/
-		update_metadata( 'post', $latest_revision_meta->ID, 'edit_summary', $latest_edit_summary );
+		update_metadata( 'post', $latest_revision_meta->ID, 'ssl_alp_edit_summary', $latest_edit_summary );
 	}
 
     /**
@@ -346,7 +346,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		// save revisioned meta field
 		// get edit summary from revision's parent
-		$edit_summary = get_post_meta( $post_id, 'edit_summary', true );
+		$edit_summary = get_post_meta( $post_id, 'ssl_alp_edit_summary', true );
 
 		if ( 0 !== sizeof( $edit_summary ) && is_array( $edit_summary ) ) {
 			/*
@@ -356,7 +356,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			 * add_post_meta() to ensure metadata is added to the revision post
 			 * and not its parent.
 			 */
-			add_metadata( 'post', $revision_id, 'edit_summary', $edit_summary );
+			add_metadata( 'post', $revision_id, 'ssl_alp_edit_summary', $edit_summary );
 		}
 	}
 
@@ -370,10 +370,10 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		}
 
 		// get parent post meta
-		$parent_meta = get_post_meta( $post->ID, 'edit_summary' );
+		$parent_meta = get_post_meta( $post->ID, 'ssl_alp_edit_summary' );
 
 		// get revision meta
-		$revision_meta = get_post_meta( $last_revision->ID, 'edit_summary' );
+		$revision_meta = get_post_meta( $last_revision->ID, 'ssl_alp_edit_summary' );
 
 		if ( ! is_array( $parent_meta ) || ! is_array( $revision_meta ) ) {
 			// invalid
@@ -419,7 +419,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		);
 
 		// update the post's edit summary
-		update_post_meta( $post_id, 'edit_summary', $edit_summary );
+		update_post_meta( $post_id, 'ssl_alp_edit_summary', $edit_summary );
 	}
 
 	/**
