@@ -12,6 +12,7 @@ class RevisionsTest extends WP_UnitTestCase {
             )
         );
 
+        $previous_user = wp_get_current_user();
         wp_set_current_user( $user_id );
 
 		// create post
@@ -88,5 +89,8 @@ class RevisionsTest extends WP_UnitTestCase {
         $revision_meta = get_post_meta( $revision->ID, 'ssl_alp_edit_summary' );
         $this->assertCount( 1, $revision_meta );
         $this->assertEquals( 'Second edit message.', $revision_meta[0]['message'] );
+
+        // restore previous user
+        wp_set_current_user( $previous_user );
 	}
 }
