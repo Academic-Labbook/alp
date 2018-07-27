@@ -68,6 +68,9 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	public function register_hooks() {
 		$loader = $this->get_loader();
 
+		// register post meta for edit summaries
+		$loader->add_action( 'init', $this, 'register_edit_summary_post_meta' );
+
         // add edit summary box to post and page edit screens
         $loader->add_action( 'post_submitbox_misc_actions', $this, 'add_edit_summary_textbox' );
 
@@ -121,6 +124,59 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Register post meta field for edit summaries
+	 */
+	public function register_edit_summary_post_meta() {
+		register_meta( 'post', 'edit_summary', array(
+			'show_in_rest'		=>	true,
+			'sanitize_callback'	=>	array( $this, 'sanitize_edit_summary' )
+		) );
+	}
+
+	/**
+	 * Sanitize the specified edit summary. The edit summary should be an array
+	 * containing 'reverted' and 'message' fields.
+	 */
+	public function sanitize_edit_summary( $edit_summary ) {
+		if ( ! is_array( $edit_summary ) ) {
+			// default to an empty array
+			$edit_summary = array();
+		}
+
+		$edit_summary = wp_parse_args( $edit_summary, array (
+			'message'	=>	'',
+			'reverted'	=>	''
+		) );
+
+		$edit_summary['message'] = wp_kses( $edit_summary['message'], wp_kses_allowed_html( 'strip' ) );
+
+		// limit length
+		$max = get_option( 'ssl_alp_edit_summary_max_length' );
+
+		if ( strlen( $edit_summary['message'] ) > $max ) {
+			// trim extra characters beyond limit
+			$edit_summary['message'] = substr( $edit_summary['message'], 0, $max );
+		}
+
+		if ( ! empty( $edit_summary['reverted']) ) {
+			$edit_summary['reverted'] = absint( $edit_summary['reverted'] );
+		} else {
+			// default to zero (not reverted)
+			$edit_summary['reverted'] = 0;
+		}
+
+		// build final array
+		$meta = array(
+			'message'	=>	$edit_summary['message'],
+			'reverted'	=>	$edit_summary['reverted']
+		);
+
+		error_log(print_r($meta, true));
+
+		return $meta;
 	}
 
     /**
@@ -180,7 +236,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		}
 
 		// add message
-		$revision_message = esc_html( $revision_meta["message"] );
+		$revision_message = sanitize_text_field( $revision_meta["message"] );
 
 		if ( ! empty( $revision_message ) ) {
 			/* translators: %s: revision edit summary */
@@ -207,7 +263,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			return $data;
 		}
 
-		$edit_summary = esc_html( $revision_meta["message"] );
+		$edit_summary = sanitize_text_field( $revision_meta["message"] );
 
 		if ( $revision_meta["reverted"] !== 0 ) {
 			// this revision was a revert to previous revision
@@ -252,7 +308,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		// create latest revision's edit summary
 		$latest_edit_summary = array(
-			"reverted"	=> $revision_id,
+			"reverted"	=>	$revision_id,
 			"message"	=>	$target_revision_meta["message"]
 		);
 
@@ -351,22 +407,14 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		
 		if ( array_key_exists( 'ssl_alp_revision_post_edit_summary', $_POST ) ) {
 			// sanitise edit summary input
-			$message = sanitize_text_field( $_POST['ssl_alp_revision_post_edit_summary'] );
+			$message = $_POST['ssl_alp_revision_post_edit_summary'];
 		} else {
 			// no edit summary provided
 			$message = '';
 		}
 
-		// limit length
-		$max = get_option( 'ssl_alp_edit_summary_max_length' );
-
-		if ( strlen( $message ) > $max ) {
-			$message = substr( $message, 0, $max );
-		}
-
 		# construct meta data array
 		$edit_summary = array(
-			"reverted"	=> 0,
 			"message"	=> $message
 		);
 
@@ -374,6 +422,9 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		update_post_meta( $post_id, 'edit_summary', $edit_summary );
 	}
 
+	/**
+	 * Display revisions meta box on edit screen by default
+	 */
     public function unhide_revisions_meta_box( $hidden, $screen ) {
 		if ( ! post_type_supports( $screen->post_type, 'revisions' ) ) {
 			// return as-is
