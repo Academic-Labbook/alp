@@ -118,7 +118,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		// check if setting is enabled, and if user has permission
 		// 'edit_post' capability == 'edit_posts', 'edit_page' == 'edit_pages', etc. (see wp-includes/capabilities.php)
-		if ( ! get_option( "ssl_alp_{$post->post_type}_edit_summaries" ) || ! current_user_can( "edit_{$post->post_type}", $post->ID ) ) {
+		if ( ! get_option( "ssl_alp_enable_{$post->post_type}_edit_summaries" ) || ! current_user_can( "edit_{$post->post_type}", $post->ID ) ) {
 			// disabled for posts, or user not allowed to view
 			return false;
 		}
@@ -172,8 +172,6 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			'message'	=>	$edit_summary['message'],
 			'reverted'	=>	$edit_summary['reverted']
 		);
-
-		error_log(print_r($meta, true));
 
 		return $meta;
 	}
