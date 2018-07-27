@@ -131,7 +131,6 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 */
 	public function register_edit_summary_post_meta() {
 		register_meta( 'post', 'ssl_alp_edit_summary', array(
-			'show_in_rest'		=>	true,
 			'sanitize_callback'	=>	array( $this, 'sanitize_edit_summary' )
 		) );
 	}
