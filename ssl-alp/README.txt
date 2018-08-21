@@ -58,3 +58,14 @@ features may be removed or broken between updates.
    Gutenberg block to be added later.
  - New automated tests.
  - Theme tweaks.
+= 0.8.1 =
+ - Internal work:
+   - Properly register edit summaries as post meta.
+   - Properly sanitise user-submitted post edit summaries.
+   - Rename internal post meta key for edit summaries.
+ - Fix post counts showing up as null on admin post list when user
+   has no posts.
+ - Fix bug with edit summary permission check.
+ - Fix bug with coauthor term not being created when network user
+   is added to a blog.
+ - New automated tests.
