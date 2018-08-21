@@ -12,7 +12,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	protected $supported_post_types = array(
         'post'
 	);
-	
+
 	protected $coauthor_term_slug_prefix = 'ssl-alp-coauthor-';
 
 	protected $having_terms = '';
@@ -35,8 +35,9 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// stop deletion of user's posts when their account is deleted (this is handled separately by `delete_user_action`)
 		$loader->add_filter( 'post_types_to_delete_with_user', $this, 'filter_post_types_to_delete_with_user' );
 
-		// create user term when user is created or updated
+		// create user term when user is created, updated or added to a blog on a network
 		$loader->add_action( 'user_register', $this, 'add_coauthor_term', 10, 1 );
+		$loader->add_action( 'add_user_to_blog', $this, 'add_coauthor_term', 10, 1 );
 		$loader->add_action( 'profile_update', $this, 'update_coauthor_term', 10, 2 );
 
 		// hooks to modify the published post number count on the Users WP List Table
@@ -114,7 +115,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			'ssl_alp_post_settings_section'
 		);
 	}
-	
+
 	public function author_settings_callback() {
 		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/author-settings-display.php';
 	}
@@ -218,14 +219,15 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Add author term
+	 * Add author term. This is called when a user is created, but also when a user is
+	 * added to a new blog.
 	 */
 	public function add_coauthor_term( $coauthor ) {
 		if ( is_int( $coauthor ) ) {
 			// get user by their id
 			$coauthor = get_user_by( 'id', $coauthor );
 		}
-		
+
 		if ( ! is_object( $coauthor ) ) {
 			return;
 		}
@@ -276,7 +278,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			// the slug doesn't contain the prefix
 			return false;
 		}
-		
+
 		// remove prefix
 		$user_nicename = substr( $term->slug, strlen( $this->coauthor_term_slug_prefix ) );
 
@@ -349,11 +351,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		$term_names = array();
-		
+
 		foreach ( $terms as $term ) {
 			$term_names[] = $term->name;
 		}
-	 
+
 		return esc_attr( join( ',', $term_names ) );
 	}
 
@@ -616,7 +618,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 				// no author defined
 				return $where;
 			}
-			
+
 			$coauthor = get_user_by( 'login', $author_data->user_login );
 		}
 
@@ -683,7 +685,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	/**
 	 * Checks if the specified post is an autodraft, i.e. a new post.
 	 */
-	private function is_post_autodraft( $post ) { 
+	private function is_post_autodraft( $post ) {
     	return $post->post_status === "auto-draft";
 	}
 
@@ -703,16 +705,16 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		} elseif ( ! $this->post_supports_coauthors( $post ) ) {
 			return;
 		}
-		
+
 		// get updated coauthors
 		$coauthors = array( wp_get_current_user() );
-		
+
 		$this->set_coauthors( $post, $coauthors );
 	}
 
 	/**
 	 * Check and if necessary update the primary author when post coauthor terms are set.
-	 * 
+	 *
 	 * This checks that WordPress core's post author is consistent with the coauthor order.
 	 * If a post is edited to move the post author to a non-first coauthor position, this
 	 * function changes the post author to whoever is now first.
@@ -739,7 +741,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		if ( ! $this->post_supports_coauthors( $post ) ) {
 			return;
 		}
-		
+
 		// get post's previous author (the post's author in the database row)
 		$existing_primary_author = get_user_by( 'id', $post->post_author );
 
@@ -769,25 +771,25 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		clean_post_cache( $post->ID );
 	}
 
-	public function get_coauthors( $post = null ) {	
+	public function get_coauthors( $post = null ) {
 		$post = get_post( $post );
-	
+
 		if ( is_null( $post ) ) {
 			// no post
 			return;
 		}
-	
+
 		// empty coauthors list
 		$coauthors = array();
-	
+
 		// get this post's terms
 		$coauthor_terms = $this->get_coauthor_terms_for_post( $post );
-	
+
 		if ( is_array( $coauthor_terms ) && ! empty( $coauthor_terms ) ) {
 			// this post has coauthors
 			foreach ( $coauthor_terms as $coauthor_term ) {
 				$post_author = $this->get_user_from_coauthor_term( $coauthor_term );
-				
+
 				// in case the user has been deleted while plugin was deactivated
 				if ( ! empty( $post_author ) ) {
 					$coauthors[] = $post_author;
@@ -797,13 +799,13 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 		// get the post's primary author
 		$post_author = get_user_by( 'id', $post->post_author );
-	
+
 		// try to ensure at least the post's primary author is in the list of coauthors
 		if ( ! empty( $post_author ) && ! in_array( $post_author, $coauthors ) ) {
 			// post primary author exists but isn't listed as a coauthor, so add them to the start of the coauthors array
 			array_unshift( $coauthors, $post_author );
 		}
-	
+
 		return $coauthors;
 	}
 
@@ -849,7 +851,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * posts instead of `wp_delete_user`. Since this plugin disables (single) author
 	 * support for posts, it must delete posts here instead of leaving it to
 	 * `wp_delete_user`.
-	 * 
+	 *
 	 * When reassigning a user, the deleted user is replaced with the reassign user in the
 	 * deleted user's posts if they are either not already a coauthor of each post, or are
 	 * a coauthor with lower position than the deleted user. If the reassigned user has a
@@ -899,7 +901,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 						// remove them as author
 						$wpdb->update( $wpdb->posts, array( 'post_author' => null ), array( 'ID' => $post_id ) );
 						clean_post_cache( $post_id );
-						
+
 						// delete (or trash, if enabled) the post
 						wp_delete_post( $post_id );
 					}
@@ -911,12 +913,12 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			// get user to reassign posts to
 			$reassign_user = get_user_by( 'id', $reassign_id );
 
-			if ( is_object( $reassign_user ) ) {				
+			if ( is_object( $reassign_user ) ) {
 				// get all posts user is author of
 				$coauthored_posts = $this->get_coauthor_posts( $delete_user );
 
 				if ( count( $coauthored_posts ) ) {
-					foreach ( $coauthored_posts as $coauthored_post ) {						
+					foreach ( $coauthored_posts as $coauthored_post ) {
 						// get existing coauthors of this post
 						$coauthors = $this->get_coauthors( $coauthored_post );
 
@@ -1009,11 +1011,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			// get user by their id
 			$user = get_user_by( 'id', $user );
 		}
-		
+
 		if ( ! is_object( $user ) ) {
 			return null;
 		}
-		
+
 		// find user term
 		$user_term = $this->get_coauthor_term( $user );
 
@@ -1309,7 +1311,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		 * behaviour of count_many_users_posts, and so it cannot inject
 		 * coauthor posts. Instead, we just have to query it manually here.
 		 */
-		
+
 		// list of counts by user id
 		$counts = array();
 
