@@ -71,8 +71,11 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		// register post meta for edit summaries
 		$loader->add_action( 'init', $this, 'register_edit_summary_post_meta' );
 
+		// add edit summary box to block editor
+		$loader->add_action( 'enqueue_block_editor_assets', $this, 'add_edit_summary_block' );
+
         // add edit summary box to post and page edit screens
-        $loader->add_action( 'post_submitbox_misc_actions', $this, 'add_edit_summary_textbox' );
+        $loader->add_action( 'post_submitbox_misc_actions', $this, 'add_edit_summary_textarea' );
 
         // add edit summary to revision history list under posts/pages/etc.
         $loader->add_filter( 'wp_post_revision_title_expanded', $this, 'add_revision_title_edit_summary', 10, 2 );
@@ -131,6 +134,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 */
 	public function register_edit_summary_post_meta() {
 		register_meta( 'post', 'ssl_alp_edit_summary', array(
+			'object_subtype'	=>	'post',
 			'sanitize_callback'	=>	array( $this, 'sanitize_edit_summary' )
 		) );
 	}
@@ -177,9 +181,28 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	}
 
     /**
-	 * Add edit summary textbox within the "Update" panel to posts and pages
+	 * Add edit summary field to the block editor
 	 */
-	public function add_edit_summary_textbox( $post ) {
+	public function add_edit_summary_block() {
+		global $ssl_alp;
+
+		// FIXME: check if post is a draft or if edit summary is not allowed!!!
+
+		wp_enqueue_script(
+			'ssl-alp-edit-summary-block-editor-js',
+			SSL_ALP_BASE_URL . 'js/edit-summary/index.js',
+			array( 'wp-edit-post', 'wp-plugins', 'wp-i18n', 'wp-element' ),
+			$ssl_alp->get_version()
+		);
+	}
+
+    /**
+	 * Add edit summary textbox within the "Update" panel of the classic editor
+	 * to posts and pages
+	 */
+	public function add_edit_summary_textarea( $post ) {
+		global $ssl_alp;
+
 		if ( $post->post_status == 'auto-draft' ) {
 			// post is newly created, so don't show an edit summary box
 			return;
@@ -401,7 +424,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			// no or invalid nonce
 			return;
 		}
-		
+
 		if ( array_key_exists( 'ssl_alp_revision_post_edit_summary', $_POST ) ) {
 			// sanitise edit summary input
 			$message = $_POST['ssl_alp_revision_post_edit_summary'];
@@ -526,7 +549,7 @@ class SSL_ALP_Widget_Revisions extends WP_Widget {
 
 		// number of revisions to display
 		$number = ( ! empty( $instance['number'] ) ) ? absint( $instance['number'] ) : self::DEFAULT_NUMBER;
-		
+
 		if ( ! $number ) {
 			$number = self::DEFAULT_NUMBER;
 		}
