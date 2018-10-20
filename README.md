@@ -130,6 +130,7 @@ fixes have also been pushed back to these plugins and WordPress itself:
 [13](https://github.com/WordPress/gutenberg/issues/6704),
 [14](https://github.com/WordPress/gutenberg/issues/8032)
 [15](https://github.com/WordPress/wordpress-importer/issues/40)
+[16](https://github.com/WordPress/gutenberg/issues/10834)
 
 ### Co-Authors Plus
 Authors: Mohammad Jangda, Daniel Bachhuber, Automattic, Shepherd Interactive, Mark Jaquith  
