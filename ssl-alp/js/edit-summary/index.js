@@ -6,7 +6,7 @@ var TextControl = wp.components.TextControl;
 var registerPlugin = wp.plugins.registerPlugin;
 var withSelect = wp.data.withSelect;
 
-class SslAlpEditSummaryPlugin extends Component {
+class SSL_ALP_Edit_Summary_Plugin extends Component {
     constructor() {
         super( ...arguments );
 
@@ -39,7 +39,7 @@ class SslAlpEditSummaryPlugin extends Component {
         return el(
             PluginPostStatusInfo,
             {
-                className: 'my-post-status-info'
+                className: 'ssl-alp-edit-summary-panel'
             },
             el(
                 TextControl,
@@ -62,7 +62,7 @@ class SslAlpEditSummaryPlugin extends Component {
 }
 
 /**
- * Give current post ID to SslAlpEditSummaryPlugin object.
+ * Give current post IDs and status flags to SslAlpEditSummaryPlugin object.
  */
 const HOC = withSelect( ( select, { forceIsSaving } ) => {
     const {
@@ -80,7 +80,7 @@ const HOC = withSelect( ( select, { forceIsSaving } ) => {
         isAutoSaving: isAutosavingPost(),
         isPublishing: isPublishingPost()
 	};
-} )( SslAlpEditSummaryPlugin );
+} )( SSL_ALP_Edit_Summary_Plugin );
 
 registerPlugin( 'ssl-alp-edit-summary-plugin', {
 	render: HOC
