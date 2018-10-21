@@ -9,6 +9,8 @@ if ( ! defined( 'WPINC' ) ) {
  * Revision summary functionality
  */
 class SSL_ALP_Revisions extends SSL_ALP_Module {
+	protected $edit_summary_max_length = 100;
+
 	/**
 	 * Register settings
 	 */
@@ -28,15 +30,6 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			array(
 				'type'		=>	'boolean',
 				'default'	=>	true
-			)
-		);
-
-		register_setting(
-			SSL_ALP_SITE_SETTINGS_PAGE,
-			'ssl_alp_edit_summary_max_length',
-			array(
-				'type'		=>	'integer',
-				'default'	=>	100
 			)
 		);
 	}
@@ -218,7 +211,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		$edit_summary = wp_kses( $edit_summary, wp_kses_allowed_html( 'strip' ) );
 
 		// limit length
-		$max = get_option( 'ssl_alp_edit_summary_max_length' );
+		$max = self::$edit_summary_max_length;
 
 		if ( strlen( $edit_summary ) > $max ) {
 			// trim extra characters beyond limit
@@ -244,6 +237,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			return;
 		}
 
+		// enqueue block editor plugin script
 		wp_enqueue_script(
 			'ssl-alp-edit-summary-block-editor-js',
 			SSL_ALP_BASE_URL . 'js/edit-summary/index.js',

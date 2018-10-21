@@ -48,7 +48,7 @@ class SSL_ALP_Edit_Summary_Plugin extends Component {
                     label: __( 'Edit summary', 'ssl-alp' ),
                     help: __( 'Briefly summarise your changes', 'ssl-alp' ),
                     spellcheck: 'true',
-                    maxlength: '100',
+                    maxlength: 100,
                     value: this.state.value,
                     onChange: ( value ) => {
                         this.setState( {
