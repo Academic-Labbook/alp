@@ -10,13 +10,11 @@ to install additional plugins as you like.
 Here are the features implemented so far...
  - Allows multiple authors to be assigned to single posts
  - Provides change logs for posts and pages with user-defined comments
-   - Unhides revisions meta box in editor by default
  - Shows list of cross-references made between posts and pages
  - Option to force users to be logged in to view
    - Feeds still accessible using HTTP authentication
    - Images still accessible with direct link (not possible to block without server configuration)
  - TeX support in posts and pages
- - DOI and arXiv shortcode support
  - Disable certain post meta fields mostly suited to commercial sites, like
    excerpts, trackbacks, etc.
  - Modifies pages to work more like a wiki:
@@ -40,8 +38,6 @@ Here are the features implemented so far...
    - *Excluded* is added (for keeping ex-users' posts, comments, etc. on record but not giving them access)
  - Hides some WordPress branding and news
  - Supports custom media (MIME) upload types
- - Is `update_count_callback` now used in `register_taxonomy`?
-   - https://core.trac.wordpress.org/ticket/40436
 
 ## Future ideas
 Some ideas pondered for the future:
@@ -61,11 +57,9 @@ Some ideas pondered for the future:
 ## Requirements
 
 ### WordPress
-In general, you should use the latest version of WordPress 4.x as that's the
-branch that will be supported. With auto-updates to WordPress Core, this is
-easy. The pending 2018 arrival of WordPress 5 may complicate matters, especially
-surrounding Gutenberg (see below). It is likely that WordPress 4.9 will be
-supported for a short while after 5.0 is released, but not for many months.
+You should use the latest version of WordPress, but at very least 4.9.6 as it
+provides features used by ALP. WordPress 5.0 will introduce the Gutenberg
+editor which ALP fully supports.
 
 It is desirable, but not required, to use WordPress in [multisite](https://codex.wordpress.org/Create_A_Network)
 mode. This exposes additional options to network administrators to control upload
@@ -82,21 +76,6 @@ uses CSS Grid, which is only available in recent versions (i.e. within the last
 two years) of the most popular browsers. The [browsers that don't support CSS Grid](https://caniuse.com/#feat=css-grid)
 represent only around 5% of global usage as of March 2018. This project is not
 concerned about losing sales from users running out of date browsers!
-
-## Gutenberg
-WordPress 5.0 will introduce a new editor interface called [Gutenberg](https://wordpress.org/gutenberg/).
-This does not show some of the custom interface additions that ALP makes to the
-standard editor, but it is not anticipated that support for these additions will
-be difficult to add, eventually. Depending on how Gutenberg is added to WordPress 5.0,
-ALP may optionally "deactivate" Gutenberg under the hood until it is fully supported
-later.
-
-The impending arrival of Gutenberg means ALP will not, for the time being,
-include changes to the TinyMCE editor, such as those provided by the (great)
-[TinyMCE Advanced](https://wordpress.org/plugins/tinymce-advanced/) plugin. (While
-the changes made by TinyMCE Advanced should not affect Gutenberg, some Gutenberg-
-specific "blocks" may take over functionality of a lot of what TinyMCE Advanced
-provides, such as table building.)
 
 ## Design principles
  - **Clean code**: there's an awful lot of terribly written code floating around
