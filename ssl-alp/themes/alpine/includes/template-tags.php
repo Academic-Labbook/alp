@@ -448,7 +448,8 @@ if ( ! function_exists( 'ssl_alpine_get_revision_description' ) ) :
 		}
 
 		// get revision's edit summary
-		$revision_meta = get_post_meta( $revision->ID, 'ssl_alp_edit_summary', true );
+		$revision_edit_summary = get_post_meta( $revision->ID, 'ssl_alp_edit_summary', true );
+		$revision_edit_summary_revert_id = get_post_meta( $revision->ID, 'ssl_alp_edit_summary_revert_id', true );
 
 		// default message
 		$message = " " . ssl_alpine_get_revision_abbreviation( $revision );
@@ -457,28 +458,28 @@ if ( ! function_exists( 'ssl_alpine_get_revision_description' ) ) :
 			// this is an autosave
 			$message .= __( ': [Autosave]', 'ssl_alp' );
 		} else {
-			// check that we have a revision summary array, and that it has set fields
-			if ( ! empty( $revision_meta ) && is_array( $revision_meta ) && ( ! empty( $revision_meta["message"] ) || ( $revision_meta["reverted"] > 0 ) ) ) {
-				if ( $revision_meta["reverted"] > 0 ) {
+			// check that we have a revision summary
+			if ( ( ! empty( $revision_edit_summary ) && is_string( $revision_edit_summary ) ) || ( ! empty( $revision_edit_summary_revert_id ) && ( $revision_edit_summary_revert_id > 0 ) ) ) {
+				if ( $revision_edit_summary_revert_id > 0 ) {
 					// revision was a revert
 					// /* translators: 1: revision ID/URL */
 					$message .= sprintf(
 						__( ': reverted to %1$s', 'ssl-alp' ),
-						ssl_alpine_get_revision_abbreviation( $revision_meta["reverted"] )
+						ssl_alpine_get_revision_abbreviation( $revision_edit_summary_revert_id )
 					);
 
 					// add summary
-					if ( ! empty ( $revision_meta["message"] ) ) {
+					if ( ! empty ( $revision_edit_summary ) ) {
 						$message .= sprintf(
 							/* translators: 1: revision message */
 							__(' (<em>"%1$s"</em>)', 'ssl-alp' ),
-							$revision_meta["message"]
+							$revision_edit_summary
 						);
 					}
 				} else {
-					if ( ! empty ( $revision_meta["message"] ) ) {
+					if ( ! empty ( $revision_edit_summary ) ) {
 						/* translators: 1: revision message */
-						$message .= sprintf( __( ': <em>"%1$s"</em>', 'ssl-alp' ), esc_html( $revision_meta["message"] ) );
+						$message .= sprintf( __( ': <em>"%1$s"</em>', 'ssl-alp' ), esc_html( $revision_edit_summary ) );
 					}
 				}
 			}
