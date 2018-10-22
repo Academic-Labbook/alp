@@ -9,7 +9,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Revision summary functionality
  */
 class SSL_ALP_Revisions extends SSL_ALP_Module {
-	protected $edit_summary_max_length = 100;
+	protected static $edit_summary_max_length = 100;
 
 	/**
 	 * Register settings
