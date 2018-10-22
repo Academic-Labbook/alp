@@ -45,6 +45,9 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$loader->add_filter( 'manage_users_columns', $this, 'filter_manage_users_columns' );
 		$loader->add_filter( 'manage_users_custom_column', $this, 'filter_manage_users_custom_column', 10, 3 );
 
+		// stop users deleting coauthor terms
+		$loader->add_filter( 'map_meta_cap', $this, 'filter_capabilities', 10, 4 );
+
 		// override the default "Mine" filter on the admin post list
 		$loader->add_filter( 'views_edit-post', $this, 'filter_edit_post_views', 10, 1 );
 
@@ -414,6 +417,31 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		return $value;
+	}
+
+	/**
+	 * Filter capabilities for editing/deleting terms to prevent users changing
+	 * or deleting coauthor terms.
+	 * 
+	 * This prohibits even admins from deleting terms because they are essential
+	 * to the correct operation of the coauthors system.
+	 */
+	function filter_capabilities( $caps, $cap, $user_id, $args ) {
+		if ( 'delete_term' !== $cap && 'edit_term' !== $cap ) {
+			// user is assigning term, which is fine
+			return $caps;
+		}
+
+		// get taxonomy
+		$term = get_term( $args[0] );
+		$taxonomy = get_taxonomy( $term->taxonomy );
+		
+		if ( 'ssl_alp_coauthor' == $taxonomy->name ) {
+			// disallow
+			$caps[] = 'do_not_allow';
+		}
+
+		return $caps;
 	}
 
 	/**
