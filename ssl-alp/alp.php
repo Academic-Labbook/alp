@@ -4,7 +4,7 @@
 Plugin Name:  Academic Labbook Plugin
 Plugin URI:   https://alp.attackllama.com/
 Description:  Turn WordPress into a collaborative academic labbook.
-Version:      0.8.1
+Version:      0.9.0
 Author:       Sean Leavey
 Author URI:   https://attackllama.com/
 License:      GPL3
@@ -20,7 +20,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Current plugin version.
  */
 
-define( 'SSL_ALP_VERSION', '0.8.1' );
+define( 'SSL_ALP_VERSION', '0.9.0' );
 
 /**
  * Plugin name
@@ -82,12 +82,6 @@ require_once SSL_ALP_BASE_DIR . 'includes/class-uninstaller.php';
 register_activation_hook( __FILE__, array( 'SSL_ALP_Activator', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'SSL_ALP_Deactivator', 'deactivate' ) );
 register_uninstall_hook( __FILE__, array( 'SSL_ALP_Uninstaller', 'uninstall' ) );
-
-/**
- * Add theme directory provided by this plugin
- */
-
-register_theme_directory( SSL_ALP_THEME_DIR );
 
 /**
  * Core plugin class used to load modules.
