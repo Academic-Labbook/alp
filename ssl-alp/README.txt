@@ -69,3 +69,16 @@ features may be removed or broken between updates.
  - Fix bug with coauthor term not being created when network user
    is added to a blog.
  - New automated tests.
+= 0.9.0 =
+ - Compatibility with Gutenberg:
+   - Added edit summary text widget to sidebar.
+ - Removed edit summary metabox from classic editor.
+ - Classic editor no longer supported.
+ - Moved Alpine theme to its own directory to fix stylesheet bug on
+   certain types of installation. The Alpine theme must be installed
+   separately from now on.
+ - Disallow anyone (including admins) from editing or deleting
+   coauthor terms, which are essential to the plugin's operation.
+ - Update role descriptions.
+ - Fix bug where new authors weren't given coauthor terms on sites
+   where ALP is not network active.

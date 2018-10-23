@@ -39,11 +39,19 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$loader->add_action( 'user_register', $this, 'add_coauthor_term', 10, 1 );
 		$loader->add_action( 'add_user_to_blog', $this, 'add_coauthor_term', 10, 1 );
 		$loader->add_action( 'profile_update', $this, 'update_coauthor_term', 10, 2 );
+		// create user term when user logs in for the first time (required where ALP is not network active)
+		$loader->add_action( 'wp_login', $this, 'check_coauthor_term_on_login', 10, 2 );
 
 		// hooks to modify the published post number count on the Users WP List Table
 		// these are required because the count_many_users_posts() function has no hooks
 		$loader->add_filter( 'manage_users_columns', $this, 'filter_manage_users_columns' );
 		$loader->add_filter( 'manage_users_custom_column', $this, 'filter_manage_users_custom_column', 10, 3 );
+
+		// filter to allow coauthors to edit posts and stop users deleting coauthor terms
+		$loader->add_filter( 'user_has_cap', $this, 'filter_user_has_cap', 10, 4 );
+
+		// stop super admins deleting coauthor terms
+		$loader->add_filter( 'map_meta_cap', $this, 'filter_capabilities', 10, 4 );
 
 		// override the default "Mine" filter on the admin post list
 		$loader->add_filter( 'views_edit-post', $this, 'filter_edit_post_views', 10, 1 );
@@ -69,9 +77,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$loader->add_action( 'delete_user', $this, 'delete_user_action', 10, 2 );
 		// delete or reassign user terms from posts when a user is deleted on a network site installation
 		$loader->add_action( 'remove_user_from_blog', $this, 'remove_user_from_blog', 10, 3 );
-
-		// filter to allow coauthors to edit posts
-		$loader->add_filter( 'user_has_cap', $this, 'filter_user_has_cap', 10, 3 );
 
 		// make sure we've correctly set author data on author pages
 		$loader->add_action( 'posts_selection', $this, 'fix_author_page', 10, 0 ); // use posts_selection since it's after WP_Query has built the request and before it's queried any posts
@@ -300,6 +305,17 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
+	 * Check that the coauthor term exists on login. Used for the edge case
+	 * where ALP is used on multisite, but only active on a blog. In this
+	 * case, when a user is created the logic runs in terms of the network,
+	 * and ALP hooks are not therefore loaded. This code runs when the created
+	 * user logs in, creating the coauthor term.
+	 */
+	public function check_coauthor_term_on_login( $user_login, $user ) {
+		$this->add_coauthor_term( $user );
+	}
+
+	/**
 	 * Rebuild coauthor terms
 	 */
 	public function rebuild_coauthors() {
@@ -414,6 +430,103 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		return $value;
+	}
+
+	/**
+	 * Allows coauthors to edit the post they're coauthors of, and stop
+	 * users deleting coauthor terms.
+	 */
+	function filter_user_has_cap( $all_capabilities, $unused, $args, $user ) {
+		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
+			// coauthors disabled
+			return $all_capabilities;
+		}
+
+		$requested_capability = $args[0];
+
+		if ( in_array( $requested_capability, array( 'edit_term', 'delete_term' ) ) ) {
+			// disallow in all circumstances
+			$all_capabilities['edit_term'] = false;
+			$all_capabilities['delete_term'] = false;
+
+			return $all_capabilities;
+		}
+
+		// assume post
+		$post_id = isset( $args[2] ) ? $args[2] : 0;
+		$post_type = get_post_type_object( get_post_type( $post_id ) );
+
+		if ( ! $post_type || 'revision' == $post_type->name ) {
+			return $all_capabilities;
+		}
+
+		$unfiltered_capabilities = array(
+			$post_type->cap->edit_post,
+			'edit_post', // Need to filter this too, unfortunately: http://core.trac.wordpress.org/ticket/22415
+			$post_type->cap->edit_others_posts, // This as well: http://core.trac.wordpress.org/ticket/22417
+		);
+
+		if ( ! in_array( $requested_capability, $unfiltered_capabilities ) ) {
+			// capability is not one we want to change
+			// this is the case if the user is a researcher or admin, for example
+			// (they can already edit other posts)
+			return $all_capabilities;
+		} elseif ( ! is_user_logged_in() || ! $this->is_coauthor_for_post( $user, $post_id ) ) {
+			// user isn't coauthor of the specified post
+			return $all_capabilities;
+		}
+
+		$post_status = get_post_status( $post_id );
+
+		if ( 'publish' == $post_status &&
+			( isset( $post_type->cap->edit_published_posts ) && ! empty( $user->all_capabilities[ $post_type->cap->edit_published_posts ] ) ) ) {
+			// allow edit of published posts for this call
+			$all_capabilities[ $post_type->cap->edit_published_posts ] = true;
+		} elseif ( 'private' == $post_status &&
+			( isset( $post_type->cap->edit_private_posts ) && ! empty( $user->all_capabilities[ $post_type->cap->edit_private_posts ] ) ) ) {
+			// allow edit of private posts for this call
+			$all_capabilities[ $post_type->cap->edit_private_posts ] = true;
+		}
+
+		// allow edit of others posts for this call
+		$all_capabilities[ $post_type->cap->edit_others_posts ] = true;
+
+		return $all_capabilities;
+	}
+
+	/**
+	 * Filter capabilities of super admins to stop them editing or deleting coauthor terms.
+	 * 
+	 * Coauthor terms are essential to the correct operation of the coauthors system.
+	 */
+	function filter_capabilities( $caps, $cap, $user_id, $args ) {
+		// construct list of capabilities based on post type
+		$filtered_caps = array(
+			// terms
+			'edit_term',
+			'delete_term'
+		);
+
+		if ( ! in_array( $cap, $filtered_caps ) ) {
+			// this is not a capability we need to filter
+			return $caps;
+		}
+
+		// get term
+		$term = get_term( $args[0] );
+
+		if ( is_null( $term ) ) {
+			return $caps;
+		}
+
+		$taxonomy = get_taxonomy( $term->taxonomy );
+		
+		if ( 'ssl_alp_coauthor' == $taxonomy->name ) {
+			// disallow
+			$caps[] = 'do_not_allow';
+		}
+
+		return $caps;
 	}
 
 	/**
@@ -1176,60 +1289,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
     	}
 
     	return $recipients;
-	}
-
-	/**
-	 * Allows coauthors to edit the post they're coauthors of
-	 */
-	function filter_user_has_cap( $all_capabilities, $unused, $args ) {
-		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
-			// coauthors disabled
-			return $all_capabilities;
-		}
-
-		$requested_capability = $args[0];
-		$user_id = isset( $args[1] ) ? $args[1] : 0;
-		$post_id = isset( $args[2] ) ? $args[2] : 0;
-
-		$post_type = get_post_type_object( get_post_type( $post_id ) );
-
-		if ( ! $post_type || 'revision' == $post_type->name ) {
-			return $all_capabilities;
-		}
-
-		$unfiltered_capabilities = array(
-			$post_type->cap->edit_post,
-			'edit_post', // Need to filter this too, unfortunately: http://core.trac.wordpress.org/ticket/22415
-			$post_type->cap->edit_others_posts, // This as well: http://core.trac.wordpress.org/ticket/22417
-		);
-
-		if ( ! in_array( $requested_capability, $unfiltered_capabilities ) ) {
-			// capability is not one we want to change
-			// this is the case if the user is a researcher or admin, for example
-			// (they can already edit other posts)
-			return $all_capabilities;
-		} elseif ( ! is_user_logged_in() || ! $this->is_coauthor_for_post( $user_id, $post_id ) ) {
-			// user isn't coauthor of the specified post
-			return $all_capabilities;
-		}
-
-		$current_user = wp_get_current_user();
-		$post_status = get_post_status( $post_id );
-
-		if ( 'publish' == $post_status &&
-			( isset( $post_type->cap->edit_published_posts ) && ! empty( $current_user->all_capabilities[ $post_type->cap->edit_published_posts ] ) ) ) {
-			// allow edit of published posts for this call
-			$all_capabilities[ $post_type->cap->edit_published_posts ] = true;
-		} elseif ( 'private' == $post_status &&
-			( isset( $post_type->cap->edit_private_posts ) && ! empty( $current_user->all_capabilities[ $post_type->cap->edit_private_posts ] ) ) ) {
-			// allow edit of private posts for this call
-			$all_capabilities[ $post_type->cap->edit_private_posts ] = true;
-		}
-
-		// allow edit of others posts for this call
-		$all_capabilities[ $post_type->cap->edit_others_posts ] = true;
-
-		return $all_capabilities;
 	}
 
 	/**
