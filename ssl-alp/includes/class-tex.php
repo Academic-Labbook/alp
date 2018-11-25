@@ -116,14 +116,27 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 	public function register_hooks() {
 		$loader = $this->get_loader();
 
-		// tex shortcode
-		$loader->add_action( 'init', $this, 'add_tex_shortcode' );
+		// enqueue block script
+		$loader->add_action( 'enqueue_block_editor_assets', $this, 'register_block' );
+	}
 
-		// add JavaScript
-		$loader->add_action( 'wp_footer', $this, 'enqueue_tex_scripts' );
+	/**
+	 * Register TeX block.
+	 */
+	public function register_block() {
+		global $ssl_alp;
 
-		// prevent processing of contents inside [tex][/tex] tags
-		$loader->add_filter( 'no_texturize_shortcodes', $this, 'exempt_texturize' );
+		if ( ! get_option( "ssl_alp_enable_tex" ) ) {
+			return;
+		}
+
+		// enqueue block editor plugin script
+		wp_enqueue_script(
+			'ssl-alp-tex-block-js',
+			SSL_ALP_BASE_URL . 'js/blocks/tex/index.js',
+			array( 'wp-blocks', 'wp-i18n', 'wp-element', 'wp-editor' ),
+			$ssl_alp->get_version()
+		);
 	}
 
     /**
