@@ -92,6 +92,13 @@ class CoauthorsTest extends WP_UnitTestCase {
         foreach ( $blog_users as $user_id => $blog_users ) {
             foreach ( $blog_users as $blog_id => $reassign_user_id ) {
                 if ( ! is_null( $reassign_user_id ) ) {
+                    // set expected postdata
+                    $_POST['delete'] = array(
+                        $blog_id    =>  array(
+                            $user_id    =>  'reassign'
+                        )
+                    );
+
                     remove_user_from_blog( $user_id, $blog_id, $reassign_user_id );
                 } else {
                     remove_user_from_blog( $user_id, $blog_id );
