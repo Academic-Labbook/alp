@@ -39,15 +39,6 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 	public function register_settings() {
 		register_setting(
 			SSL_ALP_SITE_SETTINGS_PAGE,
-			'ssl_alp_disable_post_excerpts',
-			array(
-				'type'		=>	'boolean',
-				'default'	=>	true
-			)
-		);
-
-		register_setting(
-			SSL_ALP_SITE_SETTINGS_PAGE,
 			'ssl_alp_disable_post_trackbacks',
 			array(
 				'type'		=>	'boolean',
@@ -135,7 +126,6 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 		$loader->add_filter( 'wp_dashboard_setup', $this, 'remove_wp_dashboard_metaboxes' );
 
         // post meta stuff
-        $loader->add_action( 'init', $this, 'disable_post_excerpts' );
 		$loader->add_action( 'init', $this, 'disable_post_trackbacks' );
 	}
 
@@ -258,17 +248,6 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 		remove_meta_box( 'dashboard_primary', 'dashboard', 'side' );
 		remove_meta_box( 'dashboard_secondary', 'dashboard', 'side' );
 	}
-
-    /**
-     * Disable post excerpts
-     */
-    public function disable_post_excerpts() {
-        if ( ! get_option( 'ssl_alp_disable_post_excerpts' ) ) {
-            return;
-        }
-
-        remove_post_type_support( 'post', 'excerpt' );
-    }
 
     /**
      * Disable post trackbacks

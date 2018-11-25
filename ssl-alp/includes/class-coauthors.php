@@ -1076,8 +1076,10 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		// annoyingly, $reassign_id is not passed to this call, so detect it from the post data
-		if ( ! empty( $_POST['blog'] ) && is_array( $_POST['blog'] ) ) {
-			// post data from `dodelete` case in `wp-admin/network/users.php` is present
+		if ( ! empty( $_POST['delete'] ) && 'reassign' == $_POST['delete'][ $blog_id ][ $remove_id ] &&
+		     ! empty( $_POST['blog'] ) && is_array( $_POST['blog'] ) ) {
+			// post data from `dodelete` case in `wp-admin/network/users.php` is present,
+			// and admin wishes to reassign user content
 
 			// array of blog ids to respective reassign users
 			$reassign_users = $_POST['blog'][$remove_id];

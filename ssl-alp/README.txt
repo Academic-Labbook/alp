@@ -82,3 +82,9 @@ features may be removed or broken between updates.
  - Update role descriptions.
  - Fix bug where new authors weren't given coauthor terms on sites
    where ALP is not network active.
+= 0.10.0 =
+ - Remove (unused) translation which is incompatible with 5.0.0.
+ - Removed TeX support for now until a TeX block is developed in favour
+   of shortcodes.
+ - Bug fix when deleting users from network.
+ - Remove ability to hide excerpts on block editor.

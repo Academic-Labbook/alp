@@ -244,11 +244,6 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			array( 'wp-edit-post', 'wp-plugins', 'wp-i18n', 'wp-element' ),
 			$ssl_alp->get_version()
 		);
-
-		// load translations
-		$locale  = gutenberg_get_jed_locale_data( 'ssl-alp' );
-		$content = 'wp.i18n.setLocaleData( ' . json_encode( $locale ) . ', "ssl-alp" );';
-		wp_script_add_data( 'ssl-alp-edit-summary-block-editor-js', 'data', $content );
 	}
 
     /*
