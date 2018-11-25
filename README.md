@@ -14,8 +14,7 @@ Here are the features implemented so far...
  - Option to force users to be logged in to view
    - Feeds still accessible using HTTP authentication
    - Images still accessible with direct link (not possible to block without server configuration)
- - Disable certain post meta fields mostly suited to commercial sites, like
-   excerpts, trackbacks, etc.
+ - Disable trackbacks, which are usually only useful for commercial sites.
  - Modifies pages to work more like a wiki:
    - Removes authors and dates
    - Displays a table of contents in the sidebar (generated from header elements)
