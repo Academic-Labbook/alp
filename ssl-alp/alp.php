@@ -60,16 +60,6 @@ define( 'SSL_ALP_SITE_TOOLS_MENU_SLUG', 'ssl-alp-admin-tools' );
 define( 'SSL_ALP_REST_ROUTE', 'ssl-alp/v1' );
 
 /**
- * Default settings
- */
-
-define( 'SSL_ALP_KATEX_VERSION', '0.9.0' );
-define( 'SSL_ALP_DEFAULT_KATEX_JS_URL', 'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js' );
-define( 'SSL_ALP_DEFAULT_KATEX_CSS_URL', 'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css' );
-define( 'SSL_ALP_DOI_BASE_URL', 'https://doi.org/' );
-define( 'SSL_ALP_ARXIV_BASE_URL', 'https://arxiv.org/abs/' );
-
-/**
  * Code to run on plugin activation and deactivation.
  */
 

@@ -82,3 +82,9 @@ features may be removed or broken between updates.
  - Update role descriptions.
  - Fix bug where new authors weren't given coauthor terms on sites
    where ALP is not network active.
+
+
+future
+
+ - Remove TeX support for now until a TeX block is developed in favour
+   of shortcodes.

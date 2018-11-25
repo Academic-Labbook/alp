@@ -14,7 +14,6 @@ Here are the features implemented so far...
  - Option to force users to be logged in to view
    - Feeds still accessible using HTTP authentication
    - Images still accessible with direct link (not possible to block without server configuration)
- - TeX support in posts and pages
  - Disable certain post meta fields mostly suited to commercial sites, like
    excerpts, trackbacks, etc.
  - Modifies pages to work more like a wiki:
