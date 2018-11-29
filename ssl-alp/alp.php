@@ -37,13 +37,6 @@ define( 'SSL_ALP_BASE_URL', plugin_dir_url( __FILE__ ) );
 define( 'SSL_ALP_BASE_NAME', plugin_basename( __FILE__ ) );
 
 /**
- * Theme directory
- */
-
-// must be absolute
-define( 'SSL_ALP_THEME_DIR', SSL_ALP_BASE_DIR . 'themes' );
-
-/**
  * Admin slugs
  */
 
