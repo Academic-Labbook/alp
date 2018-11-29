@@ -131,7 +131,7 @@
 			<p><strong><?php _e( 'This action cannot be undone.', 'ssl-alp' ); ?></strong></p>
 			<form method="post" action="">
 				<input type="hidden" name="ssl_alp_convert_role_submitted" value="1"/>
-				<input type="checkbox" id="ssl_alp_convert_role_confirm_checkbox" name="ssl_alp_convert_role_confirm" value="1"/>
+				<input type="checkbox" id="ssl_alp_convert_role_confirm_checkbox" name="ssl_alp_convert_role_confirm" value="1"<?php if ( ! $roles_convertable ) : ?> disabled<?php endif; ?>/>
 				<label for="ssl_alp_convert_role_confirm_checkbox"><?php _e( 'I have read and understood the above information', 'ssl-alp' ); ?></label>
 				<p class="submit">
 					<input name="submit" id="submit" class="button button-primary" value="<?php _e( 'Convert User Roles', 'ssl-alp' ); ?>" type="submit"<?php if ( ! $roles_convertable ) : ?> disabled<?php endif; ?>/>
