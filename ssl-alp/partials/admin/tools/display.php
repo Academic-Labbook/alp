@@ -34,11 +34,13 @@
 	<div class="ssl-alp-tools-cards">
 		<div class="ssl-alp-tools-card">
 			<h2 class="title"><?php _e( 'Activate theme', 'ssl-alp' ); ?></h2>
-			<p><?php _e( 'The Academic Labbook Plugin is bundled with a theme, <em>Alpine</em>. This theme, or a child theme derived from it, must be active in order for most of the plugin\'s functionality to appear.', 'ssl-alp' ); ?></p>
+			<p><?php _e( 'It is highly recommended to use the <em>Alpine</em> theme on this site. This theme, or a child theme derived from it, must be enabled in order for most of Academic Labbook Plugin\'s functionality to appear.', 'ssl-alp' ); ?></p>
 			<?php if ( $alpine_active ) : ?>
 			<p class="description"><?php _e( 'Alpine, or a child theme derived from it, is already active.', 'ssl-alp' ); ?></p>
+			<?php elseif ( $alpine_installed ) : ?>
+			<p class="description"><?php _e( 'Alpine, or a child theme derived from it, is not active. Visit the <a href="themes.php">themes page</a> to activate it. On network sites, you may have to network activate the theme first.', 'ssl-alp' ); ?></p>
 			<?php else : ?>
-			<p class="description"><?php _e( 'Alpine, or a child theme derived from it, is not active. Visit the <a href="themes.php">themes page</a> to activate it.', 'ssl-alp' ); ?></p>
+			<p class="description"><?php _e( 'Alpine is not installed. Visit the <a href="https://alp.attackllama.com/">ALP website</a> to download it.', 'ssl-alp' ); ?></p>
 			<?php endif; ?>
 		</div>
 		<div class="ssl-alp-tools-card">
