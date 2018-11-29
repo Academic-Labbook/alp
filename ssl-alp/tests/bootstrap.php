@@ -36,7 +36,12 @@ require_once $_tests_dir . '/includes/functions.php';
  * Manually load the plugin being tested.
  */
 function _manually_load_plugin() {
+	// Main plugin file.
 	require dirname( dirname( __FILE__ ) ) . '/alp.php';
+
+	// Run activation routine.
+	$activator = new SSL_ALP_Activator();
+	$activator::activate();
 }
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
 
