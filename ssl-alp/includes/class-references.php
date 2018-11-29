@@ -26,8 +26,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 			SSL_ALP_SITE_SETTINGS_PAGE,
 			'ssl_alp_enable_crossreferences',
 			array(
-				'type'		=>	'boolean',
-				'default'	=>	true
+				'type'		=>	'boolean'
 			)
 		);
 	}

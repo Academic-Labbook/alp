@@ -24,7 +24,6 @@ class SSL_ALP_Uninstaller {
         delete_option( 'ssl_alp_enable_crossreferences' );
         delete_option( 'ssl_alp_enable_post_edit_summaries' );
         delete_option( 'ssl_alp_enable_page_edit_summaries' );
-        delete_option( 'ssl_alp_edit_summary_max_length' );
 
         // delete network options
         delete_site_option( 'ssl_alp_additional_media_types' );

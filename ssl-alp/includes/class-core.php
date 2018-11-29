@@ -41,8 +41,7 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 			SSL_ALP_SITE_SETTINGS_PAGE,
 			'ssl_alp_disable_post_trackbacks',
 			array(
-				'type'		=>	'boolean',
-				'default'	=>	true
+				'type'		=>	'boolean'
 			)
 		);
 
@@ -51,7 +50,6 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 			'ssl_alp_additional_media_types',
 			array(
 				'type'		=>	'string',
-				'default'	=>	'',
 				'sanitize_callback'	=>	array( $this, 'sanitize_additional_media_types' )
 			)
 		);

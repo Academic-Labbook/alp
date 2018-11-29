@@ -32,8 +32,7 @@ class SSL_ALP_Authenticate extends SSL_ALP_Module {
             SSL_ALP_SITE_SETTINGS_PAGE,
             'ssl_alp_require_login',
             array(
-                'type'		=>	'boolean',
-                'default'	=>	true
+                'type'		=>	'boolean'
             )
         );
 	}
