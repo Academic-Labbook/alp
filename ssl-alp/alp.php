@@ -20,7 +20,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Current plugin version.
  */
 
-define( 'SSL_ALP_VERSION', '0.10.1' );
+define( 'SSL_ALP_VERSION', '0.10.2' );
 
 /**
  * Plugin name
@@ -35,13 +35,6 @@ define( 'SSL_ALP_PLUGIN_NAME', 'Academic Labbook' );
 define( 'SSL_ALP_BASE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SSL_ALP_BASE_URL', plugin_dir_url( __FILE__ ) );
 define( 'SSL_ALP_BASE_NAME', plugin_basename( __FILE__ ) );
-
-/**
- * Theme directory
- */
-
-// must be absolute
-define( 'SSL_ALP_THEME_DIR', SSL_ALP_BASE_DIR . 'themes' );
 
 /**
  * Admin slugs

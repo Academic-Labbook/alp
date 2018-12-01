@@ -98,8 +98,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			SSL_ALP_SITE_SETTINGS_PAGE,
 			'ssl_alp_allow_multiple_authors',
 			array(
-				'type'		=>	'boolean',
-				'default'	=>	true
+				'type'		=>	'boolean'
 			)
 		);
     }

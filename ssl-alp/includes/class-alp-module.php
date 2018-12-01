@@ -31,7 +31,7 @@ abstract class SSL_ALP_Module {
 		$loader = $this->get_loader();
 
 		// register settings
-		$loader->add_action( 'init', $this, 'register_settings', 5 ); // high priority
+		$loader->add_action( 'admin_init', $this, 'register_settings', 5 ); // high priority
 		$loader->add_action( 'admin_init', $this, 'register_settings_fields' );
 
 		// enqueue styles and scripts
