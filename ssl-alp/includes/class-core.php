@@ -49,8 +49,7 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 			SSL_ALP_NETWORK_SETTINGS_PAGE,
 			'ssl_alp_additional_media_types',
 			array(
-				'type'		=>	'string',
-				'sanitize_callback'	=>	array( $this, 'sanitize_additional_media_types' )
+				'type'		=>	'string'
 			)
 		);
 	}
@@ -117,6 +116,9 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 		// add additional media type support
 		$loader->add_filter( 'upload_mimes', $this, 'filter_mime_types' );
 		
+		// filter ssl_alp_additional_media_types option
+		$loader->add_filter( 'sanitize_option_ssl_alp_additional_media_types', $this, 'sanitize_additional_media_types', 10, 1 );
+
 		// remove WordPress link in meta widget
 		$loader->add_filter( 'widget_meta_poweredby', $this, 'filter_powered_by' );
 
@@ -174,16 +176,23 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 				$valid_types[] = $new_media_type;
 			} else {
 				// invalid
+				// FIXME: this notice is not displayed anywhere, seemingly.
 				add_settings_error(
 					'ssl_alp_additional_media_types',
 					'ssl-alp-invalid-media-types',
-					__( 'Invalid media type entry specified', 'ssl-alp' )
+					__(
+						sprintf(
+							'Invalid media type entry "%s" specified',
+							esc_html( $media_type )
+						),
+						'ssl-alp'
+					)
 				);
 
 				// return original value
 				// ideally WordPress would pass the original value to this function call, but
 				// it doesn't (https://github.com/WordPress/WordPress/blob/4848a09b3593b639bd9c3ccfcd6038e90adf5866/wp-includes/option.php#L2114)
-				return get_site_option( 'ssl_alp_additional_media_types', '' );
+				$valid_types = get_site_option( 'ssl_alp_additional_media_types', '' );
 			}
 		}
 
