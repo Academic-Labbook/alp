@@ -88,3 +88,7 @@ features may be removed or broken between updates.
    of shortcodes.
  - Bug fix when deleting users from network.
  - Remove ability to hide excerpts on block editor.
+= 0.10.1 =
+ - Hotfix release.
+= 0.10.2 =
+ - Hotfix release.
