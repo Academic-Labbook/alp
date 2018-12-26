@@ -13,7 +13,7 @@ class SSL_ALP_Activator {
 	 * Activate plugin.
 	 */
 	public static function activate() {
-        this::add_options();
+        self::add_options();
     }
 
     public static function add_options() {
