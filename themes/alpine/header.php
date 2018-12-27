@@ -1,61 +1,66 @@
 <?php
 /**
- * The header for our theme.
+ * The header for our theme
  *
- * Displays all of the <head> section and everything up till <div id="content">
+ * This is the template that displays all of the <head> section and everything up until <div id="content">
  *
- * @package ssl-alp
+ * @link https://developer.wordpress.org/themes/basics/template-files/#template-partials
+ *
+ * @package Alpine
  */
 
-?><!DOCTYPE html>
+?>
+<!doctype html>
 <html <?php language_attributes(); ?>>
 <head>
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="profile" href="http://gmpg.org/xfn/11">
-	<?php if ( is_singular() && pings_open( get_queried_object() ) ) : ?>
-	<link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>">
-	<?php endif; ?>
+	<link rel="profile" href="https://gmpg.org/xfn/11">
+
 	<?php wp_head(); ?>
 </head>
 
 <body <?php body_class(); ?>>
-<div id="page" class="hfeed site">
-	<a class="skip-link screen-reader-text" href="#content"><?php esc_html_e( 'Skip to content', 'ssl-alp' ); ?></a>
+<div id="page" class="site">
+	<a class="skip-link screen-reader-text" href="#content"><?php esc_html_e( 'Skip to content', 'alpine' ); ?></a>
 
-	<?php do_action( 'ssl_alp_action_before_header' ); ?>
-
-	<header id="masthead" class="site-header container" role="banner">
-		<div id="site-branding">
-			<?php if ( has_custom_logo() ) : ?>
-			<div id="site-logo">
+	<header id="masthead" class="site-header">
+		<?php if ( has_nav_menu( 'network-menu' ) ): ?>
+		<nav id="network-navigation" class="main-navigation">
+			<button class="menu-toggle" aria-controls="network-menu" aria-expanded="false"><?php esc_html_e( 'Network Menu', 'alpine' ); ?></button>
+			<?php
+			wp_nav_menu( array(
+				'theme_location' => 'network-menu',
+				'menu_id'        => 'network-menu',
+			) );
+			?>
+		</nav><!-- #network-navigation -->
+		<?php endif; ?>
+		<div class="site-branding">
+			<div class="custom-logo-container">
 				<?php the_custom_logo(); ?>
 			</div>
+			<div class="site-title-container">
+			<?php if ( is_front_page() && is_home() ) : ?>
+				<h1 class="site-title"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a></h1>
+			<?php else : ?>
+				<p class="site-title"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a></p>
+			<?php endif;
+			$alpine_description = get_bloginfo( 'description', 'display' );
+			if ( $alpine_description || is_customize_preview() ) :
+				?>
+				<p class="site-description"><?php echo $alpine_description; /* WPCS: xss ok. */ ?></p>
 			<?php endif; ?>
-			<div id="site-title-group">
-  				<h1 class="site-title text-center">
-					  <a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a>
-				</h1>
-				<p class="site-description text-center">
-					<?php bloginfo( 'description' ); ?>
-				</p>
 			</div>
-		</div>
+		</div><!-- .site-branding -->
 
-		<nav id="site-navigation" class="main-navigation" role="navigation">
-			<button class="menu-toggle" aria-hidden="true"><?php esc_html_e( 'Primary Menu', 'ssl-alp' ); ?></button>
+		<nav id="site-navigation" class="main-navigation">
+			<button class="menu-toggle" aria-controls="primary-menu" aria-expanded="false"><?php esc_html_e( 'Primary Menu', 'alpine' ); ?></button>
 			<?php
-				wp_nav_menu( array(
-					'theme_location' => 'primary',
-					'menu_id'        => 'primary-menu',
-					'fallback_cb'    => 'ssl_alp_primary_menu_fallback',
-				) );
+			wp_nav_menu( array(
+				'theme_location' => 'site-menu',
+				'menu_id'        => 'primary-menu',
+			) );
 			?>
 		</nav><!-- #site-navigation -->
-
 	</header><!-- #masthead -->
-
-	<?php do_action( 'ssl_alp_action_after_header' ); ?>
-
-	<div id="content" class="site-content container">
-		<div class="row">

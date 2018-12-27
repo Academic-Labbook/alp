@@ -1,11 +1,13 @@
 <?php
 /**
- * Theme functions and definitions.
+ * Alpine functions and definitions
  *
- * @package ssl-alp
+ * @link https://developer.wordpress.org/themes/basics/theme-functions/
+ *
+ * @package Alpine
  */
 
-if ( ! function_exists( 'ssl_alp_setup' ) ) :
+if ( ! function_exists( 'alpine_setup' ) ) :
 	/**
 	 * Sets up theme defaults and registers support for various WordPress features.
 	 *
@@ -13,174 +15,137 @@ if ( ! function_exists( 'ssl_alp_setup' ) ) :
 	 * runs before the init hook. The init hook is too late for some features, such
 	 * as indicating support for post thumbnails.
 	 */
-	function ssl_alp_setup() {
-		global $content_width;
-		global $ssl_alp_default_options;
-
-		/**
-		 * Set the content width based on the theme's design and stylesheet.
-		 */
-		if ( ! isset( $content_width ) ) {
-			$content_width = 800;
-		}
+	function alpine_setup() {
+		global $ssl_alpine_default_options;
 
 		/*
 		 * Make theme available for translation.
+		 * Translations can be filed in the /languages/ directory.
+		 * If you're building a theme based on Alpine, use a find and replace
+		 * to change 'alpine' to the name of your theme in all the template files.
 		 */
-		load_theme_textdomain( 'ssl-alp' );
+		load_theme_textdomain( 'alpine', get_template_directory() . '/languages' );
 
 		// Add default posts and comments RSS feed links to head.
 		add_theme_support( 'automatic-feed-links' );
 
 		/*
-		* Enable support for Title Tag.
-		*/
+		 * Let WordPress manage the document title.
+		 * By adding theme support, we declare that this theme does not use a
+		 * hard-coded <title> tag in the document head, and expect WordPress to
+		 * provide it for us.
+		 */
 		add_theme_support( 'title-tag' );
 
-		/*
-		 * Enable support for custom logo.
-		 */
-		add_theme_support(
-			'custom-logo',
-			array(
-				'height'		=>	150,
-				'width'			=>	600,
-				'flex-width'	=>	true,
-				'flex-height'	=>	true
-			)
-		);
-
-		/*
-		 * Enable support for partial refresh in Customizer widgets.
-		 */
-		add_theme_support( 'customize-selective-refresh-widgets' );
-
+		// This theme uses wp_nav_menu() in two locations.
 		register_nav_menus( array(
-			'primary' => __( 'Primary Menu', 'ssl-alp' ),
-			'footer'  => __( 'Footer Menu', 'ssl-alp' ),
+			'site-menu' => esc_html__( 'Primary', 'alpine' ),
+			'network-menu' => esc_html__( 'Network', 'alpine' )
 		) );
 
 		/*
-		 * Switch default HTML5 output.
+		 * Switch default core markup for search form, comment form, and comments
+		 * to output valid HTML5.
 		 */
 		add_theme_support( 'html5', array(
-			'comment-list',
-			'comment-form',
 			'search-form',
+			'comment-form',
+			'comment-list',
 			'gallery',
 			'caption',
 		) );
 
-		/*
-		 * Enable support for Post Formats.
+		// Set up the WordPress core custom background feature.
+		add_theme_support( 'custom-background', apply_filters( 'alpine_custom_background_args', array(
+			'default-color' => 'ffffff',
+			'default-image' => '',
+		) ) );
+
+		// Add theme support for selective refresh for widgets.
+		add_theme_support( 'customize-selective-refresh-widgets' );
+
+		/**
+		 * Add support for core custom logo.
+		 *
+		 * @link https://codex.wordpress.org/Theme_Logo
 		 */
-		add_theme_support( 'post-formats', array(
-			'status'
+		add_theme_support( 'custom-logo', array(
+			'height'      => 155,
+			'width'       => 700,
+			'flex-width'  => false,
+			'flex-height' => false
 		) );
 
-		// Setup the WordPress core custom background feature.
-		add_theme_support( 'custom-background', apply_filters(
-			'ssl_alp_custom_background_args', array(
-				'default-color' => 'f0f3f5',
-				'default-image' => '',
-			) ) );
-
-		$ssl_alp_default_options = ssl_alp_get_theme_option_defaults();
+		// Get default theme options.
+		$ssl_alpine_default_options = ssl_alpine_get_theme_option_defaults();
 	}
 endif;
-
-add_action( 'after_setup_theme', 'ssl_alp_setup' );
-
-if ( ! function_exists( 'ssl_alp_widgets_init' ) ) :
-	/**
-	 * Register widget area.
-	 */
-	function ssl_alp_widgets_init() {
-		// standard sidebar for posts, search, etc.
-		register_sidebar( array(
-			'name'          => __( 'Standard Sidebar', 'ssl-alp' ),
-			'id'            => 'ssl-alp-sidebar-standard',
-			'description'   => __( 'This is the sidebar appearing on front page, posts, archives, search, etc.', 'ssl-alp' ),
-			'before_widget' => '<aside id="%1$s" class="widget clearfix %2$s">',
-			'after_widget'  => '</aside>',
-			'before_title'  => '<h3 class="widgettitle">',
-			'after_title'   => '</h3>',
-		) );
-
-		if ( ssl_alp_get_option( 'page_specific_sidebar' ) ) {
-			// sidebar for pages, intended to show contents
-			register_sidebar( array(
-				'name'          => __( 'Page Sidebar', 'ssl-alp' ),
-				'id'            => 'ssl-alp-sidebar-page',
-				'description'   => __( 'This is the sidebar appearing on pages. This is intended to hold the page contents widget.', 'ssl-alp' ),
-				'before_widget' => '<aside id="%1$s" class="widget clearfix %2$s">',
-				'after_widget'  => '</aside>',
-				'before_title'  => '<h3 class="widgettitle">',
-				'after_title'   => '</h3>',
-			) );
-		}
-	}
-endif;
-
-add_action( 'widgets_init', 'ssl_alp_widgets_init' );
-
-if ( ! function_exists( 'ssl_alp_scripts' ) ) :
-	/**
-	 * Enqueue scripts and styles.
-	 */
-	function ssl_alp_scripts() {
-		wp_enqueue_style( 'fontawesome', get_template_directory_uri().'/third-party/font-awesome/css/font-awesome.css', false, '4.7.0' );
-		wp_enqueue_style( 'ssl-alp-style', get_stylesheet_uri(), array(), '2.3' );
-
-		wp_enqueue_script( 'ssl-alp-navigation', get_template_directory_uri() . '/js/navigation.js', array(), '20120206', true );
-		wp_enqueue_script( 'ssl-alp-custom', get_template_directory_uri() . '/js/custom.js', array( 'jquery' ), '1.8', true );
-
-		wp_localize_script(
-			'ssl-alp-custom',
-			'SSL_ALP_Screen_Reader_Text',
-			array(
-				'expand'   => __( 'expand menu', 'ssl-alp' ),
-				'collapse' => __( 'collapse menu', 'ssl-alp' ),
-			)
-		);
-
-		if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
-			wp_enqueue_script( 'comment-reply' );
-		}
-	}
-endif;
-
-add_action( 'wp_enqueue_scripts', 'ssl_alp_scripts' );
+add_action( 'after_setup_theme', 'alpine_setup' );
 
 /**
- * Include helper.
+ * Set the content width in pixels, based on the theme's design and stylesheet.
+ *
+ * Priority 0 to make it available to lower priority callbacks.
+ *
+ * @global int $content_width
  */
-require get_template_directory() . '/includes/helper.php';
+function alpine_content_width() {
+	// This variable is intended to be overruled from themes.
+	// Open WPCS issue: {@link https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/issues/1043}.
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+	$GLOBALS['content_width'] = apply_filters( 'alpine_content_width', 640 );
+}
+add_action( 'after_setup_theme', 'alpine_content_width', 0 );
+
+/**
+ * Register widget area.
+ *
+ * @link https://developer.wordpress.org/themes/functionality/sidebars/#registering-a-sidebar
+ */
+function alpine_widgets_init() {
+	register_sidebar( array(
+		'name'          => esc_html__( 'Sidebar', 'alpine' ),
+		'id'            => 'sidebar-1',
+		'description'   => esc_html__( 'Add widgets here.', 'alpine' ),
+		'before_widget' => '<section id="%1$s" class="widget %2$s">',
+		'after_widget'  => '</section>',
+		'before_title'  => '<h2 class="widget-title">',
+		'after_title'   => '</h2>',
+	) );
+}
+add_action( 'widgets_init', 'alpine_widgets_init' );
+
+/**
+ * Enqueue scripts and styles.
+ */
+function alpine_scripts() {
+	wp_enqueue_style( 'fontawesome', get_template_directory_uri().'/third-party/font-awesome/css/font-awesome.css', false, '4.7.0' );
+	wp_enqueue_style( 'alpine-style', get_stylesheet_uri() );
+
+	wp_enqueue_script( 'alpine-navigation', get_template_directory_uri() . '/js/navigation.js', array(), '20151215', true );
+
+	wp_enqueue_script( 'alpine-skip-link-focus-fix', get_template_directory_uri() . '/js/skip-link-focus-fix.js', array(), '20151215', true );
+
+	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
+		wp_enqueue_script( 'comment-reply' );
+	}
+}
+add_action( 'wp_enqueue_scripts', 'alpine_scripts' );
 
 /**
  * Custom template tags for this theme.
  */
-require get_template_directory() . '/includes/template-tags.php';
+require get_template_directory() . '/inc/template-tags.php';
 
 /**
- * Custom theme functions.
+ * Functions which enhance the theme by hooking into WordPress.
  */
-require get_template_directory() . '/includes/theme-functions.php';
-
-/**
- * Custom theme custom.
- */
-require get_template_directory() . '/includes/theme-custom.php';
-
-/**
- * Custom functions that act independently of the theme templates.
- */
-require get_template_directory() . '/includes/extras.php';
+require get_template_directory() . '/inc/template-functions.php';
 
 /**
  * Customizer additions.
  */
-require get_template_directory() . '/includes/customizer.php';
+require get_template_directory() . '/inc/customizer.php';
 
 /**
  * Admin functions (for is_plugin_active)

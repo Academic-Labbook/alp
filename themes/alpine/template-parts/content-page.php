@@ -1,8 +1,10 @@
 <?php
 /**
- * The template used for displaying page content in page.php
+ * Template part for displaying page content in page.php
  *
- * @package ssl-alp
+ * @link https://developer.wordpress.org/themes/basics/template-hierarchy/
+ *
+ * @package Alpine
  */
 
 ?>
@@ -16,14 +18,16 @@
 	</header><!-- .entry-header -->
 
 	<div class="entry-content">
-		<?php the_content(); ?>
 		<?php
-			wp_link_pages( array(
-				'before' => '<div class="page-links">' . __( 'Pages:', 'ssl-alp' ),
-				'after'  => '</div>',
-			) );
+		ssl_alpine_the_toc();
+		the_content();
+
+		wp_link_pages( array(
+			'before' => '<div class="page-links">' . esc_html__( 'Pages:', 'ssl-alpine' ),
+			'after'  => '</div>',
+		) );
 		?>
 	</div><!-- .entry-content -->
-</article><!-- #post-## -->
+</article><!-- #post-<?php the_ID(); ?> -->
 <?php ssl_alpine_the_references(); ?>
 <?php ssl_alpine_the_revisions(); ?>
