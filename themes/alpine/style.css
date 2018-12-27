@@ -874,21 +874,6 @@ a:hover, a:active {
 }
 
 /*--------------------------------------------------------------
-# Infinite scroll
---------------------------------------------------------------*/
-/* Globally hidden elements when Infinite Scroll is supported and in use. */
-.infinite-scroll .posts-navigation,
-.infinite-scroll.neverending .site-footer {
-    /* Theme Footer (when set to scrolling) */
-    display: none;
-}
-
-/* When Infinite Scroll has reached its end we need to re-display elements that were hidden (via .neverending) before. */
-.infinity-end.neverending .site-footer {
-    display: block;
-}
-
-/*--------------------------------------------------------------
 # Media
 --------------------------------------------------------------*/
 .page-content .wp-smiley,
@@ -995,10 +980,25 @@ body {
     font-size: 14px;
 }
 
+p {
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+}
+
 /* Default link settings, overridden further down */
 a, a:visited, a:hover, a:focus, a:active {
     color: #0b789c;
     text-decoration: none;
+}
+
+ul, ol {
+    margin: 0 0 1.5em 0;
+}
+
+li > ul,
+li > ol {
+    margin-bottom: 0;
+    margin-left: 0;
 }
 
 /* Main grid */
@@ -1213,12 +1213,6 @@ span.cat-links a, span.tag-links a {
     margin: 0;
 }
 
-.entry-header {
-    margin-bottom: 0.5em; /* for when entry content begins directly with non-margined item like a list */
-    padding-bottom: 1em;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
-}
-
 .entry-header h1, .entry-header h2 {
 	margin: 0 0 0.25em 0;
 	font-weight: 400;
@@ -1264,7 +1258,7 @@ a.entry-link, a.entry-section-link {
     clear: right;
     border: #a8bfcf 1px solid;
     padding: 0.5em;
-    margin: 5px 0 5px 5px;
+    margin: 1em 0 1em 1em; /* avoid adding margin on right where container already pads by 1em */
     width: 35%;
     font-size: 85%;
 }
@@ -1301,6 +1295,13 @@ a.entry-link, a.entry-section-link {
 	color: #0b789c;
 }
 
+.entry-content, .entry-summary {
+    border-top: 1px solid rgba(0, 0, 0, 0.07);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
 .entry-content h1,
 .entry-content h2,
 .entry-content h3,
@@ -1317,12 +1318,6 @@ a.entry-link, a.entry-section-link {
 .entry-content a:hover {
     border-bottom: #005a9c 2px solid;
     background-color:#efefef;
-}
-
-.entry-footer {
-    margin-top: 0.5em; /* for when entry content ends directly with non-margined item like a list */
-    padding-top: 1em;
-    border-top: 1px solid rgba(0, 0, 0, 0.07);
 }
 
 .entry-meta div, .entry-footer span, .comment-meta { /* div/span specificity required */

@@ -27,7 +27,11 @@ class SSL_Alpine_Menu_Level {
 		// update last child reference
 		end($this->child_menus);
 		$this->last_child = &$this->child_menus[key($this->child_menus)];
-	}
+    }
+
+    public function count() {
+        return count( $this->child_menus );
+    }
 
 	public function get_child_menus() {
 		return $this->child_menus;

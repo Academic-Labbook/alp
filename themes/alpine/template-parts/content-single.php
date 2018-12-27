@@ -1,6 +1,6 @@
 <?php
 /**
- * Template part for displaying posts
+ * Template part for displaying single post
  *
  * @link https://developer.wordpress.org/themes/basics/template-hierarchy/
  *
@@ -11,24 +11,14 @@
 
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 	<header class="entry-header">
-		<?php ssl_alpine_the_post_title(); ?>
-		<?php if ( 'post' === get_post_type() ) : ?>
+		<?php ssl_alpine_the_post_title( $post, false, true, true ); ?>
 		<div class="entry-meta">
 			<?php ssl_alpine_the_post_meta(); ?>
 		</div><!-- .entry-meta -->
-		<?php endif; ?>
 	</header><!-- .entry-header -->
 
-	<?php
-	if ( 'status' == get_post_format() ) :
-		// do nothing
-	elseif ( 'excerpt' === ssl_alpine_get_option( 'content_layout' ) ) : ?>
-	<div class="entry-summary">
-		<?php the_excerpt(); ?>
-	</div>
-	<?php else : ?>
 	<div class="entry-content">
-		<?php the_content( esc_html__( 'Continue reading', 'ssl-alpine' ) . ' <span class="meta-nav">&rarr;</span>' ); ?>
+		<?php the_content(); ?>
 		<?php
 		wp_link_pages(
 			array(
@@ -38,11 +28,11 @@
 		);
 		?>
 	</div><!-- .entry-content -->
-	<?php endif; ?>
 
-	<?php if ( 'status' !== get_post_format() ) : ?>
 	<footer class="entry-footer">
 		<?php ssl_alpine_the_footer(); ?>
 	</footer>
-	<?php endif; ?>
 </article><!-- #post-<?php the_ID(); ?> -->
+<?php ssl_alpine_the_references(); ?>
+<?php ssl_alpine_the_revisions(); ?>
+

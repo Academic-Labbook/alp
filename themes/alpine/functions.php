@@ -55,6 +55,13 @@ if ( ! function_exists( 'alpine_setup' ) ) :
 			'caption',
 		) );
 
+		/*
+		 * Enable support for Post Formats.
+		 */
+		add_theme_support( 'post-formats', array(
+			'status'
+		) );
+
 		// Set up the WordPress core custom background feature.
 		add_theme_support( 'custom-background', apply_filters( 'alpine_custom_background_args', array(
 			'default-color' => 'ffffff',
@@ -150,8 +157,8 @@ if ( ! function_exists( 'ssl_alpine_the_content_with_toc' ) ) :
 		// get contents hierarchy
 		$content = ssl_alpine_generate_post_contents( $content, $hierarchy );
 
-		if ( is_null( $hierarchy ) ) {
-			// table of contents was not generated
+		if ( is_null( $hierarchy ) || ! $hierarchy->count() ) {
+			// table of contents was not generated or has no entries
 			return $content;
 		}
 

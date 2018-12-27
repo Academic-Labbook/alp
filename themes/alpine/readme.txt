@@ -1,7 +1,7 @@
 === Alpine ===
 
 Contributors: Sean Leavey
-Tags: custom-background, custom-logo, custom-menu, threaded-comments, translation-ready
+Tags: custom-background, custom-logo, custom-menu, post-formats, threaded-comments, translation-ready
 
 Requires at least: 5.0
 Tested up to: 5.0
