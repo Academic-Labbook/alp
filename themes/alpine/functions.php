@@ -147,18 +147,18 @@ if ( ! function_exists( 'ssl_alpine_the_content_with_toc' ) ) :
 			return $content;
 		}
 
-		if ( empty( $content ) ) {
-			// don't display empty table of contents
-			return $content;
-		}
-
 		// get contents hierarchy
 		$content = ssl_alpine_generate_post_contents( $content, $hierarchy );
+
+		if ( is_null( $hierarchy ) ) {
+			// table of contents was not generated
+			return $content;
+		}
 
 		?>
 		<div class="entry-toc entry-toc-<?php the_ID(); ?>">
 			<h3 class="entry-toc-title"><?php _e( 'Contents', 'ssl-alpine' ) ?></h3>
-			<?php ssl_alpine_create_toc( $hierarchy, 3 ); ?>
+			<?php ssl_alpine_the_toc( $hierarchy, 3 ); ?>
 		</div>
 		<?php
 

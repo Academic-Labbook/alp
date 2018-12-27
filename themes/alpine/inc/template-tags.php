@@ -742,8 +742,8 @@ if ( ! function_exists( 'ssl_alpine_get_revision_count' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'ssl_alpine_create_toc' ) ) :
-    function ssl_alpine_create_toc( $contents, $max_levels ) {
+if ( ! function_exists( 'ssl_alpine_the_toc' ) ) :
+    function ssl_alpine_the_toc( $contents, $max_levels ) {
         if ( $max_levels < 0 ) {
             // beyond the maximum level setting
             return;
@@ -774,7 +774,7 @@ if ( ! function_exists( 'ssl_alpine_create_toc' ) ) :
                 foreach ( $children as $child ) {
                     // show sublevel
                     echo '<li>';
-                    ssl_alpine_create_toc( $child, $max_levels - 1 );
+                    ssl_alpine_the_toc( $child, $max_levels - 1 );
                     echo '</li>';
                 }
 

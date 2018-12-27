@@ -46,7 +46,12 @@ if ( ! function_exists( 'ssl_alpine_generate_post_contents' ) ) :
 	function ssl_alpine_generate_post_contents( $post_content, &$toc ) {
 		if ( ! extension_loaded( 'dom' ) ) {
 			// cannot generate table of contents
-			return;
+			return $post_content;
+        }
+
+        if ( empty( $post_content ) ) {
+            // nothing to do
+            return $post_content;
         }
 
 		// disable visible XML error reporting temporarily
