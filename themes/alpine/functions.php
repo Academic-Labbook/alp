@@ -132,6 +132,41 @@ function alpine_scripts() {
 }
 add_action( 'wp_enqueue_scripts', 'alpine_scripts' );
 
+if ( ! function_exists( 'ssl_alpine_the_content_with_toc' ) ) :
+	/**
+	 * Add table of contents alongside post.
+	 */
+	function ssl_alpine_the_content_with_toc( $content ) {
+		$post = get_post();
+
+		if ( is_null( $post ) ) {
+			return $content;
+		}
+
+		if ( ! is_page( $post ) ) {
+			return $content;
+		}
+
+		if ( empty( $content ) ) {
+			// don't display empty table of contents
+			return $content;
+		}
+
+		// get contents hierarchy
+		$content = ssl_alpine_generate_post_contents( $content, $hierarchy );
+
+		?>
+		<div class="entry-toc entry-toc-<?php the_ID(); ?>">
+			<h3 class="entry-toc-title"><?php _e( 'Contents', 'ssl-alpine' ) ?></h3>
+			<?php ssl_alpine_create_toc( $hierarchy, 3 ); ?>
+		</div>
+		<?php
+
+		return $content;
+	}
+endif;
+add_filter( 'the_content', 'ssl_alpine_the_content_with_toc' );
+
 /**
  * Page table of contents generator.
  */

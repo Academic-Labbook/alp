@@ -19,7 +19,6 @@
 
 	<div class="entry-content">
 		<?php
-		ssl_alpine_the_toc();
 		the_content();
 
 		wp_link_pages( array(

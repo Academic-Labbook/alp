@@ -40,20 +40,10 @@ class SSL_Alpine_Menu_Level {
 
 if ( ! function_exists( 'ssl_alpine_generate_post_contents' ) ) :
 	/**
-	 * Builds a contents list for the specified page.
+	 * Builds a table of contents for the specified page, and returns the page
+     * with heading IDs injected where appropriate.
 	 */
-	function ssl_alpine_generate_post_contents( $post_id ) {
-        // get post
-        $post = get_post( $post_id );
-
-        if ( is_null( $post ) ) {
-            return;
-        }
-
-        if ( empty( $post->post_content ) ) {
-            return;
-        }
-
+	function ssl_alpine_generate_post_contents( $post_content, &$toc ) {
 		if ( ! extension_loaded( 'dom' ) ) {
 			// cannot generate table of contents
 			return;
@@ -66,21 +56,22 @@ if ( ! function_exists( 'ssl_alpine_generate_post_contents' ) ) :
         $document = new DOMDocument();
 
         // load HTML document
-		$document->loadHTML( $post->post_content );
+		$document->loadHTML( $post_content );
 
 		// revert libxml error setting
 		libxml_use_internal_errors( $prev_libxml_error_setting );
 
 		// create root list container
-		$contents = new SSL_Alpine_Menu_Level(); // level "0"
-		$contents->is_root = true;
+		$toc = new SSL_Alpine_Menu_Level(); // level "0"
+		$toc->is_root = true;
 
 		// set parent container to root
-		$head = &$contents; // level 0
+		$head = &$toc; // level 0
 
 		// create XPath query to get header elements
-		$xpath = new DOMXPath( $document );
-		$xpath_query = $xpath->query( '//*[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6]' );
+        $xpath = new DOMXPath( $document );
+        // query headings (ignore h1, which shouldn't be used in posts)
+		$xpath_query = $xpath->query( '//*[self::h2 or self::h3 or self::h4 or self::h5 or self::h6]' );
 
 		// default last level
 		$last_level = 1;
@@ -138,7 +129,7 @@ if ( ! function_exists( 'ssl_alpine_generate_post_contents' ) ) :
 			$header_id = _unique_id( $header, $document );
 
 			// set tag's id
-			//$header->setAttribute( 'id', $header_id );
+			$header->setAttribute( 'id', $header_id );
 
 			// add new child to parent
 			$child = new SSL_Alpine_Menu_Level();
@@ -150,9 +141,10 @@ if ( ! function_exists( 'ssl_alpine_generate_post_contents' ) ) :
 			);
 
 			$head->add_child_menu( $child );
-		}
+        }
 
-		return $contents;
+		// convert DOM with any changes made back into HTML
+        return $document->saveHTML();
 	}
 endif;
 

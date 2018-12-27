@@ -742,48 +742,8 @@ if ( ! function_exists( 'ssl_alpine_get_revision_count' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'ssl_alpine_the_toc' ) ) :
-	/**
-	 * Print post table of contents.
-	 */
-	function ssl_alpine_the_toc() {
-		// get current post
-		$post = get_post();
-
-		if ( is_null( $post ) ) {
-			// post doesn't exist
-			return;
-		}
-
-		get_template_part( 'template-parts/toc', get_post_type() );
-	}
-endif;
-
-if ( ! function_exists( 'ssl_alpine_the_toc_display' ) ) :
-	/**
-	 * Print post table of contents items.
-	 */
-	function ssl_alpine_the_toc_display() {
-		$post = get_post();
-
-		if ( is_null( $post ) ) {
-			return;
-		}
-
-		if ( empty( $post->post_content ) ) {
-			// don't display empty table of contents
-			return;
-		}
-
-		// get contents hierarchy
-		$contents = ssl_alpine_generate_post_contents( $post->post_id );
-
-		ssl_alpine_toc_list( $contents, 4 );
-	}
-endif;
-
-if ( ! function_exists( 'ssl_alpine_toc_list' ) ) :
-    function ssl_alpine_toc_list( $contents, $max_levels ) {
+if ( ! function_exists( 'ssl_alpine_create_toc' ) ) :
+    function ssl_alpine_create_toc( $contents, $max_levels ) {
         if ( $max_levels < 0 ) {
             // beyond the maximum level setting
             return;
@@ -814,7 +774,7 @@ if ( ! function_exists( 'ssl_alpine_toc_list' ) ) :
                 foreach ( $children as $child ) {
                     // show sublevel
                     echo '<li>';
-                    ssl_alpine_toc_list( $child, $max_levels - 1 );
+                    ssl_alpine_create_toc( $child, $max_levels - 1 );
                     echo '</li>';
                 }
 
