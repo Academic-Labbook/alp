@@ -1264,10 +1264,41 @@ a.entry-link, a.entry-section-link {
     clear: right;
     border: #a8bfcf 1px solid;
     padding: 0.5em;
+    margin: 5px 0 5px 5px;
+    width: 35%;
+    font-size: 85%;
 }
 
 .entry-toc-title {
     margin: 0; /* get rid of heading margin */
+}
+
+/* style for all lists descended from entry-toc, including sublists */
+.entry-toc ul {
+	list-style-type: none; /* remove standard bullet points */
+    padding: 0 0 0 15px;
+    margin: 0;
+}
+
+/* remove padding from top level */
+.entry-toc > ul {
+    padding: 0;
+    margin-bottom: 0;
+}
+
+.entry-toc ul li:before {
+	font-family: 'FontAwesome';
+	content: '\f105'; /* arrow-right */
+	margin: 0 5px 0 -15px;
+    color: #0b789c;
+    content: none; /* remove icon; moved to :before selector on a elements */
+}
+
+.entry-toc ul li a:before {
+	font-family: 'FontAwesome';
+	content: '\f105'; /* arrow-right */
+	margin: 0 5px 0 -10px;
+	color: #0b789c;
 }
 
 .entry-content h1,
@@ -1328,18 +1359,6 @@ a.entry-link, a.entry-section-link {
 
 /* default list style type for widgets */
 .widget ul li:before {
-	font-family: 'FontAwesome';
-	content: '\f105'; /* arrow-right */
-	margin: 0 5px 0 -15px;
-	color: #0b789c;
-}
-
-/* table of contents widget moves :before selector to a elements */
-.widget + .widget_ssl-alp-contents ul li:before {
-	content: none; /* remove icon */
-}
-
-.widget + .widget_ssl-alp-contents ul li a:before {
 	font-family: 'FontAwesome';
 	content: '\f105'; /* arrow-right */
 	margin: 0 5px 0 -15px;

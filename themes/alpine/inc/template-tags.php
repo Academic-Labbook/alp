@@ -758,3 +758,68 @@ if ( ! function_exists( 'ssl_alpine_the_toc' ) ) :
 		get_template_part( 'template-parts/toc', get_post_type() );
 	}
 endif;
+
+if ( ! function_exists( 'ssl_alpine_the_toc_display' ) ) :
+	/**
+	 * Print post table of contents items.
+	 */
+	function ssl_alpine_the_toc_display() {
+		$post = get_post();
+
+		if ( is_null( $post ) ) {
+			return;
+		}
+
+		if ( empty( $post->post_content ) ) {
+			// don't display empty table of contents
+			return;
+		}
+
+		// get contents hierarchy
+		$contents = ssl_alpine_generate_post_contents( $post->post_id );
+
+		ssl_alpine_toc_list( $contents, 4 );
+	}
+endif;
+
+if ( ! function_exists( 'ssl_alpine_toc_list' ) ) :
+    function ssl_alpine_toc_list( $contents, $max_levels ) {
+        if ( $max_levels < 0 ) {
+            // beyond the maximum level setting
+            return;
+        }
+
+        if ( is_null( $contents ) ) {
+            return;
+        }
+
+        $menu_data = $contents->get_menu_data();
+
+        if ( is_array( $menu_data ) ) {
+            printf(
+                '<a href="#%1$s">%2$s</a>',
+                esc_html( $menu_data['id'] ),
+                esc_html( $menu_data['title'] )
+            );
+        }
+
+        if ( $max_levels > 0 ) {
+            // next level still visible
+            // get children
+            $children = $contents->get_child_menus();
+
+            if ( count( $children ) ) {
+                echo '<ul>';
+
+                foreach ( $children as $child ) {
+                    // show sublevel
+                    echo '<li>';
+                    ssl_alpine_toc_list( $child, $max_levels - 1 );
+                    echo '</li>';
+                }
+
+                echo '</ul>';
+            }
+        }
+    }
+endif;

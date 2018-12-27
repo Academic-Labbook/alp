@@ -133,6 +133,11 @@ function alpine_scripts() {
 add_action( 'wp_enqueue_scripts', 'alpine_scripts' );
 
 /**
+ * Page table of contents generator.
+ */
+require get_template_directory() . '/inc/toc.php';
+
+/**
  * Custom template tags for this theme.
  */
 require get_template_directory() . '/inc/template-tags.php';
