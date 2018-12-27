@@ -980,11 +980,6 @@ body {
     font-size: 14px;
 }
 
-p {
-    margin-top: 1.5em;
-    margin-bottom: 1.5em;
-}
-
 /* Default link settings, overridden further down */
 a, a:visited, a:hover, a:focus, a:active {
     color: #0b789c;
@@ -992,7 +987,8 @@ a, a:visited, a:hover, a:focus, a:active {
 }
 
 ul, ol {
-    margin: 0 0 1.5em 0;
+    margin: 0.5em 0 0.5em 0;
+    padding-left: 2em;
 }
 
 li > ul,
@@ -1300,6 +1296,8 @@ a.entry-link, a.entry-section-link {
     border-bottom: 1px solid rgba(0, 0, 0, 0.07);
     margin-top: 1em;
     margin-bottom: 1em;
+    padding-top: 1em;
+    padding-bottom: 1em;
 }
 
 .entry-content h1,
