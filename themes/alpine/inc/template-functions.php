@@ -48,11 +48,13 @@ if ( ! function_exists( 'ssl_alpine_get_theme_option_defaults' ) ) :
 	 */
 	function ssl_alpine_get_theme_option_defaults() {
 		return array(
-			'content_layout'               => 'excerpt',
-			'search_placeholder'           => esc_html__( 'Search...', 'ssl-alpine' ),
-			'excerpt_length'               => 55, // WordPress default
-			'copyright_text'               => '',
-			'powered_by'                   => true
+			'content_layout'               		=> 'excerpt',
+			'display_page_table_of_contents'	=> true,
+			'table_of_contents_max_depth'		=> 4,
+			'search_placeholder'           		=> esc_html__( 'Search...', 'ssl-alpine' ),
+			'excerpt_length'               		=> 55, // WordPress default
+			'copyright_text'               		=> '',
+			'powered_by'                   		=> true
 		);
 	}
 endif;

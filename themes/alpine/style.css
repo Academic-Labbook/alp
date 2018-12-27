@@ -1046,7 +1046,7 @@ li > ol {
 
 /* space after icons */
 .fa {
-	margin-right: 5px;
+	margin-right: 0.5em;
 }
 
 /* category links */

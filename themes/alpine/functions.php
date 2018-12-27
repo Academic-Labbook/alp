@@ -146,6 +146,10 @@ if ( ! function_exists( 'ssl_alpine_the_content_with_toc' ) ) :
 	function ssl_alpine_the_content_with_toc( $content ) {
 		$post = get_post();
 
+		if ( ! ssl_alpine_get_option( 'display_page_table_of_contents' ) ) {
+			return $content;
+		}
+
 		if ( is_null( $post ) ) {
 			return $content;
 		}
@@ -165,7 +169,7 @@ if ( ! function_exists( 'ssl_alpine_the_content_with_toc' ) ) :
 		?>
 		<div class="entry-toc entry-toc-<?php the_ID(); ?>">
 			<h3 class="entry-toc-title"><?php _e( 'Contents', 'ssl-alpine' ) ?></h3>
-			<?php ssl_alpine_the_toc( $hierarchy, 3 ); ?>
+			<?php ssl_alpine_the_toc( $hierarchy, ssl_alpine_get_option( 'table_of_contents_max_depth' ) ); ?>
 		</div>
 		<?php
 

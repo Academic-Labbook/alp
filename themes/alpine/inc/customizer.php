@@ -75,6 +75,73 @@ function alpine_customize_register( $wp_customize ) {
 	);
 
 	/**
+	 * Pages section
+	 */
+
+	/**
+	 * Post lists section
+	 */
+
+	$wp_customize->add_section(
+		'ssl_alpine_page_options',
+		array(
+			'title'      => __( 'Pages', 'ssl-alpine' ),
+			'priority'   => 85,
+			'capability' => 'edit_theme_options',
+			'panel'      => '',
+		)
+	);
+
+	// table of contents display setting
+	$wp_customize->add_setting(
+		'ssl_alpine_options[display_page_table_of_contents]',
+		array(
+			'default'           => $ssl_alpine_default_options['display_page_table_of_contents'],
+			'capability'        => 'edit_theme_options',
+			'sanitize_callback' => 'ssl_alpine_sanitize_checkbox',
+		)
+	);
+
+	$wp_customize->add_control(
+		'ssl_alpine_options[display_page_table_of_contents]',
+		array(
+			'label'    => __( 'Display table of contents', 'ssl-alpine' ),
+			'description'	=>	__( 'Generate and display a table of contents panel shown at the top right of the page.', 'ssl-alpine' ),
+			'section'  => 'ssl_alpine_page_options',
+			'type'     => 'checkbox',
+			'priority' => 120
+		)
+	);
+
+	// table of contents display setting
+	$wp_customize->add_setting(
+		'ssl_alpine_options[table_of_contents_max_depth]',
+		array(
+			'default'           => $ssl_alpine_default_options['table_of_contents_max_depth'],
+			'capability'        => 'edit_theme_options',
+			'sanitize_callback' => 'ssl_alpine_sanitize_select',
+		)
+	);
+
+	$wp_customize->add_control(
+		'ssl_alpine_options[table_of_contents_max_depth]',
+		array(
+			'label'    => __( 'Table of contents maximum depth', 'ssl-alpine' ),
+			'description'	=>	__( 'Maximum heading level displayed in the table of contents.', 'ssl-alpine' ),
+			'section'  => 'ssl_alpine_page_options',
+			'type'     => 'select',
+			'choices'  => array(
+				2          => __( 'h2', 'ssl-alpine' ),
+				3    	   => __( 'h3', 'ssl-alpine' ),
+				4    	   => __( 'h4', 'ssl-alpine' ),
+				5    	   => __( 'h5', 'ssl-alpine' ),
+				6    	   => __( 'h6', 'ssl-alpine' )
+			),
+			'priority'	=>	130
+		)
+	);
+
+	/**
 	 * Sidebar section
 	 */
 
@@ -257,7 +324,7 @@ if ( ! function_exists( 'ssl_alpine_sanitize_select' ) ) {
 	function ssl_alpine_sanitize_select( $input, $setting ) {
 		$input = sanitize_key( $input );
 		$choices = $setting->manager->get_control( $setting->id )->choices;
-		
+
 		return ( array_key_exists( $input, $choices ) ? $input : $setting->default );
 	}
 }
