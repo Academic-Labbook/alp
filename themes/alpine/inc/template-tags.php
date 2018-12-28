@@ -382,8 +382,17 @@ if ( ! function_exists( 'ssl_alpine_the_revisions' ) ) :
 			return;
 		}
 
+		if ( ! $current_page = get_query_var( 'paged' ) ) {
+			$current_page = 1;
+		}
+
+		// total revisions
+		$count = ssl_alpine_get_revision_count( $post );
+		$per_page = 10;
+		$pages = ceil( $count / $per_page );
+
 		// get list of revisions to this post
-		$revisions = ssl_alpine_get_revisions( $post );
+		$revisions = ssl_alpine_get_revisions( $post, $current_page, $per_page );
 
 		if ( is_null( $revisions ) || ! is_array( $revisions ) || count( $revisions ) == 0 ) {
 			// no revisions to show
@@ -396,7 +405,18 @@ if ( ! function_exists( 'ssl_alpine_the_revisions' ) ) :
 			echo '<li>' . ssl_alpine_get_revision_description( $revision ) . '</li>';
 		}
 
-		echo "</ul></div>";
+		echo "</ul>";
+
+		if ( $pages > 1 ) {
+			echo paginate_links( array(
+				'base'     => get_pagenum_link() . '%_%',
+				'format'   => '&paged=%#%',
+				'current'  => $current_page,
+				'total'    => $pages
+	  		) );
+		}
+
+		echo "</div>";
 	}
 endif;
 
@@ -404,7 +424,7 @@ if ( ! function_exists( 'ssl_alpine_get_revisions' ) ) :
 	/**
 	 * Get list of revisions for the current or specified post
 	 */
-	function ssl_alpine_get_revisions( $post = null ) {
+	function ssl_alpine_get_revisions( $post = null, $page = 1, $per_page = -1 ) {
 		if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
 			return;
 		} elseif ( ! get_option( 'ssl_alp_enable_post_edit_summaries' ) ) {
@@ -423,8 +443,10 @@ if ( ! function_exists( 'ssl_alpine_get_revisions' ) ) :
 		$revisions = wp_get_post_revisions(
 			$post,
 			array(
-				'orderby'	=>	'date',
-				'order'		=>	'DESC'
+				'orderby'			=>	'date',
+				'order'				=>	'DESC',
+				'paged'				=>	$page,
+				'posts_per_page'	=>	$per_page
 			)
 		);
 
