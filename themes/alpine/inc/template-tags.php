@@ -399,7 +399,17 @@ if ( ! function_exists( 'ssl_alpine_the_revisions' ) ) :
 			return;
 		}
 
-		echo '<div class="post-revisions"><h3>Revisions</h3><ul>';
+		echo '<div class="post-revisions">';
+		echo '<h3>';
+
+		printf( // WPCS: XSS OK.
+			/* translators: 1: revision count number, 2: title. */
+			esc_html( _nx( '%1$s revision', '%1$s revisions', $count, 'revisions title', 'ssl-alpine' ) ),
+			number_format_i18n( $count )
+		);
+
+		echo "</h3>";
+		echo "<ul>";
 
 		foreach ( $revisions as $revision ) {
 			echo '<li>' . ssl_alpine_get_revision_description( $revision ) . '</li>';
