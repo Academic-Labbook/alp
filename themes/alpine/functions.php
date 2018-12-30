@@ -21,10 +21,8 @@ if ( ! function_exists( 'alpine_setup' ) ) :
 		/*
 		 * Make theme available for translation.
 		 * Translations can be filed in the /languages/ directory.
-		 * If you're building a theme based on Alpine, use a find and replace
-		 * to change 'alpine' to the name of your theme in all the template files.
 		 */
-		load_theme_textdomain( 'alpine', get_template_directory() . '/languages' );
+		load_theme_textdomain( 'ssl-alpine', get_template_directory() . '/languages' );
 
 		// Add default posts and comments RSS feed links to head.
 		add_theme_support( 'automatic-feed-links' );
@@ -39,8 +37,8 @@ if ( ! function_exists( 'alpine_setup' ) ) :
 
 		// This theme uses wp_nav_menu() in two locations.
 		register_nav_menus( array(
-			'site-menu' => esc_html__( 'Primary', 'alpine' ),
-			'network-menu' => esc_html__( 'Network', 'alpine' )
+			'site-menu' => esc_html__( 'Primary', 'ssl-alpine' ),
+			'network-menu' => esc_html__( 'Network', 'ssl-alpine' )
 		) );
 
 		/*
@@ -111,9 +109,9 @@ add_action( 'after_setup_theme', 'alpine_content_width', 0 );
  */
 function alpine_widgets_init() {
 	register_sidebar( array(
-		'name'          => esc_html__( 'Sidebar', 'alpine' ),
+		'name'          => esc_html__( 'Sidebar', 'ssl-alpine' ),
 		'id'            => 'sidebar-1',
-		'description'   => esc_html__( 'Add widgets here.', 'alpine' ),
+		'description'   => esc_html__( 'Add widgets here.', 'ssl-alpine' ),
 		'before_widget' => '<section id="%1$s" class="widget %2$s">',
 		'after_widget'  => '</section>',
 		'before_title'  => '<h2 class="widget-title">',

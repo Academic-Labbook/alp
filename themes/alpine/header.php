@@ -22,12 +22,12 @@
 
 <body <?php body_class(); ?>>
 <div id="page" class="site">
-	<a class="skip-link screen-reader-text" href="#content"><?php esc_html_e( 'Skip to content', 'alpine' ); ?></a>
+	<a class="skip-link screen-reader-text" href="#content"><?php esc_html_e( 'Skip to content', 'ssl-alpine' ); ?></a>
 
 	<header id="masthead" class="site-header">
 		<?php if ( has_nav_menu( 'network-menu' ) ): ?>
 		<nav id="network-navigation" class="main-navigation">
-			<button class="menu-toggle" aria-controls="network-menu" aria-expanded="false"><?php esc_html_e( 'Network Menu', 'alpine' ); ?></button>
+			<button class="menu-toggle" aria-controls="network-menu" aria-expanded="false"><?php esc_html_e( 'Network Menu', 'ssl-alpine' ); ?></button>
 			<?php
 			wp_nav_menu( array(
 				'theme_location' => 'network-menu',
@@ -55,7 +55,7 @@
 		</div><!-- .site-branding -->
 
 		<nav id="site-navigation" class="main-navigation">
-			<button class="menu-toggle" aria-controls="primary-menu" aria-expanded="false"><?php esc_html_e( 'Primary Menu', 'alpine' ); ?></button>
+			<button class="menu-toggle" aria-controls="primary-menu" aria-expanded="false"><?php esc_html_e( 'Primary Menu', 'ssl-alpine' ); ?></button>
 			<?php
 			wp_nav_menu( array(
 				'theme_location' => 'site-menu',
