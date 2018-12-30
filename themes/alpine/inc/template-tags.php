@@ -245,13 +245,25 @@ if ( ! function_exists( 'ssl_alpine_get_authors' ) ) :
 			$authors = $ssl_alp->coauthors->get_coauthors( $post );
 		} else {
 			// fall back to the_author if plugin is disabled
-			$authors = array( get_user_by( 'id', $post->post_author ) );
+			$authors = array();
+
+			// get single author object
+			$author = get_user_by( 'id', $post->post_author );
+
+			// if there is no author, $author == false
+			if ( $author ) {
+				$authors[] = $author;
+			}
 		}
 
 		$author_html = array();
 
 		foreach ( $authors as $author ) {
-			$author_html[] = ssl_alpine_format_author( $author, $url );
+			$author = ssl_alpine_format_author( $author, $url );
+
+			if ( ! is_null( $author ) ) {
+				$author_html[] = $author;
+			}
 		}
 
 		if ( ! count( $author_html ) ) {
@@ -305,6 +317,10 @@ if ( ! function_exists( 'ssl_alpine_format_author' ) ) :
 	 * Gets formatted author name
 	 */
 	function ssl_alpine_format_author( $author, $url = true ) {
+		if ( is_null( $author ) ) {
+			return;
+		}
+
 		$author_html = $author->display_name;
 
 		if ( $url ) {
