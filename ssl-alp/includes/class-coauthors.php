@@ -495,7 +495,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 	/**
 	 * Filter capabilities of super admins to stop them editing or deleting coauthor terms.
-	 * 
+	 *
 	 * Coauthor terms are essential to the correct operation of the coauthors system.
 	 */
 	function filter_capabilities( $caps, $cap, $user_id, $args ) {
@@ -519,7 +519,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		$taxonomy = get_taxonomy( $term->taxonomy );
-		
+
 		if ( 'ssl_alp_coauthor' == $taxonomy->name ) {
 			// disallow
 			$caps[] = 'do_not_allow';
@@ -1460,7 +1460,7 @@ class SSL_ALP_Widget_Users extends WP_Widget {
 			);
 
 			// get user post counts
-			$user_ids = array_map( create_function( '$user', 'return $user->ID;' ), $users );
+			$user_ids = wp_list_pluck( $users, 'ID' );
 			$post_counts = $ssl_alp->coauthors->count_many_users_posts( $user_ids );
 
 			if ( ! empty( $users ) ) {
