@@ -213,21 +213,42 @@ function alpine_customize_register( $wp_customize ) {
 
 	// "powered by" setting
 	$wp_customize->add_setting(
-		'ssl_alpine_options[powered_by]',
+		'ssl_alpine_options[show_powered_by]',
 		array(
-			'default'           => $ssl_alpine_default_options['powered_by'],
+			'default'           => $ssl_alpine_default_options['show_powered_by'],
 			'capability'        => 'edit_theme_options',
 			'sanitize_callback' => 'ssl_alpine_sanitize_checkbox',
 		)
 	);
 
 	$wp_customize->add_control(
-		'ssl_alpine_options[powered_by]',
+		'ssl_alpine_options[show_powered_by]',
 		array(
 			'label'    => __( 'Show "Powered By" label', 'ssl-alpine' ),
 			'section'  => 'ssl_alpine_footer_options',
 			'type'     => 'checkbox',
 			'priority' => 120,
+		)
+	);
+
+	// privacy policy link setting
+	$wp_customize->add_setting(
+		'ssl_alpine_options[show_privacy_policy]',
+		array(
+			'default'           => $ssl_alpine_default_options['show_privacy_policy'],
+			'capability'        => 'edit_theme_options',
+			'sanitize_callback' => 'ssl_alpine_sanitize_checkbox',
+		)
+	);
+
+	$wp_customize->add_control(
+		'ssl_alpine_options[show_privacy_policy]',
+		array(
+			'label'    		=> __( 'Show Privacy Policy link', 'ssl-alpine' ),
+			'description'	=>	__( 'Only displayed if a privacy policy has been configured.', 'ssl-alpine' ),
+			'section'  		=> 'ssl_alpine_footer_options',
+			'type'     		=> 'checkbox',
+			'priority' 		=> 130,
 		)
 	);
 

@@ -54,7 +54,8 @@ if ( ! function_exists( 'ssl_alpine_get_theme_option_defaults' ) ) :
 			'search_placeholder'           		=> esc_html__( 'Search...', 'ssl-alpine' ),
 			'excerpt_length'               		=> 55, // WordPress default
 			'copyright_text'               		=> '',
-			'powered_by'                   		=> true
+			'show_powered_by'              		=> true,
+			'show_privacy_policy'				=> true
 		);
 	}
 endif;
