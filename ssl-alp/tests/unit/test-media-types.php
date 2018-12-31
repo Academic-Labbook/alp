@@ -86,7 +86,7 @@ class MediaTest extends WP_UnitTestCase {
                 $upload = wp_upload_bits( basename( $filename ), null, $contents );
 
                 // there should be an error
-                $this->assertNotEmpty( $upload['error'] );
+                $this->assertNotFalse( $upload['error'] );
             }
         }
 
@@ -114,7 +114,7 @@ class MediaTest extends WP_UnitTestCase {
                 // do the upload
                 $upload = wp_upload_bits( basename( $filename ), null, $contents );
 
-                // there should be an error
+                // there should not be an error
                 $this->assertFalse( $upload['error'] );
 
                 // remove the temporary file

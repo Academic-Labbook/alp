@@ -1,10 +1,10 @@
 <?php
 /**
- * The template part for displaying results in search pages.
+ * Template part for displaying results in search pages
  *
- * Learn more: http://codex.wordpress.org/Template_Hierarchy
+ * @link https://developer.wordpress.org/themes/basics/template-hierarchy/
  *
- * @package ssl-alp
+ * @package Alpine
  */
 
 ?>
@@ -33,4 +33,4 @@
 	</footer>
 	<?php endif; ?>
 	<?php endif; ?>
-</article><!-- #post-## -->
+</article><!-- #post-<?php the_ID(); ?> -->

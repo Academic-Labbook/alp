@@ -1,9 +1,12 @@
 <?php
 /**
- * Custom template tags for this theme.
+ * Custom template tags for this theme
  *
- * @package ssl-alp
+ * Eventually, some of the functionality here could be replaced by core features.
+ *
+ * @package Alpine
  */
+
 
 if ( ! defined( 'WPINC' ) ) {
     // prevent direct access
@@ -123,7 +126,7 @@ if ( ! function_exists( 'ssl_alpine_get_date_format' ) ):
 			// combined date and time formats
 			$datetime_fmt = sprintf(
 				/* translators: 1: date, 2: time; note that "\a\t" escapes "at" in PHP's date() function */
-				__( '%1$s \a\t %2$s', 'ssl-alp' ),
+				__( '%1$s \a\t %2$s', 'ssl-alpine' ),
 				$datetime_fmt,
 				get_option( 'time_format' )
 			);
@@ -147,7 +150,7 @@ if ( ! function_exists( 'ssl_alpine_get_human_date' ) ):
 
 		return sprintf(
 			/* translators: 1: time ago */
-			__( '%s ago', 'ssl-alp' ),
+			__( '%s ago', 'ssl-alpine' ),
 			human_time_diff( $timestamp, $compare_timestamp )
 		);
 	}
@@ -165,7 +168,7 @@ if ( ! function_exists( 'ssl_alpine_the_post_meta' ) ) :
 		if ( get_the_time( 'U', $post ) !== get_the_modified_time( 'U', $post ) ) {
 			$modified_on = ssl_alpine_get_post_date_html( $post, true );
 			/* translators: 1: post modification date */
-			$posted_on .= sprintf( __( ' (last edited %1$s)', 'ssl-alp' ), $modified_on );
+			$posted_on .= sprintf( __( ' (last edited %1$s)', 'ssl-alpine' ), $modified_on );
 		}
 
 		// post id and authors
@@ -175,12 +178,12 @@ if ( ! function_exists( 'ssl_alpine_the_post_meta' ) ) :
 			ssl_alpine_get_authors( $post )
 		);
 
-		if ( is_plugin_active( SSL_ALP_BASE_NAME ) ) {
+		if ( is_plugin_active( 'ssl-alp/alp.php' ) ) {
 			if ( get_option( 'ssl_alp_enable_post_edit_summaries' ) ) {
 				$revision_count = ssl_alpine_get_revision_count();
 
 				if ( $revision_count > 0 ) {
-					$revision_str = sprintf( _n( '%s revision', '%s revisions', $revision_count, 'ssl-alp' ), $revision_count );
+					$revision_str = sprintf( _n( '%s revision', '%s revisions', $revision_count, 'ssl-alpine' ), $revision_count );
 
 					$posted_on .= sprintf(
 						'&nbsp;&nbsp;<i class="fa fa-pencil" aria-hidden="true"></i><a href="%1$s#post-revisions">%2$s</a>',
@@ -214,7 +217,7 @@ if ( ! function_exists( 'ssl_alpine_the_page_meta' ) ) :
 	function ssl_alpine_the_page_meta( $page = null ) {
 		$page = get_post( $page );
 
-		echo '<div id="breadcrumbs">';
+		echo '<div class="breadcrumbs">';
 		ssl_alpine_the_page_breadcrumbs();
 		echo '</div>';
 
@@ -238,17 +241,29 @@ if ( ! function_exists( 'ssl_alpine_get_authors' ) ) :
 
 		$post = get_post( $post );
 
-		if ( is_plugin_active( SSL_ALP_BASE_NAME ) && get_option( 'ssl_alp_allow_multiple_authors' ) ) {
+		if ( is_plugin_active( 'ssl-alp/alp.php' ) && get_option( 'ssl_alp_allow_multiple_authors' ) ) {
 			$authors = $ssl_alp->coauthors->get_coauthors( $post );
 		} else {
 			// fall back to the_author if plugin is disabled
-			$authors = array( get_user_by( 'id', $post->post_author ) );
+			$authors = array();
+
+			// get single author object
+			$author = get_user_by( 'id', $post->post_author );
+
+			// if there is no author, $author == false
+			if ( $author ) {
+				$authors[] = $author;
+			}
 		}
 
 		$author_html = array();
 
 		foreach ( $authors as $author ) {
-			$author_html[] = ssl_alpine_format_author( $author, $url );
+			$author = ssl_alpine_format_author( $author, $url );
+
+			if ( ! is_null( $author ) ) {
+				$author_html[] = $author;
+			}
 		}
 
 		if ( ! count( $author_html ) ) {
@@ -261,17 +276,17 @@ if ( ! function_exists( 'ssl_alpine_get_authors' ) ) :
 
 				// get delimiters
 				if ( is_null( $delimiter_between ) ) {
-					$delimiter_between = _x( ', ', 'delimiter between coauthors except last', 'ssl-alp' );
+					$delimiter_between = _x( ', ', 'delimiter between coauthors except last', 'ssl-alpine' );
 				}
 				if ( is_null( $delimiter_between_last ) ) {
-					$delimiter_between_last = _x( ' and ', 'delimiter between last two coauthors', 'ssl-alp' );
+					$delimiter_between_last = _x( ' and ', 'delimiter between last two coauthors', 'ssl-alpine' );
 				}
 
 				// pop last author off
 				$last_author = array_pop( $author_html );
 
 				// implode author list
-				$author_list_html = implode( __( ', ', 'ssl-alp' ), $author_html ) . $delimiter_between_last . $last_author;
+				$author_list_html = implode( __( ', ', 'ssl-alpine' ), $author_html ) . $delimiter_between_last . $last_author;
 			} else {
 				// single author
 				$icon_class = 'fa fa-user';
@@ -284,7 +299,7 @@ if ( ! function_exists( 'ssl_alpine_get_authors' ) ) :
 			} else {
 				$icon = '';
 			}
-	
+
 			// add icon and author span
 			$author_list_html = sprintf(
 				'<span class="authors">%1$s%2$s</span>',
@@ -302,6 +317,10 @@ if ( ! function_exists( 'ssl_alpine_format_author' ) ) :
 	 * Gets formatted author name
 	 */
 	function ssl_alpine_format_author( $author, $url = true ) {
+		if ( is_null( $author ) ) {
+			return;
+		}
+
 		$author_html = $author->display_name;
 
 		if ( $url ) {
@@ -322,13 +341,13 @@ endif;
 if ( ! function_exists( 'ssl_alpine_the_footer' ) ) :
 	/**
 	 * Prints the footer for the specified post.
-	 * 
+	 *
 	 * Cannot specify a custom post id here, as `get_comments_number_text` can't
 	 * handle it. It always uses the current post.
 	 */
 	function ssl_alpine_the_footer() {
 		/* translators: used between list items, there is a space after the comma. */
-		$categories_list = get_the_category_list( esc_html__( ', ', 'ssl-alp' ) );
+		$categories_list = get_the_category_list( esc_html__( ', ', 'ssl-alpine' ) );
 
 		if ( $categories_list ) {
 			printf(
@@ -339,8 +358,8 @@ if ( ! function_exists( 'ssl_alpine_the_footer' ) ) :
 		}
 
 		/* translators: used between list items, there is a space after the comma. */
-		$tags_list = get_the_tag_list( '', esc_html__( ', ', 'ssl-alp' ) );
-		
+		$tags_list = get_the_tag_list( '', esc_html__( ', ', 'ssl-alpine' ) );
+
 		if ( $tags_list ) {
 			printf(
 				'<span class="tag-links">%1$s%2$s</span>',
@@ -355,7 +374,7 @@ if ( ! function_exists( 'ssl_alpine_the_footer' ) ) :
 				'<span class="comments-link">%1$s<a href="%2$s">%3$s</a></span>',
 				'<i class="fa fa-comment" aria-hidden="true"></i>',
 				get_comments_link(),
-				get_comments_number_text(esc_html__( 'Leave a comment', 'ssl-alp' ))
+				get_comments_number_text(esc_html__( 'Leave a comment', 'ssl-alpine' ))
 			);
 		}
 	}
@@ -366,7 +385,7 @@ if ( ! function_exists( 'ssl_alpine_the_revisions' ) ) :
 	 * Prints revisions for the specified post
 	 */
 	function ssl_alpine_the_revisions( $post = null ) {
-		if ( ! is_plugin_active( SSL_ALP_BASE_NAME ) ) {
+		if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
 			return;
 		} elseif ( ! get_option( 'ssl_alp_enable_post_edit_summaries' ) ) {
 			return;
@@ -379,21 +398,51 @@ if ( ! function_exists( 'ssl_alpine_the_revisions' ) ) :
 			return;
 		}
 
+		if ( ! $current_page = get_query_var( 'paged' ) ) {
+			$current_page = 1;
+		}
+
+		// total revisions
+		$count = ssl_alpine_get_revision_count( $post );
+		$per_page = 10;
+		$pages = ceil( $count / $per_page );
+
 		// get list of revisions to this post
-		$revisions = ssl_alpine_get_revisions( $post );
+		$revisions = ssl_alpine_get_revisions( $post, $current_page, $per_page );
 
 		if ( is_null( $revisions ) || ! is_array( $revisions ) || count( $revisions ) == 0 ) {
 			// no revisions to show
 			return;
 		}
 
-		echo '<div id="post-revisions"><h3>Revisions</h3><ul>';
+		echo '<div class="post-revisions">';
+		echo '<h3>';
+
+		printf( // WPCS: XSS OK.
+			/* translators: 1: revision count number, 2: title. */
+			esc_html( _nx( '%1$s revision', '%1$s revisions', $count, 'revisions title', 'ssl-alpine' ) ),
+			number_format_i18n( $count )
+		);
+
+		echo "</h3>";
+		echo "<ul>";
 
 		foreach ( $revisions as $revision ) {
 			echo '<li>' . ssl_alpine_get_revision_description( $revision ) . '</li>';
 		}
 
-		echo "</ul></div>";
+		echo "</ul>";
+
+		if ( $pages > 1 ) {
+			echo paginate_links( array(
+				'base'     => get_pagenum_link() . '%_%',
+				'format'   => '&paged=%#%',
+				'current'  => $current_page,
+				'total'    => $pages
+	  		) );
+		}
+
+		echo "</div>";
 	}
 endif;
 
@@ -401,8 +450,8 @@ if ( ! function_exists( 'ssl_alpine_get_revisions' ) ) :
 	/**
 	 * Get list of revisions for the current or specified post
 	 */
-	function ssl_alpine_get_revisions( $post = null ) {
-		if ( ! is_plugin_active( SSL_ALP_BASE_NAME ) ) {
+	function ssl_alpine_get_revisions( $post = null, $page = 1, $per_page = -1 ) {
+		if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
 			return;
 		} elseif ( ! get_option( 'ssl_alp_enable_post_edit_summaries' ) ) {
 			return;
@@ -420,8 +469,10 @@ if ( ! function_exists( 'ssl_alpine_get_revisions' ) ) :
 		$revisions = wp_get_post_revisions(
 			$post,
 			array(
-				'orderby'	=>	'date',
-				'order'		=>	'DESC'
+				'orderby'			=>	'date',
+				'order'				=>	'DESC',
+				'paged'				=>	$page,
+				'posts_per_page'	=>	$per_page
 			)
 		);
 
@@ -434,7 +485,7 @@ if ( ! function_exists( 'ssl_alpine_get_revision_description' ) ) :
 	 * Prints description for the specified revision
 	 */
 	function ssl_alpine_get_revision_description( $revision ) {
-		if ( ! is_plugin_active( SSL_ALP_BASE_NAME ) ) {
+		if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
 			return;
 		} elseif ( ! get_option( 'ssl_alp_enable_post_edit_summaries' ) ) {
 			return;
@@ -464,7 +515,7 @@ if ( ! function_exists( 'ssl_alpine_get_revision_description' ) ) :
 					// revision was a revert
 					// /* translators: 1: revision ID/URL */
 					$message .= sprintf(
-						__( ': reverted to %1$s', 'ssl-alp' ),
+						__( ': reverted to %1$s', 'ssl-alpine' ),
 						ssl_alpine_get_revision_abbreviation( $revision_edit_summary_revert_id )
 					);
 
@@ -472,14 +523,14 @@ if ( ! function_exists( 'ssl_alpine_get_revision_description' ) ) :
 					if ( ! empty ( $revision_edit_summary ) ) {
 						$message .= sprintf(
 							/* translators: 1: revision message */
-							__(' (<em>"%1$s"</em>)', 'ssl-alp' ),
+							__(' (<em>"%1$s"</em>)', 'ssl-alpine' ),
 							$revision_edit_summary
 						);
 					}
 				} else {
 					if ( ! empty ( $revision_edit_summary ) ) {
 						/* translators: 1: revision message */
-						$message .= sprintf( __( ': <em>"%1$s"</em>', 'ssl-alp' ), esc_html( $revision_edit_summary ) );
+						$message .= sprintf( __( ': <em>"%1$s"</em>', 'ssl-alpine' ), esc_html( $revision_edit_summary ) );
 					}
 				}
 			}
@@ -503,7 +554,7 @@ if ( ! function_exists( 'ssl_alpine_get_revision_description' ) ) :
 
 		// check if this revision is the current one
 		if ( get_the_time( 'U', $revision ) == get_the_modified_time( 'U', $revision->parent ) ) {
-			$description .= __( ' <strong>(current)</strong>', 'ssl-alp' );
+			$description .= __( ' <strong>(current)</strong>', 'ssl-alpine' );
 		}
 
 		return $description;
@@ -516,7 +567,7 @@ if ( ! function_exists( 'ssl_alpine_get_revision_abbreviation' ) ) :
 	 */
 	function ssl_alpine_get_revision_abbreviation( $revision, $url = true ) {
 		global $ssl_alp;
-		
+
 		// get revision object if id is specified
 		$revision = wp_get_post_revision( $revision );
 
@@ -526,7 +577,7 @@ if ( ! function_exists( 'ssl_alpine_get_revision_abbreviation' ) ) :
 
 		// revision post ID
 		$revision_id = sprintf(
-			_x('r%1$s', 'abbreviated revision ID text', 'ssl-alp' ),
+			_x('r%1$s', 'abbreviated revision ID text', 'ssl-alpine' ),
 			$revision->ID
 		);
 
@@ -552,7 +603,7 @@ if ( ! function_exists( 'ssl_alpine_the_references' ) ) :
 	function ssl_alpine_the_references( $post = null ) {
 		global $ssl_alp;
 
-		if ( ! is_plugin_active( SSL_ALP_BASE_NAME ) ) {
+		if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
 			// plugin is disabled
 			return;
 		} elseif ( ! get_option( 'ssl_alp_enable_crossreferences' ) ) {
@@ -575,15 +626,15 @@ if ( ! function_exists( 'ssl_alpine_the_references' ) ) :
 			return;
 		}
 
-		printf( '<div id="post-references"><h3>%1$s</h3>', __( 'Cross-references', 'ssl-alp' ));
+		printf( '<div class="post-references"><h3>%1$s</h3>', __( 'Cross-references', 'ssl-alpine' ));
 
 		if ( $ref_to_posts ) {
-			printf( '<h4>%1$s</h4>', __( 'Links to', 'ssl-alp' ) );
+			printf( '<h4>%1$s</h4>', __( 'Links to', 'ssl-alpine' ) );
 			ssl_alpine_the_referenced_post_list( $ref_to_posts );
 		}
 
 		if ( $ref_from_posts ) {
-			printf( '<h4>%1$s</h4>', __( 'Linked from', 'ssl-alp' ));
+			printf( '<h4>%1$s</h4>', __( 'Linked from', 'ssl-alpine' ));
 			ssl_alpine_the_referenced_post_list( $ref_from_posts );
 		}
 
@@ -666,7 +717,7 @@ if ( ! function_exists( 'ssl_alpine_get_page_breadcrumbs' ) ) :
 		// URL list with home
 		$breadcrumbs = array(
 			array(
-				'title'	=>	__( 'Home', 'ssl-alp' ),
+				'title'	=>	__( 'Home', 'ssl-alpine' ),
 				'url'	=>	get_home_url()
 			)
 		);
@@ -739,41 +790,44 @@ if ( ! function_exists( 'ssl_alpine_get_revision_count' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'ssl_alp_paging_nav' ) ) :
-	/**
-	 * Display navigation to next/previous set of posts when applicable.
-	 */
-	function ssl_alp_paging_nav() {
-		// Don't print empty markup if there's only one page.
-		if ( $GLOBALS['wp_query']->max_num_pages < 2 ) {
-			return;
-		}
+if ( ! function_exists( 'ssl_alpine_the_toc' ) ) :
+    function ssl_alpine_the_toc( $contents, $max_levels ) {
+        if ( $max_levels < 0 ) {
+            // beyond the maximum level setting
+            return;
+        }
 
-		$pagination_type = esc_attr( ssl_alp_get_option( 'pagination_type' ) );
+        if ( is_null( $contents ) ) {
+            return;
+        }
 
-		switch ( $pagination_type ) {
-			case 'numeric':
-				if ( function_exists( 'wp_pagenavi' ) ) {
-					wp_pagenavi();
-				} else {
-					the_posts_pagination( array(
-						'mid_size'           => 2,
-						'prev_text'          => '<span class="meta-nav"><i class="fa fa-chevron-left" aria-hidden="true"></i></span> ' . __( 'Previous page', 'ssl-alp' ),
-						'next_text'          => __( 'Next page', 'ssl-alp' ) . ' <span class="meta-nav"><i class="fa fa-chevron-right" aria-hidden="true"></i></span>',
-						'before_page_number' => '<span class="meta-nav screen-reader-text">' . __( 'Page', 'ssl-alp' ) . ' </span>',
-					) );
-				}
-				break;
+        $menu_data = $contents->get_menu_data();
 
-			case 'default':
-				the_posts_navigation( array(
-					'prev_text' => '<span class="meta-nav"><i class="fa fa-chevron-left" aria-hidden="true"></i></span> ' . __( 'Older posts', 'ssl-alp' ),
-					'next_text' => __( 'Newer posts', 'ssl-alp' ) . ' <span class="meta-nav"><i class="fa fa-chevron-right" aria-hidden="true"></i></span>',
-					) );
-				break;
+        if ( is_array( $menu_data ) ) {
+            printf(
+                '<a href="#%1$s">%2$s</a>',
+                esc_html( $menu_data['id'] ),
+                esc_html( $menu_data['title'] )
+            );
+        }
 
-			default:
-				break;
-		}
-	}
+        if ( $max_levels > 0 ) {
+            // next level still visible
+            // get children
+            $children = $contents->get_child_menus();
+
+            if ( count( $children ) ) {
+                echo '<ul>';
+
+                foreach ( $children as $child ) {
+                    // show sublevel
+                    echo '<li>';
+                    ssl_alpine_the_toc( $child, $max_levels - 1 );
+                    echo '</li>';
+                }
+
+                echo '</ul>';
+            }
+        }
+    }
 endif;

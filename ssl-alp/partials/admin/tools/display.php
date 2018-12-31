@@ -34,11 +34,13 @@
 	<div class="ssl-alp-tools-cards">
 		<div class="ssl-alp-tools-card">
 			<h2 class="title"><?php _e( 'Activate theme', 'ssl-alp' ); ?></h2>
-			<p><?php _e( 'The Academic Labbook Plugin is bundled with a theme, <em>Alpine</em>. This theme, or a child theme derived from it, must be active in order for most of the plugin\'s functionality to appear.', 'ssl-alp' ); ?></p>
+			<p><?php _e( 'It is highly recommended to use the <em>Alpine</em> theme on this site. This theme, or a child theme derived from it, must be enabled in order for most of Academic Labbook Plugin\'s functionality to appear.', 'ssl-alp' ); ?></p>
 			<?php if ( $alpine_active ) : ?>
 			<p class="description"><?php _e( 'Alpine, or a child theme derived from it, is already active.', 'ssl-alp' ); ?></p>
+			<?php elseif ( $alpine_installed ) : ?>
+			<p class="description"><?php _e( 'Alpine, or a child theme derived from it, is not active. Visit the <a href="themes.php">themes page</a> to activate it. On network sites, you may have to network activate the theme first.', 'ssl-alp' ); ?></p>
 			<?php else : ?>
-			<p class="description"><?php _e( 'Alpine, or a child theme derived from it, is not active. Visit the <a href="themes.php">themes page</a> to activate it.', 'ssl-alp' ); ?></p>
+			<p class="description"><?php _e( sprintf( 'Alpine is not installed. Visit the <a href="%s">ALP website</a> to download it.', 'https://alp.attackllama.com/documentation/themes/' ), 'ssl-alp' ); ?></p>
 			<?php endif; ?>
 		</div>
 		<div class="ssl-alp-tools-card">
@@ -131,7 +133,7 @@
 			<p><strong><?php _e( 'This action cannot be undone.', 'ssl-alp' ); ?></strong></p>
 			<form method="post" action="">
 				<input type="hidden" name="ssl_alp_convert_role_submitted" value="1"/>
-				<input type="checkbox" id="ssl_alp_convert_role_confirm_checkbox" name="ssl_alp_convert_role_confirm" value="1"/>
+				<input type="checkbox" id="ssl_alp_convert_role_confirm_checkbox" name="ssl_alp_convert_role_confirm" value="1"<?php if ( ! $roles_convertable ) : ?> disabled<?php endif; ?>/>
 				<label for="ssl_alp_convert_role_confirm_checkbox"><?php _e( 'I have read and understood the above information', 'ssl-alp' ); ?></label>
 				<p class="submit">
 					<input name="submit" id="submit" class="button button-primary" value="<?php _e( 'Convert User Roles', 'ssl-alp' ); ?>" type="submit"<?php if ( ! $roles_convertable ) : ?> disabled<?php endif; ?>/>
@@ -147,7 +149,7 @@
 		<div class="ssl-alp-tools-card">
 			<h2 class="title"><?php _e( 'Rebuild cross-references', 'ssl-alp' ); ?></h2>
 			<p><?php _e( 'This tool will rebuild the cross-references related to each published post and page. This is useful for extracting cross-references from posts or pages created or edited during any time in which the cross-references feature was disabled, and from posts or pages created before the plugin was installed or activated.', 'ssl-alp' ); ?></p>
-			<p class="description"><?php echo sprintf( __( 'Note: this tool may take a long time to execute on large sites. Due to server configuration settings, the execution may time out. You may instead wish to run this tool via <a href="%s">WP-CLI</a>.', 'ssl-alp' ), esc_url( "https://wp-cli.org/" ) ); ?></p>
+			<p class="description"><?php _e( sprintf( 'Note: this tool may take a long time to execute on large sites. Due to server configuration settings, the execution may time out. You may instead wish to <a href="%s">run this tool via WP-CLI</a>.', esc_url( "https://alp.attackllama.com/documentation/rebuilding-cross-references/" ) ), 'ssl-alp' ); ?></p>
 			<form method="post" action="">
 				<input type="hidden" name="ssl_alp_rebuild_references_submitted" value="1"/>
 				<p class="submit">

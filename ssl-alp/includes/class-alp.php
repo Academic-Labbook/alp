@@ -138,14 +138,6 @@ class SSL_ALP {
 		require_once SSL_ALP_BASE_DIR . 'includes/class-references.php';
 
 		$this->references = new SSL_ALP_References( $this );
-
-		/**
-		 * TeX markup functionality
-		 */
-
-		require_once SSL_ALP_BASE_DIR . 'includes/class-tex.php';
-
-		$this->tex = new SSL_ALP_Tex( $this );
 	}
 
 	/**
@@ -175,7 +167,6 @@ class SSL_ALP {
 		$this->coauthors->register();
 		$this->revisions->register();
 		$this->references->register();
-		$this->tex->register();
 	}
 
 	/**

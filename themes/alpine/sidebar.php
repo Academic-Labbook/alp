@@ -1,9 +1,17 @@
-<div id="secondary" <?php echo ssl_alp_sidebar_class( 'widget-area container clearfix' ); ?> role="complementary">
 <?php
-if ( is_page() && ssl_alp_get_option( 'page_specific_sidebar' ) ) {
-	get_sidebar( 'page' );
-} else {
-	get_sidebar( 'standard' );
+/**
+ * The sidebar containing the main widget area
+ *
+ * @link https://developer.wordpress.org/themes/basics/template-files/#template-partials
+ *
+ * @package Alpine
+ */
+
+if ( ! is_active_sidebar( 'sidebar-1' ) ) {
+	return;
 }
 ?>
-</div>
+
+<aside id="secondary" class="widget-area">
+	<?php dynamic_sidebar( 'sidebar-1' ); ?>
+</aside><!-- #secondary -->

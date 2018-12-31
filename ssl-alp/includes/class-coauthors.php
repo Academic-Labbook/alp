@@ -98,8 +98,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			SSL_ALP_SITE_SETTINGS_PAGE,
 			'ssl_alp_allow_multiple_authors',
 			array(
-				'type'		=>	'boolean',
-				'default'	=>	true
+				'type'		=>	'boolean'
 			)
 		);
     }
@@ -496,7 +495,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 	/**
 	 * Filter capabilities of super admins to stop them editing or deleting coauthor terms.
-	 * 
+	 *
 	 * Coauthor terms are essential to the correct operation of the coauthors system.
 	 */
 	function filter_capabilities( $caps, $cap, $user_id, $args ) {
@@ -520,7 +519,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		$taxonomy = get_taxonomy( $term->taxonomy );
-		
+
 		if ( 'ssl_alp_coauthor' == $taxonomy->name ) {
 			// disallow
 			$caps[] = 'do_not_allow';
@@ -1076,8 +1075,10 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		// annoyingly, $reassign_id is not passed to this call, so detect it from the post data
-		if ( ! empty( $_POST['blog'] ) && is_array( $_POST['blog'] ) ) {
-			// post data from `dodelete` case in `wp-admin/network/users.php` is present
+		if ( ! empty( $_POST['delete'] ) && 'reassign' == $_POST['delete'][ $blog_id ][ $remove_id ] &&
+		     ! empty( $_POST['blog'] ) && is_array( $_POST['blog'] ) ) {
+			// post data from `dodelete` case in `wp-admin/network/users.php` is present,
+			// and admin wishes to reassign user content
 
 			// array of blog ids to respective reassign users
 			$reassign_users = $_POST['blog'][$remove_id];
@@ -1459,7 +1460,7 @@ class SSL_ALP_Widget_Users extends WP_Widget {
 			);
 
 			// get user post counts
-			$user_ids = array_map( create_function( '$user', 'return $user->ID;' ), $users );
+			$user_ids = wp_list_pluck( $users, 'ID' );
 			$post_counts = $ssl_alp->coauthors->count_many_users_posts( $user_ids );
 
 			if ( ! empty( $users ) ) {
