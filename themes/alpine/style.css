@@ -1209,6 +1209,23 @@ span.cat-links a, span.tag-links a {
     margin: 0;
 }
 
+.page-header {
+    padding-left: 0.5em;
+}
+
+.page-header .page-title {
+    margin-top: 0;
+}
+
+.archive-description {
+    margin-top: 0.5em;
+    margin-bottom: 1.5em;
+}
+
+.archive-description p {
+    margin: 0;
+}
+
 .entry-header h1, .entry-header h2 {
 	margin: 0 0 0.25em 0;
 	font-weight: 400;
