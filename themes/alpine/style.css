@@ -1012,15 +1012,23 @@ li > ol {
         "footer";
 }
 
-@media (min-width: 540px) {
+/* Small devices (e.g. tablets) */
+@media (min-width: 768px) {
     #page {
-        grid-template-columns: auto 350px;
+        grid-template-columns: auto 250px;
         grid-template-rows: auto 1fr auto;
         grid-template-areas:
             "header header"
             "main sidebar"
             "footer footer";
         grid-gap: 20px;
+    }
+}
+
+/* Medium devices (desktops) */
+@media (min-width: 992px) {
+    #page {
+        grid-template-columns: auto 350px;
     }
 }
 
@@ -1206,6 +1214,23 @@ span.cat-links a, span.tag-links a {
 .page-content,
 .entry-content,
 .entry-summary {
+    margin: 0;
+}
+
+.page-header {
+    padding-left: 0.5em;
+}
+
+.page-header .page-title {
+    margin-top: 0;
+}
+
+.archive-description {
+    margin-top: 0.5em;
+    margin-bottom: 1.5em;
+}
+
+.archive-description p {
     margin: 0;
 }
 
