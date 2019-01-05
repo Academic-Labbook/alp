@@ -32,13 +32,13 @@ if ( post_password_required() ) {
 			if ( '1' === $alpine_comment_count ) {
 				printf(
 					/* translators: 1: title. */
-					esc_html__( 'One comment on &ldquo;%1$s&rdquo;', 'ssl-alpine' ),
+					esc_html__( 'One comment on &ldquo;%1$s&rdquo;', 'alpine' ),
 					'<span>' . get_the_title() . '</span>'
 				);
 			} else {
 				printf( // WPCS: XSS OK.
 					/* translators: 1: comment count number, 2: title. */
-					esc_html( _nx( '%1$s comment on &ldquo;%2$s&rdquo;', '%1$s comments on &ldquo;%2$s&rdquo;', $alpine_comment_count, 'comments title', 'ssl-alpine' ) ),
+					esc_html( _nx( '%1$s comment on &ldquo;%2$s&rdquo;', '%1$s comments on &ldquo;%2$s&rdquo;', $alpine_comment_count, 'comments title', 'alpine' ) ),
 					number_format_i18n( $alpine_comment_count ),
 					'<span>' . get_the_title() . '</span>'
 				);
@@ -63,7 +63,7 @@ if ( post_password_required() ) {
 		// If comments are closed and there are comments, let's leave a little note, shall we?
 		if ( ! comments_open() ) :
 			?>
-			<p class="no-comments"><?php esc_html_e( 'Comments are closed.', 'ssl-alpine' ); ?></p>
+			<p class="no-comments"><?php esc_html_e( 'Comments are closed.', 'alpine' ); ?></p>
 			<?php
 		endif;
 

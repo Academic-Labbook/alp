@@ -10,7 +10,7 @@ if ( ! defined( 'WPINC' ) ) {
     exit;
 }
 
-if ( ! function_exists( 'ssl_alpine_get_option' ) ) :
+if ( ! function_exists( 'alpine_get_option' ) ) :
 	/**
 	 * Get option.
 	 *
@@ -18,17 +18,17 @@ if ( ! function_exists( 'ssl_alpine_get_option' ) ) :
 	 * @param mixed  $default Default value.
 	 * @return mixed
 	 */
-	function ssl_alpine_get_option( $key, $default = '' ) {
-		global $ssl_alpine_default_options;
+	function alpine_get_option( $key, $default = '' ) {
+		global $alpine_default_options;
 
 		if ( empty( $key ) ) {
 			return;
 		}
 
-		$default = ( array_key_exists( $key, $ssl_alpine_default_options ) ) ? $ssl_alpine_default_options[ $key ] : '';
+		$default = ( array_key_exists( $key, $alpine_default_options ) ) ? $alpine_default_options[ $key ] : '';
 
-		$theme_options = get_theme_mod( 'ssl_alpine_options', $ssl_alpine_default_options );
-		$theme_options = array_merge( $ssl_alpine_default_options, $theme_options );
+		$theme_options = get_theme_mod( 'alpine_options', $alpine_default_options );
+		$theme_options = array_merge( $alpine_default_options, $theme_options );
 
 		$value = '';
 
@@ -40,18 +40,18 @@ if ( ! function_exists( 'ssl_alpine_get_option' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'ssl_alpine_get_theme_option_defaults' ) ) :
+if ( ! function_exists( 'alpine_get_theme_option_defaults' ) ) :
 	/**
 	 * Get default theme options.
 	 *
 	 * @return array
 	 */
-	function ssl_alpine_get_theme_option_defaults() {
+	function alpine_get_theme_option_defaults() {
 		return array(
 			'content_layout'               		=> 'excerpt',
 			'display_page_table_of_contents'	=> true,
 			'table_of_contents_max_depth'		=> 4,
-			'search_placeholder'           		=> esc_html__( 'Search...', 'ssl-alpine' ),
+			'search_placeholder'           		=> esc_html__( 'Search...', 'alpine' ),
 			'excerpt_length'               		=> 55, // WordPress default
 			'copyright_text'               		=> '',
 			'show_powered_by'              		=> true,
@@ -60,14 +60,14 @@ if ( ! function_exists( 'ssl_alpine_get_theme_option_defaults' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'ssl_alpine_get_options' ) ) :
+if ( ! function_exists( 'alpine_get_options' ) ) :
 	/**
 	 * Get theme options.
 	 *
 	 * @since 1.8
 	 */
-	function ssl_alpine_get_options() {
-		return get_theme_mod( 'ssl_alpine_options' );
+	function alpine_get_options() {
+		return get_theme_mod( 'alpine_options' );
 	}
 endif;
 
@@ -102,7 +102,7 @@ function alpine_pingback_header() {
 }
 add_action( 'wp_head', 'alpine_pingback_header' );
 
-if ( ! function_exists( 'ssl_alpine_custom_excerpt_length' ) ) :
+if ( ! function_exists( 'alpine_custom_excerpt_length' ) ) :
 	/**
 	 * Implement excerpt length.
 	 *
@@ -111,8 +111,8 @@ if ( ! function_exists( 'ssl_alpine_custom_excerpt_length' ) ) :
 	 * @param int $length The number of words.
 	 * @return int Excerpt length.
 	 */
-	function ssl_alpine_custom_excerpt_length( $length ) {
-		$excerpt_length = ssl_alpine_get_option( 'excerpt_length' );
+	function alpine_custom_excerpt_length( $length ) {
+		$excerpt_length = alpine_get_option( 'excerpt_length' );
 
 		if ( empty( $excerpt_length ) ) {
 			$excerpt_length = $length;
@@ -122,4 +122,4 @@ if ( ! function_exists( 'ssl_alpine_custom_excerpt_length' ) ) :
 	}
 endif;
 
-add_filter( 'excerpt_length', 'ssl_alpine_custom_excerpt_length', 999 );
+add_filter( 'excerpt_length', 'alpine_custom_excerpt_length', 999 );

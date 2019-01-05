@@ -11,14 +11,14 @@
 
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 	<header class="entry-header">
-		<?php ssl_alpine_the_post_title(); ?>
+		<?php alpine_the_post_title(); ?>
 		<?php if ( 'post' == get_post_type() ) : ?>
 		<div class="entry-meta">
-			<?php ssl_alpine_the_post_meta(); ?>
+			<?php alpine_the_post_meta(); ?>
 		</div><!-- .entry-meta -->
 		<?php elseif ( 'page' == get_post_type() ) : ?>
 		<div class="entry-meta">
-			<?php ssl_alpine_the_page_meta(); ?>
+			<?php alpine_the_page_meta(); ?>
 		</div><!-- .entry-meta -->
 		<?php endif; ?>
 	</header><!-- .entry-header -->
@@ -29,7 +29,7 @@
 	</div><!-- .entry-summary -->
 	<?php if ( 'post' === get_post_type() ) : ?>
 	<footer class="entry-footer">
-		<?php ssl_alpine_the_footer(); ?>
+		<?php alpine_the_footer(); ?>
 	</footer>
 	<?php endif; ?>
 	<?php endif; ?>

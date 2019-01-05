@@ -11,16 +11,16 @@
  * @param WP_Customize_Manager $wp_customize Theme Customizer object.
  */
 function alpine_customize_register( $wp_customize ) {
-	global $ssl_alpine_default_options;
+	global $alpine_default_options;
 
 	/**
 	 * Post lists section
 	 */
 
 	$wp_customize->add_section(
-		'ssl_alpine_post_list_options',
+		'alpine_post_list_options',
 		array(
-			'title'      => __( 'Post Lists', 'ssl-alpine' ),
+			'title'      => __( 'Post Lists', 'alpine' ),
 			'priority'   => 80,
 			'capability' => 'edit_theme_options',
 			'panel'      => '',
@@ -29,46 +29,46 @@ function alpine_customize_register( $wp_customize ) {
 
 	// post display setting
 	$wp_customize->add_setting(
-		'ssl_alpine_options[content_layout]',
+		'alpine_options[content_layout]',
 		array(
-			'default'           => $ssl_alpine_default_options['content_layout'],
+			'default'           => $alpine_default_options['content_layout'],
 			'capability'        => 'edit_theme_options',
-			'sanitize_callback' => 'ssl_alpine_sanitize_select',
+			'sanitize_callback' => 'alpine_sanitize_select',
 		)
 	);
 
 	$wp_customize->add_control(
-		'ssl_alpine_options[content_layout]',
+		'alpine_options[content_layout]',
 		array(
-			'label'    => __( 'Post Display', 'ssl-alpine' ),
-			'description'	=>	__( 'Determines how much post content is displayed in lists. Post pages always show the full content.', 'ssl-alpine' ),
-			'section'  => 'ssl_alpine_post_list_options',
+			'label'    => __( 'Post Display', 'alpine' ),
+			'description'	=>	__( 'Determines how much post content is displayed in lists. Post pages always show the full content.', 'alpine' ),
+			'section'  => 'alpine_post_list_options',
 			'type'     => 'select',
 			'priority' => 120,
 			'choices'  => array(
-				'full'          => __( 'Full post', 'ssl-alpine' ),
-				'excerpt'       => __( 'Excerpt', 'ssl-alpine' )
+				'full'          => __( 'Full post', 'alpine' ),
+				'excerpt'       => __( 'Excerpt', 'alpine' )
 			),
 		)
 	);
 
 	// excerpt length setting
 	$wp_customize->add_setting(
-		'ssl_alpine_options[excerpt_length]',
+		'alpine_options[excerpt_length]',
 		array(
-			'default'              => $ssl_alpine_default_options['excerpt_length'],
+			'default'              => $alpine_default_options['excerpt_length'],
 			'capability'           => 'edit_theme_options',
-			'sanitize_callback'    => 'ssl_alpine_sanitize_number_absint',
+			'sanitize_callback'    => 'alpine_sanitize_number_absint',
 			'sanitize_js_callback' => 'esc_attr',
 		)
 	);
 
 	$wp_customize->add_control(
-		'ssl_alpine_options[excerpt_length]',
+		'alpine_options[excerpt_length]',
 		array(
-			'label'    => __( 'Excerpt length', 'ssl-alpine' ),
-			'description'	=>	__( 'The number of words to display in the excerpt.', 'ssl-alpine' ),
-			'section'  => 'ssl_alpine_post_list_options',
+			'label'    => __( 'Excerpt length', 'alpine' ),
+			'description'	=>	__( 'The number of words to display in the excerpt.', 'alpine' ),
+			'section'  => 'alpine_post_list_options',
 			'type'     => 'text',
 			'priority' => 130,
 		)
@@ -83,9 +83,9 @@ function alpine_customize_register( $wp_customize ) {
 	 */
 
 	$wp_customize->add_section(
-		'ssl_alpine_page_options',
+		'alpine_page_options',
 		array(
-			'title'      => __( 'Pages', 'ssl-alpine' ),
+			'title'      => __( 'Pages', 'alpine' ),
 			'priority'   => 85,
 			'capability' => 'edit_theme_options',
 			'panel'      => '',
@@ -94,20 +94,20 @@ function alpine_customize_register( $wp_customize ) {
 
 	// table of contents display setting
 	$wp_customize->add_setting(
-		'ssl_alpine_options[display_page_table_of_contents]',
+		'alpine_options[display_page_table_of_contents]',
 		array(
-			'default'           => $ssl_alpine_default_options['display_page_table_of_contents'],
+			'default'           => $alpine_default_options['display_page_table_of_contents'],
 			'capability'        => 'edit_theme_options',
-			'sanitize_callback' => 'ssl_alpine_sanitize_checkbox',
+			'sanitize_callback' => 'alpine_sanitize_checkbox',
 		)
 	);
 
 	$wp_customize->add_control(
-		'ssl_alpine_options[display_page_table_of_contents]',
+		'alpine_options[display_page_table_of_contents]',
 		array(
-			'label'    => __( 'Display table of contents', 'ssl-alpine' ),
-			'description'	=>	__( 'Generate and display a table of contents panel shown at the top right of the page.', 'ssl-alpine' ),
-			'section'  => 'ssl_alpine_page_options',
+			'label'    => __( 'Display table of contents', 'alpine' ),
+			'description'	=>	__( 'Generate and display a table of contents panel shown at the top right of the page.', 'alpine' ),
+			'section'  => 'alpine_page_options',
 			'type'     => 'checkbox',
 			'priority' => 120
 		)
@@ -115,27 +115,27 @@ function alpine_customize_register( $wp_customize ) {
 
 	// table of contents display setting
 	$wp_customize->add_setting(
-		'ssl_alpine_options[table_of_contents_max_depth]',
+		'alpine_options[table_of_contents_max_depth]',
 		array(
-			'default'           => $ssl_alpine_default_options['table_of_contents_max_depth'],
+			'default'           => $alpine_default_options['table_of_contents_max_depth'],
 			'capability'        => 'edit_theme_options',
-			'sanitize_callback' => 'ssl_alpine_sanitize_select',
+			'sanitize_callback' => 'alpine_sanitize_select',
 		)
 	);
 
 	$wp_customize->add_control(
-		'ssl_alpine_options[table_of_contents_max_depth]',
+		'alpine_options[table_of_contents_max_depth]',
 		array(
-			'label'    => __( 'Table of contents maximum depth', 'ssl-alpine' ),
-			'description'	=>	__( 'Maximum heading level displayed in the table of contents.', 'ssl-alpine' ),
-			'section'  => 'ssl_alpine_page_options',
+			'label'    => __( 'Table of contents maximum depth', 'alpine' ),
+			'description'	=>	__( 'Maximum heading level displayed in the table of contents.', 'alpine' ),
+			'section'  => 'alpine_page_options',
 			'type'     => 'select',
 			'choices'  => array(
-				2          => __( 'h2', 'ssl-alpine' ),
-				3    	   => __( 'h3', 'ssl-alpine' ),
-				4    	   => __( 'h4', 'ssl-alpine' ),
-				5    	   => __( 'h5', 'ssl-alpine' ),
-				6    	   => __( 'h6', 'ssl-alpine' )
+				2          => __( 'h2', 'alpine' ),
+				3    	   => __( 'h3', 'alpine' ),
+				4    	   => __( 'h4', 'alpine' ),
+				5    	   => __( 'h5', 'alpine' ),
+				6    	   => __( 'h6', 'alpine' )
 			),
 			'priority'	=>	130
 		)
@@ -146,9 +146,9 @@ function alpine_customize_register( $wp_customize ) {
 	 */
 
 	$wp_customize->add_section(
-		'ssl_alpine_sidebar_options',
+		'alpine_sidebar_options',
 		array(
-			'title'      => __( 'Sidebar', 'ssl-alpine' ),
+			'title'      => __( 'Sidebar', 'alpine' ),
 			'priority'   => 90,
 			'capability' => 'edit_theme_options',
 			'panel'      => ''
@@ -157,20 +157,20 @@ function alpine_customize_register( $wp_customize ) {
 
 	// search placeholder setting
 	$wp_customize->add_setting(
-		'ssl_alpine_options[search_placeholder]',
+		'alpine_options[search_placeholder]',
 		array(
-			'default'           => $ssl_alpine_default_options['search_placeholder'],
+			'default'           => $alpine_default_options['search_placeholder'],
 			'capability'        => 'edit_theme_options',
 			'sanitize_callback' => 'sanitize_text_field',
 		)
 	);
 
 	$wp_customize->add_control(
-		'ssl_alpine_options[search_placeholder]',
+		'alpine_options[search_placeholder]',
 		array(
-			'label'    => __( 'Search Placeholder', 'ssl-alpine' ),
-			'description'	=>	__( 'The text to display in background of search box.', 'ssl-alpine' ),
-			'section'  => 'ssl_alpine_sidebar_options',
+			'label'    => __( 'Search Placeholder', 'alpine' ),
+			'description'	=>	__( 'The text to display in background of search box.', 'alpine' ),
+			'section'  => 'alpine_sidebar_options',
 			'type'     => 'text',
 			'priority' => 120,
 		)
@@ -181,9 +181,9 @@ function alpine_customize_register( $wp_customize ) {
 	 */
 
 	$wp_customize->add_section(
-		'ssl_alpine_footer_options',
+		'alpine_footer_options',
 		array(
-			'title'      => __( 'Footer', 'ssl-alpine' ),
+			'title'      => __( 'Footer', 'alpine' ),
 			'priority'   => 100,
 			'capability' => 'edit_theme_options',
 			'panel'      => '',
@@ -192,9 +192,9 @@ function alpine_customize_register( $wp_customize ) {
 
 	// copyright text setting
 	$wp_customize->add_setting(
-		'ssl_alpine_options[copyright_text]',
+		'alpine_options[copyright_text]',
 		array(
-			'default'           => $ssl_alpine_default_options['copyright_text'],
+			'default'           => $alpine_default_options['copyright_text'],
 			'capability'        => 'edit_theme_options',
 			'sanitize_callback' => 'sanitize_text_field',
 			'transport'         => 'postMessage',
@@ -202,10 +202,10 @@ function alpine_customize_register( $wp_customize ) {
 	);
 
 	$wp_customize->add_control(
-		'ssl_alpine_options[copyright_text]',
+		'alpine_options[copyright_text]',
 		array(
-			'label'    => __( 'Copyright Text', 'ssl-alpine' ),
-			'section'  => 'ssl_alpine_footer_options',
+			'label'    => __( 'Copyright Text', 'alpine' ),
+			'section'  => 'alpine_footer_options',
 			'type'     => 'text',
 			'priority' => 110,
 		)
@@ -213,19 +213,19 @@ function alpine_customize_register( $wp_customize ) {
 
 	// "powered by" setting
 	$wp_customize->add_setting(
-		'ssl_alpine_options[show_powered_by]',
+		'alpine_options[show_powered_by]',
 		array(
-			'default'           => $ssl_alpine_default_options['show_powered_by'],
+			'default'           => $alpine_default_options['show_powered_by'],
 			'capability'        => 'edit_theme_options',
-			'sanitize_callback' => 'ssl_alpine_sanitize_checkbox',
+			'sanitize_callback' => 'alpine_sanitize_checkbox',
 		)
 	);
 
 	$wp_customize->add_control(
-		'ssl_alpine_options[show_powered_by]',
+		'alpine_options[show_powered_by]',
 		array(
-			'label'    => __( 'Show "Powered By" label', 'ssl-alpine' ),
-			'section'  => 'ssl_alpine_footer_options',
+			'label'    => __( 'Show "Powered By" label', 'alpine' ),
+			'section'  => 'alpine_footer_options',
 			'type'     => 'checkbox',
 			'priority' => 120,
 		)
@@ -233,20 +233,20 @@ function alpine_customize_register( $wp_customize ) {
 
 	// privacy policy link setting
 	$wp_customize->add_setting(
-		'ssl_alpine_options[show_privacy_policy]',
+		'alpine_options[show_privacy_policy]',
 		array(
-			'default'           => $ssl_alpine_default_options['show_privacy_policy'],
+			'default'           => $alpine_default_options['show_privacy_policy'],
 			'capability'        => 'edit_theme_options',
-			'sanitize_callback' => 'ssl_alpine_sanitize_checkbox',
+			'sanitize_callback' => 'alpine_sanitize_checkbox',
 		)
 	);
 
 	$wp_customize->add_control(
-		'ssl_alpine_options[show_privacy_policy]',
+		'alpine_options[show_privacy_policy]',
 		array(
-			'label'    		=> __( 'Show Privacy Policy link', 'ssl-alpine' ),
-			'description'	=>	__( 'Only displayed if a privacy policy has been configured.', 'ssl-alpine' ),
-			'section'  		=> 'ssl_alpine_footer_options',
+			'label'    		=> __( 'Show Privacy Policy link', 'alpine' ),
+			'description'	=>	__( 'Only displayed if a privacy policy has been configured.', 'alpine' ),
+			'section'  		=> 'alpine_footer_options',
 			'type'     		=> 'checkbox',
 			'priority' 		=> 130,
 		)
@@ -267,9 +267,9 @@ function alpine_customize_register( $wp_customize ) {
 		) );
 		$wp_customize->selective_refresh->add_partial( 'copyright-text', array(
 			'selector'            => '.copyright-text',
-			'settings'            => array( 'ssl_alpine_options[copyright_text]' ),
+			'settings'            => array( 'alpine_options[copyright_text]' ),
 			'container_inclusive' => false,
-			'render_callback'     => 'ssl_alpine_customize_partial_copyright_text',
+			'render_callback'     => 'alpine_customize_partial_copyright_text',
 		) );
 	}
 }
@@ -302,7 +302,7 @@ function alpine_customize_preview_js() {
 add_action( 'customize_preview_init', 'alpine_customize_preview_js' );
 
 // Sanitization callback functions.
-if ( ! function_exists( 'ssl_alpine_sanitize_number_absint' ) ) {
+if ( ! function_exists( 'alpine_sanitize_number_absint' ) ) {
 	/**
 	 * Sanitize positive integer.
 	 *
@@ -312,13 +312,13 @@ if ( ! function_exists( 'ssl_alpine_sanitize_number_absint' ) ) {
 	 * @param WP_Customize_Setting $setting WP_Customize_Setting instance.
 	 * @return int Sanitized number; otherwise, the setting default.
 	 */
-	function ssl_alpine_sanitize_number_absint( $number, $setting ) {
+	function alpine_sanitize_number_absint( $number, $setting ) {
 		$number = absint( $number );
 		return ( $number ? $number : $setting->default );
 	}
 }
 
-if ( ! function_exists( 'ssl_alpine_sanitize_checkbox' ) ) {
+if ( ! function_exists( 'alpine_sanitize_checkbox' ) ) {
 	/**
 	 * Sanitize checkbox.
 	 *
@@ -327,12 +327,12 @@ if ( ! function_exists( 'ssl_alpine_sanitize_checkbox' ) ) {
 	 * @param bool $checked Whether the checkbox is checked.
 	 * @return bool Whether the checkbox is checked.
 	 */
-	function ssl_alpine_sanitize_checkbox( $checked ) {
+	function alpine_sanitize_checkbox( $checked ) {
 		return ( ( isset( $checked ) && true === $checked ) ? true : false );
 	}
 }
 
-if ( ! function_exists( 'ssl_alpine_sanitize_select' ) ) {
+if ( ! function_exists( 'alpine_sanitize_select' ) ) {
 	/**
 	 * Sanitize select.
 	 *
@@ -342,7 +342,7 @@ if ( ! function_exists( 'ssl_alpine_sanitize_select' ) ) {
 	 * @param WP_Customize_Setting $setting WP_Customize_Setting instance.
 	 * @return mixed Sanitized value.
 	 */
-	function ssl_alpine_sanitize_select( $input, $setting ) {
+	function alpine_sanitize_select( $input, $setting ) {
 		$input = sanitize_key( $input );
 		$choices = $setting->manager->get_control( $setting->id )->choices;
 
