@@ -415,7 +415,7 @@ if ( ! function_exists( 'ssl_alpine_the_revisions' ) ) :
 			return;
 		}
 
-		echo '<div class="post-revisions">';
+		echo '<div id="post-revisions">';
 		echo '<h3>';
 
 		printf( // WPCS: XSS OK.
@@ -626,7 +626,7 @@ if ( ! function_exists( 'ssl_alpine_the_references' ) ) :
 			return;
 		}
 
-		printf( '<div class="post-references"><h3>%1$s</h3>', __( 'Cross-references', 'ssl-alpine' ));
+		printf( '<div id="post-references"><h3>%1$s</h3>', __( 'Cross-references', 'ssl-alpine' ));
 
 		if ( $ref_to_posts ) {
 			printf( '<h4>%1$s</h4>', __( 'Links to', 'ssl-alpine' ) );

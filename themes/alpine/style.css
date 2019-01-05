@@ -1323,11 +1323,11 @@ a.entry-link, a.entry-section-link {
 	font-size: 85%;
 }
 
-.entry-meta a, .post-revisions a, .post-references a {
+.entry-meta a, #post-revisions a, #post-references a {
     border-bottom: #a8bfcf 1px solid;
 }
 
-.entry-meta a:hover, .post-revisions a:hover, .post-references a:hover {
+.entry-meta a:hover, #post-revisions a:hover, #post-references a:hover {
     border-bottom: #005a9c 2px solid;
     background-color:#efefef;
 }
@@ -1393,43 +1393,43 @@ footer #imprint-right {
 	float: right;
 }
 
-.post-references, .post-revisions {
+#post-references, #post-revisions {
 	background-color: #ffffff;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06);
     margin: 0 0 1.5em;
     padding: 1.5em 1.5em;
 }
 
-.post-references h3, .post-revisions h3 {
+#post-references h3, #post-revisions h3 {
 	color: #353535;
     margin: 0 0 1em 0;
     font-weight: bold;
 }
 
-.post-references h4 {
+#post-references h4 {
 	margin-bottom: 5px;
 }
 
-.post-references ul {
+#post-references ul {
 	margin: 0;
 	padding: 0 0 0 20px;
 	list-style: none;
 }
 
-.post-references ul li:before {
+#post-references ul li:before {
 	font-family: 'FontAwesome';
 	content: '\f105';
 	margin: 0 5px 0 -15px;
 	color: #0b789c;
 }
 
-.post-revisions ul {
+#post-revisions ul {
 	margin: 0;
 	padding: 0;
 	list-style: none;
 }
 
-.post-references ul li, .post-revisions ul li {
+#post-references ul li, #post-revisions ul li {
 	font-size: 85%;
 	margin-bottom: 6px;
 }
