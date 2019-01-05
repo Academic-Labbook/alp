@@ -35,4 +35,3 @@
 </article><!-- #post-<?php the_ID(); ?> -->
 <?php alpine_the_references(); ?>
 <?php alpine_the_revisions(); ?>
-

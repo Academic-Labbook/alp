@@ -75,41 +75,148 @@ function alpine_customize_register( $wp_customize ) {
 	);
 
 	/**
-	 * Pages section
-	 */
-
-	/**
-	 * Post lists section
+	 * Revisions section
 	 */
 
 	$wp_customize->add_section(
-		'alpine_page_options',
+		'alpine_revision_options',
 		array(
-			'title'      => __( 'Pages', 'alpine' ),
-			'priority'   => 85,
+			'title'      => __( 'Revisions', 'alpine' ),
+			'priority'   => 82,
 			'capability' => 'edit_theme_options',
 			'panel'      => '',
 		)
 	);
 
-	// table of contents display setting
 	$wp_customize->add_setting(
-		'alpine_options[display_page_table_of_contents]',
+		'alpine_options[show_edit_summaries]',
 		array(
-			'default'           => $alpine_default_options['display_page_table_of_contents'],
+			'default'           => $alpine_default_options['show_edit_summaries'],
 			'capability'        => 'edit_theme_options',
 			'sanitize_callback' => 'alpine_sanitize_checkbox',
 		)
 	);
 
 	$wp_customize->add_control(
-		'alpine_options[display_page_table_of_contents]',
+		'alpine_options[show_edit_summaries]',
 		array(
-			'label'    => __( 'Display table of contents', 'alpine' ),
+			'label'    => __( 'Show edit summaries', 'alpine' ),
+			'description'	=>	__( 'Display a list of edit summaries under each post/page.', 'alpine' ),
+			'section'  => 'alpine_revision_options',
+			'type'     => 'checkbox',
+			'priority' => 100
+		)
+	);
+
+	// edit summaries per page
+	$wp_customize->add_setting(
+		'alpine_options[edit_summaries_per_page]',
+		array(
+			'default'           	=> $alpine_default_options['edit_summaries_per_page'],
+			'capability'        	=> 'edit_theme_options',
+			'sanitize_callback'    	=> 'alpine_sanitize_number_absint',
+			'sanitize_js_callback' 	=> 'esc_attr',
+		)
+	);
+
+	$wp_customize->add_control(
+		'alpine_options[edit_summaries_per_page]',
+		array(
+			'label'    => __( 'Edit summary page size', 'alpine' ),
+			'description'	=>	__( 'Maximum number of edit summaries to display per page.', 'alpine' ),
+			'section'  => 'alpine_revision_options',
+			'type'     => 'text',
+			'priority'	=>	110
+		)
+	);
+
+	/**
+	 * Cross-references section
+	 */
+
+	$wp_customize->add_section(
+		'alpine_reference_options',
+		array(
+			'title'      => __( 'References', 'alpine' ),
+			'priority'   => 84,
+			'capability' => 'edit_theme_options',
+			'panel'      => '',
+		)
+	);
+
+	$wp_customize->add_setting(
+		'alpine_options[show_crossreferences]',
+		array(
+			'default'           => $alpine_default_options['show_crossreferences'],
+			'capability'        => 'edit_theme_options',
+			'sanitize_callback' => 'alpine_sanitize_checkbox',
+		)
+	);
+
+	$wp_customize->add_control(
+		'alpine_options[show_crossreferences]',
+		array(
+			'label'    => __( 'Show cross-references', 'alpine' ),
+			'description'	=>	__( 'Display a list of posts/pages that link to/from the current post/page.', 'alpine' ),
+			'section'  => 'alpine_reference_options',
+			'type'     => 'checkbox',
+			'priority' => 100
+		)
+	);
+
+	/**
+	 * Pages section
+	 */
+
+	$wp_customize->add_section(
+		'alpine_page_options',
+		array(
+			'title'      => __( 'Pages', 'alpine' ),
+			'priority'   => 86,
+			'capability' => 'edit_theme_options',
+			'panel'      => '',
+		)
+	);
+
+	// breadcrumbs display setting
+	$wp_customize->add_setting(
+		'alpine_options[show_page_breadcrumbs]',
+		array(
+			'default'           => $alpine_default_options['show_page_breadcrumbs'],
+			'capability'        => 'edit_theme_options',
+			'sanitize_callback' => 'alpine_sanitize_checkbox',
+		)
+	);
+
+	$wp_customize->add_control(
+		'alpine_options[show_page_breadcrumbs]',
+		array(
+			'label'    => __( 'Show breadcrumbs', 'alpine' ),
+			'description'	=>	__( 'Display a trail of links to parent pages at the top of each page.', 'alpine' ),
+			'section'  => 'alpine_page_options',
+			'type'     => 'checkbox',
+			'priority' => 100
+		)
+	);
+
+	// table of contents display setting
+	$wp_customize->add_setting(
+		'alpine_options[show_page_table_of_contents]',
+		array(
+			'default'           => $alpine_default_options['show_page_table_of_contents'],
+			'capability'        => 'edit_theme_options',
+			'sanitize_callback' => 'alpine_sanitize_checkbox',
+		)
+	);
+
+	$wp_customize->add_control(
+		'alpine_options[show_page_table_of_contents]',
+		array(
+			'label'    => __( 'Show table of contents', 'alpine' ),
 			'description'	=>	__( 'Generate and display a table of contents panel shown at the top right of the page.', 'alpine' ),
 			'section'  => 'alpine_page_options',
 			'type'     => 'checkbox',
-			'priority' => 120
+			'priority' => 110
 		)
 	);
 
@@ -137,7 +244,7 @@ function alpine_customize_register( $wp_customize ) {
 				5    	   => __( 'h5', 'alpine' ),
 				6    	   => __( 'h6', 'alpine' )
 			),
-			'priority'	=>	130
+			'priority'	=>	120
 		)
 	);
 
