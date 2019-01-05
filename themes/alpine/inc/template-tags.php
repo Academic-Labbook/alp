@@ -178,19 +178,17 @@ if ( ! function_exists( 'alpine_the_post_meta' ) ) :
 			alpine_get_authors( $post )
 		);
 
-		if ( is_plugin_active( 'ssl-alp/alp.php' ) ) {
-			if ( get_option( 'ssl_alp_enable_post_edit_summaries' ) ) {
-				$revision_count = alpine_get_revision_count();
+		$revision_count = alpine_get_revision_count();
 
-				if ( $revision_count > 0 ) {
-					$revision_str = sprintf( _n( '%s revision', '%s revisions', $revision_count, 'alpine' ), $revision_count );
+		if ( alpine_get_option( 'show_edit_summaries' ) && ! is_null( $revision_count ) ) {
+			if ( $revision_count > 0 ) {
+				$revision_str = sprintf( _n( '%s revision', '%s revisions', $revision_count, 'alpine' ), $revision_count );
 
-					$posted_on .= sprintf(
-						'&nbsp;&nbsp;<i class="fa fa-pencil" aria-hidden="true"></i><a href="%1$s#post-revisions">%2$s</a>',
-						esc_url( get_the_permalink( $post ) ),
-						$revision_str
-					);
-				}
+				$posted_on .= sprintf(
+					'&nbsp;&nbsp;<i class="fa fa-pencil" aria-hidden="true"></i><a href="%1$s#post-revisions">%2$s</a>',
+					esc_url( get_the_permalink( $post ) ),
+					$revision_str
+				);
 			}
 		}
 
@@ -229,86 +227,6 @@ if ( ! function_exists( 'alpine_the_page_meta' ) ) :
 				__( 'Edit', 'alpine' )
 			);
 		}
-	}
-endif;
-
-if ( ! function_exists( 'alpine_get_authors' ) ) :
-	/**
-	 * Gets formatted author HTML
-	 */
-	function alpine_get_authors( $post = null, $icon = true, $url = true, $delimiter_between = null, $delimiter_between_last = null ) {
-		global $ssl_alp;
-
-		$post = get_post( $post );
-
-		if ( is_plugin_active( 'ssl-alp/alp.php' ) && get_option( 'ssl_alp_allow_multiple_authors' ) ) {
-			$authors = $ssl_alp->coauthors->get_coauthors( $post );
-		} else {
-			// fall back to the_author if plugin is disabled
-			$authors = array();
-
-			// get single author object
-			$author = get_user_by( 'id', $post->post_author );
-
-			// if there is no author, $author == false
-			if ( $author ) {
-				$authors[] = $author;
-			}
-		}
-
-		$author_html = array();
-
-		foreach ( $authors as $author ) {
-			$author = alpine_format_author( $author, $url );
-
-			if ( ! is_null( $author ) ) {
-				$author_html[] = $author;
-			}
-		}
-
-		if ( ! count( $author_html ) ) {
-			// no authors
-			$author_list_html = "";
-		} else {
-			if ( count( $author_html ) > 1 ) {
-				// multiple authors
-				$icon_class = 'fa fa-users';
-
-				// get delimiters
-				if ( is_null( $delimiter_between ) ) {
-					$delimiter_between = _x( ', ', 'delimiter between coauthors except last', 'alpine' );
-				}
-				if ( is_null( $delimiter_between_last ) ) {
-					$delimiter_between_last = _x( ' and ', 'delimiter between last two coauthors', 'alpine' );
-				}
-
-				// pop last author off
-				$last_author = array_pop( $author_html );
-
-				// implode author list
-				$author_list_html = implode( __( ', ', 'alpine' ), $author_html ) . $delimiter_between_last . $last_author;
-			} else {
-				// single author
-				$icon_class = 'fa fa-user';
-
-				$author_list_html = $author_html[0];
-			}
-
-			if ( $icon ) {
-				$icon = sprintf( '<i class="%1$s" aria-hidden="true"></i>', $icon_class );
-			} else {
-				$icon = '';
-			}
-
-			// add icon and author span
-			$author_list_html = sprintf(
-				'<span class="authors">%1$s%2$s</span>',
-				$icon,
-				$author_list_html
-			);
-		}
-
-		return $author_list_html;
 	}
 endif;
 
@@ -385,9 +303,8 @@ if ( ! function_exists( 'alpine_the_revisions' ) ) :
 	 * Prints revisions for the specified post
 	 */
 	function alpine_the_revisions( $post = null ) {
-		if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
-			return;
-		} elseif ( ! get_option( 'ssl_alp_enable_post_edit_summaries' ) ) {
+		if ( ! alpine_get_option( 'show_edit_summaries' ) ) {
+			// display is unavailable
 			return;
 		}
 
@@ -404,7 +321,7 @@ if ( ! function_exists( 'alpine_the_revisions' ) ) :
 
 		// total revisions
 		$count = alpine_get_revision_count( $post );
-		$per_page = 10;
+		$per_page = alpine_get_option( 'edit_summaries_per_page' );
 		$pages = ceil( $count / $per_page );
 
 		// get list of revisions to this post
@@ -446,51 +363,11 @@ if ( ! function_exists( 'alpine_the_revisions' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'alpine_get_revisions' ) ) :
-	/**
-	 * Get list of revisions for the current or specified post
-	 */
-	function alpine_get_revisions( $post = null, $page = 1, $per_page = -1 ) {
-		if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
-			return;
-		} elseif ( ! get_option( 'ssl_alp_enable_post_edit_summaries' ) ) {
-			return;
-		}
-
-		// get current post
-		$post = get_post( $post );
-
-		if  ( ! post_type_supports( $post->post_type, 'revisions' ) ) {
-			// post type not supported
-			return;
-		}
-
-		// get revisions
-		$revisions = wp_get_post_revisions(
-			$post,
-			array(
-				'orderby'			=>	'date',
-				'order'				=>	'DESC',
-				'paged'				=>	$page,
-				'posts_per_page'	=>	$per_page
-			)
-		);
-
-		return $revisions;
-	}
-endif;
-
 if ( ! function_exists( 'alpine_get_revision_description' ) ) :
 	/**
 	 * Prints description for the specified revision
 	 */
 	function alpine_get_revision_description( $revision ) {
-		if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
-			return;
-		} elseif ( ! get_option( 'ssl_alp_enable_post_edit_summaries' ) ) {
-			return;
-		}
-
 		// get revision object if id is specified
 		$revision = wp_get_post_revision( $revision );
 
@@ -603,11 +480,14 @@ if ( ! function_exists( 'alpine_the_references' ) ) :
 	function alpine_the_references( $post = null ) {
 		global $ssl_alp;
 
-		if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
+		if ( ! alpine_get_option( 'show_crossreferences' ) ) {
+			// display is unavailable
+			return;
+		} elseif ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
 			// plugin is disabled
 			return;
 		} elseif ( ! get_option( 'ssl_alp_enable_post_crossreferences' ) ) {
-			// cross-references are disabled
+			// tracking of cross-references are disabled
 			return;
 		}
 
@@ -699,46 +579,16 @@ if ( ! function_exists( 'alpine_referenced_post_list_item' ) ) {
 	}
 }
 
-if ( ! function_exists( 'alpine_get_page_breadcrumbs' ) ) :
-	/**
-	 * Gets page breadcrumbs
-	 */
-	function alpine_get_page_breadcrumbs( $page = null ) {
-		$page = get_post( $page );
-
-		$ancestors = array();
-
-		if ( $page->post_parent ) {
-			// page is a child
-			// get ancestors in reverse order
-			$ancestors = array_reverse( get_post_ancestors( $page->ID ) );
-		}
-
-		// URL list with home
-		$breadcrumbs = array(
-			array(
-				'title'	=>	__( 'Home', 'alpine' ),
-				'url'	=>	get_home_url()
-			)
-		);
-
-		// add ancestor titles and URLs
-		foreach ( $ancestors as $ancestor ) {
-			$breadcrumbs[] = array(
-				'title'	=>	get_the_title( $ancestor ),
-				'url'	=>	get_permalink( $ancestor )
-			);
-		}
-
-		return $breadcrumbs;
-	}
-endif;
-
 if ( ! function_exists( 'alpine_the_page_breadcrumbs' ) ) :
 	/**
 	 * Print page breadcrumbs
 	 */
 	function alpine_the_page_breadcrumbs( $page = null ) {
+		if ( ! alpine_get_option( 'show_page_breadcrumbs' ) ) {
+			// display is unavailable
+			return;
+		}
+
 		$breadcrumbs = alpine_get_page_breadcrumbs( $page );
 
 		if ( ! count( $breadcrumbs ) ) {
@@ -756,37 +606,6 @@ if ( ! function_exists( 'alpine_the_page_breadcrumbs' ) ) :
 		}
 
 		echo '</ul>';
-	}
-endif;
-
-if ( ! function_exists( 'alpine_get_revision_count' ) ) :
-	function alpine_get_revision_count( $post = null ) {
-		// get current post
-		$post = get_post( $post );
-
-		if ( is_null( $post ) ) {
-			// post doesn't exist
-			return;
-		}
-
-		// get revisions
-		$revisions = wp_get_post_revisions(
-			$post,
-			array(
-				'orderby'	=>	'date',
-				'order'		=>	'DESC'
-			)
-		);
-
-		$count = count( $revisions );
-
-		if ( $count <= 0 ) {
-			// no posts found
-			return 0;
-		} else {
-			// subtract 1 to exclude the original post
-			return count( $revisions ) - 1;
-		}
 	}
 endif;
 

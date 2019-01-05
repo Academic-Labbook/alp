@@ -144,7 +144,7 @@ if ( ! function_exists( 'alpine_the_content_with_toc' ) ) :
 	function alpine_the_content_with_toc( $content ) {
 		$post = get_post();
 
-		if ( ! alpine_get_option( 'display_page_table_of_contents' ) ) {
+		if ( ! alpine_get_option( 'show_page_table_of_contents' ) ) {
 			return $content;
 		}
 
@@ -182,14 +182,14 @@ add_filter( 'the_content', 'alpine_the_content_with_toc' );
 require get_template_directory() . '/inc/toc.php';
 
 /**
- * Custom template tags for this theme.
- */
-require get_template_directory() . '/inc/template-tags.php';
-
-/**
  * Functions which enhance the theme by hooking into WordPress.
  */
 require get_template_directory() . '/inc/template-functions.php';
+
+/**
+ * Custom template tags for this theme.
+ */
+require get_template_directory() . '/inc/template-tags.php';
 
 /**
  * Customizer additions.
