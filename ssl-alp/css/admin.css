@@ -49,6 +49,6 @@ div.ssl-alp-tools-card {
 }
 
 /* fix Gutenberg bug: https://github.com/WordPress/gutenberg/issues/10834 */
-#inspector-text-control-0__help {
-    margin-top: 0;
+.components-base-control .components-base-control__help {
+    margin-top: 0 !important;
 }
