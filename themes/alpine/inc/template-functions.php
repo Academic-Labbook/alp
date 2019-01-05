@@ -239,6 +239,12 @@ if ( ! function_exists( 'alpine_get_page_breadcrumbs' ) ) :
 			);
 		}
 
+		// add current page to end
+		$breadcrumbs[] = array(
+			'title'	=>	get_the_title( $page ),
+			'url'	=>	''
+		);
+
 		return $breadcrumbs;
 	}
 endif;

@@ -10,6 +10,9 @@
 ?>
 
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+	<div class="breadcrumbs">
+		<?php alpine_the_page_breadcrumbs(); ?>
+	</div>
 	<header class="entry-header">
 		<?php alpine_the_post_title( $post, false, false, true ); ?>
 		<div class="entry-meta">

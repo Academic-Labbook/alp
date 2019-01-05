@@ -162,6 +162,32 @@ if ( ! function_exists( 'alpine_the_post_meta' ) ) :
 	 */
 	function alpine_the_post_meta( $post = null ) {
 		$post = get_post( $post );
+
+		// post id and authors
+		$byline = sprintf(
+			'<i class="fa fa-link"></i>%1$s&nbsp;&nbsp;%2$s',
+			$post->ID,
+			alpine_get_authors( $post )
+		);
+
+		if ( alpine_get_option( 'show_edit_summaries' ) ) {
+			$byline .= alpine_get_revisions_link( $post );
+		}
+
+		if ( current_user_can( 'edit_post', $post ) ) {
+			// add edit post link
+			$byline .= sprintf(
+				'&nbsp;&nbsp;<i class="fa fa-edit" aria-hidden="true"></i><a href="%1$s">%2$s</a>',
+				get_edit_post_link( $post ),
+				__( 'Edit', 'alpine' )
+			);
+		}
+
+		printf(
+			'<div class="byline">%1$s</div>',
+			$byline
+		);
+
 		$posted_on = alpine_get_post_date_html( $post );
 
 		// check post timestamps to see if modified
@@ -169,36 +195,6 @@ if ( ! function_exists( 'alpine_the_post_meta' ) ) :
 			$modified_on = alpine_get_post_date_html( $post, true );
 			/* translators: 1: post modification date */
 			$posted_on .= sprintf( __( ' (last edited %1$s)', 'alpine' ), $modified_on );
-		}
-
-		// post id and authors
-		printf(
-			'<div class="byline"><i class="fa fa-link"></i>%1$s&nbsp;&nbsp;%2$s</div>',
-			$post->ID,
-			alpine_get_authors( $post )
-		);
-
-		$revision_count = alpine_get_revision_count();
-
-		if ( alpine_get_option( 'show_edit_summaries' ) && ! is_null( $revision_count ) ) {
-			if ( $revision_count > 0 ) {
-				$revision_str = sprintf( _n( '%s revision', '%s revisions', $revision_count, 'alpine' ), $revision_count );
-
-				$posted_on .= sprintf(
-					'&nbsp;&nbsp;<i class="fa fa-pencil" aria-hidden="true"></i><a href="%1$s#post-revisions">%2$s</a>',
-					esc_url( get_the_permalink( $post ) ),
-					$revision_str
-				);
-			}
-		}
-
-		if ( current_user_can( 'edit_post', $post ) ) {
-			// add edit post link
-			$posted_on .= sprintf(
-				'&nbsp;&nbsp;<i class="fa fa-edit" aria-hidden="true"></i><a href="%1$s">%2$s</a>',
-				get_edit_post_link(),
-				__( 'Edit', 'alpine' )
-			);
 		}
 
 		printf(
@@ -215,18 +211,45 @@ if ( ! function_exists( 'alpine_the_page_meta' ) ) :
 	function alpine_the_page_meta( $page = null ) {
 		$page = get_post( $page );
 
-		echo '<div class="breadcrumbs">';
-		alpine_the_page_breadcrumbs();
-		echo '</div>';
+		$byline = "";
+
+		if ( alpine_get_option( 'show_edit_summaries' ) ) {
+			$byline .= alpine_get_revisions_link( $page );
+		}
 
 		if ( current_user_can( 'edit_page', $page ) ) {
-			// add edit page link
-			printf(
-				'<div class="posted-on"><i class="fa fa-edit" aria-hidden="true"></i><a href="%1$s">%2$s</a></div>',
-				get_edit_post_link(),
+			// add edit post link
+			$byline .= sprintf(
+				'&nbsp;&nbsp;<i class="fa fa-edit" aria-hidden="true"></i><a href="%1$s">%2$s</a>',
+				get_edit_post_link( $page ),
 				__( 'Edit', 'alpine' )
 			);
 		}
+
+		printf(
+			'<div class="byline">%1$s</div>',
+			$byline
+		);
+	}
+endif;
+
+if ( ! function_exists( 'alpine_get_revisions_link' ) ) :
+	function alpine_get_revisions_link( $post = null ) {
+		$post = get_post( $post );
+
+		$revision_count = alpine_get_revision_count( $post );
+
+		if ( is_null( $revision_count ) || $revision_count < 1 ) {
+			return;
+		}
+
+		$revision_str = sprintf( _n( '%s revision', '%s revisions', $revision_count, 'alpine' ), $revision_count );
+
+		return sprintf(
+			'&nbsp;&nbsp;<i class="fa fa-pencil" aria-hidden="true"></i><a href="%1$s#post-revisions">%2$s</a>',
+			esc_url( get_the_permalink( $post ) ),
+			$revision_str
+		);
 	}
 endif;
 
@@ -598,10 +621,19 @@ if ( ! function_exists( 'alpine_the_page_breadcrumbs' ) ) :
 		echo '<ul>';
 
 		foreach ( $breadcrumbs as $breadcrumb ) {
+			$title = esc_html( $breadcrumb['title'] );
+
+			if ( ! empty( $breadcrumb['url'] ) ) {
+				$title = sprintf(
+					'<a href="%1$s">%2$s</a>',
+					esc_url( $breadcrumb['url'] ),
+					$title
+				);
+			}
+
 			printf(
-				'<li><a href="%1$s">%2$s</a></li>',
-				esc_url( $breadcrumb['url'] ),
-				esc_html( $breadcrumb['title'] )
+				'<li>%1$s</li>',
+				$title
 			);
 		}
 
