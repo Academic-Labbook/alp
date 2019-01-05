@@ -128,86 +128,6 @@ endif;
 
 add_filter( 'excerpt_length', 'alpine_custom_excerpt_length', 999 );
 
-if ( ! function_exists( 'alpine_get_authors' ) ) :
-	/**
-	 * Gets formatted author HTML
-	 */
-	function alpine_get_authors( $post = null, $icon = true, $url = true, $delimiter_between = null, $delimiter_between_last = null ) {
-		global $ssl_alp;
-
-		$post = get_post( $post );
-
-		if ( is_plugin_active( 'ssl-alp/alp.php' ) && get_option( 'ssl_alp_allow_multiple_authors' ) ) {
-			$authors = $ssl_alp->coauthors->get_coauthors( $post );
-		} else {
-			// fall back to the_author if plugin is disabled
-			$authors = array();
-
-			// get single author object
-			$author = get_user_by( 'id', $post->post_author );
-
-			// if there is no author, $author == false
-			if ( $author ) {
-				$authors[] = $author;
-			}
-		}
-
-		$author_html = array();
-
-		foreach ( $authors as $author ) {
-			$author = alpine_format_author( $author, $url );
-
-			if ( ! is_null( $author ) ) {
-				$author_html[] = $author;
-			}
-		}
-
-		if ( ! count( $author_html ) ) {
-			// no authors
-			$author_list_html = "";
-		} else {
-			if ( count( $author_html ) > 1 ) {
-				// multiple authors
-				$icon_class = 'fa fa-users';
-
-				// get delimiters
-				if ( is_null( $delimiter_between ) ) {
-					$delimiter_between = _x( ', ', 'delimiter between coauthors except last', 'alpine' );
-				}
-				if ( is_null( $delimiter_between_last ) ) {
-					$delimiter_between_last = _x( ' and ', 'delimiter between last two coauthors', 'alpine' );
-				}
-
-				// pop last author off
-				$last_author = array_pop( $author_html );
-
-				// implode author list
-				$author_list_html = implode( __( ', ', 'alpine' ), $author_html ) . $delimiter_between_last . $last_author;
-			} else {
-				// single author
-				$icon_class = 'fa fa-user';
-
-				$author_list_html = $author_html[0];
-			}
-
-			if ( $icon ) {
-				$icon = sprintf( '<i class="%1$s" aria-hidden="true"></i>', $icon_class );
-			} else {
-				$icon = '';
-			}
-
-			// add icon and author span
-			$author_list_html = sprintf(
-				'<span class="authors">%1$s%2$s</span>',
-				$icon,
-				$author_list_html
-			);
-		}
-
-		return $author_list_html;
-	}
-endif;
-
 if ( ! function_exists( 'alpine_get_page_breadcrumbs' ) ) :
 	/**
 	 * Gets page breadcrumbs
@@ -286,6 +206,10 @@ if ( ! function_exists( 'alpine_get_revisions' ) ) :
 endif;
 
 if ( ! function_exists( 'alpine_get_revision_count' ) ) :
+	/**
+	 * Get number of revisions for the specified post. This includes the
+	 * published version.
+	 */
 	function alpine_get_revision_count( $post = null ) {
 		// get current post
 		$post = get_post( $post );
@@ -295,23 +219,26 @@ if ( ! function_exists( 'alpine_get_revision_count' ) ) :
 			return;
 		}
 
-		// get revisions
-		$revisions = wp_get_post_revisions(
-			$post,
-			array(
-				'orderby'	=>	'date',
-				'order'		=>	'DESC'
-			)
-		);
+		// get revisions (default descending date order)
+		$revisions = wp_get_post_revisions( $post );
 
-		$count = count( $revisions );
+		return count( $revisions );
+	}
+endif;
 
-		if ( $count <= 0 ) {
-			// no posts found
+if ( ! function_exists( 'alpine_get_edit_count' ) ) :
+	/**
+	 * Get number of edits made to the specified post after its original
+	 * published version.
+	 */
+	function alpine_get_edit_count( $post = null ) {
+		$count = alpine_get_revision_count( $post );
+
+		if ( $count == 0 ) {
+			// no revisions
 			return 0;
-		} else {
-			// subtract 1 to exclude the original post
-			return count( $revisions ) - 1;
 		}
+
+		return $count - 1;
 	}
 endif;
