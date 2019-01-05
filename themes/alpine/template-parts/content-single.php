@@ -11,9 +11,9 @@
 
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 	<header class="entry-header">
-		<?php ssl_alpine_the_post_title( $post, false, true, true ); ?>
+		<?php alpine_the_post_title( $post, false, true, true ); ?>
 		<div class="entry-meta">
-			<?php ssl_alpine_the_post_meta(); ?>
+			<?php alpine_the_post_meta(); ?>
 		</div><!-- .entry-meta -->
 	</header><!-- .entry-header -->
 
@@ -22,7 +22,7 @@
 		<?php
 		wp_link_pages(
 			array(
-				'before' => '<div class="page-links">' . esc_html__( 'Pages:', 'ssl-alpine' ),
+				'before' => '<div class="page-links">' . esc_html__( 'Pages:', 'alpine' ),
 				'after'  => '</div>',
 			)
 		);
@@ -30,9 +30,9 @@
 	</div><!-- .entry-content -->
 
 	<footer class="entry-footer">
-		<?php ssl_alpine_the_footer(); ?>
+		<?php alpine_the_footer(); ?>
 	</footer>
 </article><!-- #post-<?php the_ID(); ?> -->
-<?php ssl_alpine_the_references(); ?>
-<?php ssl_alpine_the_revisions(); ?>
+<?php alpine_the_references(); ?>
+<?php alpine_the_revisions(); ?>
 

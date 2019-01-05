@@ -16,13 +16,13 @@ if ( ! function_exists( 'alpine_setup' ) ) :
 	 * as indicating support for post thumbnails.
 	 */
 	function alpine_setup() {
-		global $ssl_alpine_default_options;
+		global $alpine_default_options;
 
 		/*
 		 * Make theme available for translation.
 		 * Translations can be filed in the /languages/ directory.
 		 */
-		load_theme_textdomain( 'ssl-alpine', get_template_directory() . '/languages' );
+		load_theme_textdomain( 'alpine', get_template_directory() . '/languages' );
 
 		// Add default posts and comments RSS feed links to head.
 		add_theme_support( 'automatic-feed-links' );
@@ -37,8 +37,8 @@ if ( ! function_exists( 'alpine_setup' ) ) :
 
 		// This theme uses wp_nav_menu() in two locations.
 		register_nav_menus( array(
-			'site-menu' => esc_html__( 'Primary', 'ssl-alpine' ),
-			'network-menu' => esc_html__( 'Network', 'ssl-alpine' )
+			'site-menu' => esc_html__( 'Primary', 'alpine' ),
+			'network-menu' => esc_html__( 'Network', 'alpine' )
 		) );
 
 		/*
@@ -82,7 +82,7 @@ if ( ! function_exists( 'alpine_setup' ) ) :
 		) );
 
 		// Get default theme options.
-		$ssl_alpine_default_options = ssl_alpine_get_theme_option_defaults();
+		$alpine_default_options = alpine_get_theme_option_defaults();
 	}
 endif;
 add_action( 'after_setup_theme', 'alpine_setup' );
@@ -109,9 +109,9 @@ add_action( 'after_setup_theme', 'alpine_content_width', 0 );
  */
 function alpine_widgets_init() {
 	register_sidebar( array(
-		'name'          => esc_html__( 'Sidebar', 'ssl-alpine' ),
+		'name'          => esc_html__( 'Sidebar', 'alpine' ),
 		'id'            => 'sidebar-1',
-		'description'   => esc_html__( 'Add widgets here.', 'ssl-alpine' ),
+		'description'   => esc_html__( 'Add widgets here.', 'alpine' ),
 		'before_widget' => '<section id="%1$s" class="widget %2$s">',
 		'after_widget'  => '</section>',
 		'before_title'  => '<h2 class="widget-title">',
@@ -137,14 +137,14 @@ function alpine_scripts() {
 }
 add_action( 'wp_enqueue_scripts', 'alpine_scripts' );
 
-if ( ! function_exists( 'ssl_alpine_the_content_with_toc' ) ) :
+if ( ! function_exists( 'alpine_the_content_with_toc' ) ) :
 	/**
 	 * Add table of contents alongside post.
 	 */
-	function ssl_alpine_the_content_with_toc( $content ) {
+	function alpine_the_content_with_toc( $content ) {
 		$post = get_post();
 
-		if ( ! ssl_alpine_get_option( 'display_page_table_of_contents' ) ) {
+		if ( ! alpine_get_option( 'display_page_table_of_contents' ) ) {
 			return $content;
 		}
 
@@ -157,7 +157,7 @@ if ( ! function_exists( 'ssl_alpine_the_content_with_toc' ) ) :
 		}
 
 		// get contents hierarchy
-		$content = ssl_alpine_generate_post_contents( $content, $hierarchy );
+		$content = alpine_generate_post_contents( $content, $hierarchy );
 
 		if ( is_null( $hierarchy ) || ! $hierarchy->count() ) {
 			// table of contents was not generated or has no entries
@@ -166,15 +166,15 @@ if ( ! function_exists( 'ssl_alpine_the_content_with_toc' ) ) :
 
 		?>
 		<div class="entry-toc entry-toc-<?php the_ID(); ?>">
-			<h3 class="entry-toc-title"><?php _e( 'Contents', 'ssl-alpine' ) ?></h3>
-			<?php ssl_alpine_the_toc( $hierarchy, ssl_alpine_get_option( 'table_of_contents_max_depth' ) ); ?>
+			<h3 class="entry-toc-title"><?php _e( 'Contents', 'alpine' ) ?></h3>
+			<?php alpine_the_toc( $hierarchy, alpine_get_option( 'table_of_contents_max_depth' ) ); ?>
 		</div>
 		<?php
 
 		return $content;
 	}
 endif;
-add_filter( 'the_content', 'ssl_alpine_the_content_with_toc' );
+add_filter( 'the_content', 'alpine_the_content_with_toc' );
 
 /**
  * Page table of contents generator.
