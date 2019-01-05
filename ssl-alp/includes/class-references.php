@@ -24,7 +24,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	public function register_settings() {
         register_setting(
 			SSL_ALP_SITE_SETTINGS_PAGE,
-			'ssl_alp_enable_crossreferences',
+			'ssl_alp_enable_post_crossreferences',
 			array(
 				'type'		=>	'boolean'
 			)
@@ -64,7 +64,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	}
 
 	public function create_crossreference_taxonomy() {
-		if ( ! get_option( 'ssl_alp_enable_crossreferences' ) ) {
+		if ( ! get_option( 'ssl_alp_enable_post_crossreferences' ) ) {
 			// cross-references are disabled
 			return;
 		}
@@ -91,7 +91,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	 * term database for display under the post
 	 */
 	public function extract_crossreferences( $post_id, $post ) {
-		if ( ! get_option( 'ssl_alp_enable_crossreferences' ) ) {
+		if ( ! get_option( 'ssl_alp_enable_post_crossreferences' ) ) {
 			// cross-references are disabled
 			return;
 		} elseif ( ! $this->is_supported( $post ) ) {
@@ -174,7 +174,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	 * Re-scan supported post types to update references
 	 */
 	public function rebuild_references() {
-		if ( ! get_option( 'ssl_alp_enable_crossreferences' ) ) {
+		if ( ! get_option( 'ssl_alp_enable_post_crossreferences' ) ) {
 			// cross-references are disabled
 			return;
 		}
@@ -184,7 +184,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 
 		foreach ( array_keys( $this->supported_reference_post_types ) as $post_type ) {
 			$posts = get_posts(
-				array( 
+				array(
 					'post_type' 		=> $post_type,
 					'post_status'		=> 'published',
 					'posts_per_page'	=> -1 // needed to get all
@@ -202,7 +202,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	 */
 	public function get_reference_to_posts( $post = null ) {
 		$post = get_post( $post );
-		
+
 		$terms = get_the_terms( $post, 'ssl_alp_crossreference' );
 
 		$posts = array();

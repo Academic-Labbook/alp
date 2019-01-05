@@ -606,7 +606,7 @@ if ( ! function_exists( 'alpine_the_references' ) ) :
 		if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
 			// plugin is disabled
 			return;
-		} elseif ( ! get_option( 'ssl_alp_enable_crossreferences' ) ) {
+		} elseif ( ! get_option( 'ssl_alp_enable_post_crossreferences' ) ) {
 			// cross-references are disabled
 			return;
 		}
