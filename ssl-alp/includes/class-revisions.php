@@ -182,7 +182,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		// get post
 		$post = get_post( $revision_id );
-		
+
 		// skip when autosaving, as custom post data is noted included in $_POST during autosaves (annoying)
 		if ( wp_is_post_autosave( $post ) ) {
 			return;
@@ -451,7 +451,9 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Get revisions, optionally grouping by object
+	 * Get recent revisions, grouped by author and post.
+	 *
+	 * Repeated edits made to posts by the same author are returned only once.
 	 */
 	public function get_recent_revisions( $number, $order = 'DESC' ) {
 		global $wpdb;
@@ -464,11 +466,11 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		$supported_post_types = array_map( 'esc_sql', $supported_post_types );
 		$supported_types_clause = '"' . implode( '", "', $supported_post_types ) . '"';
 
-		// get last $number revisions (don't need parents) grouped by parent id, ordered by date descending
+		// get last $number revisions (don't need parents) grouped by author and parent id, ordered by date descending
 		$object_ids = $wpdb->get_results(
 			$wpdb->prepare(
 				"
-				SELECT posts.post_author, posts.post_parent, MAX(posts.post_date) AS post_date, COUNT(1) - 1 AS repeats
+				SELECT posts.post_author, posts.post_parent, MAX(posts.post_date) AS post_date
 				FROM {$wpdb->posts} AS posts
 				WHERE
 					post_type = %s
@@ -594,18 +596,6 @@ class SSL_ALP_Widget_Revisions extends WP_Widget {
 			echo '<ul id="recent-revisions-list" class="list-unstyled">';
 
 			foreach ( $revisions as $revision ) {
-				// check if there are extra revisions from this author for this post
-				if ( $revision->repeats > 0 ) {
-					$extra_revisions = sprintf(
-						' (<span title="%s">+%s</span>)',
-						/* translators: %s: number of additional revisions made by this author */
-						sprintf( _n( '%s additional edit', '%s additional edits', $revision->repeats, 'ssl-alp' ), number_format_i18n( $revision->repeats ) ),
-						number_format_i18n( $revision->repeats )
-					);
-				} else {
-					$extra_revisions = "";
-				}
-
 				// get the revision's parent
 				$parent = get_post ( $revision->post_parent );
 
@@ -628,11 +618,9 @@ class SSL_ALP_Widget_Revisions extends WP_Widget {
 				);
 
 				printf(
-					'<li class="recent-revision">%s on %s%s</li>',
-					$author,
-					$post_title,
-					$extra_revisions,
-					$post_date
+					'<li class="recent-revision">%s on %s</li>',
+					esc_html( $author ),
+					$post_title
 				);
 			}
 
