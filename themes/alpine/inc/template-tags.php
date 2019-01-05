@@ -199,7 +199,7 @@ if ( ! function_exists( 'ssl_alpine_the_post_meta' ) ) :
 			$posted_on .= sprintf(
 				'&nbsp;&nbsp;<i class="fa fa-edit" aria-hidden="true"></i><a href="%1$s">%2$s</a>',
 				get_edit_post_link(),
-				__( 'Edit' )
+				__( 'Edit', 'ssl-alpine' )
 			);
 		}
 
@@ -226,7 +226,7 @@ if ( ! function_exists( 'ssl_alpine_the_page_meta' ) ) :
 			printf(
 				'<div class="posted-on"><i class="fa fa-edit" aria-hidden="true"></i><a href="%1$s">%2$s</a></div>',
 				get_edit_post_link(),
-				__( 'Edit' )
+				__( 'Edit', 'ssl-alpine' )
 			);
 		}
 	}
@@ -507,7 +507,7 @@ if ( ! function_exists( 'ssl_alpine_get_revision_description' ) ) :
 
 		if ( wp_is_post_autosave( $revision ) ) {
 			// this is an autosave
-			$message .= __( ': [Autosave]', 'ssl_alp' );
+			$message .= __( ': [Autosave]', 'ssl-alpine' );
 		} else {
 			// check that we have a revision summary
 			if ( ( ! empty( $revision_edit_summary ) && is_string( $revision_edit_summary ) ) || ( ! empty( $revision_edit_summary_revert_id ) && ( $revision_edit_summary_revert_id > 0 ) ) ) {
