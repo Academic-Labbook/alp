@@ -592,10 +592,20 @@ if ( ! function_exists( 'alpine_get_revision_abbreviation' ) ) :
 
 		// add URL to diff if user can view
 		if ( $url ) {
-			if ( $ssl_alp->revisions->current_user_can_view_revision( $revision ) ) {
+			/**
+			 * Note: interns are not shown the edit link below (it is empty) because they fail
+			 * the edit_post permission check against the *revision* here. This is a subtle bug
+			 * that would take a lot of effort to fix.
+			 *
+			 * Instead, interns simply aren't shown the revision link (but they still see the edit
+			 * link).
+			 */
+			$edit_link = get_edit_post_link( $revision->ID );
+
+			if ( !empty( $edit_link) && $ssl_alp->revisions->current_user_can_view_revision( $revision ) ) {
 				$abbr = sprintf(
 					'<a href="%1$s">%2$s</a>',
-					get_edit_post_link( $revision->ID ),
+					esc_url( $edit_link ),
 					$abbr
 				);
 			}

@@ -452,8 +452,13 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		// assume post
-		$post_id = isset( $args[2] ) ? $args[2] : 0;
-		$post_type = get_post_type_object( get_post_type( $post_id ) );
+		$post = get_post( isset( $args[2] ) ? $args[2] : 0 );
+
+		if ( is_null( $post ) ) {
+			return $all_capabilities;
+		}
+
+		$post_type = get_post_type_object( get_post_type( $post ) );
 
 		if ( ! $post_type || 'revision' == $post_type->name ) {
 			return $all_capabilities;
@@ -470,12 +475,12 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			// this is the case if the user is a researcher or admin, for example
 			// (they can already edit other posts)
 			return $all_capabilities;
-		} elseif ( ! is_user_logged_in() || ! $this->is_coauthor_for_post( $user, $post_id ) ) {
+		} elseif ( ! is_user_logged_in() || ! $this->is_coauthor_for_post( $user, $post ) ) {
 			// user isn't coauthor of the specified post
 			return $all_capabilities;
 		}
 
-		$post_status = get_post_status( $post_id );
+		$post_status = get_post_status( $post );
 
 		if ( 'publish' == $post_status &&
 			( isset( $post_type->cap->edit_published_posts ) && ! empty( $user->all_capabilities[ $post_type->cap->edit_published_posts ] ) ) ) {
