@@ -11,7 +11,7 @@ if ( ! defined( 'WPINC' ) ) {
 class SSL_ALP_Tools extends SSL_ALP_Module {
 	/**
 	 * Overrideable settings and their overridden values
-	 * 
+	 *
 	 * (Note: soome settings are set to null if switched off, others to boolean false.)
 	 */
 	protected $overrideable_settings = array(
@@ -164,7 +164,7 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 		 */
 
 		// check if cross-references are enabled
-		$references_enabled = get_option( 'ssl_alp_enable_crossreferences' );
+		$references_enabled = get_option( 'ssl_alp_enable_post_crossreferences' );
 
 		if ( $references_enabled ) {
 			if ( array_key_exists( 'ssl_alp_rebuild_references_submitted', $_POST ) && (bool) $_POST['ssl_alp_rebuild_references_submitted'] ) {
