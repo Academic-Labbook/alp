@@ -13,18 +13,24 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 	 * Register the stylesheets.
 	 */
 	public function enqueue_styles() {
-		wp_enqueue_style( 'ssl-alp-katex' );
-		wp_enqueue_style( 'ssl-alp-katex-contrib-copy' );
+		if ( get_option( 'ssl_alp_enable_tex' ) ) {
+			wp_enqueue_style( 'ssl-alp-katex' );
+			wp_enqueue_style( 'ssl-alp-katex-contrib-copy' );
+		}
 	}
 
 	public function enqueue_scripts() {
-		wp_enqueue_script( 'ssl-alp-katex' );
-		wp_enqueue_script( 'ssl-alp-katex-contrib-copy' );
-		wp_enqueue_script( 'ssl-alp-katex-render' );
+		if ( get_option( 'ssl_alp_enable_tex' ) ) {
+			wp_enqueue_script( 'ssl-alp-katex' );
+			wp_enqueue_script( 'ssl-alp-katex-contrib-copy' );
+			wp_enqueue_script( 'ssl-alp-katex-render' );
+		}
 	}
 
 	public function enqueue_admin_styles() {
-		wp_enqueue_style( 'ssl-alp-katex' );
+		if ( get_option( 'ssl_alp_enable_tex' ) ) {
+			wp_enqueue_style( 'ssl-alp-katex' );
+		}
 	}
 
 	public function enqueue_admin_scripts() {
@@ -36,9 +42,12 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 			wp_enqueue_script( 'ssl-alp-tex-settings-js', SSL_ALP_BASE_URL . 'js/admin-tex.js', array( 'jquery' ), $this->get_version(), true );
 		}
 
-		wp_enqueue_script( 'ssl-alp-katex' );
-		// disabled until it can be polished
-		//wp_enqueue_script( 'ssl-alp-katex-inline' );
+		if ( get_option( 'ssl_alp_enable_tex' ) ) {
+			wp_enqueue_script( 'ssl-alp-katex' );
+
+			// disabled until it can be polished
+			//wp_enqueue_script( 'ssl-alp-katex-inline' );
+		}
 	}
 
 	/**
@@ -149,6 +158,10 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 	}
 
 	public function register_tex_scripts() {
+		if ( ! get_option( 'ssl_alp_enable_tex' ) ) {
+			return;
+		}
+
 		// JavaScript and CSS URLs
 		$js_url = $this->get_js_url();
 		$css_url = $this->get_css_url();
