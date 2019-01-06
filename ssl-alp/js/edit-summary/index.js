@@ -9,7 +9,6 @@ var withSelect = wp.data.withSelect;
 var withDispatch = wp.data.withDispatch;
 
 function EditSummary({ summary, onUpdate }) {
-    console.log("Element value: " + summary);
     return el(
         PluginPostStatusInfo,
         {
@@ -46,7 +45,6 @@ const ssl_alp_edit_summary_plugin = compose([
                 ...currentMeta,
                 ssl_alp_edit_summary: value
             };
-            console.log("Update value: " + newMeta);
             dispatch('core/editor').editPost({ meta: newMeta });
         },
     })),
