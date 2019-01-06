@@ -22,12 +22,17 @@ class SSL_ALP_Activator {
         add_option( 'ssl_alp_require_login', true );
         add_option( 'ssl_alp_allow_multiple_authors', true );
         add_option( 'ssl_alp_disable_post_trackbacks', true );
-        add_option( 'ssl_alp_enable_post_crossreferences', true );
+        add_option( 'ssl_alp_enable_crossreferences', true );
         add_option( 'ssl_alp_enable_post_edit_summaries', true );
-		add_option( 'ssl_alp_enable_page_edit_summaries', true );
-		add_option( 'ssl_alp_enable_tex', true );
+        add_option( 'ssl_alp_enable_page_edit_summaries', true );
+        add_option( 'ssl_alp_enable_tex', true );
 
         // add network options
-		add_site_option( 'ssl_alp_additional_media_types', '' );
+        add_site_option( 'ssl_alp_additional_media_types', '' );
+        add_site_option( 'ssl_alp_tex_use_custom_urls', false );
+        add_site_option( 'ssl_alp_katex_js_url', '' );
+        add_site_option( 'ssl_alp_katex_copy_js_url', '' );
+        add_site_option( 'ssl_alp_katex_css_url', '' );
+        add_site_option( 'ssl_alp_katex_copy_css_url', '' );
     }
 }
