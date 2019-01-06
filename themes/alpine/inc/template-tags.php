@@ -529,7 +529,7 @@ if ( ! function_exists( 'alpine_get_revision_description' ) ) :
 			if ( !empty( $source_edit_summary ) ) {
 				// add original edit summary
 				$source_edit_summary = sprintf(
-					__( '"%1$s"', 'ssl-alp' ),
+					__( '"%1$s"', 'alpine' ),
 					$source_edit_summary
 				);
 
