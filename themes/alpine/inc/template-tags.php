@@ -181,6 +181,7 @@ if ( ! function_exists( 'alpine_the_post_meta' ) ) :
 			alpine_get_authors( $post )
 		);
 
+		// show revisions link on posts and pages only
 		if ( alpine_get_option( 'show_edit_summaries' ) ) {
 			$byline .= alpine_get_revisions_link( $post );
 		}
@@ -250,7 +251,18 @@ endif;
 
 if ( ! function_exists( 'alpine_get_revisions_link' ) ) :
 	function alpine_get_revisions_link( $post = null ) {
+		global $ssl_alp;
+
+		if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
+			// required functionality not available
+			return;
+		}
+
 		$post = get_post( $post );
+
+		if ( ! $ssl_alp->revisions->edit_summary_allowed( $post ) ) {
+			return;
+		}
 
 		$edit_count = alpine_get_edit_count( $post );
 		$edit_str = sprintf( _n( '%s revision', '%s revisions', $edit_count, 'alpine' ), $edit_count );

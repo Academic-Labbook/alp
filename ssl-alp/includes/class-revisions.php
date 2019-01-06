@@ -94,7 +94,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * Check if edit summaries are enabled for, and the user has permission to
 	 * view, the specified post.
 	 */
-	private function edit_summary_allowed( $post ) {
+	public function edit_summary_allowed( $post ) {
 		// get post as an object, if not already one
 		$post = get_post( $post );
 
