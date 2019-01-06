@@ -393,27 +393,31 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		$supported_post_types = array_map( 'esc_sql', $supported_post_types );
 		$supported_types_clause = '"' . implode( '", "', $supported_post_types ) . '"';
 
-		// get last $number revisions (don't need parents) grouped by author and parent id, ordered by date descending
+		/**
+		 * Get last $number revisions (don't need parents) grouped by author and parent id, ordered
+		 * by date descending, where number is > 1 if the revision was made by the original author
+		 * (this prevents the original published post showing up as a revision), or > 0 if the
+		 * revision was made by someone else.
+		 *
+		 * Note: `post_date` is the most recent revision found in each group.
+		 */
 		$object_ids = $wpdb->get_results(
 			$wpdb->prepare(
 				"
-				SELECT posts.post_author, posts.post_parent, MAX(posts.post_date) AS post_date
+				SELECT posts.post_author, posts.post_parent, MAX(posts.post_date) AS post_date,
+					COUNT(1) AS number, parent_posts.post_author AS parent_author
 				FROM {$wpdb->posts} AS posts
+				INNER JOIN {$wpdb->posts} AS parent_posts ON posts.post_parent = parent_posts.ID
 				WHERE
-					post_type = %s
-					AND post_status = %s
-					AND EXISTS(SELECT 1
-						 FROM wp_posts
-						 WHERE ID = posts.post_parent
-						 AND post_type IN ({$supported_types_clause})
-						 AND post_status = %s)
-                GROUP BY posts.post_author, posts.post_parent
+					posts.post_type = 'revision'
+					AND posts.post_status = 'inherit'
+					AND parent_posts.post_type IN ({$supported_types_clause})
+					AND parent_posts.post_status = 'publish'
+				GROUP BY posts.post_author, posts.post_parent
+				HAVING (number > 1) OR (posts.post_author <> parent_posts.post_author)
 				ORDER BY post_date {$order}
 				LIMIT %d
 				",
-				"revision",
-				"inherit",
-				"publish",
 				$number
 			)
 		);
