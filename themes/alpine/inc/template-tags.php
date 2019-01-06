@@ -483,6 +483,8 @@ if ( ! function_exists( 'alpine_get_revision_description' ) ) :
 	 * Prints description for the specified revision
 	 */
 	function alpine_get_revision_description( $revision ) {
+		global $ssl_alp;
+
 		// get revision object if id is specified
 		$revision = wp_get_post_revision( $revision );
 
@@ -500,32 +502,36 @@ if ( ! function_exists( 'alpine_get_revision_description' ) ) :
 		if ( wp_is_post_autosave( $revision ) ) {
 			// this is an autosave
 			$message .= __( ': [Autosave]', 'alpine' );
-		} else {
-			// check that we have a revision summary
-			if ( ( ! empty( $revision_edit_summary ) && is_string( $revision_edit_summary ) ) || ( ! empty( $revision_edit_summary_revert_id ) && ( $revision_edit_summary_revert_id > 0 ) ) ) {
-				if ( $revision_edit_summary_revert_id > 0 ) {
-					// revision was a revert
-					// /* translators: 1: revision ID/URL */
-					$message .= sprintf(
-						__( ': reverted to %1$s', 'alpine' ),
-						alpine_get_revision_abbreviation( $revision_edit_summary_revert_id )
-					);
+		} elseif ( !empty( $revision_edit_summary_revert_id ) ) {
+			// revision was a revert
+			// /* translators: 1: revision ID/URL */
+			$message .= sprintf(
+				__( ': reverted to %1$s', 'alpine' ),
+				alpine_get_revision_abbreviation( $revision_edit_summary_revert_id )
+			);
 
-					// add summary
-					if ( ! empty ( $revision_edit_summary ) ) {
-						$message .= sprintf(
-							/* translators: 1: revision message */
-							__(' (<em>"%1$s"</em>)', 'alpine' ),
-							$revision_edit_summary
-						);
-					}
-				} else {
-					if ( ! empty ( $revision_edit_summary ) ) {
-						/* translators: 1: revision message */
-						$message .= sprintf( __( ': <em>"%1$s"</em>', 'alpine' ), esc_html( $revision_edit_summary ) );
-					}
-				}
+			// get original source revision
+			$source_revision = $ssl_alp->revisions->get_source_revision( $revision );
+			$source_edit_summary = get_post_meta( $source_revision->ID, 'ssl_alp_edit_summary', true );
+
+			if ( !empty( $source_edit_summary ) ) {
+				// add original edit summary
+				$source_edit_summary = sprintf(
+					__( '"%1$s"', 'ssl-alp' ),
+					$source_edit_summary
+				);
+
+				$message .= sprintf(
+					' (<em>%1$s</em>)',
+					esc_html( $source_edit_summary )
+				);
 			}
+		} elseif ( !empty( $revision_edit_summary ) ) {
+			/* translators: 1: revision message */
+			$message .= sprintf(
+				__( ': <em>"%1$s"</em>', 'alpine' ),
+				esc_html( $revision_edit_summary )
+			);
 		}
 
 		$revision_time = sprintf(
@@ -560,7 +566,6 @@ if ( ! function_exists( 'alpine_get_revision_abbreviation' ) ) :
 	function alpine_get_revision_abbreviation( $revision, $url = true ) {
 		global $ssl_alp;
 
-		// get revision object if id is specified
 		$revision = wp_get_post_revision( $revision );
 
 		if  ( 'revision' !== $revision->post_type ) {
@@ -568,7 +573,7 @@ if ( ! function_exists( 'alpine_get_revision_abbreviation' ) ) :
 		}
 
 		// revision post ID
-		$revision_id = sprintf(
+		$abbr = sprintf(
 			_x('r%1$s', 'abbreviated revision ID text', 'alpine' ),
 			$revision->ID
 		);
@@ -576,15 +581,15 @@ if ( ! function_exists( 'alpine_get_revision_abbreviation' ) ) :
 		// add URL to diff if user can view
 		if ( $url ) {
 			if ( $ssl_alp->revisions->current_user_can_view_revision( $revision ) ) {
-				$revision_id = sprintf(
+				$abbr = sprintf(
 					'<a href="%1$s">%2$s</a>',
 					get_edit_post_link( $revision->ID ),
-					$revision_id
+					$abbr
 				);
 			}
 		}
 
-		return $revision_id;
+		return $abbr;
 	}
 endif;
 
