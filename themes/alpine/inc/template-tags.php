@@ -457,17 +457,6 @@ if ( ! function_exists( 'alpine_the_revisions' ) ) :
 			esc_html( 'History', 'alpine' )
 		);
 
-		$versions_str = sprintf(
-			/* translators: 1: revision count number, 2: title. */
-			_nx( '%1$s version', '%1$s versions', $count, 'versions title', 'alpine' ),
-			number_format_i18n( $count )
-		);
-
-		printf(
-			'<h4>%1$s</h4>',
-			esc_html( $versions_str )
-		);
-
 		echo "<ul>";
 
 		foreach ( $revisions as $revision ) {
