@@ -107,8 +107,18 @@ if ( ! function_exists( 'alpine_get_post_date_html' ) ) :
 		}
 
 		if ( $icon ) {
+			if ( $modified ) {
+				$title = __( 'Modification date', 'alpine' );
+			} else {
+				$title = __( 'Publication date', 'alpine' );
+			}
+
 			// add icons
-			$time_str = '<i class="fa fa-calendar" aria-hidden="true"></i>' . $time_str;
+			$time_str = sprintf(
+				'<i class="fa fa-calendar" title="%1$s" aria-hidden="true"></i>%2$s',
+				esc_html( $title ),
+				$time_str
+			);
 		}
 
 		return $time_str;
@@ -165,22 +175,20 @@ if ( ! function_exists( 'alpine_the_post_meta' ) ) :
 
 		// post id and authors
 		$byline = sprintf(
-			'<i class="fa fa-link"></i>%1$s&nbsp;&nbsp;%2$s',
+			'<i class="fa fa-link" title="%1$s"></i>%2$s&nbsp;&nbsp;%3$s',
+			esc_html__( 'ID', 'alpine' ),
 			$post->ID,
 			alpine_get_authors( $post )
 		);
 
+		// show revisions link on posts and pages only
 		if ( alpine_get_option( 'show_edit_summaries' ) ) {
 			$byline .= alpine_get_revisions_link( $post );
 		}
 
 		if ( current_user_can( 'edit_post', $post ) ) {
 			// add edit post link
-			$byline .= sprintf(
-				'&nbsp;&nbsp;<i class="fa fa-edit" aria-hidden="true"></i><a href="%1$s">%2$s</a>',
-				get_edit_post_link( $post ),
-				__( 'Edit', 'alpine' )
-			);
+			$byline .= alpine_get_post_edit_link( $post );
 		}
 
 		printf(
@@ -219,11 +227,7 @@ if ( ! function_exists( 'alpine_the_page_meta' ) ) :
 
 		if ( current_user_can( 'edit_page', $page ) ) {
 			// add edit post link
-			$byline .= sprintf(
-				'&nbsp;&nbsp;<i class="fa fa-edit" aria-hidden="true"></i><a href="%1$s">%2$s</a>',
-				get_edit_post_link( $page ),
-				__( 'Edit', 'alpine' )
-			);
+			$byline .= alpine_get_post_edit_link( $page );
 		}
 
 		printf(
@@ -233,23 +237,126 @@ if ( ! function_exists( 'alpine_the_page_meta' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'alpine_get_revisions_link' ) ) :
-	function alpine_get_revisions_link( $post = null ) {
+if ( ! function_exists( 'alpine_get_post_edit_link' ) ) :
+	function alpine_get_post_edit_link( $post ) {
 		$post = get_post( $post );
 
-		$revision_count = alpine_get_revision_count( $post );
+		return sprintf(
+			'&nbsp;&nbsp;<i class="fa fa-edit" aria-hidden="true"></i><a href="%1$s">%2$s</a>',
+			get_edit_post_link( $post ),
+			__( 'Edit', 'alpine' )
+		);
+	}
+endif;
 
-		if ( is_null( $revision_count ) || $revision_count < 1 ) {
+if ( ! function_exists( 'alpine_get_revisions_link' ) ) :
+	function alpine_get_revisions_link( $post = null ) {
+		global $ssl_alp;
+
+		if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
+			// required functionality not available
 			return;
 		}
 
-		$revision_str = sprintf( _n( '%s revision', '%s revisions', $revision_count, 'alpine' ), $revision_count );
+		$post = get_post( $post );
+
+		if ( ! $ssl_alp->revisions->edit_summary_allowed( $post ) ) {
+			return;
+		}
+
+		$edit_count = alpine_get_edit_count( $post );
+		$edit_str = sprintf( _n( '%s revision', '%s revisions', $edit_count, 'alpine' ), $edit_count );
 
 		return sprintf(
-			'&nbsp;&nbsp;<i class="fa fa-pencil" aria-hidden="true"></i><a href="%1$s#post-revisions">%2$s</a>',
+			'&nbsp;&nbsp;<i class="fa fa-pencil" title="%1$s" aria-hidden="true"></i><a href="%2$s#post-revisions">%3$s</a>',
+			esc_html__( 'Number of edits made to the original post', 'alpine' ),
 			esc_url( get_the_permalink( $post ) ),
-			$revision_str
+			$edit_str
 		);
+	}
+endif;
+
+if ( ! function_exists( 'alpine_get_authors' ) ) :
+	/**
+	 * Gets formatted author HTML
+	 */
+	function alpine_get_authors( $post = null, $icon = true, $url = true, $delimiter_between = null, $delimiter_between_last = null ) {
+		global $ssl_alp;
+
+		$post = get_post( $post );
+
+		if ( is_plugin_active( 'ssl-alp/alp.php' ) && get_option( 'ssl_alp_allow_multiple_authors' ) ) {
+			$authors = $ssl_alp->coauthors->get_coauthors( $post );
+		} else {
+			// fall back to the_author if plugin is disabled
+			$authors = array();
+
+			// get single author object
+			$author = get_user_by( 'id', $post->post_author );
+
+			// if there is no author, $author == false
+			if ( $author ) {
+				$authors[] = $author;
+			}
+		}
+
+		$author_html = array();
+
+		foreach ( $authors as $author ) {
+			$author = alpine_format_author( $author, $url );
+
+			if ( ! is_null( $author ) ) {
+				$author_html[] = $author;
+			}
+		}
+
+		if ( ! count( $author_html ) ) {
+			// no authors
+			$author_list_html = "";
+		} else {
+			if ( count( $author_html ) > 1 ) {
+				// multiple authors
+				$icon_class = 'fa fa-users';
+
+				// get delimiters
+				if ( is_null( $delimiter_between ) ) {
+					$delimiter_between = _x( ', ', 'delimiter between coauthors except last', 'alpine' );
+				}
+				if ( is_null( $delimiter_between_last ) ) {
+					$delimiter_between_last = _x( ' and ', 'delimiter between last two coauthors', 'alpine' );
+				}
+
+				// pop last author off
+				$last_author = array_pop( $author_html );
+
+				// implode author list
+				$author_list_html = implode( __( ', ', 'alpine' ), $author_html ) . $delimiter_between_last . $last_author;
+			} else {
+				// single author
+				$icon_class = 'fa fa-user';
+
+				$author_list_html = $author_html[0];
+			}
+
+			if ( $icon ) {
+				$icon = sprintf(
+					'<i class="%1$s" title="%2$s" aria-hidden="true"></i>',
+					$icon_class,
+					esc_html__( 'Authors', 'alpine' )
+				);
+			} else {
+				$icon = '';
+			}
+
+			// add icon and author span
+			$author_list_html = sprintf(
+				'<span class="authors">%1$s%2$s</span>',
+				$icon,
+				$author_list_html
+			);
+		}
+
+		return $author_list_html;
 	}
 endif;
 
@@ -356,15 +463,12 @@ if ( ! function_exists( 'alpine_the_revisions' ) ) :
 		}
 
 		echo '<div id="post-revisions">';
-		echo '<h3>';
 
-		printf( // WPCS: XSS OK.
-			/* translators: 1: revision count number, 2: title. */
-			esc_html( _nx( '%1$s revision', '%1$s revisions', $count, 'revisions title', 'alpine' ) ),
-			number_format_i18n( $count )
+		printf(
+			'<h3>%1$s</h3>',
+			esc_html( 'History', 'alpine' )
 		);
 
-		echo "</h3>";
 		echo "<ul>";
 
 		foreach ( $revisions as $revision ) {
@@ -391,6 +495,8 @@ if ( ! function_exists( 'alpine_get_revision_description' ) ) :
 	 * Prints description for the specified revision
 	 */
 	function alpine_get_revision_description( $revision ) {
+		global $ssl_alp;
+
 		// get revision object if id is specified
 		$revision = wp_get_post_revision( $revision );
 
@@ -408,32 +514,36 @@ if ( ! function_exists( 'alpine_get_revision_description' ) ) :
 		if ( wp_is_post_autosave( $revision ) ) {
 			// this is an autosave
 			$message .= __( ': [Autosave]', 'alpine' );
-		} else {
-			// check that we have a revision summary
-			if ( ( ! empty( $revision_edit_summary ) && is_string( $revision_edit_summary ) ) || ( ! empty( $revision_edit_summary_revert_id ) && ( $revision_edit_summary_revert_id > 0 ) ) ) {
-				if ( $revision_edit_summary_revert_id > 0 ) {
-					// revision was a revert
-					// /* translators: 1: revision ID/URL */
-					$message .= sprintf(
-						__( ': reverted to %1$s', 'alpine' ),
-						alpine_get_revision_abbreviation( $revision_edit_summary_revert_id )
-					);
+		} elseif ( !empty( $revision_edit_summary_revert_id ) ) {
+			// revision was a revert
+			// /* translators: 1: revision ID/URL */
+			$message .= sprintf(
+				__( ': reverted to %1$s', 'alpine' ),
+				alpine_get_revision_abbreviation( $revision_edit_summary_revert_id )
+			);
 
-					// add summary
-					if ( ! empty ( $revision_edit_summary ) ) {
-						$message .= sprintf(
-							/* translators: 1: revision message */
-							__(' (<em>"%1$s"</em>)', 'alpine' ),
-							$revision_edit_summary
-						);
-					}
-				} else {
-					if ( ! empty ( $revision_edit_summary ) ) {
-						/* translators: 1: revision message */
-						$message .= sprintf( __( ': <em>"%1$s"</em>', 'alpine' ), esc_html( $revision_edit_summary ) );
-					}
-				}
+			// get original source revision
+			$source_revision = $ssl_alp->revisions->get_source_revision( $revision );
+			$source_edit_summary = get_post_meta( $source_revision->ID, 'ssl_alp_edit_summary', true );
+
+			if ( !empty( $source_edit_summary ) ) {
+				// add original edit summary
+				$source_edit_summary = sprintf(
+					__( '"%1$s"', 'ssl-alp' ),
+					$source_edit_summary
+				);
+
+				$message .= sprintf(
+					' (<em>%1$s</em>)',
+					esc_html( $source_edit_summary )
+				);
 			}
+		} elseif ( !empty( $revision_edit_summary ) ) {
+			/* translators: 1: revision message */
+			$message .= sprintf(
+				__( ': <em>"%1$s"</em>', 'alpine' ),
+				esc_html( $revision_edit_summary )
+			);
 		}
 
 		$revision_time = sprintf(
@@ -468,7 +578,6 @@ if ( ! function_exists( 'alpine_get_revision_abbreviation' ) ) :
 	function alpine_get_revision_abbreviation( $revision, $url = true ) {
 		global $ssl_alp;
 
-		// get revision object if id is specified
 		$revision = wp_get_post_revision( $revision );
 
 		if  ( 'revision' !== $revision->post_type ) {
@@ -476,7 +585,7 @@ if ( ! function_exists( 'alpine_get_revision_abbreviation' ) ) :
 		}
 
 		// revision post ID
-		$revision_id = sprintf(
+		$abbr = sprintf(
 			_x('r%1$s', 'abbreviated revision ID text', 'alpine' ),
 			$revision->ID
 		);
@@ -484,15 +593,15 @@ if ( ! function_exists( 'alpine_get_revision_abbreviation' ) ) :
 		// add URL to diff if user can view
 		if ( $url ) {
 			if ( $ssl_alp->revisions->current_user_can_view_revision( $revision ) ) {
-				$revision_id = sprintf(
+				$abbr = sprintf(
 					'<a href="%1$s">%2$s</a>',
 					get_edit_post_link( $revision->ID ),
-					$revision_id
+					$abbr
 				);
 			}
 		}
 
-		return $revision_id;
+		return $abbr;
 	}
 endif;
 
