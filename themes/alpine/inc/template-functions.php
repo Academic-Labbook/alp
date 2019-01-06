@@ -177,7 +177,7 @@ if ( ! function_exists( 'alpine_get_revisions' ) ) :
 		if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
 			// plugin is disabled
 			return false;
-		} elseif ( ! get_option( 'ssl_alp_enable_post_edit_summaries' ) ) {
+		} elseif ( ! get_option( 'ssl_alp_enable_edit_summaries' ) ) {
 			// tracking of edit summaries is disabled
 			return false;
 		}

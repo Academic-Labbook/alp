@@ -22,8 +22,7 @@ class SSL_ALP_Uninstaller {
         delete_option( 'ssl_alp_allow_multiple_authors' );
         delete_option( 'ssl_alp_disable_post_trackbacks' );
         delete_option( 'ssl_alp_enable_crossreferences' );
-        delete_option( 'ssl_alp_enable_post_edit_summaries' );
-        delete_option( 'ssl_alp_enable_page_edit_summaries' );
+        delete_option( 'ssl_alp_enable_edit_summaries' );
         delete_option( 'ssl_alp_enable_tex' );
 
         // delete network options

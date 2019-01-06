@@ -23,8 +23,7 @@ class SSL_ALP_Activator {
         add_option( 'ssl_alp_allow_multiple_authors', true );
         add_option( 'ssl_alp_disable_post_trackbacks', true );
         add_option( 'ssl_alp_enable_crossreferences', true );
-        add_option( 'ssl_alp_enable_post_edit_summaries', true );
-        add_option( 'ssl_alp_enable_page_edit_summaries', true );
+        add_option( 'ssl_alp_enable_edit_summaries', true );
         add_option( 'ssl_alp_enable_tex', true );
 
         // add network options

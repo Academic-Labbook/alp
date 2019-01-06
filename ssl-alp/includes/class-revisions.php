@@ -17,15 +17,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	public function register_settings() {
 		register_setting(
 			SSL_ALP_SITE_SETTINGS_PAGE,
- 			'ssl_alp_enable_post_edit_summaries',
- 			array(
- 				'type'		=>	'boolean'
- 			)
- 		);
-
-		register_setting(
-			SSL_ALP_SITE_SETTINGS_PAGE,
-			'ssl_alp_enable_page_edit_summaries',
+			'ssl_alp_enable_edit_summaries',
 			array(
 				'type'		=>	'boolean'
 			)
@@ -109,7 +101,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		// check if setting is enabled, and if user has permission
 		// 'edit_post' capability == 'edit_posts', 'edit_page' == 'edit_pages', etc. (see wp-includes/capabilities.php)
-		if ( ! get_option( "ssl_alp_enable_{$post->post_type}_edit_summaries" ) || ! current_user_can( "edit_{$post->post_type}", $post->ID ) ) {
+		if ( ! get_option( "ssl_alp_enable_edit_summaries" ) || ! current_user_can( "edit_{$post->post_type}", $post->ID ) ) {
 			// disabled for posts, or user not allowed to view
 			return false;
 		}
