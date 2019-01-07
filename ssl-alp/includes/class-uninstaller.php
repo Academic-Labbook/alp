@@ -81,7 +81,7 @@ class SSL_ALP_Uninstaller {
 
                 // delete post relationships to term
                 $wpdb->delete(
-                    $wpdb->term_relationships
+                    $wpdb->term_relationships,
                     array(
                         'term_taxonomy_id' => $term->term_taxonomy_id
                     )
