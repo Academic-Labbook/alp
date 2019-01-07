@@ -158,7 +158,7 @@
 				<?php wp_nonce_field( 'ssl-alp-rebuild-references', 'ssl_alp_rebuild_references_nonce' ); ?>
 			</form>
 			<?php if ( ! $references_enabled ) : ?>
-			<p class="description"><?php _e( 'Cross-references are disabled. To enable them, go to <a href="options-general.php?page=ssl-alp-admin-options">this settings page</a>.', 'ssl-alp' ); ?></p>
+			<p class="description"><?php _e( 'Cross-references are disabled. To enable them, go to <a href="options-general.php?page=ssl-alp-site-options">this settings page</a>.', 'ssl-alp' ); ?></p>
 			<?php endif; ?>
 		</div>
 		<div class="ssl-alp-tools-card">
