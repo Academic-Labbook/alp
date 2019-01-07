@@ -6,92 +6,87 @@ labbook/logbook fit for purpose. It's free, open source, and attempts to be
 minimally invasive on the core WordPress functionality, which should allow you
 to install additional plugins as you like.
 
+Lots of documentation is provided on the [ALP website](https://alp.attackllama.com/).
+
 ## What does ALP do?
-Here are the features implemented so far...
  - Allows multiple authors to be assigned to single posts
  - Provides change logs for posts and pages with user-defined comments
  - Shows list of cross-references made between posts and pages
+ - Provides TeX block for rendering mathematical markup
  - Option to force users to be logged in to view
    - Feeds still accessible using HTTP authentication
    - Images still accessible with direct link (not possible to block without server configuration)
- - Disable trackbacks, which are usually only useful for commercial sites.
+ - Disable trackbacks, which are usually only useful for commercial sites
  - Modifies pages to work more like a wiki:
    - Removes authors and dates
-   - Displays a table of contents in the sidebar (generated from header elements)
-   - Shows breadcrumb trail back to home page
- - Special ALP theme
-   - Displays multiple authors
-   - Displays author widget, to view lists of each authors' posts, including those coauthored
-   - Displays revision history under posts and pages
-     - Recent revisions widget for sidebar
-   - Shows reference widget under posts/pages showing cross-references to/from other posts/pages
-   - Optionally display institute logo and icon
-   - Optionally shows contents on page sidebars
+   - Displays a table of contents based on page headers (when used with Alpine theme)
+   - Shows breadcrumb trail back to home page (when used with Alpine theme)
+ - Supports custom media (MIME) upload types (when used on a network)
  - Optionally changes user roles:
    - *Administrator* is unchanged
    - *Editor* is renamed *Researcher*
    - *Author* is renamed *Intern*
    - *Contributor* is removed
    - *Subscriber* is unchanged
-   - *Excluded* is added (for keeping ex-users' posts, comments, etc. on record but not giving them access)
+   - *Excluded* is added (for keeping ex-users' posts, comments, etc. on record but not giving them
+     access)
  - Hides some WordPress branding and news
- - Supports custom media (MIME) upload types
 
-## Future ideas
-Some ideas pondered for the future:
- - Labbook theme
-   - Display author, edited posts and recent comments widgets by default
-   - Top bar for linking to other network sites?
- - Configurable email alerts for certain things
-   - New posts
-   - Comments on other posts
- - Disable private posts (kinda useless with forced login)
- - Advanced search:
-   - Search within PDFs etc.
-   - Advanced search page with options to search by revision, etc.
- - Gutenberg block for linking to Git/SVN commits and other archives
- - Gutenberg block for DOI and arXiv references
+## Alpine theme
+ALP is intended to be used with the specially created "Alpine" theme, which supports display of
+multiple authors, edit summaries, cross-references, etc. provided by ALP.
+
+Features:
+ - Displays multiple authors
+ - Displays revision history under posts and pages
+ - Displays breadcrumb trail on pages showing page hierarchy
+ - Displays table of contents on pages based on page headings
+ - Provides users sidebar widget showing links to view lists of each authors' posts, including those
+   coauthored
+ - Provides recent revisions sidebar widget showing recently edited posts and pages
+ - Shows cross-references (links in the post body) between posts and pages under each post or page
+ - Supports display of an institute logo and icon
+ - Provides two menu locations for providing links to site or external pages or URLs
+ - Provides customisable copyright notice and ability to hide branding
+ - Responsive to screen size: viewable on mobile, tablet and desktop browsers
 
 ## Requirements
 
 ### WordPress
-You should use the latest version of WordPress, but at very least 4.9.6 as it
-provides features used by ALP. WordPress 5.0 will introduce the Gutenberg
-editor which ALP fully supports.
+WordPress 5.0.0 or newer is required. ALP adds a block to and extends the sidebar of the new editor
+provided in WordPress 5.
 
 It is desirable, but not required, to use WordPress in [multisite](https://codex.wordpress.org/Create_A_Network)
-mode. This exposes additional options to network administrators to control upload
-media (MIME) types and custom script paths.
+mode. This exposes additional options to network administrators to control upload media (MIME) types
+and custom script paths.
 
 ### PHP
-The plugin has only been tested on PHP7. You must have the [DOM extension](http://www.php.net/manual/en/book.dom.php) installed in order for the page
-table of contents lists to work. You also cannot use PHP via CGI if you wish
-to make the site private but still have syndication feeds available to the user.
+The plugin has only been tested on and only supports PHP 7. You must have the [DOM extension](http://www.php.net/manual/en/book.dom.php)
+installed in order for the page table of contents lists provided by the Alpine theme to work. You
+also cannot use PHP via CGI if you wish to make the site private but still have syndication feeds
+available to the user.
 
 ### Clients
-Your users should use up-to-date browsers. The theme bundled with ALP (Alpine)
-uses CSS Grid, which is only available in recent versions (i.e. within the last
-two years) of the most popular browsers. The [browsers that don't support CSS Grid](https://caniuse.com/#feat=css-grid)
-represent only around 5% of global usage as of March 2018. This project is not
-concerned about losing sales from users running out of date browsers!
+Your users should use up-to-date browsers. The Alpine theme uses CSS Grid, which is a web standard
+only supported in relatively recent browsers (i.e. within the last three years) of the most popular
+browsers. The [browsers that don't support CSS Grid](https://caniuse.com/#feat=css-grid) represent
+only around 5% of global usage as of March 2018. There are very little legitimate reasons to use
+outdated browsers, and this project is not concerned about losing sales from users running them!
 
 ## Design principles
- - **Clean code**: there's an awful lot of terribly written code floating around
-   in the WordPress ecosystem. This plugin attempts to conform to coding
-   standards, and to interfere minimally with the default WordPress behaviour
-   where possible.
- - **Modular**: most/all features can be enabled or disabled, and work
-   independently from each other.
+ - **Clean code**: there's an awful lot of terribly written code in the WordPress ecosystem. This
+   plugin attempts to conform to coding standards, and to interfere minimally with the default
+   WordPress behaviour where possible. For some of the more major features, like coauthors,
+   some quiet major modifications are required to core behaviour, which means that ALP may not be
+   compatible with certain other plugins.
+ - **Modular**: most/all features can be enabled or disabled, and work independently from each
+   other.
 
 ## Credits
-ALP is a mixture of new code and code forked from other open source, GPL
-licenced plugins and themes. The code specific to this plugin was authored by
-[Sean Leavey](https://attackllama.com/).
-
-The following list of plugins have been partialy adapted into ALP. All have been
-modified in some way (e.g. admin settings, class and setting namespaces, features
-added or removed, etc.), some more so than others. Some upstream bug reports and
-fixes have also been pushed back to these plugins and WordPress itself:
+This plugin was entirely authored by [Sean Leavey](https://attackllama.com/), but in some cases
+code was adapted from other GPL licenced plugins. Features from the list of plugins below have
+inspired features in ALP. Some bug reports and fixes discovered during the making of ALP have also
+been pushed back to these plugins and WordPress itself:
 [1](https://wordpress.org/support/topic/two-bug-fixes-for-author-page/),
 [2](https://wordpress.org/support/topic/overriding-cookie-expiry-for-directory-authenticated-users/),
 [3](https://core.trac.wordpress.org/ticket/43613),
@@ -110,36 +105,30 @@ fixes have also been pushed back to these plugins and WordPress itself:
 [16](https://github.com/WordPress/gutenberg/issues/10834)
 
 ### Co-Authors Plus
-Authors: Mohammad Jangda, Daniel Bachhuber, Automattic, Shepherd Interactive, Mark Jaquith  
+Authors: Mohammad Jangda, Daniel Bachhuber, Automattic, Shepherd Interactive, Mark Jaquith
 Link: [Co-Authors Plus](https://wordpress.org/plugins/co-authors-plus/)
 
-This plugin was originally adapted with light changes but has since been heavily modified.
+Some of the code from this plugin has been adapted into ALP, but the main behaviour has been
+heavily modified to function using the block editor in WordPress 5.
 
 ### WP-Post-Meta-Revisions and Revision Notes
-Authors: Adam Silverstein, Helen Hou-Sandí  
+Authors: Adam Silverstein, Helen Hou-Sandí
 Links: [WP-Post-Meta-Revisions](https://github.com/adamsilverstein/wp-post-meta-revisions) and [Revision Notes](https://wordpress.org/plugins/revision-notes/)
 
-These plugins inspired parts of the design of ALP's revisions feature, but the code in ALP
-is not particularly based on either one.
-
-### WP-KaTeX
-Author: Andrew Sun  
-Link: [WP-KaTeX](https://wordpress.org/plugins/wp-katex/)
-
-The JavaScript function used to enable KaTeX rendering for particular elements was adapted
-in ALP.
+These plugins inspired parts of the design of ALP's edit summaries feature.
 
 ### Authenticator
-Authors: Inpsyde GmbH  
+Authors: Inpsyde GmbH
 Link: [Authenticator](https://wordpress.org/plugins/authenticator/)
 
-The core authentication code, and the feed HTTP authenticator, have been adapted. The special
-settings page, private feed keys, cookie lifetime and XML-RPC and REST settings have been
-removed.
+The core authentication code, and the feed HTTP authenticator, have been adapted with only a few
+changes. The special settings page, private feed keys, cookie lifetime and XML-RPC and REST settings
+have been removed.
 
 ### Simple Life
-Author: Nilambar Sharma  
+Author: Nilambar Sharma
 Link: [Simple Life](https://wordpress.org/themes/simple-life/)
 
-The core theme has been forked, but with many features added, removed or changed. Bootstrap was
-removed and replaced with [CSS Grid](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Grid_Layout).
+The look and feel of the Alpine theme recommended for use with ALP has been inspired by Simple Life,
+but the templates are not based on Simple Life's code, but rather based on boilerplate code provided
+by [Underscores](https://underscores.me/).

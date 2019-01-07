@@ -17,6 +17,9 @@ Academic labbook theme
 
 == Installation ==
 
+Note: this plugin requires the PHP DOM extension in order to properly render page tables of
+contents. If this extension is not available, tables of contents will be unavailable.
+
 1. In your admin panel, go to Appearance > Themes and click the Add New button.
 2. Click Upload Theme and Choose File, then select the theme's .zip file. Click Install Now.
 3. Click Activate to use your new theme right away.
