@@ -89,7 +89,7 @@ class SSL_ALP_Uninstaller {
 
                 // delete term meta
                 $wpdb->delete(
-                    $wpdb->term_meta,
+                    $wpdb->termmeta,
                     array(
                         'term_id' => $term->term_id
                     )
@@ -129,7 +129,7 @@ class SSL_ALP_Uninstaller {
         global $wpdb;
 
         $wpdb->delete(
-            $wpdb->post_meta,
+            $wpdb->postmeta,
             array(
                 'meta_key' => $meta_key
             ),
