@@ -163,8 +163,10 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 		}
 
 		// JavaScript and CSS URLs
-		$js_url = $this->get_js_url();
-		$css_url = $this->get_css_url();
+		$katex_js_url = $this->get_katex_js_url();
+		$katex_copy_js_url = $this->get_katex_copy_js_url();
+		$katex_css_url = $this->get_katex_css_url();
+		$katex_copy_css_url = $this->get_katex_copy_css_url();
 
 		wp_register_style(
 			'tex-block',
@@ -182,14 +184,14 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 
 		wp_register_script(
 			'ssl-alp-katex',
-			esc_url( $js_url ),
+			esc_url( $katex_js_url ),
 			array(),
 			SSL_ALP_KATEX_VERSION
 		);
 
 		wp_register_style(
 			'ssl-alp-katex',
-			esc_url( $css_url ),
+			esc_url( $katex_css_url ),
 			array(),
 			SSL_ALP_KATEX_VERSION
 		);
@@ -197,14 +199,14 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 		// KaTeX copy support
 		wp_register_script(
 			'ssl-alp-katex-contrib-copy',
-			esc_url( SSL_ALP_DEFAULT_KATEX_COPY_JS_URL ),
+			esc_url( $katex_copy_js_url ),
 			array(),
 			SSL_ALP_KATEX_VERSION
 		);
 
 		wp_register_style(
 			'ssl-alp-katex-contrib-copy',
-			esc_url( SSL_ALP_DEFAULT_KATEX_COPY_CSS_URL ),
+			esc_url( $katex_copy_css_url ),
 			array(),
 			SSL_ALP_KATEX_VERSION
 		);
@@ -248,7 +250,7 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 	/**
 	 * Get KaTeX JavaScript library URL
 	 */
-	protected function get_js_url() {
+	protected function get_katex_js_url() {
 		if ( get_site_option( 'ssl_alp_tex_use_custom_urls' ) ) {
 			// use custom URL
 			$url = get_site_option( 'ssl_alp_katex_js_url' );
@@ -261,15 +263,45 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 	}
 
 	/**
+	 * Get KaTeX Copy JavaScript library URL
+	 */
+	protected function get_katex_copy_js_url() {
+		if ( get_site_option( 'ssl_alp_tex_use_custom_urls' ) ) {
+			// use custom URL
+			$url = get_site_option( 'ssl_alp_katex_copy_js_url' );
+		} else {
+			// use default URL
+			$url = SSL_ALP_DEFAULT_KATEX_COPY_JS_URL;
+		}
+
+		return $url;
+	}
+
+	/**
 	 * Get KaTeX CSS URL
 	 */
-	protected function get_css_url() {
+	protected function get_katex_css_url() {
 		if ( get_site_option( 'ssl_alp_tex_use_custom_urls' ) ) {
 			// use custom URL
 			$url = get_site_option( 'ssl_alp_katex_css_url' );
 		} else {
 			// use default URL
 			$url = SSL_ALP_DEFAULT_KATEX_CSS_URL;
+		}
+
+		return $url;
+	}
+
+	/**
+	 * Get KaTeX Copy CSS URL
+	 */
+	protected function get_katex_copy_css_url() {
+		if ( get_site_option( 'ssl_alp_tex_use_custom_urls' ) ) {
+			// use custom URL
+			$url = get_site_option( 'ssl_alp_katex_copy_css_url' );
+		} else {
+			// use default URL
+			$url = SSL_ALP_DEFAULT_KATEX_COPY_CSS_URL;
 		}
 
 		return $url;
