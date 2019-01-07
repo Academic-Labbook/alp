@@ -1,22 +1,77 @@
-=== Academic Labbook Plugin ===
+=== Academic Labbook ===
 Contributors: seanleavey
+Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
+Requires at least: 5.0.0
+Tested up to: 5.0.2
+Requires PHP: 7.0
+Stable tag: 1.0.0
 License: GPL3
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
-ALP (Academic Labbook Plugin) is a WordPress plugin that turns the platform into
-a collaborative laboratory notebook.
+Turn WordPress into a collaborative laboratory notebook supporting multiple
+authors on posts, wiki-like pages, cross-references, revision summaries, and
+more.
 
 == Description ==
-ALP is intended to provide a lightweight but powerful set of tools to allow
-researchers to write about their work, leveraging the WordPress platform.
+Please also visit [our website](https://alp.attackllama.com/)!
 
-ALP is currently in alpha development. While everyone is invited and encouraged
-to test APL, please bear in mind that it is in early development and therefore
-features may be removed or broken between updates.
+Academic Labbook Plugin (ALP) provides a lightweight but powerful set of tools
+on top of core WordPress to allow researchers to write about their work,
+leveraging the powerful WordPress platform. With ALP, you can benefit from
+WordPress's post compositition, tagging and categorisation, media management and
+search tools while enabling features useful in an academic context like
+mathematical markup rendering, coauthors, edit summaries and cross-references.
+
+ALP is intended to be used with the corresponding theme [Alpine](https://alp.attackllama.com/themes/alpine/),
+which was created in parallel to ALP, and which enables various public-facing
+features provided by the plugin. It is highly encouraged to use this theme, or
+derive a child theme from this base. Various features such as coauthors, edit
+summaries, cross-references and page contents will not appear visible on the
+site without this theme.
+
+ALP is written for WordPress 5.0 and the new block editor it provides. A
+textbox is added to post and page edit screens to allow users to leave a brief
+summary of the changes they make. These changes are recorded in the database
+and displayed alongside posts and pages when used with the Alpine theme.
+Additionally, a TeX block is added to the editor to allow users to write and
+preview mathematical formulae as part of their posts and pages.
+
+ALP provides the ability to set multiple coauthors for posts. This allows
+posts for which each user is a coauthor to show up in their post archives and
+contribute to their post counts. Any user may edit posts for which they are a
+coauthor.
+
+ALP adds the ability to make blogs private, forcing users to log in with their
+account in order to access the content. Combined with WordPress's disable login
+setting, and perhaps an LDAP authentication plugin, access can be tightly
+controlled.
+
+ALP provides a tool to convert user roles from the blog-centric WordPress
+defaults to one more suitable for an academic group. The primary role becomes
+"Researcher" instead of "Editor", allowing users with this role to create, edit
+and delete all types of content. The "Intern" role is akin to the standard
+WordPress "Author", intended for temporary group members, allowing them to make
+new posts and edit any post on which they are an author, but not other content.
+Finally, a new role, "Excluded", is added, into which any previous group members
+can be added in order to disable their access to the site but preserve their
+contributions.
+
+Note: ALP is currently in beta. Whilst many bugs have been squashed and the code
+is considered to be relatively stable, there may be some issues waiting to be
+discovered in the wild. In particular, if you intend to run a private site using
+ALP's forced login feature, please accept the risk that this data could be
+exposed to the public or to other users on your network if the code does not
+work as intended. Consider other means of security beyond this plugin (such as
+HTTP digest authentication or institutional intranets) if this risk is
+unacceptable.
+
+== Installation ==
+Installation is slightly more complicated than a usual WordPress plugin, due to
+various configuration steps which are intentionally not automated to provide you
+with maximum control. Please see https://alp.attackllama.com/installation/ for a
+guide.
 
 == Changelog ==
-= 0.1.0 =
- - Initial version.
 = 0.7.0 =
  - First alpha release.
 = 0.7.1 =
@@ -84,11 +139,14 @@ features may be removed or broken between updates.
    where ALP is not network active.
 = 0.10.0 =
  - Remove (unused) translation which is incompatible with 5.0.0.
- - Removed TeX support for now until a TeX block is developed in favour
-   of shortcodes.
- - Bug fix when deleting users from network.
+ - Fixed bug when deleting users from network.
  - Remove ability to hide excerpts on block editor.
 = 0.10.1 =
  - Hotfix release.
 = 0.10.2 =
  - Hotfix release.
+= 1.0.0 =
+ - First public release.
+ - Added TeX block.
+ - Revised edit summary editor plugin to use core Gutenberg post meta support
+   instead of separate REST endpoint.
