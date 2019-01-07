@@ -7,6 +7,8 @@
  * @package Alpine
  */
 
+define( 'ALPINE_VERSION', '1.0.0' );
+
 if ( ! function_exists( 'alpine_setup' ) ) :
 	/**
 	 * Sets up theme defaults and registers support for various WordPress features.
@@ -124,12 +126,35 @@ add_action( 'widgets_init', 'alpine_widgets_init' );
  * Enqueue scripts and styles.
  */
 function alpine_scripts() {
-	wp_enqueue_style( 'fontawesome', get_template_directory_uri().'/third-party/font-awesome/css/font-awesome.css', false, '4.7.0' );
-	wp_enqueue_style( 'alpine-style', get_stylesheet_uri() );
+	wp_enqueue_style(
+		'fontawesome',
+		get_template_directory_uri() . '/third-party/font-awesome/css/font-awesome.css',
+		array(),
+		ALPINE_VERSION
+	);
 
-	wp_enqueue_script( 'alpine-navigation', get_template_directory_uri() . '/js/navigation.js', array(), '20151215', true );
+	wp_enqueue_style(
+		'alpine-style',
+		get_stylesheet_uri(),
+		array(),
+		ALPINE_VERSION
+	);
 
-	wp_enqueue_script( 'alpine-skip-link-focus-fix', get_template_directory_uri() . '/js/skip-link-focus-fix.js', array(), '20151215', true );
+	wp_enqueue_script(
+		'alpine-navigation',
+		get_template_directory_uri() . '/js/navigation.js',
+		array(),
+		ALPINE_VERSION,
+		true
+	);
+
+	wp_enqueue_script(
+		'alpine-skip-link-focus-fix',
+		get_template_directory_uri() . '/js/skip-link-focus-fix.js',
+		array(),
+		ALPINE_VERSION,
+		true
+	);
 
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
 		wp_enqueue_script( 'comment-reply' );
