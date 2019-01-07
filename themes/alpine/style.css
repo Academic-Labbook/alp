@@ -980,6 +980,11 @@ body {
     font-size: 14px;
 }
 
+.beta-notice {
+    font-size: 80%;
+    font-style: italic;
+}
+
 /* Default link settings, overridden further down */
 a, a:visited, a:hover, a:focus, a:active {
     color: #0b789c;

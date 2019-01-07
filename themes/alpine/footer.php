@@ -29,10 +29,13 @@
 			<?php endif; ?>
 		</div>
 		<div id="imprint-right">
-			<?php if ( true === alpine_get_option( 'show_powered_by' ) ) : ?>
+			<?php if ( alpine_get_option( 'show_powered_by' ) ) : ?>
 			<span id="powered-by">
-				<a href="<?php echo esc_url( __( 'https://alp.attackllama.com/', 'alpine' ) ); ?>"><?php printf( esc_html__( 'Powered by %s', 'alpine' ), 'Academic Labbook Plugin for WordPress' ); ?></a>
-			</span><!-- .site-info -->
+				<?php _e( 'Powered by <a href="https://alp.attackllama.com/">Academic Labbook Plugin for WordPress</a>.', 'alpine' ); ?>
+			</span><!-- .powered-by -->
+			<span class="beta-notice">
+				<?php _e( 'This is a beta release. Please report bugs <a href="https://alp.attackllama.com/bugs/">here</a>.', 'alpine' ); ?>
+			</span>
 			<?php endif; ?>
 		</div>
 	</footer><!-- #colophon -->
