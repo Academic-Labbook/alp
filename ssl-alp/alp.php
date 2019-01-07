@@ -1,10 +1,10 @@
 <?php
 
 /*
-Plugin Name:  Academic Labbook Plugin
+Plugin Name:  Academic Labbook
 Plugin URI:   https://alp.attackllama.com/
 Description:  Turn WordPress into a collaborative academic labbook.
-Version:      0.10.1
+Version:      0.11.0
 Author:       Sean Leavey
 Author URI:   https://attackllama.com/
 License:      GPL3
