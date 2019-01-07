@@ -20,7 +20,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Current plugin version.
  */
 
-define( 'SSL_ALP_VERSION', '0.10.2' );
+define( 'SSL_ALP_VERSION', '0.11.0' );
 
 /**
  * Plugin name
