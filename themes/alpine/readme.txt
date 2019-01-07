@@ -7,7 +7,7 @@ Requires at least: 5.0
 Tested up to: 5.0
 Stable tag: 1.0.0
 License: GPL3
-License URI: LICENSE
+License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
 Theme for the Academic Labbook Plugin.
 
