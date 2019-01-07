@@ -6,7 +6,7 @@ Tags: custom-background, custom-logo, custom-menu, post-formats, threaded-commen
 Requires at least: 5.0
 Tested up to: 5.0
 Stable tag: 1.0.0
-License: GNU General Public License v2 or later
+License: GPL3
 License URI: LICENSE
 
 Theme for the Academic Labbook Plugin.
@@ -22,10 +22,6 @@ Academic labbook theme
 3. Click Activate to use your new theme right away.
 
 == Frequently Asked Questions ==
-
-= Does this theme support any plugins? =
-
-Alpine includes support for Infinite Scroll in Jetpack.
 
 == Changelog ==
 

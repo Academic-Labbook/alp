@@ -22,7 +22,7 @@ WordPress's post compositition, tagging and categorisation, media management and
 search tools while enabling features useful in an academic context like
 mathematical markup rendering, coauthors, edit summaries and cross-references.
 
-ALP is intended to be used with the corresponding theme [Alpine](https://alp.attackllama.com/themes/alpine/),
+ALP is intended to be used with the corresponding theme [Alpine](https://alp.attackllama.com/documentation/themes/alpine/),
 which was created in parallel to ALP, and which enables various public-facing
 features provided by the plugin. It is highly encouraged to use this theme, or
 derive a child theme from this base. Various features such as coauthors, edit
@@ -68,8 +68,8 @@ unacceptable.
 == Installation ==
 Installation is slightly more complicated than a usual WordPress plugin, due to
 various configuration steps which are intentionally not automated to provide you
-with maximum control. Please see https://alp.attackllama.com/installation/ for a
-guide.
+with maximum control. Please see [this guide](https://alp.attackllama.com/documentation/installation/)
+on the ALP website.
 
 == Changelog ==
 = 0.7.0 =
