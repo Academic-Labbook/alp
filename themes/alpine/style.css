@@ -1026,7 +1026,8 @@ li > ol {
 /* Small devices (e.g. tablets) */
 @media (min-width: 768px) {
     #page {
-        grid-template-columns: auto 250px;
+        /* minmax(0, 1fr) stops <pre> expanding column: https://stackoverflow.com/questions/52587749/why-does-a-1fr-css-grid-column-neutralize-overflow-scroll-of-its-child-pre */
+        grid-template-columns: minmax(0, 1fr) 250px;
         grid-template-rows: auto 1fr auto;
         grid-template-areas:
             "header header"
@@ -1039,7 +1040,8 @@ li > ol {
 /* Medium devices (desktops) */
 @media (min-width: 992px) {
     #page {
-        grid-template-columns: auto 350px;
+        /* minmax(0, 1fr) stops <pre> expanding column: https://stackoverflow.com/questions/52587749/why-does-a-1fr-css-grid-column-neutralize-overflow-scroll-of-its-child-pre */
+        grid-template-columns: minmax(0, 1fr) 350px;
     }
 }
 
