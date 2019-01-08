@@ -16,6 +16,7 @@ Lots of documentation is provided on the [ALP website](https://alp.attackllama.c
  - Option to force users to be logged in to view
    - Feeds still accessible using HTTP authentication
    - Images still accessible with direct link (not possible to block without server configuration)
+   - XML-RPC interface disabled
  - Disable trackbacks, which are usually only useful for commercial sites
  - Modifies pages to work more like a wiki:
    - Removes authors and dates
@@ -122,8 +123,7 @@ Authors: Inpsyde GmbH
 Link: [Authenticator](https://wordpress.org/plugins/authenticator/)
 
 The core authentication code, and the feed HTTP authenticator, have been adapted with only a few
-changes. The special settings page, private feed keys, cookie lifetime and XML-RPC and REST settings
-have been removed.
+changes. The special settings page, private feed keys and cookie lifetime setting have been removed.
 
 ### Simple Life
 Author: Nilambar Sharma

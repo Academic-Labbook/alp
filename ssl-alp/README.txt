@@ -5,8 +5,8 @@ Requires at least: 5.0.0
 Tested up to: 5.0.2
 Requires PHP: 7.0
 Stable tag: 0.11.0
-License: GPL3
-License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
+License: GNU General Public License v3 or later
+License URI: LICENCE
 
 Turn WordPress into a collaborative laboratory notebook supporting multiple
 authors on posts, wiki-like pages, cross-references, revision summaries, and
