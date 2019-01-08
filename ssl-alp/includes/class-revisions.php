@@ -353,6 +353,11 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		// get the revision created as part of the restoration (prior to this function firing)
 		$latest_revision = $this->get_latest_revision( $post_id );
 
+		if ( is_null( $latest_revision ) ) {
+			// no new revision found
+			return;
+		}
+
 	    /**
 		 * Update new revision meta data.
 		 *
