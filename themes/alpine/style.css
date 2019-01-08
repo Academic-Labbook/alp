@@ -991,6 +991,20 @@ body {
     border: 2px dashed red;
 }
 
+/* merge into underscores block above */
+.comment-navigation .nav-previous,
+.posts-navigation .nav-previous,
+.post-navigation .nav-previous {
+    padding-left: 1em;
+}
+
+/* merge into underscores block above */
+.comment-navigation .nav-next,
+.posts-navigation .nav-next,
+.post-navigation .nav-next {
+    padding-right: 1em;
+}
+
 /* Default link settings, overridden further down */
 a, a:visited, a:hover, a:focus, a:active {
     color: #0b789c;
