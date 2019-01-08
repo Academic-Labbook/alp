@@ -173,27 +173,27 @@ if ( ! function_exists( 'alpine_the_post_meta' ) ) :
 	function alpine_the_post_meta( $post = null ) {
 		$post = get_post( $post );
 
-		// post id and authors
-		$byline = sprintf(
-			'<i class="fa fa-link" title="%1$s"></i>%2$s&nbsp;&nbsp;%3$s',
-			esc_html__( 'ID', 'alpine' ),
-			$post->ID,
-			alpine_get_authors( $post )
-		);
+		$byline_pieces = array();
+
+		// post id
+		$byline_pieces[] = alpine_get_post_id_icon( $post );
+
+		// authors
+		$byline_pieces[] = alpine_get_authors( $post );
 
 		// show revisions link on posts and pages only
 		if ( alpine_get_option( 'show_edit_summaries' ) ) {
-			$byline .= alpine_get_revisions_link( $post );
+			$byline_pieces[] = alpine_get_revisions_link( $post );
 		}
 
 		if ( current_user_can( 'edit_post', $post ) ) {
 			// add edit post link
-			$byline .= alpine_get_post_edit_link( $post );
+			$byline_pieces[] = alpine_get_post_edit_link( $post );
 		}
 
 		printf(
 			'<div class="byline">%1$s</div>',
-			$byline
+			implode( '&nbsp;&nbsp;', $byline_pieces )
 		);
 
 		$posted_on = alpine_get_post_date_html( $post );
@@ -219,20 +219,32 @@ if ( ! function_exists( 'alpine_the_page_meta' ) ) :
 	function alpine_the_page_meta( $page = null ) {
 		$page = get_post( $page );
 
-		$byline = "";
+		$byline_pieces = array();
 
 		if ( alpine_get_option( 'show_edit_summaries' ) ) {
-			$byline .= alpine_get_revisions_link( $page );
+			$byline_pieces[] = alpine_get_revisions_link( $page );
 		}
 
 		if ( current_user_can( 'edit_page', $page ) ) {
 			// add edit post link
-			$byline .= alpine_get_post_edit_link( $page );
+			$byline_pieces[] = alpine_get_post_edit_link( $page );
 		}
 
 		printf(
 			'<div class="byline">%1$s</div>',
-			$byline
+			implode( '&nbsp;&nbsp;', $byline_pieces )
+		);
+	}
+endif;
+
+if ( ! function_exists( 'alpine_get_post_id_icon' ) ) :
+	function alpine_get_post_id_icon( $post ) {
+		$post = get_post( $post );
+
+		return sprintf(
+			'<i class="fa fa-link" title="%1$s"></i>%2$s',
+			esc_html__( 'ID', 'alpine' ),
+			$post->ID
 		);
 	}
 endif;
@@ -242,7 +254,7 @@ if ( ! function_exists( 'alpine_get_post_edit_link' ) ) :
 		$post = get_post( $post );
 
 		return sprintf(
-			'&nbsp;&nbsp;<i class="fa fa-edit" aria-hidden="true"></i><a href="%1$s">%2$s</a>',
+			'<i class="fa fa-edit" aria-hidden="true"></i><a href="%1$s">%2$s</a>',
 			get_edit_post_link( $post ),
 			__( 'Edit', 'alpine' )
 		);
@@ -268,7 +280,7 @@ if ( ! function_exists( 'alpine_get_revisions_link' ) ) :
 		$edit_str = sprintf( _n( '%s revision', '%s revisions', $edit_count, 'alpine' ), $edit_count );
 
 		return sprintf(
-			'&nbsp;&nbsp;<i class="fa fa-pencil" title="%1$s" aria-hidden="true"></i><a href="%2$s#post-revisions">%3$s</a>',
+			'<i class="fa fa-pencil" title="%1$s" aria-hidden="true"></i><a href="%2$s#post-revisions">%3$s</a>',
 			esc_html__( 'Number of edits made to the original post', 'alpine' ),
 			esc_url( get_the_permalink( $post ) ),
 			$edit_str
