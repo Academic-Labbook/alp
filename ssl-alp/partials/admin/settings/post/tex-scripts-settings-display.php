@@ -9,13 +9,13 @@
     <label for="ssl_alp_katex_js_url_textbox">
         <?php _e( 'KaTeX JavaScript library URL:', 'ssl-alp' ); ?>
     </label>
-    <input name="ssl_alp_katex_js_url" id="ssl_alp_katex_js_url_textbox" value="<?php echo esc_url( get_site_option( 'ssl_alp_katex_js_url', '' ) ); ?>" class="large-text code" type="url">
-    <label for="ssl_alp_katex_copy_js_url_textbox">
-        <?php _e( 'KaTeX Copy-tex extension JavaScript library URL:', 'ssl-alp' ); ?>
-    </label>
     <input name="ssl_alp_katex_copy_js_url" id="ssl_alp_katex_copy_js_url_textbox" value="<?php echo esc_url( get_site_option( 'ssl_alp_katex_copy_js_url', '' ) ); ?>" class="large-text code" type="url">
     <label for="ssl_alp_katex_css_url_textbox">
         <?php _e( 'KaTeX CSS library URL:', 'ssl-alp' ); ?>
+    </label>
+    <input name="ssl_alp_katex_js_url" id="ssl_alp_katex_js_url_textbox" value="<?php echo esc_url( get_site_option( 'ssl_alp_katex_js_url', '' ) ); ?>" class="large-text code" type="url">
+    <label for="ssl_alp_katex_copy_js_url_textbox">
+        <?php _e( 'KaTeX Copy-tex extension JavaScript library URL:', 'ssl-alp' ); ?>
     </label>
     <input name="ssl_alp_katex_css_url" id="ssl_alp_katex_css_url_textbox" value="<?php echo esc_url( get_site_option( 'ssl_alp_katex_css_url', '' ) ); ?>" class="large-text code" type="url">
     <label for="ssl_alp_katex_copy_css_url_textbox">
