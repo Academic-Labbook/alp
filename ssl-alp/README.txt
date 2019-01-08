@@ -22,7 +22,7 @@ WordPress's post compositition, tagging and categorisation, media management and
 search tools while enabling features useful in an academic context like
 mathematical markup rendering, coauthors, edit summaries and cross-references.
 
-ALP is intended to be used with the corresponding theme [Alpine](https://alp.attackllama.com/documentation/themes/alpine/),
+ALP is intended to be used with the corresponding theme [Labbook](https://alp.attackllama.com/documentation/themes/labbook/),
 which was created in parallel to ALP, and which enables various public-facing
 features provided by the plugin. It is highly encouraged to use this theme, or
 derive a child theme from this base. Various features such as coauthors, edit
@@ -32,7 +32,7 @@ site without this theme.
 ALP is written for WordPress 5.0 and the new block editor it provides. A
 textbox is added to post and page edit screens to allow users to leave a brief
 summary of the changes they make. These changes are recorded in the database
-and displayed alongside posts and pages when used with the Alpine theme.
+and displayed alongside posts and pages when used with the "Labbook" theme.
 Additionally, a TeX block is added to the editor to allow users to write and
 preview mathematical formulae as part of their posts and pages.
 
@@ -129,8 +129,8 @@ on the ALP website.
    - Added edit summary text widget to sidebar.
  - Removed edit summary metabox from classic editor.
  - Classic editor no longer supported.
- - Moved Alpine theme to its own directory to fix stylesheet bug on
-   certain types of installation. The Alpine theme must be installed
+ - Moved Labbook theme to its own directory to fix stylesheet bug on
+   certain types of installation. The Labbook theme must be installed
    separately from now on.
  - Disallow anyone (including admins) from editing or deleting
    coauthor terms, which are essential to the plugin's operation.

@@ -1,15 +1,15 @@
 <?php
 /**
- * Alpine functions and definitions
+ * Labbook functions and definitions
  *
  * @link https://developer.wordpress.org/themes/basics/theme-functions/
  *
- * @package Alpine
+ * @package Labbook
  */
 
-define( 'ALPINE_VERSION', '1.0.0' );
+define( 'LABBOOK_VERSION', '1.0.0' );
 
-if ( ! function_exists( 'alpine_setup' ) ) :
+if ( ! function_exists( 'labbook_setup' ) ) :
 	/**
 	 * Sets up theme defaults and registers support for various WordPress features.
 	 *
@@ -17,14 +17,14 @@ if ( ! function_exists( 'alpine_setup' ) ) :
 	 * runs before the init hook. The init hook is too late for some features, such
 	 * as indicating support for post thumbnails.
 	 */
-	function alpine_setup() {
-		global $alpine_default_options;
+	function labbook_setup() {
+		global $labbook_default_options;
 
 		/*
 		 * Make theme available for translation.
 		 * Translations can be filed in the /languages/ directory.
 		 */
-		load_theme_textdomain( 'alpine', get_template_directory() . '/languages' );
+		load_theme_textdomain( 'labbook', get_template_directory() . '/languages' );
 
 		// Add default posts and comments RSS feed links to head.
 		add_theme_support( 'automatic-feed-links' );
@@ -39,8 +39,8 @@ if ( ! function_exists( 'alpine_setup' ) ) :
 
 		// This theme uses wp_nav_menu() in two locations.
 		register_nav_menus( array(
-			'site-menu' => esc_html__( 'Primary', 'alpine' ),
-			'network-menu' => esc_html__( 'Network', 'alpine' )
+			'site-menu' => esc_html__( 'Primary', 'labbook' ),
+			'network-menu' => esc_html__( 'Network', 'labbook' )
 		) );
 
 		/*
@@ -63,7 +63,7 @@ if ( ! function_exists( 'alpine_setup' ) ) :
 		) );
 
 		// Set up the WordPress core custom background feature.
-		add_theme_support( 'custom-background', apply_filters( 'alpine_custom_background_args', array(
+		add_theme_support( 'custom-background', apply_filters( 'labbook_custom_background_args', array(
 			'default-color' => 'ffffff',
 			'default-image' => '',
 		) ) );
@@ -84,10 +84,10 @@ if ( ! function_exists( 'alpine_setup' ) ) :
 		) );
 
 		// Get default theme options.
-		$alpine_default_options = alpine_get_theme_option_defaults();
+		$labbook_default_options = labbook_get_theme_option_defaults();
 	}
 endif;
-add_action( 'after_setup_theme', 'alpine_setup' );
+add_action( 'after_setup_theme', 'labbook_setup' );
 
 /**
  * Set the content width in pixels, based on the theme's design and stylesheet.
@@ -96,63 +96,63 @@ add_action( 'after_setup_theme', 'alpine_setup' );
  *
  * @global int $content_width
  */
-function alpine_content_width() {
+function labbook_content_width() {
 	// This variable is intended to be overruled from themes.
 	// Open WPCS issue: {@link https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/issues/1043}.
 	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
-	$GLOBALS['content_width'] = apply_filters( 'alpine_content_width', 640 );
+	$GLOBALS['content_width'] = apply_filters( 'labbook_content_width', 640 );
 }
-add_action( 'after_setup_theme', 'alpine_content_width', 0 );
+add_action( 'after_setup_theme', 'labbook_content_width', 0 );
 
 /**
  * Register widget area.
  *
  * @link https://developer.wordpress.org/themes/functionality/sidebars/#registering-a-sidebar
  */
-function alpine_widgets_init() {
+function labbook_widgets_init() {
 	register_sidebar( array(
-		'name'          => esc_html__( 'Sidebar', 'alpine' ),
+		'name'          => esc_html__( 'Sidebar', 'labbook' ),
 		'id'            => 'sidebar-1',
-		'description'   => esc_html__( 'Add widgets here.', 'alpine' ),
+		'description'   => esc_html__( 'Add widgets here.', 'labbook' ),
 		'before_widget' => '<section id="%1$s" class="widget %2$s">',
 		'after_widget'  => '</section>',
 		'before_title'  => '<h2 class="widget-title">',
 		'after_title'   => '</h2>',
 	) );
 }
-add_action( 'widgets_init', 'alpine_widgets_init' );
+add_action( 'widgets_init', 'labbook_widgets_init' );
 
 /**
  * Enqueue scripts and styles.
  */
-function alpine_scripts() {
+function labbook_scripts() {
 	wp_enqueue_style(
 		'fontawesome',
 		get_template_directory_uri() . '/vendor/font-awesome/css/font-awesome.css',
 		array(),
-		ALPINE_VERSION
+		LABBOOK_VERSION
 	);
 
 	wp_enqueue_style(
-		'alpine-style',
+		'labbook-style',
 		get_stylesheet_uri(),
 		array(),
-		ALPINE_VERSION
+		LABBOOK_VERSION
 	);
 
 	wp_enqueue_script(
-		'alpine-navigation',
+		'labbook-navigation',
 		get_template_directory_uri() . '/js/navigation.js',
 		array(),
-		ALPINE_VERSION,
+		LABBOOK_VERSION,
 		true
 	);
 
 	wp_enqueue_script(
-		'alpine-skip-link-focus-fix',
+		'labbook-skip-link-focus-fix',
 		get_template_directory_uri() . '/js/skip-link-focus-fix.js',
 		array(),
-		ALPINE_VERSION,
+		LABBOOK_VERSION,
 		true
 	);
 
@@ -160,16 +160,16 @@ function alpine_scripts() {
 		wp_enqueue_script( 'comment-reply' );
 	}
 }
-add_action( 'wp_enqueue_scripts', 'alpine_scripts' );
+add_action( 'wp_enqueue_scripts', 'labbook_scripts' );
 
-if ( ! function_exists( 'alpine_the_content_with_toc' ) ) :
+if ( ! function_exists( 'labbook_the_content_with_toc' ) ) :
 	/**
 	 * Add table of contents alongside post.
 	 */
-	function alpine_the_content_with_toc( $content ) {
+	function labbook_the_content_with_toc( $content ) {
 		$post = get_post();
 
-		if ( ! alpine_get_option( 'show_page_table_of_contents' ) ) {
+		if ( ! labbook_get_option( 'show_page_table_of_contents' ) ) {
 			return $content;
 		}
 
@@ -182,7 +182,7 @@ if ( ! function_exists( 'alpine_the_content_with_toc' ) ) :
 		}
 
 		// get contents hierarchy
-		$content = alpine_generate_post_contents( $content, $hierarchy );
+		$content = labbook_generate_post_contents( $content, $hierarchy );
 
 		if ( is_null( $hierarchy ) || ! $hierarchy->count() ) {
 			// table of contents was not generated or has no entries
@@ -191,15 +191,15 @@ if ( ! function_exists( 'alpine_the_content_with_toc' ) ) :
 
 		?>
 		<div class="entry-toc entry-toc-<?php the_ID(); ?>">
-			<h3 class="entry-toc-title"><?php _e( 'Contents', 'alpine' ) ?></h3>
-			<?php alpine_the_toc( $hierarchy, alpine_get_option( 'table_of_contents_max_depth' ) ); ?>
+			<h3 class="entry-toc-title"><?php _e( 'Contents', 'labbook' ) ?></h3>
+			<?php labbook_the_toc( $hierarchy, labbook_get_option( 'table_of_contents_max_depth' ) ); ?>
 		</div>
 		<?php
 
 		return $content;
 	}
 endif;
-add_filter( 'the_content', 'alpine_the_content_with_toc' );
+add_filter( 'the_content', 'labbook_the_content_with_toc' );
 
 /**
  * Page table of contents generator.

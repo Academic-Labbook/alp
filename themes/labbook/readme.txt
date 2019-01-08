@@ -1,11 +1,11 @@
-=== Alpine ===
+=== Labbook ===
 
 Contributors: Sean Leavey
 Tags: custom-background, custom-logo, custom-menu, education, theme-options, threaded-comments, translation-ready, two-columns
 
 Requires at least: 5.0.0
 Tested up to: 5.0.0
-Stable tag: 1.0.0
+Stable tag: 1.0.2
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -32,7 +32,7 @@ Optional: install Academic Labbook Plugin.
 
 == Changelog ==
 
-= 1.0.0 - 2019-01-08 =
+= 1.0.2 - 2019-01-08 =
 * Initial release
 
 == Credits ==

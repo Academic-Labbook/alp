@@ -4,7 +4,7 @@
  *
  * Eventually, some of the functionality here could be replaced by core features.
  *
- * @package Alpine
+ * @package Labbook
  */
 
 
@@ -13,11 +13,11 @@ if ( ! defined( 'WPINC' ) ) {
     exit;
 }
 
-if ( ! function_exists( 'alpine_the_post_title' ) ) :
+if ( ! function_exists( 'labbook_the_post_title' ) ) :
 	/**
 	 * Print the post title
 	 */
-	function alpine_the_post_title( $post = null, $url = true, $icon = true, $anchor = false ) {
+	function labbook_the_post_title( $post = null, $url = true, $icon = true, $anchor = false ) {
 		$post = get_post( $post );
 		$title = get_the_title( $post );
 		$permalink = esc_url( get_permalink( $post ) );
@@ -66,12 +66,12 @@ if ( ! function_exists( 'alpine_the_post_title' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'alpine_get_post_date_html' ) ) :
+if ( ! function_exists( 'labbook_get_post_date_html' ) ) :
 	/**
 	 * Format a post date
 	 */
-	function alpine_get_post_date_html( $post = null, $modified = false, $time = true, $icon = true, $url = true ) {
-		$datetime_fmt = alpine_get_date_format( $time );
+	function labbook_get_post_date_html( $post = null, $modified = false, $time = true, $icon = true, $url = true ) {
+		$datetime_fmt = labbook_get_date_format( $time );
 
 		// ISO 8601 formatted date
 		$date_iso = $modified ? get_the_modified_date( 'c', $post ) : get_the_date( 'c', $post );
@@ -80,7 +80,7 @@ if ( ! function_exists( 'alpine_get_post_date_html' ) ) :
 		$date_str = $modified ? get_the_modified_date( $datetime_fmt, $post ) : get_the_date( $datetime_fmt, $post );
 
 		// how long ago
-		$human_date = $modified ? alpine_get_human_date( $post->post_modified ) : alpine_get_human_date( $post->post_date );
+		$human_date = $modified ? labbook_get_human_date( $post->post_modified ) : labbook_get_human_date( $post->post_date );
 
 		$time_str = sprintf(
 			'<time class="%1$s" datetime="%2$s" title="%3$s">%4$s</time>',
@@ -108,9 +108,9 @@ if ( ! function_exists( 'alpine_get_post_date_html' ) ) :
 
 		if ( $icon ) {
 			if ( $modified ) {
-				$title = __( 'Modification date', 'alpine' );
+				$title = __( 'Modification date', 'labbook' );
 			} else {
-				$title = __( 'Publication date', 'alpine' );
+				$title = __( 'Publication date', 'labbook' );
 			}
 
 			// add icons
@@ -125,18 +125,18 @@ if ( ! function_exists( 'alpine_get_post_date_html' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'alpine_get_date_format' ) ):
+if ( ! function_exists( 'labbook_get_date_format' ) ):
 	/**
 	 * Get date and optional time format strings to pass to get_the_date or get_the_modified_date
 	 */
-	function alpine_get_date_format( $time = true ) {
+	function labbook_get_date_format( $time = true ) {
 		$datetime_fmt = get_option( 'date_format' );
 
 		if ( $time ) {
 			// combined date and time formats
 			$datetime_fmt = sprintf(
 				/* translators: 1: date, 2: time; note that "\a\t" escapes "at" in PHP's date() function */
-				__( '%1$s \a\t %2$s', 'alpine' ),
+				__( '%1$s \a\t %2$s', 'labbook' ),
 				$datetime_fmt,
 				get_option( 'time_format' )
 			);
@@ -146,11 +146,11 @@ if ( ! function_exists( 'alpine_get_date_format' ) ):
 	}
 endif;
 
-if ( ! function_exists( 'alpine_get_human_date' ) ):
+if ( ! function_exists( 'labbook_get_human_date' ) ):
 	/**
 	 * Get human formatted date, e.g. "3 hours ago"
 	 */
-	function alpine_get_human_date( $date_str, $compare_timestamp = null ) {
+	function labbook_get_human_date( $date_str, $compare_timestamp = null ) {
 		if ( is_null( $compare_timestamp ) ) {
 			// use current time
 			$compare_timestamp = current_time( 'timestamp' );
@@ -160,39 +160,39 @@ if ( ! function_exists( 'alpine_get_human_date' ) ):
 
 		return sprintf(
 			/* translators: 1: time ago */
-			__( '%s ago', 'alpine' ),
+			__( '%s ago', 'labbook' ),
 			human_time_diff( $timestamp, $compare_timestamp )
 		);
 	}
 endif;
 
-if ( ! function_exists( 'alpine_the_post_meta' ) ) :
+if ( ! function_exists( 'labbook_the_post_meta' ) ) :
 	/**
 	 * Print HTML with meta information about post
 	 */
-	function alpine_the_post_meta( $post = null ) {
+	function labbook_the_post_meta( $post = null ) {
 		$post = get_post( $post );
 
 		$byline_pieces = array();
 
 		// post id
-		$byline_pieces[] = alpine_get_post_id_icon( $post );
+		$byline_pieces[] = labbook_get_post_id_icon( $post );
 
 		// authors
-		$authors = alpine_get_authors( $post );
+		$authors = labbook_get_authors( $post );
 
 		if ( !empty( $authors ) ) {
 			$byline_pieces[] = $authors;
 		}
 
 		// show revisions link on posts and pages only
-		if ( alpine_get_option( 'show_edit_summaries' ) ) {
-			$byline_pieces[] = alpine_get_revisions_link( $post );
+		if ( labbook_get_option( 'show_edit_summaries' ) ) {
+			$byline_pieces[] = labbook_get_revisions_link( $post );
 		}
 
 		if ( current_user_can( 'edit_post', $post ) ) {
 			// add edit post link
-			$byline_pieces[] = alpine_get_post_edit_link( $post );
+			$byline_pieces[] = labbook_get_post_edit_link( $post );
 		}
 
 		printf(
@@ -200,13 +200,13 @@ if ( ! function_exists( 'alpine_the_post_meta' ) ) :
 			implode( '&nbsp;&nbsp;', $byline_pieces )
 		);
 
-		$posted_on = alpine_get_post_date_html( $post );
+		$posted_on = labbook_get_post_date_html( $post );
 
 		// check post timestamps to see if modified
 		if ( get_the_time( 'U', $post ) !== get_the_modified_time( 'U', $post ) ) {
-			$modified_on = alpine_get_post_date_html( $post, true );
+			$modified_on = labbook_get_post_date_html( $post, true );
 			/* translators: 1: post modification date */
-			$posted_on .= sprintf( __( ' (last edited %1$s)', 'alpine' ), $modified_on );
+			$posted_on .= sprintf( __( ' (last edited %1$s)', 'labbook' ), $modified_on );
 		}
 
 		printf(
@@ -216,22 +216,22 @@ if ( ! function_exists( 'alpine_the_post_meta' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'alpine_the_page_meta' ) ) :
+if ( ! function_exists( 'labbook_the_page_meta' ) ) :
 	/**
 	 * Print HTML with meta information about page
 	 */
-	function alpine_the_page_meta( $page = null ) {
+	function labbook_the_page_meta( $page = null ) {
 		$page = get_post( $page );
 
 		$byline_pieces = array();
 
-		if ( alpine_get_option( 'show_edit_summaries' ) ) {
-			$byline_pieces[] = alpine_get_revisions_link( $page );
+		if ( labbook_get_option( 'show_edit_summaries' ) ) {
+			$byline_pieces[] = labbook_get_revisions_link( $page );
 		}
 
 		if ( current_user_can( 'edit_page', $page ) ) {
 			// add edit post link
-			$byline_pieces[] = alpine_get_post_edit_link( $page );
+			$byline_pieces[] = labbook_get_post_edit_link( $page );
 		}
 
 		printf(
@@ -241,32 +241,32 @@ if ( ! function_exists( 'alpine_the_page_meta' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'alpine_get_post_id_icon' ) ) :
-	function alpine_get_post_id_icon( $post ) {
+if ( ! function_exists( 'labbook_get_post_id_icon' ) ) :
+	function labbook_get_post_id_icon( $post ) {
 		$post = get_post( $post );
 
 		return sprintf(
 			'<i class="fa fa-link" title="%1$s"></i>%2$s',
-			esc_html__( 'ID', 'alpine' ),
+			esc_html__( 'ID', 'labbook' ),
 			$post->ID
 		);
 	}
 endif;
 
-if ( ! function_exists( 'alpine_get_post_edit_link' ) ) :
-	function alpine_get_post_edit_link( $post ) {
+if ( ! function_exists( 'labbook_get_post_edit_link' ) ) :
+	function labbook_get_post_edit_link( $post ) {
 		$post = get_post( $post );
 
 		return sprintf(
 			'<i class="fa fa-edit" aria-hidden="true"></i><a href="%1$s">%2$s</a>',
 			get_edit_post_link( $post ),
-			__( 'Edit', 'alpine' )
+			__( 'Edit', 'labbook' )
 		);
 	}
 endif;
 
-if ( ! function_exists( 'alpine_get_revisions_link' ) ) :
-	function alpine_get_revisions_link( $post = null ) {
+if ( ! function_exists( 'labbook_get_revisions_link' ) ) :
+	function labbook_get_revisions_link( $post = null ) {
 		global $ssl_alp;
 
 		if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
@@ -280,23 +280,23 @@ if ( ! function_exists( 'alpine_get_revisions_link' ) ) :
 			return;
 		}
 
-		$edit_count = alpine_get_edit_count( $post );
-		$edit_str = sprintf( _n( '%s revision', '%s revisions', $edit_count, 'alpine' ), $edit_count );
+		$edit_count = labbook_get_edit_count( $post );
+		$edit_str = sprintf( _n( '%s revision', '%s revisions', $edit_count, 'labbook' ), $edit_count );
 
 		return sprintf(
 			'<i class="fa fa-pencil" title="%1$s" aria-hidden="true"></i><a href="%2$s#post-revisions">%3$s</a>',
-			esc_html__( 'Number of edits made to the original post', 'alpine' ),
+			esc_html__( 'Number of edits made to the original post', 'labbook' ),
 			esc_url( get_the_permalink( $post ) ),
 			$edit_str
 		);
 	}
 endif;
 
-if ( ! function_exists( 'alpine_get_authors' ) ) :
+if ( ! function_exists( 'labbook_get_authors' ) ) :
 	/**
 	 * Gets formatted author HTML
 	 */
-	function alpine_get_authors( $post = null, $icon = true, $url = true, $delimiter_between = null, $delimiter_between_last = null ) {
+	function labbook_get_authors( $post = null, $icon = true, $url = true, $delimiter_between = null, $delimiter_between_last = null ) {
 		global $ssl_alp;
 
 		$post = get_post( $post );
@@ -319,7 +319,7 @@ if ( ! function_exists( 'alpine_get_authors' ) ) :
 		$author_html = array();
 
 		foreach ( $authors as $author ) {
-			$author = alpine_format_author( $author, $url );
+			$author = labbook_format_author( $author, $url );
 
 			if ( ! is_null( $author ) ) {
 				$author_html[] = $author;
@@ -336,17 +336,17 @@ if ( ! function_exists( 'alpine_get_authors' ) ) :
 
 				// get delimiters
 				if ( is_null( $delimiter_between ) ) {
-					$delimiter_between = _x( ', ', 'delimiter between coauthors except last', 'alpine' );
+					$delimiter_between = _x( ', ', 'delimiter between coauthors except last', 'labbook' );
 				}
 				if ( is_null( $delimiter_between_last ) ) {
-					$delimiter_between_last = _x( ' and ', 'delimiter between last two coauthors', 'alpine' );
+					$delimiter_between_last = _x( ' and ', 'delimiter between last two coauthors', 'labbook' );
 				}
 
 				// pop last author off
 				$last_author = array_pop( $author_html );
 
 				// implode author list
-				$author_list_html = implode( __( ', ', 'alpine' ), $author_html ) . $delimiter_between_last . $last_author;
+				$author_list_html = implode( __( ', ', 'labbook' ), $author_html ) . $delimiter_between_last . $last_author;
 			} else {
 				// single author
 				$icon_class = 'fa fa-user';
@@ -358,7 +358,7 @@ if ( ! function_exists( 'alpine_get_authors' ) ) :
 				$icon = sprintf(
 					'<i class="%1$s" title="%2$s" aria-hidden="true"></i>',
 					$icon_class,
-					esc_html__( 'Authors', 'alpine' )
+					esc_html__( 'Authors', 'labbook' )
 				);
 			} else {
 				$icon = '';
@@ -376,11 +376,11 @@ if ( ! function_exists( 'alpine_get_authors' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'alpine_format_author' ) ) :
+if ( ! function_exists( 'labbook_format_author' ) ) :
 	/**
 	 * Gets formatted author name
 	 */
-	function alpine_format_author( $author, $url = true ) {
+	function labbook_format_author( $author, $url = true ) {
 		if ( is_null( $author ) ) {
 			return;
 		}
@@ -402,16 +402,16 @@ if ( ! function_exists( 'alpine_format_author' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'alpine_the_footer' ) ) :
+if ( ! function_exists( 'labbook_the_footer' ) ) :
 	/**
 	 * Prints the footer for the specified post.
 	 *
 	 * Cannot specify a custom post id here, as `get_comments_number_text` can't
 	 * handle it. It always uses the current post.
 	 */
-	function alpine_the_footer() {
+	function labbook_the_footer() {
 		/* translators: used between list items, there is a space after the comma. */
-		$categories_list = get_the_category_list( esc_html__( ', ', 'alpine' ) );
+		$categories_list = get_the_category_list( esc_html__( ', ', 'labbook' ) );
 
 		if ( $categories_list ) {
 			printf(
@@ -422,7 +422,7 @@ if ( ! function_exists( 'alpine_the_footer' ) ) :
 		}
 
 		/* translators: used between list items, there is a space after the comma. */
-		$tags_list = get_the_tag_list( '', esc_html__( ', ', 'alpine' ) );
+		$tags_list = get_the_tag_list( '', esc_html__( ', ', 'labbook' ) );
 
 		if ( $tags_list ) {
 			printf(
@@ -438,18 +438,18 @@ if ( ! function_exists( 'alpine_the_footer' ) ) :
 				'<span class="comments-link">%1$s<a href="%2$s">%3$s</a></span>',
 				'<i class="fa fa-comment" aria-hidden="true"></i>',
 				get_comments_link(),
-				get_comments_number_text(esc_html__( 'Leave a comment', 'alpine' ))
+				get_comments_number_text(esc_html__( 'Leave a comment', 'labbook' ))
 			);
 		}
 	}
 endif;
 
-if ( ! function_exists( 'alpine_the_revisions' ) ) :
+if ( ! function_exists( 'labbook_the_revisions' ) ) :
 	/**
 	 * Prints revisions for the specified post
 	 */
-	function alpine_the_revisions( $post = null ) {
-		if ( ! alpine_get_option( 'show_edit_summaries' ) ) {
+	function labbook_the_revisions( $post = null ) {
+		if ( ! labbook_get_option( 'show_edit_summaries' ) ) {
 			// display is unavailable
 			return;
 		}
@@ -466,12 +466,12 @@ if ( ! function_exists( 'alpine_the_revisions' ) ) :
 		}
 
 		// total revisions
-		$count = alpine_get_revision_count( $post );
-		$per_page = alpine_get_option( 'edit_summaries_per_page' );
+		$count = labbook_get_revision_count( $post );
+		$per_page = labbook_get_option( 'edit_summaries_per_page' );
 		$pages = ceil( $count / $per_page );
 
 		// get list of revisions to this post
-		$revisions = alpine_get_revisions( $post, $current_page, $per_page );
+		$revisions = labbook_get_revisions( $post, $current_page, $per_page );
 
 		if ( is_null( $revisions ) || ! is_array( $revisions ) || count( $revisions ) == 0 ) {
 			// no revisions to show
@@ -482,13 +482,13 @@ if ( ! function_exists( 'alpine_the_revisions' ) ) :
 
 		printf(
 			'<h3>%1$s</h3>',
-			esc_html( 'History', 'alpine' )
+			esc_html( 'History', 'labbook' )
 		);
 
 		echo "<ul>";
 
 		foreach ( $revisions as $revision ) {
-			echo '<li>' . alpine_get_revision_description( $revision ) . '</li>';
+			echo '<li>' . labbook_get_revision_description( $revision ) . '</li>';
 		}
 
 		echo "</ul>";
@@ -506,11 +506,11 @@ if ( ! function_exists( 'alpine_the_revisions' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'alpine_get_revision_description' ) ) :
+if ( ! function_exists( 'labbook_get_revision_description' ) ) :
 	/**
 	 * Prints description for the specified revision
 	 */
-	function alpine_get_revision_description( $revision ) {
+	function labbook_get_revision_description( $revision ) {
 		global $ssl_alp;
 
 		// get revision object if id is specified
@@ -525,17 +525,17 @@ if ( ! function_exists( 'alpine_get_revision_description' ) ) :
 		$revision_edit_summary_revert_id = get_post_meta( $revision->ID, 'ssl_alp_edit_summary_revert_id', true );
 
 		// default message
-		$message = " " . alpine_get_revision_abbreviation( $revision );
+		$message = " " . labbook_get_revision_abbreviation( $revision );
 
 		if ( wp_is_post_autosave( $revision ) ) {
 			// this is an autosave
-			$message .= __( ': [Autosave]', 'alpine' );
+			$message .= __( ': [Autosave]', 'labbook' );
 		} elseif ( !empty( $revision_edit_summary_revert_id ) ) {
 			// revision was a revert
 			// /* translators: 1: revision ID/URL */
 			$message .= sprintf(
-				__( ': reverted to %1$s', 'alpine' ),
-				alpine_get_revision_abbreviation( $revision_edit_summary_revert_id )
+				__( ': reverted to %1$s', 'labbook' ),
+				labbook_get_revision_abbreviation( $revision_edit_summary_revert_id )
 			);
 
 			// get original source revision
@@ -545,7 +545,7 @@ if ( ! function_exists( 'alpine_get_revision_description' ) ) :
 			if ( !empty( $source_edit_summary ) ) {
 				// add original edit summary
 				$source_edit_summary = sprintf(
-					__( '"%1$s"', 'alpine' ),
+					__( '"%1$s"', 'labbook' ),
 					$source_edit_summary
 				);
 
@@ -557,15 +557,15 @@ if ( ! function_exists( 'alpine_get_revision_description' ) ) :
 		} elseif ( !empty( $revision_edit_summary ) ) {
 			/* translators: 1: revision message */
 			$message .= sprintf(
-				__( ': <em>"%1$s"</em>', 'alpine' ),
+				__( ': <em>"%1$s"</em>', 'labbook' ),
 				esc_html( $revision_edit_summary )
 			);
 		}
 
 		$revision_time = sprintf(
 			'<span title="%1$s">%2$s</span>',
-			get_the_modified_date( alpine_get_date_format( true ), $revision ),
-			alpine_get_human_date( $revision->post_modified )
+			get_the_modified_date( labbook_get_date_format( true ), $revision ),
+			labbook_get_human_date( $revision->post_modified )
 		);
 
 		$author_display_name = get_the_author_meta( 'display_name', $revision->post_author );
@@ -580,18 +580,18 @@ if ( ! function_exists( 'alpine_get_revision_description' ) ) :
 
 		// check if this revision is the current one
 		if ( get_the_time( 'U', $revision ) == get_the_modified_time( 'U', $revision->parent ) ) {
-			$description .= __( ' <strong>(current)</strong>', 'alpine' );
+			$description .= __( ' <strong>(current)</strong>', 'labbook' );
 		}
 
 		return $description;
 	}
 endif;
 
-if ( ! function_exists( 'alpine_get_revision_abbreviation' ) ) :
+if ( ! function_exists( 'labbook_get_revision_abbreviation' ) ) :
 	/**
 	 * Gets abbreviated revision ID, with optional URL
 	 */
-	function alpine_get_revision_abbreviation( $revision, $url = true ) {
+	function labbook_get_revision_abbreviation( $revision, $url = true ) {
 		global $ssl_alp;
 
 		$revision = wp_get_post_revision( $revision );
@@ -602,7 +602,7 @@ if ( ! function_exists( 'alpine_get_revision_abbreviation' ) ) :
 
 		// revision post ID
 		$abbr = sprintf(
-			_x('r%1$s', 'abbreviated revision ID text', 'alpine' ),
+			_x('r%1$s', 'abbreviated revision ID text', 'labbook' ),
 			$revision->ID
 		);
 
@@ -631,14 +631,14 @@ if ( ! function_exists( 'alpine_get_revision_abbreviation' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'alpine_the_references' ) ) :
+if ( ! function_exists( 'labbook_the_references' ) ) :
 	/**
 	 * Prints HTML with post references
 	 */
-	function alpine_the_references( $post = null ) {
+	function labbook_the_references( $post = null ) {
 		global $ssl_alp;
 
-		if ( ! alpine_get_option( 'show_crossreferences' ) ) {
+		if ( ! labbook_get_option( 'show_crossreferences' ) ) {
 			// display is unavailable
 			return;
 		} elseif ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
@@ -664,27 +664,27 @@ if ( ! function_exists( 'alpine_the_references' ) ) :
 			return;
 		}
 
-		printf( '<div id="post-references"><h3>%1$s</h3>', __( 'Cross-references', 'alpine' ));
+		printf( '<div id="post-references"><h3>%1$s</h3>', __( 'Cross-references', 'labbook' ));
 
 		if ( $ref_to_posts ) {
-			printf( '<h4>%1$s</h4>', __( 'Links to', 'alpine' ) );
-			alpine_the_referenced_post_list( $ref_to_posts );
+			printf( '<h4>%1$s</h4>', __( 'Links to', 'labbook' ) );
+			labbook_the_referenced_post_list( $ref_to_posts );
 		}
 
 		if ( $ref_from_posts ) {
-			printf( '<h4>%1$s</h4>', __( 'Linked from', 'alpine' ));
-			alpine_the_referenced_post_list( $ref_from_posts );
+			printf( '<h4>%1$s</h4>', __( 'Linked from', 'labbook' ));
+			labbook_the_referenced_post_list( $ref_from_posts );
 		}
 
 		echo '</div>';
 	}
 endif;
 
-if ( ! function_exists( 'alpine_the_referenced_post_list' ) ) {
+if ( ! function_exists( 'labbook_the_referenced_post_list' ) ) {
 	/**
 	 * Prints list of reference links
 	 */
-	function alpine_the_referenced_post_list( $referenced_posts ) {
+	function labbook_the_referenced_post_list( $referenced_posts ) {
 		echo '<ul>';
 
 		foreach ( $referenced_posts as $referenced_post ) {
@@ -692,18 +692,18 @@ if ( ! function_exists( 'alpine_the_referenced_post_list' ) ) {
 			$referenced_post = get_post( $referenced_post );
 
 			// print reference post information
-			alpine_referenced_post_list_item( $referenced_post );
+			labbook_referenced_post_list_item( $referenced_post );
 		}
 
 		echo '</ul>';
 	}
 }
 
-if ( ! function_exists( 'alpine_referenced_post_list_item' ) ) {
+if ( ! function_exists( 'labbook_referenced_post_list_item' ) ) {
 	/**
 	 * Prints HTML link to the specified reference post
 	 */
-	function alpine_referenced_post_list_item( $referenced_post = null, $url = true ) {
+	function labbook_referenced_post_list_item( $referenced_post = null, $url = true ) {
 		global $ssl_alp;
 
 		$referenced_post = get_post( $referenced_post );
@@ -737,17 +737,17 @@ if ( ! function_exists( 'alpine_referenced_post_list_item' ) ) {
 	}
 }
 
-if ( ! function_exists( 'alpine_the_page_breadcrumbs' ) ) :
+if ( ! function_exists( 'labbook_the_page_breadcrumbs' ) ) :
 	/**
 	 * Print page breadcrumbs
 	 */
-	function alpine_the_page_breadcrumbs( $page = null ) {
-		if ( ! alpine_get_option( 'show_page_breadcrumbs' ) ) {
+	function labbook_the_page_breadcrumbs( $page = null ) {
+		if ( ! labbook_get_option( 'show_page_breadcrumbs' ) ) {
 			// display is unavailable
 			return;
 		}
 
-		$breadcrumbs = alpine_get_page_breadcrumbs( $page );
+		$breadcrumbs = labbook_get_page_breadcrumbs( $page );
 
 		if ( ! count( $breadcrumbs ) ) {
 			return;
@@ -776,8 +776,8 @@ if ( ! function_exists( 'alpine_the_page_breadcrumbs' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'alpine_the_toc' ) ) :
-    function alpine_the_toc( $contents, $max_levels ) {
+if ( ! function_exists( 'labbook_the_toc' ) ) :
+    function labbook_the_toc( $contents, $max_levels ) {
         if ( $max_levels < 0 ) {
             // beyond the maximum level setting
             return;
@@ -808,7 +808,7 @@ if ( ! function_exists( 'alpine_the_toc' ) ) :
                 foreach ( $children as $child ) {
                     // show sublevel
                     echo '<li>';
-                    alpine_the_toc( $child, $max_levels - 1 );
+                    labbook_the_toc( $child, $max_levels - 1 );
                     echo '</li>';
                 }
 

@@ -20,8 +20,8 @@ Lots of documentation is provided on the [ALP website](https://alp.attackllama.c
  - Disable trackbacks, which are usually only useful for commercial sites
  - Modifies pages to work more like a wiki:
    - Removes authors and dates
-   - Displays a table of contents based on page headers (when used with Alpine theme)
-   - Shows breadcrumb trail back to home page (when used with Alpine theme)
+   - Displays a table of contents based on page headers (when used with Labbook theme)
+   - Shows breadcrumb trail back to home page (when used with Labbook theme)
  - Supports custom media (MIME) upload types (when used on a network)
  - Optionally changes user roles:
    - *Administrator* is unchanged
@@ -33,8 +33,8 @@ Lots of documentation is provided on the [ALP website](https://alp.attackllama.c
      access)
  - Hides some WordPress branding and news
 
-## Alpine theme
-ALP is intended to be used with the specially created "Alpine" theme, which supports display of
+## Labbook theme
+ALP is intended to be used with the specially created "Labbook" theme, which supports display of
 multiple authors, edit summaries, cross-references, etc. provided by ALP.
 
 Features:
@@ -63,12 +63,12 @@ and custom script paths.
 
 ### PHP
 The plugin has only been tested on and only supports PHP 7. You must have the [DOM extension](http://www.php.net/manual/en/book.dom.php)
-installed in order for the page table of contents lists provided by the Alpine theme to work. You
+installed in order for the page table of contents lists provided by the Labbook theme to work. You
 also cannot use PHP via CGI if you wish to make the site private but still have syndication feeds
 available to the user.
 
 ### Clients
-Your users should use up-to-date browsers. The Alpine theme uses CSS Grid, which is a web standard
+Your users should use up-to-date browsers. The Labbook theme uses CSS Grid, which is a web standard
 only supported in relatively recent browsers (i.e. within the last three years) of the most popular
 browsers. The [browsers that don't support CSS Grid](https://caniuse.com/#feat=css-grid) represent
 only around 5% of global usage as of March 2018. There are very little legitimate reasons to use
@@ -129,6 +129,6 @@ changes. The special settings page, private feed keys and cookie lifetime settin
 Author: Nilambar Sharma
 Link: [Simple Life](https://wordpress.org/themes/simple-life/)
 
-The look and feel of the Alpine theme recommended for use with ALP has been inspired by Simple Life,
+The look and feel of the Labbook theme recommended for use with ALP has been inspired by Simple Life,
 but the templates are not based on Simple Life's code, but rather based on boilerplate code provided
 by [Underscores](https://underscores.me/).

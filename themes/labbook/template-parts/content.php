@@ -4,17 +4,17 @@
  *
  * @link https://developer.wordpress.org/themes/basics/template-hierarchy/
  *
- * @package Alpine
+ * @package Labbook
  */
 
 ?>
 
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 	<header class="entry-header">
-		<?php alpine_the_post_title(); ?>
+		<?php labbook_the_post_title(); ?>
 		<?php if ( 'post' === get_post_type() ) : ?>
 		<div class="entry-meta">
-			<?php alpine_the_post_meta(); ?>
+			<?php labbook_the_post_meta(); ?>
 		</div><!-- .entry-meta -->
 		<?php endif; ?>
 	</header><!-- .entry-header -->
@@ -22,17 +22,17 @@
 	<?php
 	if ( 'status' == get_post_format() ) :
 		// do nothing
-	elseif ( 'excerpt' === alpine_get_option( 'content_layout' ) ) : ?>
+	elseif ( 'excerpt' === labbook_get_option( 'content_layout' ) ) : ?>
 	<div class="entry-summary">
 		<?php the_excerpt(); ?>
 	</div>
 	<?php else : ?>
 	<div class="entry-content">
-		<?php the_content( esc_html__( 'Continue reading', 'alpine' ) . ' <span class="meta-nav">&rarr;</span>' ); ?>
+		<?php the_content( esc_html__( 'Continue reading', 'labbook' ) . ' <span class="meta-nav">&rarr;</span>' ); ?>
 		<?php
 		wp_link_pages(
 			array(
-				'before' => '<div class="page-links">' . esc_html__( 'Pages:', 'alpine' ),
+				'before' => '<div class="page-links">' . esc_html__( 'Pages:', 'labbook' ),
 				'after'  => '</div>',
 			)
 		);
@@ -42,7 +42,7 @@
 
 	<?php if ( 'status' !== get_post_format() ) : ?>
 	<footer class="entry-footer">
-		<?php alpine_the_footer(); ?>
+		<?php labbook_the_footer(); ?>
 	</footer>
 	<?php endif; ?>
 </article><!-- #post-<?php the_ID(); ?> -->

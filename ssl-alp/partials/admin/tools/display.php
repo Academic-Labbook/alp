@@ -34,13 +34,13 @@
 	<div class="ssl-alp-tools-cards">
 		<div class="ssl-alp-tools-card">
 			<h2 class="title"><?php _e( 'Activate theme', 'ssl-alp' ); ?></h2>
-			<p><?php _e( 'It is highly recommended to use the <em>Alpine</em> theme on this site. This theme, or a child theme derived from it, must be enabled in order for most of Academic Labbook Plugin\'s functionality to appear.', 'ssl-alp' ); ?></p>
-			<?php if ( $alpine_active ) : ?>
-			<p class="description"><?php _e( 'Alpine, or a child theme derived from it, is already active.', 'ssl-alp' ); ?></p>
-			<?php elseif ( $alpine_installed ) : ?>
-			<p class="description"><?php _e( 'Alpine, or a child theme derived from it, is not active. Visit the <a href="themes.php">themes page</a> to activate it. On network sites, you may have to network activate the theme first.', 'ssl-alp' ); ?></p>
+			<p><?php _e( 'It is highly recommended to use the <em>Labbook</em> theme on this site. This theme, or a child theme derived from it, must be enabled in order for most of Academic Labbook Plugin\'s functionality to appear.', 'ssl-alp' ); ?></p>
+			<?php if ( $supported_theme_active ) : ?>
+			<p class="description"><?php _e( '<em>Labbook</em>, or a child theme derived from it, is already active.', 'ssl-alp' ); ?></p>
+			<?php elseif ( $supported_theme_installed ) : ?>
+			<p class="description"><?php _e( '<em>Labbook</em>, or a child theme derived from it, is not active. Visit the <a href="themes.php">themes page</a> to activate it. On network sites, you may have to network activate the theme first.', 'ssl-alp' ); ?></p>
 			<?php else : ?>
-			<p class="description"><?php _e( sprintf( 'Alpine is not installed. Visit the <a href="%s">ALP website</a> to download it.', 'https://alp.attackllama.com/documentation/themes/' ), 'ssl-alp' ); ?></p>
+			<p class="description"><?php _e( sprintf( '<em>Labbook</em> is not installed. Visit the <a href="%s">ALP website</a> to download it.', 'https://alp.attackllama.com/documentation/themes/' ), 'ssl-alp' ); ?></p>
 			<?php endif; ?>
 		</div>
 		<div class="ssl-alp-tools-card">

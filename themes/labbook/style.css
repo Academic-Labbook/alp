@@ -1,19 +1,19 @@
 /*!
-Theme Name: Alpine
-Theme URI: https://alp.attackllama.com/themes/alpine/
+Theme Name: Labbook
+Theme URI: https://alp.attackllama.com/themes/labbook/
 Author: Sean Leavey
 Author URI: https://attackllama.com/
-Description: Academic labbook theme, intended to be used in combination with Academic Labbook Plugin.
-Version: 1.0.0
+Description: Laboratory notebook theme, intended to be used in combination with Academic Labbook Plugin.
+Version: 1.0.2
 License: GNU General Public License v3 or later
 License URI: LICENSE
-Text Domain: alpine
+Text Domain: labbook
 Tags: custom-background, custom-logo, custom-menu, education, theme-options, threaded-comments, translation-ready, two-columns
 
 This theme, like WordPress, is licensed under the GPL.
 Use it to make something cool, have fun, and share what you've learned with others.
 
-Alpine is based on Underscores https://underscores.me/, (C) 2012-2017 Automattic, Inc.
+Labbook is based on Underscores https://underscores.me/, (C) 2012-2017 Automattic, Inc.
 Underscores is distributed under the terms of the GNU GPL v2 or later.
 
 Normalizing styles have been helped along thanks to the fine work of
@@ -972,7 +972,7 @@ object {
 /* END OF UNDERSCORES DEFAULTS */
 
 /*--------------------------------------------------------------
-# Alpine theme implementation
+# Labbook theme implementation
 --------------------------------------------------------------*/
 
 body {

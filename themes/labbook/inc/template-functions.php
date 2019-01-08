@@ -2,7 +2,7 @@
 /**
  * Functions which enhance the theme by hooking into WordPress
  *
- * @package Alpine
+ * @package Labbook
  */
 
 if ( ! defined( 'WPINC' ) ) {
@@ -10,7 +10,7 @@ if ( ! defined( 'WPINC' ) ) {
     exit;
 }
 
-if ( ! function_exists( 'alpine_get_option' ) ) :
+if ( ! function_exists( 'labbook_get_option' ) ) :
 	/**
 	 * Get option.
 	 *
@@ -18,17 +18,17 @@ if ( ! function_exists( 'alpine_get_option' ) ) :
 	 * @param mixed  $default Default value.
 	 * @return mixed
 	 */
-	function alpine_get_option( $key, $default = '' ) {
-		global $alpine_default_options;
+	function labbook_get_option( $key, $default = '' ) {
+		global $labbook_default_options;
 
 		if ( empty( $key ) ) {
 			return;
 		}
 
-		$default = ( array_key_exists( $key, $alpine_default_options ) ) ? $alpine_default_options[ $key ] : '';
+		$default = ( array_key_exists( $key, $labbook_default_options ) ) ? $labbook_default_options[ $key ] : '';
 
-		$theme_options = get_theme_mod( 'alpine_options', $alpine_default_options );
-		$theme_options = array_merge( $alpine_default_options, $theme_options );
+		$theme_options = get_theme_mod( 'labbook_options', $labbook_default_options );
+		$theme_options = array_merge( $labbook_default_options, $theme_options );
 
 		$value = '';
 
@@ -40,16 +40,16 @@ if ( ! function_exists( 'alpine_get_option' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'alpine_get_theme_option_defaults' ) ) :
+if ( ! function_exists( 'labbook_get_theme_option_defaults' ) ) :
 	/**
 	 * Get default theme options.
 	 *
 	 * @return array
 	 */
-	function alpine_get_theme_option_defaults() {
+	function labbook_get_theme_option_defaults() {
 		return array(
 			'content_layout'               		=> 'excerpt',
-			'search_placeholder'           		=> esc_html__( 'Search...', 'alpine' ),
+			'search_placeholder'           		=> esc_html__( 'Search...', 'labbook' ),
 			'excerpt_length'               		=> 55, // WordPress default
 			'copyright_text'               		=> '',
 			'show_page_breadcrumbs'				=> true,
@@ -64,14 +64,14 @@ if ( ! function_exists( 'alpine_get_theme_option_defaults' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'alpine_get_options' ) ) :
+if ( ! function_exists( 'labbook_get_options' ) ) :
 	/**
 	 * Get theme options.
 	 *
 	 * @since 1.8
 	 */
-	function alpine_get_options() {
-		return get_theme_mod( 'alpine_options' );
+	function labbook_get_options() {
+		return get_theme_mod( 'labbook_options' );
 	}
 endif;
 
@@ -81,7 +81,7 @@ endif;
  * @param array $classes Classes for the body element.
  * @return array
  */
-function alpine_body_classes( $classes ) {
+function labbook_body_classes( $classes ) {
 	// Adds a class of hfeed to non-singular pages.
 	if ( ! is_singular() ) {
 		$classes[] = 'hfeed';
@@ -94,19 +94,19 @@ function alpine_body_classes( $classes ) {
 
 	return $classes;
 }
-add_filter( 'body_class', 'alpine_body_classes' );
+add_filter( 'body_class', 'labbook_body_classes' );
 
 /**
  * Add a pingback url auto-discovery header for single posts, pages, or attachments.
  */
-function alpine_pingback_header() {
+function labbook_pingback_header() {
 	if ( is_singular() && pings_open() ) {
 		printf( '<link rel="pingback" href="%s">', esc_url( get_bloginfo( 'pingback_url' ) ) );
 	}
 }
-add_action( 'wp_head', 'alpine_pingback_header' );
+add_action( 'wp_head', 'labbook_pingback_header' );
 
-if ( ! function_exists( 'alpine_custom_excerpt_length' ) ) :
+if ( ! function_exists( 'labbook_custom_excerpt_length' ) ) :
 	/**
 	 * Implement excerpt length.
 	 *
@@ -115,8 +115,8 @@ if ( ! function_exists( 'alpine_custom_excerpt_length' ) ) :
 	 * @param int $length The number of words.
 	 * @return int Excerpt length.
 	 */
-	function alpine_custom_excerpt_length( $length ) {
-		$excerpt_length = alpine_get_option( 'excerpt_length' );
+	function labbook_custom_excerpt_length( $length ) {
+		$excerpt_length = labbook_get_option( 'excerpt_length' );
 
 		if ( empty( $excerpt_length ) ) {
 			$excerpt_length = $length;
@@ -126,13 +126,13 @@ if ( ! function_exists( 'alpine_custom_excerpt_length' ) ) :
 	}
 endif;
 
-add_filter( 'excerpt_length', 'alpine_custom_excerpt_length', 999 );
+add_filter( 'excerpt_length', 'labbook_custom_excerpt_length', 999 );
 
-if ( ! function_exists( 'alpine_get_page_breadcrumbs' ) ) :
+if ( ! function_exists( 'labbook_get_page_breadcrumbs' ) ) :
 	/**
 	 * Gets page breadcrumbs
 	 */
-	function alpine_get_page_breadcrumbs( $page = null ) {
+	function labbook_get_page_breadcrumbs( $page = null ) {
 		$page = get_post( $page );
 
 		$ancestors = array();
@@ -146,7 +146,7 @@ if ( ! function_exists( 'alpine_get_page_breadcrumbs' ) ) :
 		// URL list with home
 		$breadcrumbs = array(
 			array(
-				'title'	=>	__( 'Home', 'alpine' ),
+				'title'	=>	__( 'Home', 'labbook' ),
 				'url'	=>	get_home_url()
 			)
 		);
@@ -169,11 +169,11 @@ if ( ! function_exists( 'alpine_get_page_breadcrumbs' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'alpine_get_revisions' ) ) :
+if ( ! function_exists( 'labbook_get_revisions' ) ) :
 	/**
 	 * Get list of revisions for the current or specified post
 	 */
-	function alpine_get_revisions( $post = null, $page = 1, $per_page = -1 ) {
+	function labbook_get_revisions( $post = null, $page = 1, $per_page = -1 ) {
 		if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
 			// plugin is disabled
 			return false;
@@ -205,12 +205,12 @@ if ( ! function_exists( 'alpine_get_revisions' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'alpine_get_revision_count' ) ) :
+if ( ! function_exists( 'labbook_get_revision_count' ) ) :
 	/**
 	 * Get number of revisions for the specified post. This includes the
 	 * published version.
 	 */
-	function alpine_get_revision_count( $post = null ) {
+	function labbook_get_revision_count( $post = null ) {
 		// get current post
 		$post = get_post( $post );
 
@@ -226,13 +226,13 @@ if ( ! function_exists( 'alpine_get_revision_count' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'alpine_get_edit_count' ) ) :
+if ( ! function_exists( 'labbook_get_edit_count' ) ) :
 	/**
 	 * Get number of edits made to the specified post after its original
 	 * published version.
 	 */
-	function alpine_get_edit_count( $post = null ) {
-		$count = alpine_get_revision_count( $post );
+	function labbook_get_edit_count( $post = null ) {
+		$count = labbook_get_revision_count( $post );
 
 		if ( $count == 0 ) {
 			// no revisions

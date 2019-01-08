@@ -2,10 +2,10 @@
 /**
  * Table of contents generator functions.
  *
- * @package Alpine
+ * @package Labbook
  */
 
-class alpine_Menu_Level {
+class labbook_Menu_Level {
 	public $parent_menu = null;
 	private $child_menus = array();
 	public $last_child = null;
@@ -42,12 +42,12 @@ class alpine_Menu_Level {
 	}
 }
 
-if ( ! function_exists( 'alpine_generate_post_contents' ) ) :
+if ( ! function_exists( 'labbook_generate_post_contents' ) ) :
 	/**
 	 * Builds a table of contents for the specified page, and returns the page
      * with heading IDs injected where appropriate.
 	 */
-	function alpine_generate_post_contents( $post_content, &$toc ) {
+	function labbook_generate_post_contents( $post_content, &$toc ) {
 		if ( ! extension_loaded( 'dom' ) ) {
 			// cannot generate table of contents
 			return $post_content;
@@ -71,7 +71,7 @@ if ( ! function_exists( 'alpine_generate_post_contents' ) ) :
 		libxml_use_internal_errors( $prev_libxml_error_setting );
 
 		// create root list container
-		$toc = new alpine_Menu_Level(); // level "0"
+		$toc = new labbook_Menu_Level(); // level "0"
 		$toc->is_root = true;
 
 		// set parent container to root
@@ -124,7 +124,7 @@ if ( ! function_exists( 'alpine_generate_post_contents' ) ) :
 				for ( $i = $last_level; $i < $current_level; $i++ ) {
 					// new parent should now be the last child of the current parent
 					if ( is_null( $head->last_child ) ) {
-						$head->add_child_menu( new alpine_Menu_Level() );
+						$head->add_child_menu( new labbook_Menu_Level() );
 					}
 
 					$head = &$head->last_child;
@@ -141,7 +141,7 @@ if ( ! function_exists( 'alpine_generate_post_contents' ) ) :
 			$header->setAttribute( 'id', $header_id );
 
 			// add new child to parent
-			$child = new alpine_Menu_Level();
+			$child = new labbook_Menu_Level();
 			$child->set_menu_data(
 				array(
 					'id'	=>	$header_id,

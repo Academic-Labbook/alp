@@ -75,8 +75,8 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 		$role_conversion_unconfirmed = false;
 
 		// default completed action states
-		$alpine_installed = false;
-		$alpine_active = false;
+		$supported_theme_installed = false;
+		$supported_theme_active = false;
 		$override_core_settings_completed = false;
 		$role_conversion_completed = false;
 		$rebuild_references_completed = false;
@@ -89,14 +89,14 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 		$themes = wp_get_themes();
 		$theme_names = wp_list_pluck( $themes, 'name' );
 
-		if ( in_array( 'Alpine', $theme_names ) ) {
-			$alpine_installed = true;
+		if ( in_array( 'Labbook', $theme_names ) ) {
+			$supported_theme_installed = true;
 
 			// get active theme
 			$active_theme = wp_get_theme();
 
-			if ( 'Alpine' == $active_theme->name || 'Alpine' == $active_theme->parent_theme ) {
-				$alpine_active = true;
+			if ( 'Labbook' == $active_theme->name || 'Labbook' == $active_theme->parent_theme ) {
+				$supported_theme_active = true;
 			}
 		}
 
