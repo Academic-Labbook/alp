@@ -83,6 +83,14 @@ if ( ! function_exists( 'labbook_setup' ) ) :
 			'flex-height' => false
 		) );
 
+		/**
+		 * Add support for styling the post editor.
+		 *
+		 * @link https://wordpress.org/gutenberg/handbook/designers-developers/developers/themes/theme-support/#editor-styles
+		 */
+		add_theme_support( 'editor-styles' );
+		add_editor_style( 'style-editor.css' );
+
 		// Get default theme options.
 		$labbook_default_options = labbook_get_theme_option_defaults();
 	}
