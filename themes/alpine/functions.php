@@ -128,7 +128,7 @@ add_action( 'widgets_init', 'alpine_widgets_init' );
 function alpine_scripts() {
 	wp_enqueue_style(
 		'fontawesome',
-		get_template_directory_uri() . '/third-party/font-awesome/css/font-awesome.css',
+		get_template_directory_uri() . '/vendor/font-awesome/css/font-awesome.css',
 		array(),
 		ALPINE_VERSION
 	);

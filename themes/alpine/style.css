@@ -3,9 +3,9 @@ Theme Name: Alpine
 Theme URI: https://alp.attackllama.com/themes/alpine/
 Author: Sean Leavey
 Author URI: https://attackllama.com/
-Description: Academic labbook theme
+Description: Academic labbook theme, intended to be used in combination with Academic Labbook Plugin.
 Version: 1.0.0
-License: GNU General Public License v2 or later
+License: GNU General Public License v3 or later
 License URI: LICENSE
 Text Domain: alpine
 Tags: custom-background, custom-logo, custom-menu, education, theme-options, threaded-comments, translation-ready, two-columns
@@ -980,6 +980,7 @@ body {
     font-size: 14px;
 }
 
+/* beta notice shown on footer; will be removed eventually */
 .beta-notice {
     font-size: 80%;
     font-style: italic;
