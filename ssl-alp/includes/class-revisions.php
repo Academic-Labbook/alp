@@ -64,7 +64,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		$loader->add_action( 'init', $this, 'register_edit_summary_post_meta' );
 
 		// register REST API endpoint for setting edit summaries with the block editor
-		$loader->add_action( 'rest_api_init', $this, 'register_edit_summary_rest_api_route' );
+		$loader->add_action( 'rest_api_init', $this, 'rest_register_edit_summary_route' );
 
 		// add edit summary box to block editor
 		$loader->add_action( 'enqueue_block_editor_assets', $this, 'add_edit_summary_control' );
@@ -208,13 +208,13 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	/**
 	 * Register REST API route for setting edit summary
 	 */
-	public function register_edit_summary_rest_api_route() {
+	public function rest_register_edit_summary_route() {
 		register_rest_route(
 			SSL_ALP_REST_ROUTE,
-			'/update-meta',
+			'/update-revision-meta',
 			array(
 				'methods'	=>	'POST',
-				'callback'	=>	array( $this, 'set_edit_summary' ),
+				'callback'	=>	array( $this, 'rest_update_revision_meta' ),
 				'args'		=>	array(
 					'id'	=>	array(
 						'sanitize_callback'	=>	'absint'
@@ -227,14 +227,14 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	/**
 	 * Set edit summary received via REST API
 	 */
-	public function set_edit_summary( WP_REST_Request $data ) {
+	public function rest_update_revision_meta( WP_REST_Request $data ) {
 		if ( is_null( $data['id'] ) || is_null( $data['key'] ) || is_null( $data['value'] ) ) {
 			// invalid
 			return;
 		}
 
 		if ( 'ssl_alp_edit_summary' !== $data['key'] ) {
-			// not edit summary
+			// ignore
 			return;
 		}
 
