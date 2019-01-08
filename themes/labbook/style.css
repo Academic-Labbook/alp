@@ -1280,6 +1280,10 @@ a.entry-link, a.entry-section-link {
 	display: inline;
 }
 
+.breadcrumbs {
+    font-size: 85%;
+}
+
 .breadcrumbs ul {
 	clear: both;
     list-style: none;
