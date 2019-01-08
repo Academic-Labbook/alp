@@ -36,7 +36,7 @@ class SSL_ALP_Uninstaller {
 
         // delete network options
         delete_site_option( 'ssl_alp_additional_media_types' );
-        delete_site_option( 'ssl_alp_tex_use_custom_urls' );
+        delete_site_option( 'ssl_alp_katex_use_custom_urls' );
         delete_site_option( 'ssl_alp_katex_js_url' );
         delete_site_option( 'ssl_alp_katex_copy_js_url' );
         delete_site_option( 'ssl_alp_katex_css_url' );

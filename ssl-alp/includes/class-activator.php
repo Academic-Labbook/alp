@@ -28,7 +28,7 @@ class SSL_ALP_Activator {
 
         // add network options
         add_site_option( 'ssl_alp_additional_media_types', '' );
-        add_site_option( 'ssl_alp_tex_use_custom_urls', false );
+        add_site_option( 'ssl_alp_katex_use_custom_urls', false );
         add_site_option( 'ssl_alp_katex_js_url', '' );
         add_site_option( 'ssl_alp_katex_copy_js_url', '' );
         add_site_option( 'ssl_alp_katex_css_url', '' );
