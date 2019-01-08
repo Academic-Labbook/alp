@@ -1,14 +1,56 @@
-var el = wp.element.createElement;
-var __ = wp.i18n.__;
-var Component = wp.element.Component;
-var PluginPostStatusInfo = wp.editPost.PluginPostStatusInfo;
-var TextControl = wp.components.TextControl;
-var registerPlugin = wp.plugins.registerPlugin;
-var subscribe = wp.data.subscribe;
-var registerStore = wp.data.registerStore;
+const el = wp.element.createElement;
+const __ = wp.i18n.__;
+const Component = wp.element.Component;
+const PluginPostStatusInfo = wp.editPost.PluginPostStatusInfo;
+const TextControl = wp.components.TextControl;
+const registerPlugin = wp.plugins.registerPlugin;
+const registerStore = wp.data.registerStore;
+const compose = wp.compose.compose;
+const withSelect = wp.data.withSelect;
+const withDispatch = wp.data.withDispatch;
 
-// initial value
-wp.data.select('core/editor').ssl_alp_edit_summary = '';
+const DEFAULT_STATE = {
+    // edit summary initially empty
+	editSummary: ''
+};
+
+const actions = {
+	setEditSummary( editSummary ) {
+		return {
+			type: 'SET_EDIT_SUMMARY',
+			editSummary: editSummary
+		};
+    },
+
+    resetEditSummary() {
+        return {
+            type: 'SET_EDIT_SUMMARY',
+            editSummary: DEFAULT_STATE.editSummary
+        };
+    }
+};
+
+const editSummaryStore = registerStore( 'ssl-alp/edit-summary', {
+	reducer( state = DEFAULT_STATE, action ) {
+		switch ( action.type ) {
+            case 'SET_EDIT_SUMMARY':
+				return {
+					...state,
+					editSummary: action.editSummary
+				};
+		}
+
+		return state;
+	},
+
+	actions,
+
+	selectors: {
+		getEditSummary( state ) {
+			return state.editSummary;
+		},
+	},
+} );
 
 class EditSummaryPlugin extends Component {
     constructor() {
@@ -24,26 +66,38 @@ class EditSummaryPlugin extends Component {
          */
 
         // previous (initial) revision ID
-        let lastRevisionId;
+        let lastRevisionId = this.props.lastRevisionId;
 
-        subscribe(() => {
-            // get latest revision ID
-            let newRevisionId = wp.data.select('core/editor').getCurrentPostLastRevisionId();
+        wp.data.subscribe(() => {
+            if ( this.props.isPublished && this.props.isSaving && !this.props.isAutosaving && !this.props.isPublishing ) {
+                // User is saving update to published post.
 
-            if (newRevisionId !== null && lastRevisionId !== null && newRevisionId !== lastRevisionId) {
-                // a new revision has been created
+                // get latest revision ID
+                let newRevisionId = this.props.lastRevisionId;
 
-                // get edit message
-                let editSummary = wp.data.select('core/editor').ssl_alp_edit_summary;
+                if ( newRevisionId !== null && lastRevisionId !== null && newRevisionId !== lastRevisionId ) {
+                    // a new revision has been created
 
-                // set this message in the revision
-                this.setRevisionEditSummary( newRevisionId, editSummary );
+                    // get edit message
+                    let editSummary = this.props.getEditSummary();
 
-                // clear the edit summary
-                wp.data.select('core/editor').ssl_alp_edit_summary = '';
+                    // set this message in the revision
+                    this.setRevisionEditSummary( newRevisionId, editSummary );
+
+                    // update revision
+                    lastRevisionId = newRevisionId;
+
+                    if ( this.props.isSaving && !this.props.isAutosaving ) {
+                        // clear the edit summary
+                        this.props.resetEditSummary();
+                    }
+                }
+            } else if ( this.props.isPublishing ) {
+                // User is publishing a new post.
+
+                // set last revision id
+                lastRevisionId = this.props.lastRevisionId;
             }
-
-            lastRevisionId = newRevisionId;
         });
 
         /**
@@ -56,9 +110,9 @@ class EditSummaryPlugin extends Component {
         // previous (initial) edit summary value
         let lastEditSummary = '';
 
-        subscribe(() => {
+        wp.data.subscribe(() => {
             // latest edit summary
-            let newEditSummary = wp.data.select('core/editor').ssl_alp_edit_summary;
+            let newEditSummary = this.props.getEditSummary();
 
             if ( newEditSummary !== null && lastEditSummary !== null && newEditSummary !== lastEditSummary ) {
                 // an external change has been made to the edit summary
@@ -80,7 +134,11 @@ class EditSummaryPlugin extends Component {
             value: editSummary
         };
 
-        wp.apiRequest( { path: `/ssl-alp/v1/update-revision-meta?id=${revisionId}`, method: 'POST', data: payload } ).then(
+        wp.apiRequest( {
+            path: `/ssl-alp/v1/update-revision-meta?id=${revisionId}`,
+            method: 'POST',
+            data: payload
+        } ).then(
             ( data ) => {
                 return data;
             },
@@ -91,6 +149,11 @@ class EditSummaryPlugin extends Component {
     }
 
     render() {
+        if ( !this.props.isPublished ) {
+            // don't render edit summary box on new posts
+            return null;
+        }
+
         return el(
             PluginPostStatusInfo,
             {
@@ -112,7 +175,7 @@ class EditSummaryPlugin extends Component {
                         });
 
                         // set message in datastore
-                        wp.data.select('core/editor').ssl_alp_edit_summary = value;
+                        this.props.setEditSummary( value );
                     }
                 }
             )
@@ -121,8 +184,47 @@ class EditSummaryPlugin extends Component {
 }
 
 /**
+ * Wrap a higher-order component around plugin to catch post update events.
+ */
+const EditSummaryPluginHOC = compose( [
+    withSelect( ( select, { forceIsSaving } ) => {
+        const {
+            isCurrentPostPublished,
+            isPublishingPost,
+            isSavingPost,
+            isAutosavingPost,
+            getCurrentPostLastRevisionId,
+        } = select( 'core/editor' );
+
+        const {
+            getEditSummary
+        } = select( 'ssl-alp/edit-summary' );
+
+        return {
+            isPublished: isCurrentPostPublished(),
+            isPublishing: isPublishingPost(),
+            isSaving: forceIsSaving || isSavingPost(),
+            isAutosaving: isAutosavingPost(),
+            lastRevisionId: getCurrentPostLastRevisionId(),
+            getEditSummary: getEditSummary,
+        };
+    } ),
+    withDispatch( ( dispatch ) => {
+        const {
+            setEditSummary,
+            resetEditSummary,
+        } = dispatch( 'ssl-alp/edit-summary' );
+
+        return {
+            setEditSummary: setEditSummary,
+            resetEditSummary: resetEditSummary,
+        };
+    } )
+])( EditSummaryPlugin );
+
+/**
  * Register sidebar plugin with block editor.
  */
 registerPlugin( 'ssl-alp-edit-summary-plugin', {
-	render: EditSummaryPlugin
+	render: EditSummaryPluginHOC
 } );

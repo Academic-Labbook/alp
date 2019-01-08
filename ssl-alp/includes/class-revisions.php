@@ -69,6 +69,14 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		// add edit summary box to block editor
 		$loader->add_action( 'enqueue_block_editor_assets', $this, 'add_edit_summary_control' );
 
+		/**
+		 * Force all revisions to be saved.
+		 *
+		 * This avoids confusion with block editor edit summary not being cleared. In the future,
+		 * we might also track when categories etc. are changed.
+		 */
+		$loader->add_filter( 'wp_save_post_revision_post_has_changed', $this, 'force_revision_creation', 10, 0 );
+
         // modify revision screen data to show edit summary
         $loader->add_filter( 'wp_prepare_revision_for_js', $this, 'prepare_revision_for_js', 10, 2 );
 
@@ -169,10 +177,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		// get post
 		$post = get_post();
 
-		if ( $post->post_status == 'auto-draft' ) {
-			// post is newly created, so don't show an edit summary box
-			return;
-		} elseif ( ! $this->edit_summary_allowed( $post ) ) {
+		if ( ! $this->edit_summary_allowed( $post ) ) {
 			return;
 		}
 
@@ -184,10 +189,15 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 				'wp-edit-post',
 				'wp-plugins',
 				'wp-i18n',
-				'wp-element'
+				'wp-element',
+				'wp-compose'
 			),
 			$ssl_alp->get_version()
 		);
+	}
+
+	public function force_revision_creation() {
+		return true;
 	}
 
 	public function get_latest_revision( $post_id ) {
