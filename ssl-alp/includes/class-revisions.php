@@ -6,7 +6,16 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Revision summary functionality
+ * Post and page edit summary functionality.
+ *
+ * Edit summaries are stored as post meta on post revisions. In the block editor, when a new
+ * revision is created (after clicking "Update"), some JavaScript calls out to a REST endpoint
+ * defined here to set its edit summary.
+ *
+ * It is not possible to use WordPress's built-in support for setting post meta directly from the
+ * block editor (avoiding the need for a custom REST endpoint), because it is only possible to set
+ * post meta on the parent post itself, not revisions. This approach was previously attempted using
+ * a hook on `updated_postmeta`, but this hook fired unreliably.
  */
 class SSL_ALP_Revisions extends SSL_ALP_Module {
 	protected static $edit_summary_max_length = 100;
@@ -54,28 +63,16 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		// register post meta for edit summaries
 		$loader->add_action( 'init', $this, 'register_edit_summary_post_meta' );
 
+		// register REST API endpoint for setting edit summaries with the block editor
+		$loader->add_action( 'rest_api_init', $this, 'register_edit_summary_rest_api_route' );
+
 		// add edit summary box to block editor
 		$loader->add_action( 'enqueue_block_editor_assets', $this, 'add_edit_summary_control' );
 
-		/**
-		 * Save meta data into revisions.
-		 *
-		 * In Gutenberg, when an update to a post is made, the new revision is saved (see hook
-		 * _wp_put_post_revision) before the post metadata is updated in the parent. That means we
-		 * cannot simply intercept the new revision and store the latest meta data there. Instead,
-		 * we hook into updated_postmeta which is fired after the parent's meta data is updated,
-		 * then back-fill the data into the revision and delete it from the parent.
-		 *
-		 * NOTE: move_edit_summary_into_latest_revision removes and re-adds this action. If the
-		 * priority or number of arguments is updated here, it must also be updated in the function
-		 * body.
-		 */
-		$loader->add_action( 'updated_postmeta', $this, 'move_edit_summary_into_latest_revision', 10, 4 );
-
-        // modify revision screen data
+        // modify revision screen data to show edit summary
         $loader->add_filter( 'wp_prepare_revision_for_js', $this, 'prepare_revision_for_js', 10, 2 );
 
-        // When restoring a revision, also restore that revisions's revisioned meta.
+        // when restoring a revision, point the new revision to the source revision
         $loader->add_action( 'wp_restore_post_revision', $this, 'restore_post_revision_meta', 10, 2 );
 
 		// register revisions widget
@@ -122,7 +119,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 				'description'		=>	'Edit summary',
 				'single'			=>	true,
 				'sanitize_callback'	=>	array( $this, 'sanitize_edit_summary' ),
-				'show_in_rest'		=>	true
+				'show_in_rest'		=>	false // edit summary submitted separately from parent post
 			)
 		);
 
@@ -183,67 +180,14 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		wp_enqueue_script(
 			'ssl-alp-edit-summary-block-editor-js',
 			SSL_ALP_BASE_URL . 'js/edit-summary/index.js',
-			array( 'wp-edit-post', 'wp-plugins', 'wp-i18n', 'wp-element' ),
+			array(
+				'wp-edit-post',
+				'wp-plugins',
+				'wp-i18n',
+				'wp-element'
+			),
 			$ssl_alp->get_version()
 		);
-	}
-
-	/**
-	 * Save meta data into revisions.
-	 *
-	 * In Gutenberg, when an update to a post is made, the new revision is saved (see hook
-	 * _wp_put_post_revision) before the post metadata is updated in the parent. That means we
-	 * cannot simply intercept the new revision and store the latest meta data there. Instead,
-	 * we hook into updated_postmeta which is fired after the parent's meta data is updated,
-	 * then back-fill the data into the revision and delete it from the parent.
-	 *
-	 * Note that this function is fired at least twice:
-	 *   1. When Gutenberg sets the parent's edit summary, which fires this function via the
-	 *      updated_postmeta action.
-	 *   2. When this function sets the latest revision's meta value to the parent's edit summary,
-	 *      before it empty's the parent's edit summary (in this case, the wp_is_post_revision
-	 *      call prevents this function from emptying itself).
-	 */
-	public function move_edit_summary_into_latest_revision( $meta_id, $post_id, $meta_key, $meta_value ) {
-		if ( $meta_key !== "ssl_alp_edit_summary" ) {
-			// not the right meta key
-			return;
-		}
-
-		$post = get_post( $post_id );
-
-		if ( wp_is_post_revision( $post ) ) {
-			// only fire on parents
-			return;
-		}
-
-		// get latest revision
-		$revision = $this->get_latest_revision( $post_id );
-
-		if ( ! is_null( $revision ) ) {
-			// revision found; check it matches current post
-			if ( $post->post_content !== $revision->post_content ) {
-				// revision was not created for the current post, but rather a previous one
-				return;
-			}
-
-			// update revision meta
-			// (use update_metadata to set revision's meta instead of parent's)
-			update_metadata( 'post', $revision->ID, 'ssl_alp_edit_summary', $meta_value );
-		}
-
-		/**
-		 * Delete edit summary from parent.
-		 *
-		 * This action has to be removed while making this update otherwise it will be called again.
-		 *
-		 * Note: don't delete the meta key, just make it empty, because Gutenberg expects it to
-		 * exist and uses its (empty) value when showing the edit screen.
-		 */
-		remove_action( 'updated_postmeta', array( $this, 'move_edit_summary_into_latest_revision' ) );
-		update_post_meta( $post_id, 'ssl_alp_edit_summary', '' );
-		update_post_meta( $post_id, 'ssl_alp_edit_summary_revert_id', 0 );
-		add_action( 'updated_postmeta', array( $this, 'move_edit_summary_into_latest_revision' ), 10, 4 );
 	}
 
 	public function get_latest_revision( $post_id ) {
@@ -259,6 +203,56 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		// return first value
 		return reset( $revisions );
+	}
+
+	/**
+	 * Register REST API route for setting edit summary
+	 */
+	public function register_edit_summary_rest_api_route() {
+		register_rest_route(
+			SSL_ALP_REST_ROUTE,
+			'/update-meta',
+			array(
+				'methods'	=>	'POST',
+				'callback'	=>	array( $this, 'set_edit_summary' ),
+				'args'		=>	array(
+					'id'	=>	array(
+						'sanitize_callback'	=>	'absint'
+					)
+				)
+			)
+		);
+	}
+
+	/**
+	 * Set edit summary received via REST API
+	 */
+	public function set_edit_summary( WP_REST_Request $data ) {
+		if ( is_null( $data['id'] ) || is_null( $data['key'] ) || is_null( $data['value'] ) ) {
+			// invalid
+			return;
+		}
+
+		if ( 'ssl_alp_edit_summary' !== $data['key'] ) {
+			// not edit summary
+			return;
+		}
+
+		$revision_id = $data['id'];
+
+		// get post
+		$post = get_post( $revision_id );
+
+		if ( wp_is_post_autosave( $post ) ) {
+			return;
+		} elseif ( ! $this->edit_summary_allowed( $post ) ) {
+			return;
+		}
+
+		$edit_summary = $this->sanitize_edit_summary( $data['value'] );
+
+		// update the revision's edit summary
+		update_metadata( 'post', $revision_id, 'ssl_alp_edit_summary', $edit_summary );
 	}
 
     /**
@@ -352,21 +346,23 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * created revision.
 	 */
 	public function restore_post_revision_meta( $post_id, $revision_id ) {
-		/**
-		 * Clear parent post and latest revision edit summary.
-		 *
-		 * This is copied from the target revision by WordPress, but we don't
-		 * want that.
-		 *
-		 * This implicitly uses `move_edit_summary_into_latest_revision` to do
-		 * this, fired via the `updated_postmeta` hook.
-		 */
-		update_post_meta( $post_id, 'ssl_alp_edit_summary', '' );
+		// clear any existing meta on the parent post
+		delete_post_meta( $post_id, 'ssl_alp_edit_summary' );
+		delete_post_meta( $post_id, 'ssl_alp_edit_summary_revert_id' );
 
 		// get the revision created as part of the restoration (prior to this function firing)
 		$latest_revision = $this->get_latest_revision( $post_id );
 
-	    // set latest revision's revert id
+	    /**
+		 * Update new revision meta data.
+		 *
+		 * Clear any edit summaries present, and set its revert id to the source revision's id.
+		 *
+		 * Use the underlying update_meta() function instead of
+		 * update_meta() to ensure metadata is updated on the revision post
+		 * and not its parent.
+		 */
+		update_metadata( 'post', $latest_revision->ID, 'ssl_alp_edit_summary', '' );
 		update_metadata( 'post', $latest_revision->ID, 'ssl_alp_edit_summary_revert_id', $revision_id );
 	}
 
