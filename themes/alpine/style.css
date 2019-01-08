@@ -985,6 +985,11 @@ body {
     font-style: italic;
 }
 
+/* sticky posts */
+.sticky {
+    border: 2px dashed red;
+}
+
 /* Default link settings, overridden further down */
 a, a:visited, a:hover, a:focus, a:active {
     color: #0b789c;
