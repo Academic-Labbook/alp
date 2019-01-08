@@ -78,7 +78,7 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 			array(
 				'type'				=>	'string',
 				'sanitize_callback'	=>	'esc_url_raw',
-				'default'			=>	SSL_ALP_DEFAULT_KATEX_JS_URL
+				'default'			=>	''
 			)
 		);
 
@@ -88,7 +88,7 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 			array(
 				'type'				=>	'string',
 				'sanitize_callback'	=>	'esc_url_raw',
-				'default'			=>	SSL_ALP_DEFAULT_KATEX_COPY_JS_URL
+				'default'			=>	''
 			)
 		);
 
@@ -98,7 +98,7 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 			array(
 				'type'				=>	'string',
 				'sanitize_callback'	=>	'esc_url_raw',
-				'default'			=>	SSL_ALP_DEFAULT_KATEX_CSS_URL
+				'default'			=>	''
 			)
 		);
 
@@ -108,7 +108,7 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 			array(
 				'type'				=>	'string',
 				'sanitize_callback'	=>	'esc_url_raw',
-				'default'			=>	SSL_ALP_DEFAULT_KATEX_COPY_CSS_URL
+				'default'			=>	''
 			)
 		);
 	}
@@ -256,7 +256,7 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 			$url = get_site_option( 'ssl_alp_katex_js_url' );
 		} else {
 			// use default URL
-			$url = SSL_ALP_DEFAULT_KATEX_JS_URL;
+			$url = SSL_ALP_BASE_URL . 'vendor/katex/katex.min.js';
 		}
 
 		return $url;
@@ -271,7 +271,7 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 			$url = get_site_option( 'ssl_alp_katex_copy_js_url' );
 		} else {
 			// use default URL
-			$url = SSL_ALP_DEFAULT_KATEX_COPY_JS_URL;
+			$url = SSL_ALP_BASE_URL . 'vendor/katex/contrib/copy-tex.min.js';
 		}
 
 		return $url;
@@ -286,7 +286,7 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 			$url = get_site_option( 'ssl_alp_katex_css_url' );
 		} else {
 			// use default URL
-			$url = SSL_ALP_DEFAULT_KATEX_CSS_URL;
+			$url = SSL_ALP_BASE_URL . 'vendor/katex/katex.min.css';
 		}
 
 		return $url;
@@ -301,7 +301,7 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 			$url = get_site_option( 'ssl_alp_katex_copy_css_url' );
 		} else {
 			// use default URL
-			$url = SSL_ALP_DEFAULT_KATEX_COPY_CSS_URL;
+			$url = SSL_ALP_BASE_URL . 'vendor/katex/contrib/copy-tex.min.css';
 		}
 
 		return $url;

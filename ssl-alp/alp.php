@@ -57,10 +57,6 @@ define( 'SSL_ALP_REST_ROUTE', 'ssl-alp/v1' );
  */
 
 define( 'SSL_ALP_KATEX_VERSION', '0.10.0' );
-define( 'SSL_ALP_DEFAULT_KATEX_JS_URL', 'https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.js' );
-define( 'SSL_ALP_DEFAULT_KATEX_CSS_URL', 'https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.css' );
-define( 'SSL_ALP_DEFAULT_KATEX_COPY_JS_URL', 'https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/contrib/copy-tex.min.js' );
-define( 'SSL_ALP_DEFAULT_KATEX_COPY_CSS_URL', 'https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/contrib/copy-tex.css' );
 
 /**
  * Code to run on plugin activation and deactivation.

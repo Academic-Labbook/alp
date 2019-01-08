@@ -149,5 +149,6 @@ on the ALP website.
  - Added TeX block.
  - Revised edit summary editor plugin to use core Gutenberg post meta support
    instead of separate REST endpoint.
+ - Self-host KaTeX scripts.
 = 1.0.0 =
  - First public release.
