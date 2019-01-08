@@ -179,7 +179,11 @@ if ( ! function_exists( 'alpine_the_post_meta' ) ) :
 		$byline_pieces[] = alpine_get_post_id_icon( $post );
 
 		// authors
-		$byline_pieces[] = alpine_get_authors( $post );
+		$authors = alpine_get_authors( $post );
+
+		if ( !empty( $authors ) ) {
+			$byline_pieces[] = $authors;
+		}
 
 		// show revisions link on posts and pages only
 		if ( alpine_get_option( 'show_edit_summaries' ) ) {
