@@ -169,6 +169,16 @@ if ( ! function_exists( 'labbook_get_page_breadcrumbs' ) ) :
 	}
 endif;
 
+if ( ! function_exists( 'labbook_add_revision_pagination_query_var' ) ) :
+	function labbook_add_revision_pagination_query_var() {
+		global $wp;
+
+		// allow URL query variable for paginating revision lists on posts and pages
+		$wp->add_query_var( 'revision_page' );
+	}
+endif;
+add_action( 'init', 'labbook_add_revision_pagination_query_var' );
+
 if ( ! function_exists( 'labbook_get_revisions' ) ) :
 	/**
 	 * Get list of revisions for the current or specified post

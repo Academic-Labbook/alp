@@ -467,9 +467,7 @@ if ( ! function_exists( 'labbook_the_revisions' ) ) :
 			return;
 		}
 
-		if ( ! $current_page = get_query_var( 'paged' ) ) {
-			$current_page = 1;
-		}
+		$current_page = ( get_query_var( 'revision_page' ) ) ? get_query_var( 'revision_page' ) : 1;
 
 		// total revisions
 		$count = labbook_get_post_revision_count( $post );
@@ -507,10 +505,9 @@ if ( ! function_exists( 'labbook_the_revisions' ) ) :
 
 		if ( $pages > 1 ) {
 			echo paginate_links( array(
-				'base'     => get_pagenum_link() . '%_%',
-				'format'   => '&paged=%#%',
-				'current'  => $current_page,
-				'total'    => $pages
+				'format'		=> '?revision_page=%#%',
+				'current'  		=> $current_page,
+				'total'    		=> $pages
 	  		) );
 		}
 
