@@ -227,7 +227,19 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 				'callback'	=>	array( $this, 'rest_update_revision_meta' ),
 				'args'		=>	array(
 					'id'	=>	array(
-						'sanitize_callback'	=>	'absint'
+						'required'			=> true,
+						'validate_callback'	=> function( $param, $request, $key ) {
+							return is_numeric( $param );
+						},
+						'sanitize_callback'	=> 'absint'
+					),
+					'key'	=>	array(
+						'required'			=> true,
+						'validate_callback'	=> array( $this, 'validate_revision_meta_key' )
+					),
+					'value'	=>	array(
+						'required'			=> true,
+						'sanitize_callback'	=> array( $this, 'sanitize_edit_summary' )
 					)
 				)
 			)
@@ -254,15 +266,34 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		$post = get_post( $revision_id );
 
 		if ( wp_is_post_autosave( $post ) ) {
-			return;
+			return new WP_Error(
+				'post_is_autosave',
+				__( 'The specified post is an autosave, and therefore cannot have its edit summary set.', 'ssl-alp' ),
+				array(
+					'status'	=>	400 // bad request
+				)
+			);
 		} elseif ( ! $this->edit_summary_allowed( $post ) ) {
-			return;
+			return new WP_Error(
+				'post_cannot_read',
+				__( 'Sorry, you are not allowed to edit this post.', 'ssl-alp' ),
+				array(
+					'status'	=>	rest_authorization_required_code()
+				)
+			);
 		}
 
-		$edit_summary = $this->sanitize_edit_summary( $data['value'] );
+		$edit_summary = $data['value']; // sanitized already by REST endpoint callback
 
 		// update the revision's edit summary
 		update_metadata( 'post', $revision_id, 'ssl_alp_edit_summary', $edit_summary );
+	}
+
+	/**
+	 * Validate that the key passed from REST to rest_update_revision_meta is valid.
+	 */
+	public function validate_revision_meta_key( $key ) {
+		return 'ssl_alp_edit_summary' === $key;
 	}
 
     /**
