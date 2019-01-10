@@ -7,6 +7,8 @@ minimally invasive on the core WordPress functionality, which should allow you
 to install additional plugins as you like.
 
 Lots of documentation is provided on the [ALP website](https://alp.attackllama.com/).
+Before installing, please read and understand the `Future development plans in the context of WordPress upgrades`
+section below. It explains how new features in WordPress will be tracked by ALP.
 
 ## What does ALP do?
  - Allows multiple authors to be assigned to single posts
@@ -82,6 +84,33 @@ outdated browsers, and this project is not concerned about losing sales from use
    compatible with certain other plugins.
  - **Modular**: most/all features can be enabled or disabled, and work independently from each
    other.
+
+## Future development plans in the context of WordPress upgrades
+The intention is for ALP to track the latest improvements to WordPress and Gutenberg as much as
+possible. *Any feature that is provided by ALP that becomes available in WordPress Core will
+probably be removed from ALP quite soon after*. The author does not have enough time to support
+many different versions of WordPress, and so the latest release will always be the focus. If a
+new core WordPress feature is released in the future that does something very similar to what ALP
+provides, then it is likely that the corresponding ALP feature will be removed. If in order to
+avoid breaking installations, some maintenance is required, instructions will be provided for
+system administrators to perform the necessary changes and the ALP release removing the feature will
+be given a new major version number.
+
+WordPress is in a period of transition: the new [Gutenberg](https://wordpress.org/gutenberg/) editor
+has introduced a completely different way of writing content. The feature roadmap shows a plan to
+eventually replace most of the configurable parts of WordPress with Gutenberb-based assets.
+
+Two changes of particular note are:
+
+  - The navigation menu and sidebar will probably eventually be
+    [converted](https://make.wordpress.org/core/2018/12/08/9-priorities-for-2019/) to use Gutenberg
+    blocks, with existing widgets and menu configurations becoming "legacy" types. The widgets
+    provided by ALP will likely therefore be made into blocks.
+  - There is a possibility that a table of contents block will become part of the core WordPress
+    block library (see [this](https://github.com/WordPress/gutenberg/issues/11047),
+    [this](https://github.com/WordPress/gutenberg/issues/7115) and
+    [this](https://github.com/WordPress/gutenberg/issues/6182)). The ALP table of contents block is
+    auto-generated on page load, so it probably won't disrupt too much to use the new block instead.
 
 ## Credits
 This plugin was entirely authored by [Sean Leavey](https://attackllama.com/), but in some cases
