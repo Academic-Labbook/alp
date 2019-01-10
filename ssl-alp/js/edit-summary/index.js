@@ -75,7 +75,7 @@ class EditSummaryPlugin extends Component {
                 // get latest revision ID
                 let newRevisionId = this.props.lastRevisionId;
 
-                if ( newRevisionId !== null && lastRevisionId !== null && newRevisionId !== lastRevisionId ) {
+                if ( newRevisionId !== null && newRevisionId !== lastRevisionId ) {
                     // a new revision has been created
 
                     // get edit message
