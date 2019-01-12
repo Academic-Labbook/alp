@@ -428,6 +428,8 @@ dfn, cite, em, i {
 
 blockquote {
     margin: 0 1.5em;
+    border-left: 0.25em solid #ccc;
+    padding-left: 0.5em;
 }
 
 address {
@@ -437,8 +439,7 @@ address {
 pre {
     background: #eee;
     font-family: "Courier 10 Pitch", Courier, monospace;
-    font-size: 15px;
-    font-size: 0.9375rem;
+    font-size: 95%;
     line-height: 1.6;
     margin-bottom: 1.6em;
     max-width: 100%;
@@ -448,8 +449,7 @@ pre {
 
 code, kbd, tt, var {
     font-family: Monaco, Consolas, "Andale Mono", "DejaVu Sans Mono", monospace;
-    font-size: 15px;
-    font-size: 0.9375rem;
+    font-size: 95%;
 }
 
 abbr, acronym {
@@ -533,7 +533,15 @@ figure {
 
 table {
     margin: 0 0 1.5em;
+    border-collapse: collapse;
     width: 100%;
+}
+
+table td,
+table th {
+    padding: 0.5em;
+    border: 1px solid #767676;
+    word-break: break-all;
 }
 
 /*--------------------------------------------------------------
@@ -984,8 +992,6 @@ a:hover, a:active {
     clip-path: none;
     color: #21759b;
     display: block;
-    font-size: 14px;
-    font-size: 0.875rem;
     font-weight: bold;
     height: auto;
     left: 5px;
@@ -1144,7 +1150,7 @@ a:hover, a:active {
 
 .page-links {
     clear: both;
-    margin: 0 0 1.5em;
+    padding: 1em 0.5em;
 }
 
 /*--------------------------------------------------------------

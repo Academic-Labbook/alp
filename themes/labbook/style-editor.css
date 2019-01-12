@@ -10,11 +10,11 @@ Editor style.
 
 
 /**
- * Remove the margin in all browsers.
+ * Add margin to keep the add block button away from the edge.
  */
 
 body {
-    margin: 0;
+    margin-left: 1em;
 }
 
 /**
@@ -134,7 +134,7 @@ optgroup,
 textarea {
     color: #404040;
     font-family: sans-serif;
-    font-size: 16px;
+    font-size: 14px;
     font-size: 1rem;
     line-height: 1.5;
 }
