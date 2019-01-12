@@ -608,7 +608,7 @@ if ( ! function_exists( 'labbook_get_revision_description' ) ) :
 		);
 
 		// check if this revision is the current one
-		if ( get_the_time( 'U', $revision ) == get_the_modified_time( 'U', $revision->parent ) ) {
+		if ( get_the_time( 'U', $revision ) === get_the_modified_time( 'U', $revision->parent ) ) {
 			$description .= __( ' <strong>(current)</strong>', 'labbook' );
 		}
 
