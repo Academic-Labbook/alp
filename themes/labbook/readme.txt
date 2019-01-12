@@ -4,8 +4,8 @@ Contributors: Sean Leavey
 Tags: custom-background, custom-logo, custom-menu, editor-style, education, theme-options, threaded-comments, translation-ready, two-columns
 
 Requires at least: 5.0.0
-Tested up to: 5.0.0
-Stable tag: 1.0.2
+Tested up to: 5.0.2
+Stable tag: 1.0.3
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -30,7 +30,20 @@ Optional: install Academic Labbook Plugin.
 
 == Frequently Asked Questions ==
 
+= Does this theme support any plugins? =
+
+Labbook supports Academic Labbook Plugin - indeed, use of it is highly encouraged to make the most
+of features provided in this theme.
+
 == Changelog ==
+
+= 1.0.3 - 2019-01-12 =
+* Editor style now closely matches the front end.
+* Bug fix for edit counts, where number of edits was shown including the revision created upon
+  publication, leading to an error of 1 in some cases.
+* Edit count not shown in post/page headers where there have been no edits so far.
+* Additional filtering on vulnerable output strings.
+* Minor layout fixes.
 
 = 1.0.2 - 2019-01-08 =
 * Initial release
