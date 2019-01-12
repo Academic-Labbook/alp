@@ -12,7 +12,7 @@
 ?>
 
 	<footer id="colophon" class="site-footer">
-		<div id="imprint-left">
+		<div class="imprint-left">
 			<?php if ( ! empty( labbook_get_option( 'copyright_text' ) ) ) : ?>
 			<span id="copyright"><?php echo wp_kses_post( labbook_get_option( 'copyright_text' ) ); ?></span>
 			<?php endif; ?>
@@ -28,7 +28,7 @@
 			</span>
 			<?php endif; ?>
 		</div>
-		<div id="imprint-right">
+		<div class="imprint-right">
 			<?php if ( labbook_get_option( 'show_powered_by' ) ) : ?>
 			<span id="powered-by">
 				<?php _e( 'Powered by <a href="https://alp.attackllama.com/">Academic Labbook Plugin for WordPress</a>.', 'labbook' ); ?>

@@ -25,6 +25,11 @@ Nicolas Gallagher and Jonathan Neal https://necolas.github.io/normalize.css/
 # Normalize
 # Typography
 # Elements
+    ## Page
+    ## Primary (content)
+    ## Secondary (sidebar)
+    ## Header (masthead)
+    ## Footer (colophon)
 # Forms
 # Navigation
     ## Links
@@ -33,10 +38,12 @@ Nicolas Gallagher and Jonathan Neal https://necolas.github.io/normalize.css/
 # Alignments
 # Clearings
 # Widgets
-# Content
-    ## Posts and pages
+# Posts and pages
+    ## Entries
+    ## References
+    ## Revisions
     ## Comments
-# Infinite scroll
+# Archives
 # Media
     ## Captions
     ## Galleries
@@ -397,12 +404,17 @@ optgroup,
 textarea {
     color: #404040;
     font-family: sans-serif;
-    font-size: 16px;
-    font-size: 1rem;
+    font-size: 14px;
     line-height: 1.5;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1, h2 {
+    clear: both;
+    font-weight: 400;
+    color: #252525;
+}
+
+h3, h4, h5, h6 {
     clear: both;
 }
 
@@ -469,8 +481,8 @@ html {
 }
 
 body {
-    background: #fff;
     /* Fallback for when there is no custom background color defined. */
+    background: none repeat scroll 0 0 #f0f3f5;
 }
 
 hr {
@@ -481,7 +493,8 @@ hr {
 }
 
 ul, ol {
-    margin: 0 0 1.5em 3em;
+    margin: 0.5em 0 0.5em 0;
+    padding-left: 2em;
 }
 
 ul {
@@ -495,7 +508,7 @@ ol {
 li > ul,
 li > ol {
     margin-bottom: 0;
-    margin-left: 1.5em;
+    margin-left: 0;
 }
 
 dt {
@@ -521,6 +534,144 @@ figure {
 table {
     margin: 0 0 1.5em;
     width: 100%;
+}
+
+/*--------------------------------------------------------------
+## Page
+--------------------------------------------------------------*/
+
+/* Main grid */
+#page {
+    display: grid;
+    width: 95%;
+    max-width: 1200px;
+    margin: 2em auto 0 auto;
+    grid-template-columns: 100%;
+    grid-template-rows: auto 1fr auto auto;
+    grid-template-areas:
+        "header"
+        "main"
+        "sidebar"
+        "footer";
+}
+
+/* Small devices (e.g. tablets) */
+@media (min-width: 768px) {
+    #page {
+        /* minmax(0, 1fr) stops <pre> expanding column: https://stackoverflow.com/questions/52587749/why-does-a-1fr-css-grid-column-neutralize-overflow-scroll-of-its-child-pre */
+        grid-template-columns: minmax(0, 1fr) 250px;
+        grid-template-rows: auto 1fr auto;
+        grid-template-areas:
+            "header header"
+            "main sidebar"
+            "footer footer";
+        grid-gap: 20px;
+    }
+}
+
+/* Medium devices (desktops) */
+@media (min-width: 992px) {
+    #page {
+        /* minmax(0, 1fr) stops <pre> expanding column: https://stackoverflow.com/questions/52587749/why-does-a-1fr-css-grid-column-neutralize-overflow-scroll-of-its-child-pre */
+        grid-template-columns: minmax(0, 1fr) 350px;
+    }
+}
+
+/*--------------------------------------------------------------
+## Primary (content)
+--------------------------------------------------------------*/
+
+#primary {
+    grid-area: main;
+}
+
+/*--------------------------------------------------------------
+## Secondary (sidebar)
+--------------------------------------------------------------*/
+
+#secondary {
+    grid-area: sidebar;
+    font-size: 95%;
+}
+
+/*--------------------------------------------------------------
+## Header (Masthead)
+--------------------------------------------------------------*/
+
+#masthead {
+    grid-area: header;
+}
+
+#masthead .site-branding {
+    background-color: #ffffff;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: 155px; /* should match header image max height */
+    grid-template-areas: "title logo";
+    align-items: center;
+    overflow: hidden;
+}
+
+#masthead .site-title-container {
+    grid-area: title;
+    padding: 1em;
+}
+
+#masthead .site-title {
+	font-size: 200%;
+    font-weight: 700;
+	line-height: 1.2;
+	margin: 0 0 5px 0;
+    padding: 0;
+}
+
+#masthead .site-title a {
+	color: #555;
+}
+
+#masthead .site-description {
+    color: #555;
+    font-size: 110%;
+	letter-spacing: 1px;
+	margin: 5px 0 0 0;
+    padding: 0;
+}
+
+#masthead .custom-logo-container {
+    grid-area: logo;
+    justify-self: end;
+}
+
+/*--------------------------------------------------------------
+## Footer (Colophon)
+--------------------------------------------------------------*/
+
+#colophon {
+    font-size: 95%;
+    grid-area: footer;
+    background-color: #0b789c;
+    color: #ffffff;
+    text-align: center;
+    padding: 1em;
+}
+
+#colophon a {
+	color: #eeeeee;
+}
+
+#colophon .imprint-left {
+	float: left;
+}
+
+#colophon .imprint-right {
+	float: right;
+}
+
+/* beta notice (will be removed eventually) */
+#colophon .beta-notice {
+    font-size: 80%;
+    font-style: italic;
 }
 
 /*--------------------------------------------------------------
@@ -613,16 +764,10 @@ textarea {
 /*--------------------------------------------------------------
 ## Links
 --------------------------------------------------------------*/
-a {
-    color: royalblue;
-}
 
-a:visited {
-    color: purple;
-}
-
-a:hover, a:focus, a:active {
-    color: midnightblue;
+a, a:visited, a:hover, a:focus, a:active {
+    color: #0b789c;
+    text-decoration: none;
 }
 
 a:focus {
@@ -637,10 +782,12 @@ a:hover, a:active {
 ## Menus
 --------------------------------------------------------------*/
 .main-navigation {
+    font-size: 95%;
     clear: both;
     display: block;
     float: left;
     width: 100%;
+    background-color: #0b789c;
 }
 
 .main-navigation ul {
@@ -654,6 +801,7 @@ a:hover, a:active {
     box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2);
     float: left;
     position: absolute;
+    min-width: 180px;
     top: 100%;
     left: -999em;
     z-index: 99999;
@@ -662,6 +810,15 @@ a:hover, a:active {
 .main-navigation ul ul ul {
     left: -999em;
     top: 0;
+}
+
+.main-navigation ul ul li {
+	border-top: 1px dashed #ddd;
+	width: 100%;
+}
+
+.main-navigation ul ul li:first-child {
+    border: 0;
 }
 
 .main-navigation ul ul li:hover > ul,
@@ -675,6 +832,7 @@ a:hover, a:active {
 
 .main-navigation ul li:hover > ul,
 .main-navigation ul li.focus > ul {
+    background-color: #fff;
     left: auto;
 }
 
@@ -683,15 +841,48 @@ a:hover, a:active {
     position: relative;
 }
 
+.main-navigation li ul li {
+	float: left;
+	text-align: left;
+}
+
 .main-navigation a {
     display: block;
     text-decoration: none;
+	color: #fff;
+	height: 48px;
+	line-height: 48px;
+	padding: 0 1em;
 }
 
-/* Small menu. */
+.main-navigation ul ul a {
+	color: #656565;
+	display: block;
+	height: auto;
+	line-height: 1.5;
+	padding: 0.75em 1em;
+	background: #fff;
+}
+
+.main-navigation ul ul a:hover,
+.main-navigation ul ul a:focus,
+.main-navigation ul ul a:active {
+	color: #0b789c;
+}
+
+/* Small menu, displays on mobile instead of full menu. */
 .menu-toggle,
 .main-navigation.toggled ul {
     display: block;
+    border: medium none;
+    background: none repeat scroll 0 0 #0b789c;
+    color: #fff;
+}
+
+.menu-toggle:before {
+    font-family: "FontAwesome" !important;
+    content: '\f0c9'; /* bars */
+    margin-right: 10px;
 }
 
 @media screen and (min-width: 37.5em) {
@@ -701,6 +892,29 @@ a:hover, a:active {
     .main-navigation ul {
         display: block;
     }
+}
+
+.main-navigation > .menu > ul > li.page_item_has_children > a,
+.main-navigation > div > ul > li.menu-item-has-children > a {
+    padding-right: 18px;
+}
+
+.main-navigation > .menu > ul > li.page_item_has_children > a:before,
+.main-navigation > div > ul > li.menu-item-has-children > a:before {
+    font-family: "FontAwesome" !important;
+    font-style: normal !important;
+    font-weight: normal !important;
+    font-variant: normal !important;
+    text-transform: none !important;
+    line-height: 1;
+    position: absolute;
+    right: 2px;
+    top: 18px;
+    content: "\f107";
+    font-size: 95%;
+    width: 14px;
+    text-align: left;
+    display: inline-block;
 }
 
 .site-main .comment-navigation, .site-main
@@ -715,6 +929,7 @@ a:hover, a:active {
 .post-navigation .nav-previous {
     float: left;
     width: 50%;
+    padding-left: 1em;
 }
 
 .comment-navigation .nav-next,
@@ -723,6 +938,7 @@ a:hover, a:active {
     float: right;
     text-align: right;
     width: 50%;
+    padding-right: 1em;
 }
 
 /*--------------------------------------------------------------
@@ -824,37 +1040,88 @@ a:hover, a:active {
 # Widgets
 --------------------------------------------------------------*/
 .widget {
-    margin: 0 0 1.5em;
-    /* Make sure select elements fit in widgets. */
+    background-color: #ffffff;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06);
+    margin: 0 0 1.5em 0;
+    padding: 1em;
+    color: #757575;
 }
 
+/* Make sure select elements fit in widgets */
 .widget select {
     max-width: 100%;
 }
 
+.widget .widget-title {
+    margin: 0;
+    color: #353535;
+    font-size: 110%;
+    font-weight: bold;
+}
+
+/* remove standard bullet points */
+.widget ul {
+	list-style-type: none;
+    margin: 0 0 0 15px;
+    padding: 0;
+}
+
+/* default list style type for widgets */
+.widget ul li:before {
+	font-family: 'FontAwesome';
+	content: '\f105'; /* arrow-right */
+	margin: 0 5px 0 -15px;
+	color: #0b789c;
+}
+
+.widget + .widget_ssl-alp-revisions li:before {
+    font-family: 'FontAwesome';
+	content: '\f040'; /* pencil */
+}
+
+.widget + .widget_recent_comments li:before {
+    font-family: 'FontAwesome';
+	content: '\f0e5'; /* question */
+}
+
+/* search widget */
+.search-form .search-field {
+	border:1px #CCCCCC solid;
+	font-weight: normal;
+	font-family: inherit;
+	box-sizing: border-box;
+	max-width: 350px;
+}
+
+.search-form .search-field {
+	width: 100%;
+}
+
 /*--------------------------------------------------------------
-# Content
---------------------------------------------------------------*/
-/*--------------------------------------------------------------
-## Posts and pages
+# Posts and pages
 --------------------------------------------------------------*/
 .sticky {
     display: block;
+    border: 2px dashed red;
 }
 
 .post,
 .page {
-    margin: 0 0 1.5em;
-}
-
-.updated:not(.published) {
-    display: none;
+    margin: 0 0 1.5em 0;
 }
 
 .page-content,
 .entry-content,
 .entry-summary {
-    margin: 1.5em 0 0;
+    margin: 0;
+}
+
+.page-header {
+    padding-left: 0.5em;
+}
+
+.page-header .page-title {
+    margin-top: 0;
 }
 
 .page-links {
@@ -863,14 +1130,289 @@ a:hover, a:active {
 }
 
 /*--------------------------------------------------------------
+## Entries
+--------------------------------------------------------------*/
+.hentry {
+    background-color: #ffffff;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06);
+    padding: 1em;
+}
+
+.entry-header, .entry-footer {
+	clear: both;
+	color: #0b789c;
+    position: relative;
+    font-size: 85%;
+}
+
+/* space after icons in post header and footer */
+.entry-header .fa, .entry-footer .fa {
+	margin-right: 0.5em;
+}
+
+.entry-title {
+    font-size: 1.9em;
+    margin: 0 0 0.25em 0;
+}
+
+/* permalink, default invisible */
+a.entry-link {
+	float: right;
+	margin-left: 5px;
+	display: none;
+}
+
+/* remove padding from entry link icon */
+a.entry-link .fa {
+    margin-right: 0;
+}
+
+/* display permalink when hovering over title */
+.entry-title:hover a.entry-link, .entry-section:hover {
+	display: inline;
+}
+
+.entry-content, .entry-summary {
+    border-top: 1px solid rgba(0, 0, 0, 0.07);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+    margin-top: 1em;
+    margin-bottom: 1em;
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+
+.entry-content h1,
+.entry-content h2,
+.entry-content h3,
+.entry-content h4,
+.entry-content h5,
+.entry-content h6 {
+    clear: left; /* disable clear: right to allow table of contents to float to right */
+}
+
+/* category and tag links */
+.entry-footer .cat-links a, .entry-footer .tag-links a {
+	background-color: #F5DF44;
+    border-radius: 4px;
+    padding: 2px;
+}
+
+.breadcrumbs {
+    font-size: 85%;
+}
+
+.breadcrumbs ul {
+	clear: both;
+    list-style: none;
+	margin: 0 0 0.5em 0;
+	padding: 0;
+    overflow: hidden;
+}
+
+.breadcrumbs ul li {
+	display: inline;
+    vertical-align: middle;
+    margin-right: 15px;
+}
+
+/* breadcrumb list item separator */
+.breadcrumbs ul li + li:before {
+	font-family: "FontAwesome" !important;
+	content: "\f101";
+    margin-right: 15px;
+}
+
+.entry-toc {
+    float: right;
+    clear: right;
+    border: #a8bfcf 1px solid;
+    padding: 0.5em;
+    margin: 1em 0 1em 1em; /* avoid adding margin on right where container already pads by 1em */
+    width: 35%;
+    font-size: 85%;
+}
+
+.entry-toc-title {
+    margin: 0; /* get rid of heading margin */
+}
+
+/* style for all lists descended from entry-toc, including sublists */
+.entry-toc ul {
+	list-style-type: none; /* remove standard bullet points */
+    padding: 0 0 0 15px;
+    margin: 0;
+}
+
+/* remove padding from top level */
+.entry-toc > ul {
+    padding: 0;
+    margin-bottom: 0;
+}
+
+.entry-toc ul li:before {
+	font-family: 'FontAwesome';
+	content: '\f105'; /* arrow-right */
+	margin: 0 5px 0 -15px;
+    color: #0b789c;
+    content: none; /* remove icon; moved to :before selector on a elements */
+}
+
+.entry-toc ul li a:before {
+	font-family: 'FontAwesome';
+	content: '\f105'; /* arrow-right */
+	margin: 0 5px 0 -10px;
+	color: #0b789c;
+}
+
+/*--------------------------------------------------------------
+## References
+--------------------------------------------------------------*/
+#post-references {
+	background-color: #ffffff;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06);
+    margin: 0 0 1.5em;
+    padding: 1.5em 1.5em;
+}
+
+#post-references h3 {
+	color: #353535;
+    margin: 0 0 1em 0;
+    font-weight: bold;
+}
+
+#post-references h4 {
+	margin-bottom: 5px;
+}
+
+#post-references ul {
+	margin: 0;
+	padding: 0 0 0 20px;
+	list-style: none;
+}
+
+#post-references ul li:before {
+	font-family: 'FontAwesome';
+	content: '\f105';
+	margin: 0 5px 0 -15px;
+	color: #0b789c;
+}
+
+#post-references ul li {
+	font-size: 85%;
+	margin-bottom: 6px;
+}
+
+/*--------------------------------------------------------------
+## Revisions
+--------------------------------------------------------------*/
+#post-revisions {
+	background-color: #ffffff;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06);
+    margin: 0 0 1.5em;
+    padding: 1.5em 1.5em;
+}
+
+#post-revisions h3 {
+	color: #353535;
+    margin: 0 0 1em 0;
+    font-weight: bold;
+}
+
+#post-revisions ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+#post-revisions ul li {
+	font-size: 85%;
+	margin-bottom: 6px;
+}
+
+/*--------------------------------------------------------------
 ## Comments
 --------------------------------------------------------------*/
+.comments-area {
+    background-color: #ffffff;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06);
+    padding: 1.5em;
+}
+
 .comment-content a {
     word-wrap: break-word;
 }
 
 .bypostauthor {
     display: block;
+}
+
+.comment-meta {
+	margin-right: 15px;
+	font-size: 85%;
+}
+
+.comment-list {
+    margin: 1em 0;
+}
+
+.comments-area h3 {
+    color: #353535;
+    font-size: 1.385em;
+}
+
+.comment-list .comment-meta {
+	padding: 10px 0px;
+}
+
+.comment-list .comment-content {
+	border: 1px dotted #cccccc;
+	padding: 10px;
+}
+
+.comment-list .comment-content p {
+	margin: 3px 0 3px 0;
+}
+
+.comment-body .reply {
+	margin: 5px 0px 10px 0px;
+}
+
+.comment-body .comment-metadata {
+	margin: 5px 0px;
+}
+
+.comment-list a.comment-reply-link:before {
+	font-family: "FontAwesome"; /* swinging left arrow */
+	content: '\f112';
+	margin-right: 3px;
+}
+
+.comment-list a.comment-edit-link {
+	margin-left: 10px;
+}
+
+.comment-list a.comment-edit-link:before {
+	font-family: "FontAwesome";
+	content: '\f044';
+	margin-right: 3px;
+}
+
+.comment-list .comment-metadata > a:before {
+	font-family: "FontAwesome";
+	content: '\f073';
+    margin-right: 3px;
+}
+
+/*--------------------------------------------------------------
+# Archives
+--------------------------------------------------------------*/
+.archive-description {
+    margin-top: 0.5em;
+    margin-bottom: 1.5em;
+}
+
+.archive-description p {
+    margin: 0;
 }
 
 /*--------------------------------------------------------------
@@ -967,632 +1509,4 @@ object {
 
 .gallery-caption {
     display: block;
-}
-
-/* END OF UNDERSCORES DEFAULTS */
-
-/*--------------------------------------------------------------
-# Labbook theme implementation
---------------------------------------------------------------*/
-
-body {
-    background: none repeat scroll 0 0 #f0f3f5;
-    font-size: 14px;
-}
-
-/* beta notice shown on footer; will be removed eventually */
-.beta-notice {
-    font-size: 80%;
-    font-style: italic;
-}
-
-/* sticky posts */
-.sticky {
-    border: 2px dashed red;
-}
-
-/* merge into underscores block above */
-.comment-navigation .nav-previous,
-.posts-navigation .nav-previous,
-.post-navigation .nav-previous {
-    padding-left: 1em;
-}
-
-/* merge into underscores block above */
-.comment-navigation .nav-next,
-.posts-navigation .nav-next,
-.post-navigation .nav-next {
-    padding-right: 1em;
-}
-
-/* Default link settings, overridden further down */
-a, a:visited, a:hover, a:focus, a:active {
-    color: #0b789c;
-    text-decoration: none;
-}
-
-ul, ol {
-    margin: 0.5em 0 0.5em 0;
-    padding-left: 2em;
-}
-
-li > ul,
-li > ol {
-    margin-bottom: 0;
-    margin-left: 0;
-}
-
-/* Main grid */
-#page {
-    display: grid;
-    width: 95%;
-    max-width: 1200px;
-    margin: 2em auto 0 auto;
-    grid-template-columns: 100%;
-    grid-template-rows: auto 1fr auto auto;
-    grid-template-areas:
-        "header"
-        "main"
-        "sidebar"
-        "footer";
-}
-
-/* Small devices (e.g. tablets) */
-@media (min-width: 768px) {
-    #page {
-        /* minmax(0, 1fr) stops <pre> expanding column: https://stackoverflow.com/questions/52587749/why-does-a-1fr-css-grid-column-neutralize-overflow-scroll-of-its-child-pre */
-        grid-template-columns: minmax(0, 1fr) 250px;
-        grid-template-rows: auto 1fr auto;
-        grid-template-areas:
-            "header header"
-            "main sidebar"
-            "footer footer";
-        grid-gap: 20px;
-    }
-}
-
-/* Medium devices (desktops) */
-@media (min-width: 992px) {
-    #page {
-        /* minmax(0, 1fr) stops <pre> expanding column: https://stackoverflow.com/questions/52587749/why-does-a-1fr-css-grid-column-neutralize-overflow-scroll-of-its-child-pre */
-        grid-template-columns: minmax(0, 1fr) 350px;
-    }
-}
-
-#masthead {
-    grid-area: header;
-}
-
-#primary {
-    grid-area: main;
-}
-
-#secondary {
-    grid-area: sidebar;
-}
-
-#colophon {
-    grid-area: footer;
-}
-
-/* space after icons */
-.fa {
-	margin-right: 0.5em;
-}
-
-/* category links */
-span.cat-links a, span.tag-links a {
-	background-color: #F5DF44;
-    border-radius: 4px;
-    padding: 2px;
-}
-
-/* display undisplayed update times */
-.updated:not(.published) {
-    display: unset;
-}
-
-.site-branding {
-    background-color: #ffffff;
-    width: 100%;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    grid-template-rows: 155px; /* should match header image max height */
-    grid-template-areas: "title logo";
-    align-items: center;
-    overflow: hidden;
-}
-
-.site-title-container {
-    grid-area: title;
-    padding: 1em;
-}
-
-.site-title {
-	font-size: 200%;
-    font-weight: 700;
-	line-height: 1.2;
-	margin: 0 0 5px 0;
-    padding: 0;
-}
-
-.site-title a {
-	color: #555;
-}
-
-.site-title a:hover, .site-title a:focus, .site-title a:active {
-	color: #0b789c;
-}
-
-.site-description {
-    color: #555;
-    font-size: 110%;
-	letter-spacing: 1px;
-	margin: 5px 0 0 0;
-    padding: 0;
-}
-
-.custom-logo-container {
-    grid-area: logo;
-    justify-self: end;
-}
-
-.main-navigation {
-    background-color: #0b789c;
-    font-size: 95%;
-}
-
-.main-navigation li ul li {
-	float: left;
-	text-align: left;
-}
-
-.main-navigation a {
-	color: #fff;
-	height: 48px;
-	line-height: 48px;
-	padding: 0 1em;
-}
-
-.main-navigation ul ul {
-	min-width: 180px;
-}
-
-.main-navigation ul ul a {
-	color: #656565;
-	display: block;
-	height: auto;
-	line-height: 1.5;
-	padding: 0.75em 1em;
-	background: #fff;
-}
-
-.main-navigation ul ul a:hover,
-.main-navigation ul ul a:focus,
-.main-navigation ul ul a:active {
-	color: #0b789c;
-}
-
-.main-navigation ul ul li {
-	border-top: 1px dashed #ddd;
-	width: 100%;
-}
-
-.main-navigation ul ul li:first-child {
-    border: 0;
-}
-
-.main-navigation ul li:hover > ul,
-.main-navigation ul li.focus > ul {
-	background-color: #fff;
-}
-
-.main-navigation > .menu > ul > li.page_item_has_children > a,
-.main-navigation > div > ul > li.menu-item-has-children > a {
-    padding-right: 18px;
-}
-
-.main-navigation > .menu > ul > li.page_item_has_children > a:before,
-.main-navigation > div > ul > li.menu-item-has-children > a:before {
-    font-family: "FontAwesome" !important;
-    font-style: normal !important;
-    font-weight: normal !important;
-    font-variant: normal !important;
-    text-transform: none !important;
-    line-height: 1;
-    position: absolute;
-    right: 2px;
-    top: 18px;
-    content: "\f107";
-    font-size: 95%;
-    width: 14px;
-    text-align: left;
-    display: inline-block;
-}
-
-.hentry, .widget {
-    background-color: #ffffff;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06);
-    margin: 0 0 1.5em 0;
-    padding: 1em;
-}
-
-#colophon {
-    background-color: #0b789c;
-    color: #ffffff;
-    text-align: center;
-    padding: 1em;
-}
-
-#colophon a {
-	color: #eeeeee;
-}
-
-.main-navigation, .site-footer, .widget-area, .entry-meta p {
-    font-size: 95%;
-}
-
-.entry-header, .entry-footer {
-	clear: both;
-	color: #0b789c;
-    position: relative;
-}
-
-.page-content,
-.entry-content,
-.entry-summary {
-    margin: 0;
-}
-
-.page-header {
-    padding-left: 0.5em;
-}
-
-.page-header .page-title {
-    margin-top: 0;
-}
-
-.archive-description {
-    margin-top: 0.5em;
-    margin-bottom: 1.5em;
-}
-
-.archive-description p {
-    margin: 0;
-}
-
-.entry-header h1, .entry-header h2 {
-	margin: 0 0 0.25em 0;
-	font-weight: 400;
-	color: #252525;
-	font-size: 175%;
-}
-
-/* permalink, default invisible */
-a.entry-link, a.entry-section-link {
-	float: right;
-	margin-left: 5px;
-	display: none;
-}
-
-/* display permalink when hovering over title */
-.entry-title:hover a.entry-link, .entry-section:hover a.entry-section-link {
-	display: inline;
-}
-
-.breadcrumbs {
-    font-size: 85%;
-}
-
-.breadcrumbs ul {
-	clear: both;
-    list-style: none;
-	margin: 0 0 0.5em 0;
-	padding: 0;
-    overflow: hidden;
-}
-
-.breadcrumbs ul li {
-	display: inline;
-    vertical-align: middle;
-    margin-right: 15px;
-}
-
-/* breadcrumb list item separator */
-.breadcrumbs ul li + li:before {
-	font-family: "FontAwesome" !important;
-	content: "\f101";
-    margin-right: 15px;
-}
-
-.entry-toc {
-    float: right;
-    clear: right;
-    border: #a8bfcf 1px solid;
-    padding: 0.5em;
-    margin: 1em 0 1em 1em; /* avoid adding margin on right where container already pads by 1em */
-    width: 35%;
-    font-size: 85%;
-}
-
-.entry-toc-title {
-    margin: 0; /* get rid of heading margin */
-}
-
-/* style for all lists descended from entry-toc, including sublists */
-.entry-toc ul {
-	list-style-type: none; /* remove standard bullet points */
-    padding: 0 0 0 15px;
-    margin: 0;
-}
-
-/* remove padding from top level */
-.entry-toc > ul {
-    padding: 0;
-    margin-bottom: 0;
-}
-
-.entry-toc ul li:before {
-	font-family: 'FontAwesome';
-	content: '\f105'; /* arrow-right */
-	margin: 0 5px 0 -15px;
-    color: #0b789c;
-    content: none; /* remove icon; moved to :before selector on a elements */
-}
-
-.entry-toc ul li a:before {
-	font-family: 'FontAwesome';
-	content: '\f105'; /* arrow-right */
-	margin: 0 5px 0 -10px;
-	color: #0b789c;
-}
-
-.entry-content, .entry-summary {
-    border-top: 1px solid rgba(0, 0, 0, 0.07);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
-    margin-top: 1em;
-    margin-bottom: 1em;
-    padding-top: 1em;
-    padding-bottom: 1em;
-}
-
-.entry-content h1,
-.entry-content h2,
-.entry-content h3,
-.entry-content h4,
-.entry-content h5,
-.entry-content h6 {
-    clear: left; /* disable clear: right to allow table of contents to float to right */
-}
-
-.entry-content a {
-    border-bottom: #a8bfcf 1px solid;
-}
-
-.entry-content a:hover {
-    border-bottom: #005a9c 2px solid;
-    background-color:#efefef;
-}
-
-.entry-meta div, .entry-footer span, .comment-meta { /* div/span specificity required */
-	margin-right: 15px;
-	font-size: 85%;
-}
-
-.entry-meta a, #post-revisions a, #post-references a {
-    border-bottom: #a8bfcf 1px solid;
-}
-
-.entry-meta a:hover, #post-revisions a:hover, #post-references a:hover {
-    border-bottom: #005a9c 2px solid;
-    background-color:#efefef;
-}
-
-.widget {
-    color: #757575;
-}
-
-.widget .widget-title {
-    margin: 0;
-    color: #353535;
-    font-size: 110%;
-    font-weight: bold;
-}
-
-/* remove standard bullet points */
-.widget ul {
-	list-style-type: none;
-    margin: 0 0 0 15px;
-    padding: 0;
-}
-
-/* default list style type for widgets */
-.widget ul li:before {
-	font-family: 'FontAwesome';
-	content: '\f105'; /* arrow-right */
-	margin: 0 5px 0 -15px;
-	color: #0b789c;
-}
-
-.widget + .widget_ssl-alp-revisions li:before {
-    font-family: 'FontAwesome';
-	content: '\f040'; /* pencil */
-}
-
-.widget + .widget_recent_comments li:before {
-    font-family: 'FontAwesome';
-	content: '\f0e5'; /* question */
-}
-
-/* Search widget */
-.search-form .search-form label {
-	width: 100%;
-}
-
-.search-form .search-field {
-	border:1px #CCCCCC solid;
-	font-weight: normal;
-	font-family: inherit;
-	box-sizing: border-box;
-	max-width: 350px;
-}
-
-.search-form .search-field {
-	width: 100%;
-}
-
-footer #imprint-left {
-	float: left;
-}
-
-footer #imprint-right {
-	float: right;
-}
-
-#post-references, #post-revisions {
-	background-color: #ffffff;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06);
-    margin: 0 0 1.5em;
-    padding: 1.5em 1.5em;
-}
-
-#post-references h3, #post-revisions h3 {
-	color: #353535;
-    margin: 0 0 1em 0;
-    font-weight: bold;
-}
-
-#post-references h4 {
-	margin-bottom: 5px;
-}
-
-#post-references ul {
-	margin: 0;
-	padding: 0 0 0 20px;
-	list-style: none;
-}
-
-#post-references ul li:before {
-	font-family: 'FontAwesome';
-	content: '\f105';
-	margin: 0 5px 0 -15px;
-	color: #0b789c;
-}
-
-#post-revisions ul {
-	margin: 0;
-	padding: 0;
-	list-style: none;
-}
-
-#post-references ul li, #post-revisions ul li {
-	font-size: 85%;
-	margin-bottom: 6px;
-}
-
-.comments-area {
-    background-color: #ffffff;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06);
-    margin: 1.5em 0;
-    padding: 1.5em;
-}
-
-h2.comments-title {
-    font-size: 110%;
-    font-weight: 700;
-}
-
-.comment-list {
-    margin: 1em 0;
-}
-
-.comments-area h3 {
-    color: #353535;
-    font-size: 1.385em;
-}
-
-.comment-list .comment-meta {
-	padding: 10px 0px;
-}
-
-.comment-list .comment-content {
-	border: 1px dotted #cccccc;
-	padding: 10px;
-}
-
-.comment-list .comment-content p {
-	margin: 3px 0 3px 0;
-}
-
-.comment-body .reply {
-	margin: 5px 0px 10px 0px;
-}
-
-.comment-body .comment-metadata {
-	margin: 5px 0px;
-}
-
-.comment-list a.comment-reply-link:before {
-	font-family: "FontAwesome";
-	content: '\f112';
-	margin-right: 3px;
-}
-
-.comment-list a.comment-edit-link {
-	margin-left: 10px;
-}
-
-.comment-list a.comment-edit-link:before {
-	font-family: "FontAwesome";
-	content: '\f044';
-	margin-right: 3px;
-}
-
-.comment-list .comment-metadata > a:before {
-	font-family: "FontAwesome";
-	content: '\f073';
-    margin-right: 3px;
-}
-
-button, input, select, textarea {
-	font-size: 100%; /* Corrects font size not being inherited in all browsers */
-	margin: 0; /* Addresses margins set differently in IE6/7, F3/4, S5, Chrome */
-	vertical-align: baseline; /* Improves appearance and consistency in all browsers */
-}
-
-button, input[type="button"], input[type="reset"], input[type="submit"] {
-	border: medium none;
-	background: none repeat scroll 0 0 #0b789c;
-	cursor: pointer; /* Improves usability and consistency of cursor style between image-type 'input' and others */
-	font-size: 85%;
-	line-height: 1.4;
-	color: #ffffff;
-	padding: 0.75em 1.5em;
-	font-weight: bold;
-	text-transform: uppercase;
-}
-
-button:focus, input[type="button"]:focus, input[type="reset"]:focus, input[type="submit"]:focus {
-	border: 1px #FFF solid;
-	border-radius: 3px;
-	box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.6);
-}
-
-input[type="search"] {
-	box-sizing:         content-box;
-}
-
-input[type="text"], input[type="email"], input[type="url"], input[type="password"], input[type="search"],
-textarea {
-	color: #666;
-	border: 1px solid #ccc;
-}
-
-input[type="text"]:focus, input[type="email"]:focus, input[type="url"]:focus, input[type="password"]:focus,
-input[type="search"]:focus, textarea:focus {
-	color: #111;
-}
-
-input[type="text"], input[type="email"], input[type="url"], input[type="password"], input[type="search"] {
-	padding: 3px;
 }
