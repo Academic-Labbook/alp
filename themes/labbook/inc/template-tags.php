@@ -525,6 +525,10 @@ if ( ! function_exists( 'labbook_get_revision_description' ) ) :
 		// get revision object if id is specified
 		$revision = wp_get_post_revision( $revision );
 
+		if ( is_null( $revision ) ) {
+			return;
+		}
+
 		if  ( 'revision' !== $revision->post_type ) {
 			return;
 		}
@@ -533,8 +537,16 @@ if ( ! function_exists( 'labbook_get_revision_description' ) ) :
 		$revision_edit_summary = get_post_meta( $revision->ID, 'ssl_alp_edit_summary', true );
 		$revision_edit_summary_revert_id = get_post_meta( $revision->ID, 'ssl_alp_edit_summary_revert_id', true );
 
+		// revision abbreviation, e.g. r101, with link to diff
+		$abbr = labbook_get_revision_abbreviation( $revision );
+
+		if ( is_null( $abbr ) ) {
+			// invalid
+			return;
+		}
+
 		// default message
-		$message = " " . labbook_get_revision_abbreviation( $revision );
+		$message = " " . $abbr;
 
 		if ( wp_is_post_autosave( $revision ) ) {
 			// this is an autosave
@@ -544,11 +556,19 @@ if ( ! function_exists( 'labbook_get_revision_description' ) ) :
 			$message .= __( ' <strong>(published)</strong>', 'labbook' );
 		} elseif ( !empty( $revision_edit_summary_revert_id ) ) {
 			// revision was a revert
-			// /* translators: 1: revision ID/URL */
-			$message .= sprintf(
-				__( ': reverted to %1$s', 'labbook' ),
-				labbook_get_revision_abbreviation( $revision_edit_summary_revert_id )
-			);
+			$source_abbr = labbook_get_revision_abbreviation( $revision_edit_summary_revert_id );
+
+			if ( is_null( $source_abbr ) ) {
+				// source revision is invalid
+				// /* translators: reverted to unknown revision */
+				$message .= __( ': reverted', 'labbook' );
+			} else {
+				// /* translators: 1: reverted revision ID/URL */
+				$message .= sprintf(
+					__( ': reverted to %1$s', 'labbook' ),
+					$source_abbr
+				);
+			}
 
 			// get original source revision
 			$source_revision = $ssl_alp->revisions->get_source_revision( $revision );
@@ -601,22 +621,37 @@ endif;
 
 if ( ! function_exists( 'labbook_get_revision_abbreviation' ) ) :
 	/**
-	 * Gets abbreviated revision ID, with optional URL
+	 * Gets abbreviated revision ID, with optional URL.
+	 *
+	 * If the specified revision doesn't exist, it may have been deleted but is still referenced by
+	 * another revision edit summary. In this case, this function will will still show the
+	 * non-existent revision ID but will not provide a URL to the diff screen.
+	 *
+	 * @param int $revision Revision ID
 	 */
 	function labbook_get_revision_abbreviation( $revision, $url = true ) {
 		global $ssl_alp;
 
 		$revision = wp_get_post_revision( $revision );
 
+		$abbr_format = _x('r%1$s', 'abbreviated revision ID text', 'labbook' );
+
+		if ( is_null( $revision ) ) {
+			if ( !is_numeric( $revision ) ) {
+				// invalid
+				return;
+			}
+
+			// revision post ID
+			return sprintf( $abbr_format, $revision_id );
+		}
+
 		if  ( 'revision' !== $revision->post_type ) {
 			return;
 		}
 
 		// revision post ID
-		$abbr = sprintf(
-			_x('r%1$s', 'abbreviated revision ID text', 'labbook' ),
-			$revision->ID
-		);
+		$abbr = sprintf( $abbr_format, $revision->ID );
 
 		// add URL to diff if user can view
 		if ( $url ) {
