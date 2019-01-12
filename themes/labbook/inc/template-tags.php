@@ -41,7 +41,7 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 		if ( $url ) {
 			// wrap title in its permalink
 			$html .= sprintf(
-				'<a href="%1$s" rel="bookmark" >%2$s</a>',
+				'<a href="%1$s" rel="bookmark">%2$s</a>',
 				$permalink,
 				$title
 			);
@@ -52,10 +52,7 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 
 		if ( $anchor ) {
 			// add hover anchor with permalink
-			$html .= sprintf(
-				'<a class="entry-link" href="%1$s"><i class="fa fa-link"></i></a>',
-				$permalink
-			);
+			$html .= labbook_get_post_anchor( $post );
 		}
 
 		// output header tag
@@ -65,6 +62,20 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 		);
 	}
 endif;
+
+function labbook_get_post_anchor( $post = null ) {
+	$post = get_post( $post );
+
+	if ( is_null( $post ) ) {
+		return;
+	}
+
+	return sprintf(
+		'<a class="entry-link" href="%1$s" title="%2$s"><i class="fa fa-link"></i></a>',
+		esc_url( get_permalink( $post ) ),
+		esc_html__( 'Permalink', 'labbook' )
+	);
+}
 
 if ( ! function_exists( 'labbook_get_post_date_html' ) ) :
 	/**
@@ -178,11 +189,13 @@ if ( ! function_exists( 'labbook_the_post_meta' ) ) :
 		// post id
 		$byline_pieces[] = labbook_get_post_id_icon( $post );
 
-		// authors
-		$authors = labbook_get_authors( $post );
+		if ( $post->post_type == 'post' ) {
+			// authors
+			$authors = labbook_get_authors( $post );
 
-		if ( !empty( $authors ) ) {
-			$byline_pieces[] = $authors;
+			if ( !empty( $authors ) ) {
+				$byline_pieces[] = $authors;
+			}
 		}
 
 		// show revisions link
@@ -190,7 +203,13 @@ if ( ! function_exists( 'labbook_the_post_meta' ) ) :
 			$byline_pieces[] = labbook_get_revisions_link( $post );
 		}
 
-		if ( current_user_can( 'edit_post', $post ) ) {
+		if ( $post->post_type == 'page' ) {
+			$permission = 'edit_page';
+		} else {
+			$permission = 'edit_post';
+		}
+
+		if ( current_user_can( $permission, $post ) ) {
 			// add edit post link
 			$byline_pieces[] = labbook_get_post_edit_link( $post );
 		}
@@ -200,45 +219,21 @@ if ( ! function_exists( 'labbook_the_post_meta' ) ) :
 			implode( '&nbsp;&nbsp;', $byline_pieces )
 		);
 
-		$posted_on = labbook_get_post_date_html( $post );
+		if ( $post->post_type == 'post' ) {
+			$posted_on = labbook_get_post_date_html( $post );
 
-		// check post timestamps to see if modified
-		if ( get_the_time( 'U', $post ) !== get_the_modified_time( 'U', $post ) ) {
-			$modified_on = labbook_get_post_date_html( $post, true );
-			/* translators: 1: post modification date */
-			$posted_on .= sprintf( __( ' (last edited %1$s)', 'labbook' ), $modified_on );
+			// check post timestamps to see if modified
+			if ( get_the_time( 'U', $post ) !== get_the_modified_time( 'U', $post ) ) {
+				$modified_on = labbook_get_post_date_html( $post, true );
+				/* translators: 1: post modification date */
+				$posted_on .= sprintf( __( ' (last edited %1$s)', 'labbook' ), $modified_on );
+			}
+
+			printf(
+				'<div class="posted-on">%1$s</div>',
+				$posted_on
+			);
 		}
-
-		printf(
-			'<div class="posted-on">%1$s</div>',
-			$posted_on
-		);
-	}
-endif;
-
-if ( ! function_exists( 'labbook_the_page_meta' ) ) :
-	/**
-	 * Print HTML with meta information about page
-	 */
-	function labbook_the_page_meta( $page = null ) {
-		$page = get_post( $page );
-
-		$byline_pieces = array();
-
-		// show revisions link
-		if ( labbook_get_option( 'show_edit_summaries' ) && labbook_get_post_edit_count( $page ) > 0 ) {
-			$byline_pieces[] = labbook_get_revisions_link( $page );
-		}
-
-		if ( current_user_can( 'edit_page', $page ) ) {
-			// add edit post link
-			$byline_pieces[] = labbook_get_post_edit_link( $page );
-		}
-
-		printf(
-			'<div class="byline">%1$s</div>',
-			implode( '&nbsp;&nbsp;', $byline_pieces )
-		);
 	}
 endif;
 

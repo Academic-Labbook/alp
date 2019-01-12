@@ -12,15 +12,9 @@
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 	<header class="entry-header">
 		<?php labbook_the_post_title(); ?>
-		<?php if ( 'post' == get_post_type() ) : ?>
 		<div class="entry-meta">
 			<?php labbook_the_post_meta(); ?>
 		</div><!-- .entry-meta -->
-		<?php elseif ( 'page' == get_post_type() ) : ?>
-		<div class="entry-meta">
-			<?php labbook_the_page_meta(); ?>
-		</div><!-- .entry-meta -->
-		<?php endif; ?>
 	</header><!-- .entry-header -->
 
 	<?php if ( 'status' !== get_post_format() ) : // status update theme type; don't show content ?>

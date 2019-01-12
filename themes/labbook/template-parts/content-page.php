@@ -16,7 +16,7 @@
 	<header class="entry-header">
 		<?php labbook_the_post_title( $post, false, false, true ); ?>
 		<div class="entry-meta">
-			<?php labbook_the_page_meta(); ?>
+			<?php labbook_the_post_meta(); ?>
 		</div><!-- .entry-meta -->
 	</header><!-- .entry-header -->
 
