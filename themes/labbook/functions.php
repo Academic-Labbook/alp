@@ -40,7 +40,7 @@ if ( ! function_exists( 'labbook_setup' ) ) :
 		// This theme uses wp_nav_menu() in two locations.
 		register_nav_menus( array(
 			'site-menu' => esc_html__( 'Primary', 'labbook' ),
-			'network-menu' => esc_html__( 'Network', 'labbook' )
+			'network-menu' => esc_html__( 'Network', 'labbook' ),
 		) );
 
 		/*
@@ -80,7 +80,7 @@ if ( ! function_exists( 'labbook_setup' ) ) :
 			'height'      => 155,
 			'width'       => 700,
 			'flex-width'  => false,
-			'flex-height' => false
+			'flex-height' => false,
 		) );
 
 		/**
@@ -122,7 +122,6 @@ add_action( 'after_setup_theme', 'labbook_setup' );
 function labbook_content_width() {
 	// This variable is intended to be overruled from themes.
 	// Open WPCS issue: {@link https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/issues/1043}.
-	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 	$GLOBALS['content_width'] = apply_filters( 'labbook_content_width', 640 );
 }
 add_action( 'after_setup_theme', 'labbook_content_width', 0 );
@@ -185,11 +184,13 @@ function labbook_scripts() {
 }
 add_action( 'wp_enqueue_scripts', 'labbook_scripts' );
 
-if ( ! function_exists( 'labbook_the_content_with_toc' ) ) :
+if ( ! function_exists( 'labbook_get_content_with_toc' ) ) :
 	/**
-	 * Add table of contents alongside post.
+	 * Insert table of contents into post.
+	 *
+	 * @param string $content The post content.
 	 */
-	function labbook_the_content_with_toc( $content ) {
+	function labbook_get_content_with_toc( $content ) {
 		$post = get_post();
 
 		if ( ! labbook_get_option( 'show_page_table_of_contents' ) ) {
@@ -204,17 +205,17 @@ if ( ! function_exists( 'labbook_the_content_with_toc' ) ) :
 			return $content;
 		}
 
-		// get contents hierarchy
+		// Get contents hierarchy.
 		$content = labbook_generate_post_contents( $content, $hierarchy );
 
 		if ( is_null( $hierarchy ) || ! $hierarchy->count() ) {
-			// table of contents was not generated or has no entries
+			// Table of contents was not generated or has no entries.
 			return $content;
 		}
 
 		?>
 		<div class="entry-toc entry-toc-<?php the_ID(); ?>">
-			<h3 class="entry-toc-title"><?php _e( 'Contents', 'labbook' ) ?></h3>
+			<h3 class="entry-toc-title"><?php esc_html_e( 'Contents', 'labbook' ) ?></h3>
 			<?php labbook_the_toc( $hierarchy, labbook_get_option( 'table_of_contents_max_depth' ) ); ?>
 		</div>
 		<?php
@@ -222,12 +223,12 @@ if ( ! function_exists( 'labbook_the_content_with_toc' ) ) :
 		return $content;
 	}
 endif;
-add_filter( 'the_content', 'labbook_the_content_with_toc' );
+add_filter( 'the_content', 'labbook_get_content_with_toc' );
 
 /**
  * Page table of contents generator.
  */
-require get_template_directory() . '/inc/toc.php';
+require get_template_directory() . '/inc/class-toc-menu-level.php';
 
 /**
  * Functions which enhance the theme by hooking into WordPress.

@@ -20,8 +20,8 @@
 	</header><!-- .entry-header -->
 
 	<?php
-	if ( 'status' == get_post_format() ) :
-		// do nothing
+	if ( 'status' === get_post_format() ) :
+		// Do nothing.
 	elseif ( 'excerpt' === labbook_get_option( 'content_layout' ) ) : ?>
 	<div class="entry-summary">
 		<?php the_excerpt(); ?>

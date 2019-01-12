@@ -31,10 +31,27 @@
 		<div class="imprint-right">
 			<?php if ( labbook_get_option( 'show_powered_by' ) ) : ?>
 			<span id="powered-by">
-				<?php _e( 'Powered by <a href="https://alp.attackllama.com/">Academic Labbook Plugin for WordPress</a>.', 'labbook' ); ?>
+				<a href="<?php echo esc_url( 'https://alp.attackllama.com/', 'labbook' ); ?>">
+					<?php
+					esc_html_e( 'Powered by Academic Labbook Plugin for WordPress', 'labbook' );
+					?>
+				</a>
 			</span><!-- .powered-by -->
 			<span class="beta-notice">
-				<?php _e( 'This is a beta release. Please report bugs <a href="https://alp.attackllama.com/bugs/">here</a>.', 'labbook' ); ?>
+				<?php
+				printf(
+					wp_kses(
+						/* translators: 1: link to Academic Labbook Plugin bug information page */
+						__( 'This is a beta release. Please report bugs <a href="%1$s">here</a>.', 'labbook' ),
+						array(
+							'a'	=> array(
+								'href'	=> array(),
+							),
+						)
+					),
+					esc_url( 'https://alp.attackllama.com/bugs/' )
+				);
+				?>
 			</span>
 			<?php endif; ?>
 		</div>

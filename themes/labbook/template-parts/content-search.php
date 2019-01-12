@@ -17,7 +17,7 @@
 		</div><!-- .entry-meta -->
 	</header><!-- .entry-header -->
 
-	<?php if ( 'status' !== get_post_format() ) : // status update theme type; don't show content ?>
+	<?php if ( 'status' !== get_post_format() ) : // Status update theme type; don't show content. ?>
 	<div class="entry-summary">
 		<?php the_excerpt(); ?>
 	</div><!-- .entry-summary -->

@@ -27,7 +27,7 @@ function labbook_customize_register( $wp_customize ) {
 		)
 	);
 
-	// post display setting
+	// Post display setting.
 	$wp_customize->add_setting(
 		'labbook_options[content_layout]',
 		array(
@@ -40,19 +40,19 @@ function labbook_customize_register( $wp_customize ) {
 	$wp_customize->add_control(
 		'labbook_options[content_layout]',
 		array(
-			'label'    => __( 'Post Display', 'labbook' ),
-			'description'	=>	__( 'Determines how much post content is displayed in lists. Post pages always show the full content.', 'labbook' ),
-			'section'  => 'labbook_post_list_options',
-			'type'     => 'select',
-			'priority' => 120,
-			'choices'  => array(
+			'label'    		=> __( 'Post Display', 'labbook' ),
+			'description'	=> __( 'Determines how much post content is displayed in lists. Post pages always show the full content.', 'labbook' ),
+			'section'  		=> 'labbook_post_list_options',
+			'type'     		=> 'select',
+			'priority'		=> 120,
+			'choices'  		=> array(
 				'full'          => __( 'Full post', 'labbook' ),
-				'excerpt'       => __( 'Excerpt', 'labbook' )
+				'excerpt'       => __( 'Excerpt', 'labbook' ),
 			),
 		)
 	);
 
-	// excerpt length setting
+	// Excerpt length setting.
 	$wp_customize->add_setting(
 		'labbook_options[excerpt_length]',
 		array(
@@ -66,11 +66,11 @@ function labbook_customize_register( $wp_customize ) {
 	$wp_customize->add_control(
 		'labbook_options[excerpt_length]',
 		array(
-			'label'    => __( 'Excerpt length', 'labbook' ),
-			'description'	=>	__( 'The number of words to display in the excerpt.', 'labbook' ),
-			'section'  => 'labbook_post_list_options',
-			'type'     => 'text',
-			'priority' => 130,
+			'label'    		=> __( 'Excerpt length', 'labbook' ),
+			'description'	=> __( 'The number of words to display in the excerpt.', 'labbook' ),
+			'section'  		=> 'labbook_post_list_options',
+			'type'     		=> 'text',
+			'priority'		=> 130,
 		)
 	);
 
@@ -100,15 +100,15 @@ function labbook_customize_register( $wp_customize ) {
 	$wp_customize->add_control(
 		'labbook_options[show_edit_summaries]',
 		array(
-			'label'    => __( 'Show edit summaries', 'labbook' ),
-			'description'	=>	__( 'Display a list of edit summaries under each post/page.', 'labbook' ),
-			'section'  => 'labbook_revision_options',
-			'type'     => 'checkbox',
-			'priority' => 100
+			'label'    		=> __( 'Show edit summaries', 'labbook' ),
+			'description'	=> __( 'Display a list of edit summaries under each post/page.', 'labbook' ),
+			'section'  		=> 'labbook_revision_options',
+			'type'     		=> 'checkbox',
+			'priority' 		=> 100,
 		)
 	);
 
-	// edit summaries per page
+	// Edit summaries per page.
 	$wp_customize->add_setting(
 		'labbook_options[edit_summaries_per_page]',
 		array(
@@ -122,16 +122,16 @@ function labbook_customize_register( $wp_customize ) {
 	$wp_customize->add_control(
 		'labbook_options[edit_summaries_per_page]',
 		array(
-			'label'    => __( 'Edit summary page size', 'labbook' ),
-			'description'	=>	__( 'Maximum number of edit summaries to display per page.', 'labbook' ),
-			'section'  => 'labbook_revision_options',
-			'type'     => 'text',
-			'priority'	=>	110
+			'label'    		=> __( 'Edit summary page size', 'labbook' ),
+			'description'	=> __( 'Maximum number of edit summaries to display per page.', 'labbook' ),
+			'section'  		=> 'labbook_revision_options',
+			'type'     		=> 'text',
+			'priority'		=> 110,
 		)
 	);
 
 	/**
-	 * Cross-references section
+	 * Cross-references section.
 	 */
 
 	$wp_customize->add_section(
@@ -156,16 +156,16 @@ function labbook_customize_register( $wp_customize ) {
 	$wp_customize->add_control(
 		'labbook_options[show_crossreferences]',
 		array(
-			'label'    => __( 'Show cross-references', 'labbook' ),
-			'description'	=>	__( 'Display a list of posts/pages that link to/from the current post/page.', 'labbook' ),
-			'section'  => 'labbook_reference_options',
-			'type'     => 'checkbox',
-			'priority' => 100
+			'label'    		=> __( 'Show cross-references', 'labbook' ),
+			'description'	=> __( 'Display a list of posts/pages that link to/from the current post/page.', 'labbook' ),
+			'section'  		=> 'labbook_reference_options',
+			'type'     		=> 'checkbox',
+			'priority' 		=> 100,
 		)
 	);
 
 	/**
-	 * Pages section
+	 * Pages section.
 	 */
 
 	$wp_customize->add_section(
@@ -178,7 +178,7 @@ function labbook_customize_register( $wp_customize ) {
 		)
 	);
 
-	// breadcrumbs display setting
+	// Breadcrumbs display setting.
 	$wp_customize->add_setting(
 		'labbook_options[show_page_breadcrumbs]',
 		array(
@@ -191,15 +191,15 @@ function labbook_customize_register( $wp_customize ) {
 	$wp_customize->add_control(
 		'labbook_options[show_page_breadcrumbs]',
 		array(
-			'label'    => __( 'Show breadcrumbs', 'labbook' ),
-			'description'	=>	__( 'Display a trail of links to parent pages at the top of each page.', 'labbook' ),
-			'section'  => 'labbook_page_options',
-			'type'     => 'checkbox',
-			'priority' => 100
+			'label'    		=> __( 'Show breadcrumbs', 'labbook' ),
+			'description'	=> __( 'Display a trail of links to parent pages at the top of each page.', 'labbook' ),
+			'section'  		=> 'labbook_page_options',
+			'type'     		=> 'checkbox',
+			'priority' 		=> 100,
 		)
 	);
 
-	// table of contents display setting
+	// Table of contents display setting.
 	$wp_customize->add_setting(
 		'labbook_options[show_page_table_of_contents]',
 		array(
@@ -212,15 +212,15 @@ function labbook_customize_register( $wp_customize ) {
 	$wp_customize->add_control(
 		'labbook_options[show_page_table_of_contents]',
 		array(
-			'label'    => __( 'Show table of contents', 'labbook' ),
-			'description'	=>	__( 'Generate and display a table of contents panel shown at the top right of the page.', 'labbook' ),
-			'section'  => 'labbook_page_options',
-			'type'     => 'checkbox',
-			'priority' => 110
+			'label'    		=> __( 'Show table of contents', 'labbook' ),
+			'description'	=> __( 'Generate and display a table of contents panel shown at the top right of the page.', 'labbook' ),
+			'section'  		=> 'labbook_page_options',
+			'type'     		=> 'checkbox',
+			'priority' 		=> 110,
 		)
 	);
 
-	// table of contents display setting
+	// Table of contents maximum header depth setting.
 	$wp_customize->add_setting(
 		'labbook_options[table_of_contents_max_depth]',
 		array(
@@ -233,23 +233,23 @@ function labbook_customize_register( $wp_customize ) {
 	$wp_customize->add_control(
 		'labbook_options[table_of_contents_max_depth]',
 		array(
-			'label'    => __( 'Table of contents maximum depth', 'labbook' ),
-			'description'	=>	__( 'Maximum heading level displayed in the table of contents.', 'labbook' ),
-			'section'  => 'labbook_page_options',
-			'type'     => 'select',
-			'choices'  => array(
-				2          => __( 'h2', 'labbook' ),
-				3    	   => __( 'h3', 'labbook' ),
-				4    	   => __( 'h4', 'labbook' ),
-				5    	   => __( 'h5', 'labbook' ),
-				6    	   => __( 'h6', 'labbook' )
+			'label'    		=> __( 'Table of contents maximum depth', 'labbook' ),
+			'description'	=> __( 'Maximum heading level displayed in the table of contents.', 'labbook' ),
+			'section'  		=> 'labbook_page_options',
+			'type'     		=> 'select',
+			'choices'  		=> array(
+				2          		=> __( 'h2', 'labbook' ),
+				3    	   		=> __( 'h3', 'labbook' ),
+				4    	   		=> __( 'h4', 'labbook' ),
+				5    	   		=> __( 'h5', 'labbook' ),
+				6    	   		=> __( 'h6', 'labbook' ),
 			),
-			'priority'	=>	120
+			'priority'		=> 120,
 		)
 	);
 
 	/**
-	 * Sidebar section
+	 * Sidebar section.
 	 */
 
 	$wp_customize->add_section(
@@ -258,11 +258,11 @@ function labbook_customize_register( $wp_customize ) {
 			'title'      => __( 'Sidebar', 'labbook' ),
 			'priority'   => 90,
 			'capability' => 'edit_theme_options',
-			'panel'      => ''
+			'panel'      => '',
 		)
 	);
 
-	// search placeholder setting
+	// Search placeholder setting.
 	$wp_customize->add_setting(
 		'labbook_options[search_placeholder]',
 		array(
@@ -275,16 +275,16 @@ function labbook_customize_register( $wp_customize ) {
 	$wp_customize->add_control(
 		'labbook_options[search_placeholder]',
 		array(
-			'label'    => __( 'Search Placeholder', 'labbook' ),
-			'description'	=>	__( 'The text to display in background of search box.', 'labbook' ),
-			'section'  => 'labbook_sidebar_options',
-			'type'     => 'text',
-			'priority' => 120,
+			'label'    		=> __( 'Search Placeholder', 'labbook' ),
+			'description'	=> __( 'The text to display in background of search box.', 'labbook' ),
+			'section'  		=> 'labbook_sidebar_options',
+			'type'     		=> 'text',
+			'priority' 		=> 120,
 		)
 	);
 
 	/**
-	 * Footer section
+	 * Footer section.
 	 */
 
 	$wp_customize->add_section(
@@ -297,7 +297,7 @@ function labbook_customize_register( $wp_customize ) {
 		)
 	);
 
-	// copyright text setting
+	// Copyright text setting.
 	$wp_customize->add_setting(
 		'labbook_options[copyright_text]',
 		array(
@@ -318,7 +318,7 @@ function labbook_customize_register( $wp_customize ) {
 		)
 	);
 
-	// "powered by" setting
+	// "Powered by" setting.
 	$wp_customize->add_setting(
 		'labbook_options[show_powered_by]',
 		array(
@@ -338,7 +338,7 @@ function labbook_customize_register( $wp_customize ) {
 		)
 	);
 
-	// privacy policy link setting
+	// Privacy policy link setting.
 	$wp_customize->add_setting(
 		'labbook_options[show_privacy_policy]',
 		array(
@@ -352,7 +352,7 @@ function labbook_customize_register( $wp_customize ) {
 		'labbook_options[show_privacy_policy]',
 		array(
 			'label'    		=> __( 'Show Privacy Policy link', 'labbook' ),
-			'description'	=>	__( 'Only displayed if a privacy policy has been configured.', 'labbook' ),
+			'description'	=> __( 'Only displayed if a privacy policy has been configured.', 'labbook' ),
 			'section'  		=> 'labbook_footer_options',
 			'type'     		=> 'checkbox',
 			'priority' 		=> 130,

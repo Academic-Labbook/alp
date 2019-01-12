@@ -5,6 +5,7 @@
  *
  * Learn more: https://git.io/vWdr2
  */
+
 ( function() {
 	var isIe = /(trident|msie)/i.test( navigator.userAgent );
 

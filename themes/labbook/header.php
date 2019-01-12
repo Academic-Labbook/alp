@@ -25,7 +25,7 @@
 	<a class="skip-link screen-reader-text" href="#content"><?php esc_html_e( 'Skip to content', 'labbook' ); ?></a>
 
 	<header id="masthead" class="site-header">
-		<?php if ( has_nav_menu( 'network-menu' ) ): ?>
+		<?php if ( has_nav_menu( 'network-menu' ) ) : ?>
 		<nav id="network-navigation" class="main-navigation">
 			<button class="menu-toggle" aria-controls="network-menu" aria-expanded="false"><?php esc_html_e( 'Network Menu', 'labbook' ); ?></button>
 			<?php
@@ -45,10 +45,11 @@
 				<h1 class="site-title"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a></h1>
 			<?php else : ?>
 				<p class="site-title"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a></p>
-			<?php endif;
+			<?php endif; ?>
+			<?php
 			$labbook_description = get_bloginfo( 'description', 'display' );
 			if ( $labbook_description || is_customize_preview() ) :
-				?>
+			?>
 				<p class="site-description"><?php echo $labbook_description; /* WPCS: xss ok. */ ?></p>
 			<?php endif; ?>
 			</div>
