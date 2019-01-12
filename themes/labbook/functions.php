@@ -91,6 +91,21 @@ if ( ! function_exists( 'labbook_setup' ) ) :
 		add_theme_support( 'editor-styles' );
 		add_editor_style( 'style-editor.css' );
 
+		/**
+		 * Add support for showing coauthors.
+		 */
+		add_theme_support( 'ssl-alp-coauthors' );
+
+		/**
+		 * Add support for showing edit summaries under posts.
+		 */
+		add_theme_support( 'ssl-alp-edit-summaries' );
+
+		/**
+		 * Add support for showing cross-references under posts.
+		 */
+		add_theme_support( 'ssl-alp-cross-references' );
+
 		// Get default theme options.
 		$labbook_default_options = labbook_get_theme_option_defaults();
 	}
