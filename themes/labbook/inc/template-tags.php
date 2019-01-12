@@ -185,7 +185,7 @@ if ( ! function_exists( 'labbook_the_post_meta' ) ) :
 			$byline_pieces[] = $authors;
 		}
 
-		// show revisions link on posts and pages only
+		// show revisions link
 		if ( labbook_get_option( 'show_edit_summaries' ) && labbook_get_post_edit_count( $post ) > 0 ) {
 			$byline_pieces[] = labbook_get_revisions_link( $post );
 		}
@@ -225,7 +225,8 @@ if ( ! function_exists( 'labbook_the_page_meta' ) ) :
 
 		$byline_pieces = array();
 
-		if ( labbook_get_option( 'show_edit_summaries' ) ) {
+		// show revisions link
+		if ( labbook_get_option( 'show_edit_summaries' ) && labbook_get_post_edit_count( $page ) > 0 ) {
 			$byline_pieces[] = labbook_get_revisions_link( $page );
 		}
 
