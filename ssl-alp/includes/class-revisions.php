@@ -90,8 +90,11 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
     /*
 	 * Check if edit summaries are enabled for, and the user has permission to
 	 * view, the specified post.
+	 *
+	 * @param int|WP_Post|null $post                  Post ID or post object. Defaults to global $post.
+	 * @param bool             $check_edit_permission Only allow if user has edit permission for the post.
 	 */
-	public function edit_summary_allowed( $post ) {
+	public function edit_summary_allowed( $post, $check_edit_permission = true ) {
 		// get post as an object, if not already one
 		$post = get_post( $post );
 
@@ -104,10 +107,15 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			return false;
 		}
 
-		// check if setting is enabled, and if user has permission
-		// 'edit_post' capability == 'edit_posts', 'edit_page' == 'edit_pages', etc. (see wp-includes/capabilities.php)
-		if ( ! get_option( "ssl_alp_enable_edit_summaries" ) || ! current_user_can( "edit_{$post->post_type}", $post->ID ) ) {
-			// disabled for posts, or user not allowed to view
+		// Check if edit summaries are enabled.
+		if ( ! get_option( "ssl_alp_enable_edit_summaries" ) ) {
+			// Edit summaries disabled for posts.
+			return false;
+		}
+
+		// Check if user has permission to edit the post, if we are to check this.
+		if ( $check_edit_permission && current_user_can( "edit_{$post->post_type}", $post->ID ) ) {
+			// No permission.
 			return false;
 		}
 

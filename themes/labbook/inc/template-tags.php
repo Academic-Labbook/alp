@@ -323,7 +323,8 @@ if ( ! function_exists( 'labbook_the_revisions_link' ) ) :
 
 		$post = get_post( $post );
 
-		if ( ! $ssl_alp->revisions->edit_summary_allowed( $post ) ) {
+		// Check if edit summaries are available for this post.
+		if ( ! $ssl_alp->revisions->edit_summary_allowed( $post, false ) ) {
 			return;
 		}
 
