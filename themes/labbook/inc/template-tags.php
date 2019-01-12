@@ -415,10 +415,11 @@ if ( ! function_exists( 'labbook_the_footer' ) ) :
 		/* translators: used between list items, there is a space after the comma. */
 		$categories_list = get_the_category_list( esc_html__( ', ', 'labbook' ) );
 
+		$footer_pieces = array();
+
 		if ( $categories_list ) {
-			printf(
-				'<span class="cat-links">%1$s%2$s</span>',
-				'<i class="fa fa-folder-open" aria-hidden="true"></i>',
+			$footer_pieces[] = sprintf(
+				'<span class="cat-links"><i class="fa fa-folder-open" aria-hidden="true"></i>%1$s</span>',
 				$categories_list
 			);
 		}
@@ -427,22 +428,22 @@ if ( ! function_exists( 'labbook_the_footer' ) ) :
 		$tags_list = get_the_tag_list( '', esc_html__( ', ', 'labbook' ) );
 
 		if ( $tags_list ) {
-			printf(
-				'<span class="tag-links">%1$s%2$s</span>',
-				'<i class="fa fa-tags" aria-hidden="true"></i>',
+			$footer_pieces[] = sprintf(
+				'<span class="tag-links"><i class="fa fa-tags" aria-hidden="true"></i>%1$s</span>',
 				$tags_list
 			);
 		}
 
 		if ( ! is_single() && ! post_password_required() && ( comments_open() || get_comments_number() ) ) {
 			// show comments link
-			printf(
-				'<span class="comments-link">%1$s<a href="%2$s">%3$s</a></span>',
-				'<i class="fa fa-comment" aria-hidden="true"></i>',
-				get_comments_link(),
-				get_comments_number_text(esc_html__( 'Leave a comment', 'labbook' ))
+			$footer_pieces[] = sprintf(
+				'<span class="comments-link"><i class="fa fa-comment" aria-hidden="true"></i><a href="%1$s">%2$s</a></span>',
+				esc_url( get_comments_link() ),
+				esc_html( get_comments_number_text( __( 'Leave a comment', 'labbook' ) ) )
 			);
 		}
+
+		echo implode( '&nbsp;&nbsp;', $footer_pieces );
 	}
 endif;
 
