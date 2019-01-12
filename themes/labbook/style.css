@@ -585,6 +585,15 @@ table {
     grid-area: main;
 }
 
+#primary a {
+    border-bottom: #a8bfcf 1px solid;
+}
+
+#primary a:hover {
+    border-bottom: #005a9c 2px solid;
+    background-color:#efefef;
+}
+
 /*--------------------------------------------------------------
 ## Secondary (sidebar)
 --------------------------------------------------------------*/
@@ -592,6 +601,15 @@ table {
 #secondary {
     grid-area: sidebar;
     font-size: 95%;
+}
+
+#secondary a {
+    border-bottom: #a8bfcf 1px solid;
+}
+
+#secondary a:hover {
+    border-bottom: #005a9c 2px solid;
+    background-color:#efefef;
 }
 
 /*--------------------------------------------------------------
@@ -1159,7 +1177,12 @@ a:hover, a:active {
 a.entry-link {
 	float: right;
 	margin-left: 5px;
-	display: none;
+    display: none;
+    border: none !important;
+}
+
+a.entry-link:hover {
+    background: none !important;
 }
 
 /* remove padding from entry link icon */
@@ -1195,6 +1218,7 @@ a.entry-link .fa {
 	background-color: #F5DF44;
     border-radius: 4px;
     padding: 2px;
+    border: none !important;
 }
 
 .breadcrumbs {
