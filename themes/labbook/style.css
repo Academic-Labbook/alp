@@ -489,7 +489,7 @@ hr {
     background-color: #ccc;
     border: 0;
     height: 1px;
-    margin-bottom: 1.5em;
+    margin: 1.5em 0;
 }
 
 ul, ol {
