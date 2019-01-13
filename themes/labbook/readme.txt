@@ -4,8 +4,8 @@ Contributors: seanleavey
 Tags: custom-background, custom-logo, custom-menu, editor-style, education, theme-options, threaded-comments, translation-ready, two-columns
 
 Requires at least: 5.0.0
-Tested up to: 5.0.2
-Stable tag: 1.0.3
+Tested up to: 5.0.3
+Stable tag: 1.0.4
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -36,6 +36,11 @@ Labbook supports Academic Labbook Plugin - indeed, use of it is highly encourage
 of features provided in this theme.
 
 == Changelog ==
+
+= 1.0.4 - 2019-01-13 =
+* Post edits now avoid showing drafts made before publication.
+* Fixed bug with revision list pagination.
+* Minor CSS fixes.
 
 = 1.0.3 - 2019-01-12 =
 * Editor style now closely matches the front end.
