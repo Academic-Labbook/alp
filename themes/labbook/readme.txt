@@ -1,6 +1,6 @@
 === Labbook ===
 
-Contributors: Sean Leavey
+Contributors: seanleavey
 Tags: custom-background, custom-logo, custom-menu, editor-style, education, theme-options, threaded-comments, translation-ready, two-columns
 
 Requires at least: 5.0.0
