@@ -1068,7 +1068,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$post_author = get_user_by( 'id', $post->post_author );
 
 		// Try to ensure at least the post's primary author is in the list of coauthors.
-		if ( ! empty( $post_author ) && ! in_array( $post_author, $coauthors, true ) ) {
+		if ( ! empty( $post_author ) && ! in_array( $post_author, $coauthors, false ) ) {
 			// Post primary author exists but isn't listed as a coauthor,
 			// so add them to the start of the coauthors array.
 			array_unshift( $coauthors, $post_author );
@@ -1105,7 +1105,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		foreach ( $coauthors as $coauthor ) {
 			if ( ! is_object( $coauthor ) ) {
 				// Invalid user specified - remove.
-				unset( $coauthors[ array_search( $coauthor, $coauthors, true ) ] );
+				unset( $coauthors[ array_search( $coauthor, $coauthors ) ] );
 			}
 		}
 
@@ -1176,7 +1176,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 					if ( count( $coauthors ) > 1 ) {
 						// This post has multiple authors; remove the deleted user.
-						unset( $coauthors[ array_search( $delete_user, $coauthors, true ) ] );
+						unset( $coauthors[ array_search( $delete_user, $coauthors ) ] );
 
 						// Set coauthors (this changes the primary author).
 						$this->set_coauthors( $post, $coauthors );
@@ -1214,8 +1214,8 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 						$coauthors = $this->get_coauthors( $coauthored_post );
 
 						// Get indices of users in coauthor list.
-						$delete_user_key   = array_search( $delete_user, $coauthors, true );
-						$reassign_user_key = array_search( $reassign_user, $coauthors, true );
+						$delete_user_key   = array_search( $delete_user, $coauthors );
+						$reassign_user_key = array_search( $reassign_user, $coauthors );
 
 						if ( $reassign_user_key ) {
 							// Reassign user is already a coauthor.
@@ -1261,7 +1261,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			 ! empty( $_POST['blog'] ) && is_array( $_POST['blog'] ) ) {
 			// Post data from `dodelete` case in `wp-admin/network/users.php` is present, and
 			// admin wishes to reassign user content array of blog ids to respective reassign users.
-			$reassign_users = wp_unslash( $_POST['blog'][ $remove_id ] );
+			$reassign_users = $_POST['blog'][ $remove_id ];
 
 			// Get reassign user for this blog.
 			$reassign_id = $reassign_users[ $blog_id ];
@@ -1549,7 +1549,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		foreach ( $coauthors as $coauthor ) {
-			if ( $user === $coauthor->user_login ) {
+			if ( $user == $coauthor->user_login ) {
 				return true;
 			}
 		}
