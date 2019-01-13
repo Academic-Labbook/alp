@@ -1,35 +1,40 @@
 <?php
+/**
+ * Page tools.
+ *
+ * @package ssl-alp
+ */
 
 if ( ! defined( 'WPINC' ) ) {
-    // prevent direct access
-    exit;
+	// Prevent direct access.
+	exit;
 }
 
 /**
- * Page wiki functionality
+ * Page wiki functionality.
  */
 class SSL_ALP_Pages extends SSL_ALP_Module {
 	/**
-	 * Register hooks
+	 * Register hooks.
 	 */
 	public function register_hooks() {
 		$loader = $this->get_loader();
 
-		// remove comment, author and thumbnail support
+		// Remove comment, author and thumbnail support from pages.
 		$loader->add_action( 'init', $this, 'disable_post_type_support' );
 
-		// remove month dropdown filter on admin page list
+		// Remove month dropdown filter on admin page list.
 		$loader->add_action( 'months_dropdown_results', $this, 'disable_months_dropdown_results', 10, 2 );
 
-		// remove date column from list of wiki pages in admin
+		// Remove date column from admin page list.
 		$loader->add_filter( 'manage_edit-page_columns', $this, 'manage_edit_columns' );
 
-		// sort alphabetically by default
+		// Sort pages alphabetically by default.
 		$loader->add_filter( 'manage_edit-page_sortable_columns', $this, 'manage_edit_sortable_columns' );
 	}
 
 	/**
-	 * Disable comments on pages
+	 * Disable comments, author and thumbnail support on pages.
 	 */
 	public function disable_post_type_support() {
 		remove_post_type_support( 'page', 'comments' );
@@ -38,11 +43,15 @@ class SSL_ALP_Pages extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Disable months dropdown box in admin page list
+	 * Disable months dropdown box in admin page list.
+	 *
+	 * @param array  $months    Months.
+	 * @param string $post_type Post type being shown.
+	 * @return array Empty array if post type is page, otherwise $months.
 	 */
 	public function disable_months_dropdown_results( $months, $post_type ) {
-		if ( $post_type == 'page' ) {
-			// return empty array to force it to hide (see months_dropdown() in class-wp-list-table.php)
+		if ( 'page' === $post_type ) {
+			// Return empty array to force it to hide (see months_dropdown() in class-wp-list-table.php).
 			return array();
 		}
 
@@ -50,24 +59,34 @@ class SSL_ALP_Pages extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Filter columns shown on list of wiki pages in admin panel
+	 * Filter columns shown on list of wiki pages in admin panel.
+	 *
+	 * @param array $columns Columns to show by default.
+	 * @return array Columns with date column removed.
 	 */
 	public function manage_edit_columns( $columns ) {
-		// remove date
-		unset( $columns["date"] );
+		if ( array_key_exists( 'date', $columns ) ) {
+			// Remove date column.
+			unset( $columns['date'] );
+		}
 
 		return $columns;
 	}
 
 	/**
-	 * Sort columns alphabetically by default on list of wiki pages in admin panel
+	 * Remove date column and sort columns alphabetically by name on list of pages in admin panel.
+	 *
+	 * @param array $columns Sortable columns.
+	 * @return array Columns with title column set as default sort.
 	 */
 	public function manage_edit_sortable_columns( $columns ) {
-		// remove date
-		unset( $columns["date"] );
+		if ( array_key_exists( 'date', $columns ) ) {
+			// Remove date column.
+			unset( $columns['date'] );
+		}
 
-		// make title default sort
-		$columns["title"] = array( $columns["title"], true );
+		// Make title the default sort.
+		$columns['title'] = array( $columns['title'], true );
 
 		return $columns;
 	}

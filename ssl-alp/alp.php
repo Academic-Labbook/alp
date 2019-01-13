@@ -1,19 +1,20 @@
 <?php
-
-/*
-Plugin Name:  Academic Labbook
-Plugin URI:   https://alp.attackllama.com/
-Description:  Turn WordPress into a collaborative academic labbook.
-Version:      0.11.0
-Author:       Sean Leavey
-Author URI:   https://attackllama.com/
-License:      GPL3
-License URI:  https://www.gnu.org/licenses/gpl-3.0.en.html
-*/
+/**
+ * Plugin Name:  Academic Labbook
+ * Plugin URI:   https://alp.attackllama.com/
+ * Description:  Turn WordPress into a collaborative academic labbook.
+ * Version:      0.11.0
+ * Author:       Sean Leavey
+ * Author URI:   https://attackllama.com/
+ * License:      GPL3
+ * License URI:  https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * @package ssl-alp
+ */
 
 if ( ! defined( 'WPINC' ) ) {
-    // prevent direct access
-    exit;
+	// Prevent direct access.
+	exit;
 }
 
 /**
@@ -62,12 +63,12 @@ define( 'SSL_ALP_KATEX_VERSION', '0.10.0' );
  * Code to run on plugin activation and deactivation.
  */
 
-// import classes
-require_once SSL_ALP_BASE_DIR . 'includes/class-activator.php';
-require_once SSL_ALP_BASE_DIR . 'includes/class-deactivator.php';
-require_once SSL_ALP_BASE_DIR . 'includes/class-uninstaller.php';
+// Import classes.
+require_once SSL_ALP_BASE_DIR . 'includes/class-ssl-alp-activator.php';
+require_once SSL_ALP_BASE_DIR . 'includes/class-ssl-alp-deactivator.php';
+require_once SSL_ALP_BASE_DIR . 'includes/class-ssl-alp-uninstaller.php';
 
-// register hooks
+// Register special hooks.
 register_activation_hook( __FILE__, array( 'SSL_ALP_Activator', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'SSL_ALP_Deactivator', 'deactivate' ) );
 register_uninstall_hook( __FILE__, array( 'SSL_ALP_Uninstaller', 'uninstall' ) );
@@ -76,17 +77,16 @@ register_uninstall_hook( __FILE__, array( 'SSL_ALP_Uninstaller', 'uninstall' ) )
  * Core plugin class used to load modules.
  */
 
-require SSL_ALP_BASE_DIR . 'includes/class-alp.php';
-require SSL_ALP_BASE_DIR . 'includes/class-alp-module.php';
+require SSL_ALP_BASE_DIR . 'includes/class-ssl-alp.php';
+require SSL_ALP_BASE_DIR . 'includes/class-ssl-alp-module.php';
 
 /**
  * Execute plugin.
  */
-
 function ssl_alp_run() {
-    global $ssl_alp;
+	global $ssl_alp;
 
-    $ssl_alp = new SSL_ALP();
+	$ssl_alp = new SSL_ALP();
 	$ssl_alp->run();
 }
 

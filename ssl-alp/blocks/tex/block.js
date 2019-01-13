@@ -1,25 +1,42 @@
+/**
+ * TeX block.
+ *
+ * @package ssl-alp
+ */
+
 ( function( wp ) {
 	/**
-	 * Registers a new block provided a unique name and an object defining its behavior.
-	 * @see https://github.com/WordPress/gutenberg/tree/master/blocks#api
+	 * New block registration function.
 	 */
 	var registerBlockType = wp.blocks.registerBlockType;
+
 	/**
-	 * Returns a new element of given type. Element is an abstraction layer atop React.
-	 * @see https://github.com/WordPress/gutenberg/tree/master/element#element
+	 * Element creator.
 	 */
 	var el = wp.element.createElement;
 
+	/**
+	 * Raw HTML element.
+	 */
 	var rawHTML = wp.element.RawHTML;
 
 	/**
 	 * Retrieves the translation of text.
+	 *
 	 * @see https://github.com/WordPress/gutenberg/tree/master/i18n#api
 	 */
 	var __ = wp.i18n.__;
 
-	const parser = new DOMParser;
+	/**
+	 * DOM parser.
+	 */
+	const parser = new DOMParser();
 
+	/**
+	 * Render mathematical formula using KaTeX.
+	 *
+	 * @param {*} formula Mathematical formula to render.
+	 */
 	const katexDisplay = (formula) => {
 		const doc = parser.parseFromString(
 			'<!doctype html><body>' + formula + '</body></html>',

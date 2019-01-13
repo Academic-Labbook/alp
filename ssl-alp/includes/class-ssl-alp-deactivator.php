@@ -1,8 +1,13 @@
 <?php
+/**
+ * Deactivation tools.
+ *
+ * @package ssl-alp
+ */
 
 if ( ! defined( 'WPINC' ) ) {
-    // prevent direct access
-    exit;
+	// Prevent direct access.
+	exit;
 }
 
 /**

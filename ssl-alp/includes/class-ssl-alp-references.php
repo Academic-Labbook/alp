@@ -1,153 +1,173 @@
 <?php
+/**
+ * Cross-reference tools.
+ *
+ * @package ssl-alp
+ */
 
 if ( ! defined( 'WPINC' ) ) {
-    // prevent direct access
-    exit;
+	// Prevent direct access.
+	exit;
 }
 
 /**
- * Literature reference functionality
+ * Literature reference functionality.
  */
 class SSL_ALP_References extends SSL_ALP_Module {
 	/**
 	 * Supported post types for reference extraction/display, and whether to display their date
-	 * on the revisions list
+	 * on the revisions list.
+	 *
+	 * @var array
 	 */
 	protected $supported_reference_post_types = array(
-		'post'	=>	true,
-		'page'	=>	false
+		'post' => true,
+		'page' => false,
 	);
 
 	/**
-	 * Register settings
+	 * Register settings.
 	 */
 	public function register_settings() {
-        register_setting(
+		// Enable cross-references on supported post types.
+		register_setting(
 			SSL_ALP_SITE_SETTINGS_PAGE,
 			'ssl_alp_enable_crossreferences',
 			array(
-				'type'		=>	'boolean'
+				'type' => 'boolean',
 			)
 		);
 	}
 
-    /**
-     * Register settings fields
-     */
-    public function register_settings_fields() {
-        /**
-         * Post references settings
-         */
-
-        add_settings_field(
+	/**
+	 * Register settings fields.
+	 */
+	public function register_settings_fields() {
+		/**
+		 * Post references settings
+		 */
+		add_settings_field(
 			'ssl_alp_reference_settings',
 			__( 'References', 'ssl-alp' ),
 			array( $this, 'reference_settings_callback' ),
 			SSL_ALP_SITE_SETTINGS_PAGE,
 			'ssl_alp_post_settings_section'
 		);
-    }
+	}
 
-    public function reference_settings_callback() {
+	/**
+	 * Reference settings partial.
+	 */
+	public function reference_settings_callback() {
 		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/reference-settings-display.php';
 	}
 
 	/**
-	 * Register hooks
+	 * Register hooks.
 	 */
 	public function register_hooks() {
 		$loader = $this->get_loader();
 
-		// extract references from saved posts
-		$loader->add_action( 'init', $this, 'create_crossreference_taxonomy', 20 ); // called after settings are registered
+		// Create cross-reference taxonomy. Priority makes it get called after settings are registered.
+		$loader->add_action( 'init', $this, 'register_crossreference_taxonomy', 20 );
+
+		// Extract references from saved posts.
 		$loader->add_action( 'save_post', $this, 'extract_crossreferences', 10, 2 );
 	}
 
-	public function create_crossreference_taxonomy() {
+	/**
+	 * Register cross-reference taxonomy.
+	 */
+	public function register_crossreference_taxonomy() {
 		if ( ! get_option( 'ssl_alp_enable_crossreferences' ) ) {
-			// cross-references are disabled
+			// Cross-references are disabled.
 			return;
 		}
 
-		// create internal reference taxonomy
 		register_taxonomy(
 			'ssl_alp_crossreference',
 			array_keys( $this->supported_reference_post_types ),
 			array(
-				'hierarchical'	=> false,
-				'rewrite' 		=> false,
-				'meta_box_cb'	=> false,
-				'public'		=> false,
-				'labels' 		=> array(
-					'name'                       => _x( 'Cross-references', 'cross-reference taxonomy general name', 'ssl-alp' ),
-					'singular_name'              => _x( 'Cross-reference', 'cross-reference taxonomy singular name', 'ssl-alp' )
-				)
+				'hierarchical' => false,
+				'rewrite'      => false,
+				'meta_box_cb'  => false,
+				'public'       => false,
+				'labels'       => array(
+					'name'          => _x( 'Cross-references', 'cross-reference taxonomy general name', 'ssl-alp' ),
+					'singular_name' => _x( 'Cross-reference', 'cross-reference taxonomy singular name', 'ssl-alp' ),
+				),
 			)
 		);
 	}
 
 	/**
-	 * Extract references from updated/created posts and insert them into the
-	 * term database for display under the post
+	 * Extract references from updated/created posts and insert them into the term database for
+	 * display under the post.
+	 *
+	 * @param int     $post_id Post ID.
+	 * @param WP_Post $post    Post object.
 	 */
 	public function extract_crossreferences( $post_id, $post ) {
 		if ( ! get_option( 'ssl_alp_enable_crossreferences' ) ) {
-			// cross-references are disabled
+			// Cross-references are disabled.
 			return;
 		} elseif ( ! $this->is_supported( $post ) ) {
-			// post type not supported
+			// Post type not supported.
 			return;
 		}
 
-		// find URLs in post content
+		// Find URLs in post content.
 		$urls = wp_extract_urls( $post->post_content );
 
-		// terms to set
+		// Terms to set.
 		$terms = array();
 
 		foreach ( $urls as $url ) {
-			// attempt to find the post ID for the URL
+			// Attempt to find the post ID for the URL.
 			$reference_id = url_to_postid( $url );
 
 			$referenced_post = get_post( $reference_id );
 
 			if ( is_null( $referenced_post ) ) {
-				// invalid post - skip
+				// Invalid post - skip.
 				continue;
 			} elseif ( ! $this->is_supported( $referenced_post ) ) {
-				// target not supported for referencing
+				// Target not supported for referencing.
 				continue;
-			} elseif ( $referenced_post->ID == $post_id ) {
-				// self-reference
+			} elseif ( $referenced_post->ID === $post_id ) {
+				// Self-reference.
 				continue;
 			}
 
 			/*
-			 * create referenced-to relationship
+			 * Create referenced-to relationship.
 			 */
 
-			// create "reference to" term
+			// Create "reference to" term.
 			$ref_to_post_term_name = sprintf( 'reference-to-post-id-%d', $referenced_post->ID );
 
-			// add term name to list that will be associated with the post
+			// Add term name to list that will be associated with the post.
 			$terms[ $ref_to_post_term_name ] = $referenced_post->ID;
 		}
 
-		// update post's reference taxonomy terms (replaces any existing terms)
+		// Update post's reference taxonomy terms (replaces any existing terms).
 		wp_set_post_terms( $post->ID, array_keys( $terms ), 'ssl_alp_crossreference' );
 
-		// set internal term metadata
+		// Set internal term metadata.
 		foreach ( $terms as $term_name => $referenced_post_id ) {
-			// get term
+			// Get term.
 			$term = get_term_by( 'name', $term_name, 'ssl_alp_crossreference' );
 
-			// add term metadata
-			update_term_meta( $term->term_id, "reference-to-post-id", $referenced_post_id );
+			// Add term metadata.
+			update_term_meta( $term->term_id, 'reference-to-post-id', $referenced_post_id );
 		}
 	}
 
 	/**
-	 * Check if specified post is supported with references
+	 * Check if specified post is supported with references.
+	 *
+	 * @param WP_Post $post Post object.
+	 * @return bool
 	 */
 	public function is_supported( $post ) {
 		$post = get_post( $post );
@@ -156,38 +176,41 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Check whether the specified post should have its publication date shown in cross-references
+	 * Check if the specified post should have its publication date shown in cross-references.
+	 *
+	 * @param WP_Post $post Post object.
+	 * @return bool
 	 */
 	public function show_date( $post ) {
 		$post = get_post( $post );
 
-		if ( ! $this->is_supported( $post ) ) {
-			// post type is not supported
-			return null;
-		}
-
-		// values of supported_reference_post_types specifies whether to show date
-		return (bool) $this->supported_reference_post_types[$post->post_type];
-	}
-
-	/**
-	 * Re-scan supported post types to update references
-	 */
-	public function rebuild_references() {
-		if ( ! get_option( 'ssl_alp_enable_crossreferences' ) ) {
-			// cross-references are disabled
+		if ( is_null( $post ) || ! $this->is_supported( $post ) ) {
+			// Post is invalid or post type is not supported.
 			return;
 		}
 
-		// allow unlimited execution
+		// Values of supported_reference_post_types specifies whether to show date.
+		return (bool) $this->supported_reference_post_types[ $post->post_type ];
+	}
+
+	/**
+	 * Re-scan supported post types to update references.
+	 */
+	public function rebuild_references() {
+		if ( ! get_option( 'ssl_alp_enable_crossreferences' ) ) {
+			// Cross-references are disabled.
+			return;
+		}
+
+		// Allow unlimited execution time.
 		ini_set( 'max_execution_time', 0 );
 
 		foreach ( array_keys( $this->supported_reference_post_types ) as $post_type ) {
 			$posts = get_posts(
 				array(
-					'post_type' 		=> $post_type,
-					'post_status'		=> 'published',
-					'posts_per_page'	=> -1 // needed to get all
+					'post_type'      => $post_type,
+					'post_status'    => 'published',
+					'posts_per_page' => -1, // Needed to get all.
 				)
 			);
 
@@ -198,27 +221,37 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Get posts that are referenced by the specified post
+	 * Get posts that are referenced by the specified post.
+	 *
+	 * @param int|WP_Post|null $post Post ID or post object. Defaults to global $post.
+	 * @return array|null Referenced posts, or null if invalid post specified.
 	 */
 	public function get_reference_to_posts( $post = null ) {
 		$post = get_post( $post );
+
+		if ( is_null( $post ) ) {
+			return;
+		}
 
 		$terms = get_the_terms( $post, 'ssl_alp_crossreference' );
 
 		$posts = array();
 
 		if ( ! is_array( $terms ) ) {
-			// no terms to get posts from
+			// No terms to get posts from.
 			return $posts;
 		}
 
-		// get the posts associated with the terms
+		// Get the posts associated with the terms.
 		foreach ( $terms as $term ) {
-			// get post ID
-			$post_id = get_term_meta( $term->term_id, 'reference-to-post-id', 'ssl_alp_crossreference' );
+			// Get referenced post ID.
+			$referenced_post_id = get_term_meta(
+				$term->term_id,
+				'reference-to-post-id',
+				'ssl_alp_crossreference'
+			);
 
-			// get the post
-			$referenced_post = get_post( $post_id );
+			$referenced_post = get_post( $referenced_post_id );
 
 			if ( ! is_null( $referenced_post ) ) {
 				$posts[] = $referenced_post;
@@ -229,50 +262,64 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Get posts that reference the specified post
+	 * Get posts that reference the specified post.
+	 *
+	 * @param int|WP_Post|null $post Post ID or post object. Defaults to global $post.
+	 * @return array|null Referencing posts, or null if invalid post specified.
+	 * @global $wpdb
 	 */
 	public function get_reference_from_posts( $post = null ) {
 		global $wpdb;
 
 		$post = get_post( $post );
 
-		$posts = array();
-
 		if ( is_null( $post ) ) {
-			return $posts;
+			return;
 		}
 
-		// query for terms that reference this post
-		$object_ids = $wpdb->get_col(
-			$wpdb->prepare(
-				"
-				SELECT posts.ID
-				FROM {$wpdb->termmeta} AS termmeta
-				INNER JOIN {$wpdb->term_relationships} AS term_relationships
-					ON termmeta.term_id = term_relationships.term_taxonomy_id
-				INNER JOIN {$wpdb->posts} AS posts
-					ON term_relationships.object_id = posts.ID
-				INNER JOIN {$wpdb->term_taxonomy} AS term_taxonomy
-					ON termmeta.term_id = term_taxonomy.term_id
-				WHERE
-					termmeta.meta_key = %s
-					AND termmeta.meta_value = %d
-					AND term_taxonomy.taxonomy = %s
-				ORDER BY
-					posts.post_date DESC
-				",
-				'reference-to-post-id',
-				$post->ID,
-				'ssl_alp_crossreference'
-			)
-		);
+		// Reference posts cache key.
+		$cache_key = 'ssl-alp-reference-from_posts-' . $post->ID;
 
-		// get the posts associated with the term IDs
-		foreach ( $object_ids as $post_id ) {
-			// get the post
-			$referenced_post = get_post( $post_id );
+		$posts = wp_cache_get( $cache_key );
 
-			$posts[] = $referenced_post;
+		if ( false === $posts ) {
+			// Query for terms that reference this post.
+			$object_ids = $wpdb->get_col(
+				$wpdb->prepare(
+					"
+					SELECT posts.ID
+					FROM {$wpdb->termmeta} AS termmeta
+					INNER JOIN {$wpdb->term_relationships} AS term_relationships
+						ON termmeta.term_id = term_relationships.term_taxonomy_id
+					INNER JOIN {$wpdb->posts} AS posts
+						ON term_relationships.object_id = posts.ID
+					INNER JOIN {$wpdb->term_taxonomy} AS term_taxonomy
+						ON termmeta.term_id = term_taxonomy.term_id
+					WHERE
+						termmeta.meta_key = %s
+						AND termmeta.meta_value = %d
+						AND term_taxonomy.taxonomy = %s
+					ORDER BY
+						posts.post_date DESC
+					",
+					'reference-to-post-id',
+					$post->ID,
+					'ssl_alp_crossreference'
+				)
+			);
+
+			$posts = array();
+
+			// Get the posts associated with the term IDs.
+			foreach ( $object_ids as $post_id ) {
+				$referenced_post = get_post( $post_id );
+
+				if ( ! is_null( $referenced_post ) ) {
+					$posts[] = $referenced_post;
+				}
+			}
+
+			wp_cache_set( $cache_key, $posts );
 		}
 
 		return $posts;

@@ -1,8 +1,13 @@
 <?php
+/**
+ * Mathematical rendering tools.
+ *
+ * @package ssl-alp
+ */
 
 if ( ! defined( 'WPINC' ) ) {
-    // prevent direct access
-    exit;
+	// Prevent direct access.
+	exit;
 }
 
 /**
@@ -19,6 +24,9 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 		}
 	}
 
+	/**
+	 * Register the JavaScript for the public-facing side of the site.
+	 */
 	public function enqueue_scripts() {
 		if ( get_option( 'ssl_alp_enable_tex' ) ) {
 			wp_enqueue_script( 'ssl-alp-katex' );
@@ -27,12 +35,18 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 		}
 	}
 
+	/**
+	 * Enqueue styles in the admin header.
+	 */
 	public function enqueue_admin_styles() {
 		if ( get_option( 'ssl_alp_enable_tex' ) ) {
 			wp_enqueue_style( 'ssl-alp-katex' );
 		}
 	}
 
+	/**
+	 * Enqueue scripts in the admin header.
+	 */
 	public function enqueue_admin_scripts() {
 		$screen = get_current_screen();
 
@@ -44,9 +58,6 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 
 		if ( get_option( 'ssl_alp_enable_tex' ) ) {
 			wp_enqueue_script( 'ssl-alp-katex' );
-
-			// disabled until it can be polished
-			//wp_enqueue_script( 'ssl-alp-katex-inline' );
 		}
 	}
 
@@ -54,31 +65,31 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 	 * Register settings
 	 */
 	public function register_settings() {
-        register_setting(
+		register_setting(
 			SSL_ALP_SITE_SETTINGS_PAGE,
 			'ssl_alp_enable_tex',
 			array(
-				'type'		=>	'boolean',
-				'default'	=>	true
+				'type'    => 'boolean',
+				'default' => true,
 			)
 		);
 
-        register_setting(
+		register_setting(
 			SSL_ALP_NETWORK_SETTINGS_PAGE,
 			'ssl_alp_katex_use_custom_urls',
 			array(
-				'type'		=>	'boolean',
-				'default'	=>	false
+				'type'    => 'boolean',
+				'default' => false,
 			)
 		);
 
-        register_setting(
+		register_setting(
 			SSL_ALP_NETWORK_SETTINGS_PAGE,
 			'ssl_alp_katex_js_url',
 			array(
-				'type'				=>	'string',
-				'sanitize_callback'	=>	'esc_url_raw',
-				'default'			=>	''
+				'type'              => 'string',
+				'sanitize_callback' => 'esc_url_raw',
+				'default'           => '',
 			)
 		);
 
@@ -86,19 +97,19 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 			SSL_ALP_NETWORK_SETTINGS_PAGE,
 			'ssl_alp_katex_copy_js_url',
 			array(
-				'type'				=>	'string',
-				'sanitize_callback'	=>	'esc_url_raw',
-				'default'			=>	''
+				'type'              => 'string',
+				'sanitize_callback' => 'esc_url_raw',
+				'default'           => '',
 			)
 		);
 
-        register_setting(
+		register_setting(
 			SSL_ALP_NETWORK_SETTINGS_PAGE,
 			'ssl_alp_katex_css_url',
 			array(
-				'type'				=>	'string',
-				'sanitize_callback'	=>	'esc_url_raw',
-				'default'			=>	''
+				'type'              => 'string',
+				'sanitize_callback' => 'esc_url_raw',
+				'default'           => '',
 			)
 		);
 
@@ -106,22 +117,22 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 			SSL_ALP_NETWORK_SETTINGS_PAGE,
 			'ssl_alp_katex_copy_css_url',
 			array(
-				'type'				=>	'string',
-				'sanitize_callback'	=>	'esc_url_raw',
-				'default'			=>	''
+				'type'              => 'string',
+				'sanitize_callback' => 'esc_url_raw',
+				'default'           => '',
 			)
 		);
 	}
 
-    /**
-     * Register settings fields
-     */
-    public function register_settings_fields() {
-        /**
-         * Post mathematics settings
-         */
+	/**
+	 * Register settings fields
+	 */
+	public function register_settings_fields() {
+		/**
+		 * Post mathematics settings
+		 */
 
-        add_settings_field(
+		add_settings_field(
 			'ssl_alp_mathematics_display_settings',
 			__( 'Mathematics display', 'ssl-alp' ),
 			array( $this, 'tex_display_settings_callback' ),
@@ -129,21 +140,27 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 			'ssl_alp_post_settings_section'
 		);
 
-		// add mathematics settings section to network admin if available
-        add_settings_field(
+		// Add mathematics settings section to network admin if available.
+		add_settings_field(
 			'ssl_alp_mathematics_settings',
 			__( 'Mathematics', 'ssl-alp' ),
 			array( $this, 'tex_scripts_settings_callback' ),
 			SSL_ALP_NETWORK_SETTINGS_PAGE,
 			'ssl_alp_script_settings_section'
 		);
-    }
+	}
 
-    public function tex_scripts_settings_callback() {
+	/**
+	 * TeX scripts settings partial.
+	 */
+	public function tex_scripts_settings_callback() {
 		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/tex-scripts-settings-display.php';
 	}
 
-    public function tex_display_settings_callback() {
+	/**
+	 * TeX display settings partial.
+	 */
+	public function tex_display_settings_callback() {
 		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/tex-display-settings-display.php';
 	}
 
@@ -153,19 +170,22 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 	public function register_hooks() {
 		$loader = $this->get_loader();
 
-		// add JavaScript
+		// Add JavaScript.
 		$loader->add_action( 'init', $this, 'register_tex_scripts' );
 	}
 
+	/**
+	 * Register TeX scripts.
+	 */
 	public function register_tex_scripts() {
 		if ( ! get_option( 'ssl_alp_enable_tex' ) ) {
 			return;
 		}
 
-		// JavaScript and CSS URLs
-		$katex_js_url = $this->get_katex_js_url();
-		$katex_copy_js_url = $this->get_katex_copy_js_url();
-		$katex_css_url = $this->get_katex_css_url();
+		// JavaScript and CSS URLs.
+		$katex_js_url       = $this->get_katex_js_url();
+		$katex_copy_js_url  = $this->get_katex_copy_js_url();
+		$katex_css_url      = $this->get_katex_css_url();
 		$katex_copy_css_url = $this->get_katex_copy_css_url();
 
 		wp_register_style(
@@ -186,7 +206,8 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 			'ssl-alp-katex',
 			esc_url( $katex_js_url ),
 			array(),
-			SSL_ALP_KATEX_VERSION
+			SSL_ALP_KATEX_VERSION,
+			true
 		);
 
 		wp_register_style(
@@ -196,12 +217,13 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 			SSL_ALP_KATEX_VERSION
 		);
 
-		// KaTeX copy support
+		// KaTeX copy support.
 		wp_register_script(
 			'ssl-alp-katex-contrib-copy',
 			esc_url( $katex_copy_js_url ),
 			array(),
-			SSL_ALP_KATEX_VERSION
+			SSL_ALP_KATEX_VERSION,
+			true
 		);
 
 		wp_register_style(
@@ -215,7 +237,8 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 			'ssl-alp-katex-render',
 			esc_url( SSL_ALP_BASE_URL . 'js/katex.js' ),
 			array(),
-			$this->get_version()
+			$this->get_version(),
+			true
 		);
 
 		wp_register_script(
@@ -224,9 +247,10 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 			array(
 				'wp-element',
 				'wp-i18n',
-				'wp-editor'
+				'wp-editor',
 			),
-			$this->get_version()
+			$this->get_version(),
+			true
 		);
 
 		wp_register_script(
@@ -235,27 +259,31 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 			array(
 				'wp-blocks',
 				'wp-i18n',
-				'wp-element'
+				'wp-element',
 			),
-			$this->get_version()
+			$this->get_version(),
+			true
 		);
 
-		register_block_type( 'ssl-alp/tex', array(
-			'editor_script' 	=> 'tex-block-editor',
-			'editor_style'  	=> 'tex-block-editor',
-			'style'         	=> 'tex-block'
-		) );
+		register_block_type(
+			'ssl-alp/tex',
+			array(
+				'editor_script' => 'tex-block-editor',
+				'editor_style'  => 'tex-block-editor',
+				'style'         => 'tex-block',
+			)
+		);
 	}
 
 	/**
-	 * Get KaTeX JavaScript library URL
+	 * Get KaTeX JavaScript library URL.
 	 */
 	protected function get_katex_js_url() {
 		if ( get_site_option( 'ssl_alp_katex_use_custom_urls' ) ) {
-			// use custom URL
+			// Use custom URL.
 			$url = get_site_option( 'ssl_alp_katex_js_url' );
 		} else {
-			// use default URL
+			// Use default URL.
 			$url = SSL_ALP_BASE_URL . 'vendor/katex/katex.min.js';
 		}
 
@@ -263,14 +291,14 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Get KaTeX Copy JavaScript library URL
+	 * Get KaTeX Copy JavaScript library URL.
 	 */
 	protected function get_katex_copy_js_url() {
 		if ( get_site_option( 'ssl_alp_katex_use_custom_urls' ) ) {
-			// use custom URL
+			// Use custom URL.
 			$url = get_site_option( 'ssl_alp_katex_copy_js_url' );
 		} else {
-			// use default URL
+			// Use default URL.
 			$url = SSL_ALP_BASE_URL . 'vendor/katex/contrib/copy-tex.min.js';
 		}
 
@@ -278,14 +306,14 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Get KaTeX CSS URL
+	 * Get KaTeX CSS URL.
 	 */
 	protected function get_katex_css_url() {
 		if ( get_site_option( 'ssl_alp_katex_use_custom_urls' ) ) {
-			// use custom URL
+			// Use custom URL.
 			$url = get_site_option( 'ssl_alp_katex_css_url' );
 		} else {
-			// use default URL
+			// Use default URL.
 			$url = SSL_ALP_BASE_URL . 'vendor/katex/katex.min.css';
 		}
 
@@ -293,14 +321,14 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Get KaTeX Copy CSS URL
+	 * Get KaTeX Copy CSS URL.
 	 */
 	protected function get_katex_copy_css_url() {
 		if ( get_site_option( 'ssl_alp_katex_use_custom_urls' ) ) {
-			// use custom URL
+			// Use custom URL.
 			$url = get_site_option( 'ssl_alp_katex_copy_css_url' );
 		} else {
-			// use default URL
+			// Use default URL.
 			$url = SSL_ALP_BASE_URL . 'vendor/katex/contrib/copy-tex.min.css';
 		}
 
