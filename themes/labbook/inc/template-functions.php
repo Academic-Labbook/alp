@@ -58,7 +58,6 @@ if ( ! function_exists( 'labbook_get_theme_option_defaults' ) ) :
 			'show_crossreferences'				=> true,
 			'show_edit_summaries'				=> true,
 			'edit_summaries_per_page'			=> 5,
-			'show_powered_by'              		=> true,
 			'show_privacy_policy'				=> true,
 		);
 	}

@@ -318,26 +318,6 @@ function labbook_customize_register( $wp_customize ) {
 		)
 	);
 
-	// "Powered by" setting.
-	$wp_customize->add_setting(
-		'labbook_options[show_powered_by]',
-		array(
-			'default'           => $labbook_default_options['show_powered_by'],
-			'capability'        => 'edit_theme_options',
-			'sanitize_callback' => 'labbook_sanitize_checkbox',
-		)
-	);
-
-	$wp_customize->add_control(
-		'labbook_options[show_powered_by]',
-		array(
-			'label'    => __( 'Show "Powered By" label', 'labbook' ),
-			'section'  => 'labbook_footer_options',
-			'type'     => 'checkbox',
-			'priority' => 120,
-		)
-	);
-
 	// Privacy policy link setting.
 	$wp_customize->add_setting(
 		'labbook_options[show_privacy_policy]',

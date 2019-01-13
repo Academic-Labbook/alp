@@ -537,11 +537,10 @@ table {
     width: 100%;
 }
 
-table td,
-table th {
+td,
+th {
     padding: 0.5em;
     border: 1px solid #767676;
-    word-break: break-all;
 }
 
 /*--------------------------------------------------------------
@@ -692,12 +691,6 @@ table th {
 
 #colophon .imprint-right {
 	float: right;
-}
-
-/* beta notice (will be removed eventually) */
-#colophon .beta-notice {
-    font-size: 80%;
-    font-style: italic;
 }
 
 /*--------------------------------------------------------------
