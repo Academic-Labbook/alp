@@ -2,8 +2,8 @@
 Contributors: seanleavey
 Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
 Requires at least: 5.0.0
-Tested up to: 5.0.2
-Requires PHP: 7.0
+Tested up to: 5.0.3
+Requires PHP: 7.0.0
 Stable tag: 0.11.0
 License: GNU General Public License v3 or later
 License URI: LICENCE
@@ -72,83 +72,6 @@ with maximum control. Please see [this guide](https://alp.attackllama.com/docume
 on the ALP website.
 
 == Changelog ==
-= 0.7.0 =
- - First alpha release.
-= 0.7.1 =
- - Fix activation/deactivation post type registration bug.
-= 0.7.2 =
- - Fix incorrect function call regression in class-coauthors.php.
- - Prevent direct access to scripts.
- - Prevent directory listing.
-= 0.7.3 =
- - Remove option to disable tags.
- - Add settings and tools page links to plugin page.
- - Fix bug with additional edit counts in revisions widget.
- - Theme tweaks.
- - Internal naming changes.
-= 0.7.4 =
- - Theme tweaks.
-= 0.7.5 =
- - Move media type settings to network admin.
- - Move KaTeX custom script path control to network admin.
- - Setting page tweaks.
- - Change behaviour of [doi] and [arxiv] shortcodes.
- - Fix bug with generated table of contents HTML.
- - Show real revision count on posts (one less than before).
- - Rename settings for consistency.
- - Fix JavaScript bug.
- - Add uninstaller.
- - Add page and tools tests.
-= 0.7.6 =
- - Fix bug with coauthor delete on multisite.
- - New automated tests.
-= 0.7.7 =
- - Fix bug with coauthor JavaScript on Safari.
- - New automated tests.
-= 0.8.0 =
- - Coauthors are now selected using a tag-like taxonomy selector on
-   the post edit page, meaning that custom JavaScript is no longer
-   required.
- - Removed [arxiv] and [doi] shortcode support in anticipation of a
-   Gutenberg block to be added later.
- - New automated tests.
- - Theme tweaks.
-= 0.8.1 =
- - Internal work:
-   - Properly register edit summaries as post meta.
-   - Properly sanitise user-submitted post edit summaries.
-   - Rename internal post meta key for edit summaries.
- - Fix post counts showing up as null on admin post list when user
-   has no posts.
- - Fix bug with edit summary permission check.
- - Fix bug with coauthor term not being created when network user
-   is added to a blog.
- - New automated tests.
-= 0.9.0 =
- - Compatibility with Gutenberg:
-   - Added edit summary text widget to sidebar.
- - Removed edit summary metabox from classic editor.
- - Classic editor no longer supported.
- - Moved Labbook theme to its own directory to fix stylesheet bug on
-   certain types of installation. The Labbook theme must be installed
-   separately from now on.
- - Disallow anyone (including admins) from editing or deleting
-   coauthor terms, which are essential to the plugin's operation.
- - Update role descriptions.
- - Fix bug where new authors weren't given coauthor terms on sites
-   where ALP is not network active.
-= 0.10.0 =
- - Remove (unused) translation which is incompatible with 5.0.0.
- - Fixed bug when deleting users from network.
- - Remove ability to hide excerpts on block editor.
-= 0.10.1 =
- - Hotfix release.
-= 0.10.2 =
- - Hotfix release.
-= 0.11.0 =
- - Added TeX block.
- - Revised edit summary editor plugin to use core Gutenberg post meta support
-   instead of separate REST endpoint.
- - Self-host KaTeX scripts.
+
 = 1.0.0 =
  - First public release.
