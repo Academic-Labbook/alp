@@ -4,7 +4,7 @@ Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
 Requires at least: 5.0.0
 Tested up to: 5.0.3
 Requires PHP: 7.0.0
-Stable tag: 0.12.0
+Stable tag: 0.12.1
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
