@@ -746,7 +746,7 @@ if ( ! function_exists( 'labbook_the_revision_description_row' ) ) :
 				);
 				echo '</em>';
 			}
-		}
+		} // End if().
 
 		echo '</td>';
 		echo '</tr>';
