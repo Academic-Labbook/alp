@@ -687,7 +687,6 @@ if ( ! function_exists( 'labbook_the_revision_description_row' ) ) :
 		if ( $author ) {
 			// Print author link.
 			echo labbook_format_author( $author );
-			echo '&nbsp;';
 		}
 
 		echo '</td>';
