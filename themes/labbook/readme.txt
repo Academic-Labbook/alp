@@ -5,7 +5,7 @@ Tags: custom-background, custom-logo, custom-menu, editor-style, education, them
 
 Requires at least: 5.0.0
 Tested up to: 5.0.3
-Stable tag: 1.0.4
+Stable tag: 1.0.5
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -36,6 +36,11 @@ Labbook supports Academic Labbook Plugin - indeed, use of it is highly encourage
 of features provided in this theme.
 
 == Changelog ==
+
+= 1.0.5 - 2019-01-16 =
+* Changed edit summary list under posts and pages to a table.
+* Now page links in edit summary table scroll back to the table at their destination.
+* Footer only shown if there is contents.
 
 = 1.0.4 - 2019-01-13 =
 * Post edits now avoid showing drafts made before publication.
