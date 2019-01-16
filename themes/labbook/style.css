@@ -1341,15 +1341,35 @@ a.entry-link .fa {
     font-weight: bold;
 }
 
-#post-revisions ul {
-	margin: 0;
-	padding: 0;
-	list-style: none;
+#post-revisions table {
+    font-size: 85%;
 }
 
-#post-revisions ul li {
-	font-size: 85%;
-	margin-bottom: 6px;
+#post-revisions td, #post-revisions th {
+    border-color: #a7a7a7;
+}
+
+#post-revisions tr.post-revision-current,
+#post-revisions tr.post-revision-autosave,
+#post-revisions tr.post-revision-original {
+    background-color: #c4c4c4;
+}
+
+#post-revisions .post-revision-abbr-col {
+    width: 7ch; /* character widths */
+}
+
+#post-revisions .post-revision-author-col {
+    width: 150px;
+}
+
+#post-revisions .post-revision-date-col {
+    width: 14ch; /* character widths */
+}
+
+#post-revisions .post-revision-author,
+#post-revisions .post-revision-date {
+    text-align: center;
 }
 
 /*--------------------------------------------------------------
