@@ -574,10 +574,10 @@ if ( ! function_exists( 'labbook_the_revisions' ) ) :
 			</colgroup>
 			<thead>
 				<tr>
-					<th scope="col"><abbr title="<?php esc_html_e( 'Revision ID', 'ssl-alp' ); ?>"><?php echo esc_html_x( '#', 'Revision ID abbreviation', 'ssl-alp' ); ?></abbr></th>
-					<th scope="col"><?php esc_html_e( 'Date', 'ssl-alp' ); ?></th>
-					<th scope="col"><?php esc_html_e( 'User', 'ssl-alp' ); ?></th>
-					<th scope="col"><?php esc_html_e( 'Information', 'ssl-alp' ); ?></th>
+					<th scope="col"><abbr title="<?php esc_html_e( 'Revision ID', 'labbook' ); ?>"><?php echo esc_html_x( '#', 'Revision ID abbreviation', 'labbook' ); ?></abbr></th>
+					<th scope="col"><?php esc_html_e( 'Date', 'labbook' ); ?></th>
+					<th scope="col"><?php esc_html_e( 'User', 'labbook' ); ?></th>
+					<th scope="col"><?php esc_html_e( 'Information', 'labbook' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -695,7 +695,7 @@ if ( ! function_exists( 'labbook_the_revision_description_row' ) ) :
 		if ( ! empty( $revision_edit_summary ) ) {
 			// Print the edit summary.
 			echo '<em>';
-			esc_html_e( $revision_edit_summary );
+			echo esc_html( $revision_edit_summary );
 			echo '</em>';
 			echo '&nbsp';
 		}
@@ -800,7 +800,7 @@ if ( ! function_exists( 'labbook_get_revision_abbreviation' ) ) :
 					esc_attr(
 						sprintf(
 							/* translators: 1: revision ID */
-							__( 'View changes in revision %1$s', 'ssl-alp' ),
+							__( 'View changes in revision %1$s', 'labbook' ),
 							$revision->ID
 						)
 					),
