@@ -449,18 +449,20 @@ if ( ! function_exists( 'labbook_format_author' ) ) :
 			return;
 		}
 
-		if ( $url ) {
-			$author_url = get_author_posts_url( $author->ID );
+		$author_display = '<span class="author vcard">';
 
+		if ( $url ) {
 			// Wrap author in link to their posts.
-			$author_display = sprintf(
-				'<span class="author vcard"><a href="%1$s">%2$s</a></span>',
-				esc_url( $author_url ),
+			$author_display .= sprintf(
+				'<a href="%1$s">%2$s</a>',
+				esc_url( get_author_posts_url( $author->ID ) ),
 				esc_html( $author->display_name )
 			);
 		} else {
-			$author_display = esc_html( $author->display_name );
+			$author_display .= esc_html( $author->display_name );
 		}
+
+		$author_display .= '</span>';
 
 		return $author_display;
 	}
@@ -622,6 +624,7 @@ if ( ! function_exists( 'labbook_the_revision_description_list_item' ) ) :
 		echo get_avatar( $revision->post_author, 18, null, $author_display_name );
 		echo '&nbsp;&nbsp;';
 
+		// Print date.
 		printf(
 			'<span title="%1$s">%2$s</span>',
 			esc_attr( get_the_modified_date( labbook_get_date_format( true ), $revision ) ),
