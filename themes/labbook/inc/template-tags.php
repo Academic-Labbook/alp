@@ -574,7 +574,7 @@ if ( ! function_exists( 'labbook_the_revisions' ) ) :
 			</colgroup>
 			<thead>
 				<tr>
-					<th scope="col"><abbr title="<?php esc_html_e( 'Revision ID', 'ssl-alp' ); ?>"><?php echo esc_html_x( 'R', 'Revision ID abbreviation', 'ssl-alp' ); ?></abbr></th>
+					<th scope="col"><abbr title="<?php esc_html_e( 'Revision ID', 'ssl-alp' ); ?>"><?php echo esc_html_x( '#', 'Revision ID abbreviation', 'ssl-alp' ); ?></abbr></th>
 					<th scope="col"><?php esc_html_e( 'Date', 'ssl-alp' ); ?></th>
 					<th scope="col"><?php esc_html_e( 'User', 'ssl-alp' ); ?></th>
 					<th scope="col"><?php esc_html_e( 'Information', 'ssl-alp' ); ?></th>
@@ -594,6 +594,7 @@ if ( ! function_exists( 'labbook_the_revisions' ) ) :
 
 		if ( $pages > 1 ) {
 			echo paginate_links( array(
+				'base'			=> '%_%#post-revisions',
 				'format'		=> '?revision_page=%#%',
 				'current'  		=> $current_page,
 				'total'    		=> $pages,
