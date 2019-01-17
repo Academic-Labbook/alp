@@ -17,6 +17,10 @@ class SSL_ALP_Uninstaller {
 	/**
 	 * Uninstall plugin.
 	 *
+	 * This function fires when the plugin is uninstalled, either on an individual blog or a
+	 * network, but not when a blog is deleted on a network. That condition is handled by
+	 * `uninstall_multisite_blog`.
+	 *
 	 * This should remove all traces of the plugin. See e.g.
 	 * https://wordpress.stackexchange.com/a/716/138112.
 	 *
@@ -24,6 +28,69 @@ class SSL_ALP_Uninstaller {
 	 * by ALP.
 	 */
 	public static function uninstall() {
+		if ( is_multisite() ) {
+			// This is a network and the plugin is being uninstalled on all blogs. Remove data from
+			// each blog.
+			self::delete_data_from_blogs();
+		} else {
+			// Delete data on single site.
+			self::delete_data();
+		}
+	}
+
+	/**
+	 * Action to run when a blog is deleted on a network, to delete plugin options and terms.
+	 *
+	 * @param int $blog_id Blog ID.
+	 */
+	public static function uninstall_multisite_blog( $blog_id ) {
+		// Add blog options using blog ID specified in call.
+		self::delete_data_from_blog( $blog_id );
+	}
+
+	/**
+	 * Delete plugin data from each blog on the network.
+	 *
+	 * @global wpdb $wpdb
+	 */
+	private static function delete_data_from_blogs() {
+		global $wpdb;
+
+		if ( ! is_multisite() ) {
+			return;
+		}
+
+		// Loop over all blogs on the network.
+		foreach ( $wpdb->get_col( "SELECT blog_id FROM {$wpdb->blogs}" ) as $blog_id ) {
+			// Delete data from this blog.
+			self::delete_data_from_blog( $blog_id );
+		}
+	}
+
+	/**
+	 * Delete plugin data from the specified blog.
+	 *
+	 * @param int $blog_id Blog ID.
+	 */
+	private static function delete_data_from_blog( $blog_id ) {
+		if ( ! is_multisite() ) {
+			return;
+		}
+
+		// Switch to the blog.
+		switch_to_blog( $blog_id );
+
+		// Delete data from this blog.
+		self::delete_data();
+
+		// Switch back to previous blog.
+		restore_current_blog();
+	}
+
+	/**
+	 * Delete plugin data from a single site.
+	 */
+	public static function delete_data() {
 		self::delete_options();
 		self::delete_taxonomies();
 		self::delete_post_metas();
@@ -119,8 +186,10 @@ class SSL_ALP_Uninstaller {
 					)
 				);
 
-				// Delete taxonomy prefix.
-				delete_option( 'prefix_' . $taxonomy->slug . '_option_name' );
+				if ( is_object( $taxonomy ) && property_exists( $taxonomy, 'slug' ) && ! is_null( $taxonomy->slug ) ) {
+					// Delete taxonomy prefix.
+					delete_option( 'prefix_' . $taxonomy->slug . '_option_name' );
+				}
 			}
 		}
 
