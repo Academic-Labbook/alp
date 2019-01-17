@@ -17,6 +17,10 @@ class SSL_ALP_Activator {
 	/**
 	 * Activate plugin.
 	 *
+	 * This function fires when the plugin is activated, either on an individual blog or a
+	 * network, but not when a blog is created on a network *after* this plugin has been network
+	 * activated. That condition is handled by `activate_multisite_blog`.
+	 *
 	 * @param bool $network_wide Whether the plugin is being enabled on the
 	 *                           network or just an individual site.
 	 */
@@ -29,6 +33,17 @@ class SSL_ALP_Activator {
 			// Add options for single site.
 			self::add_options();
 		}
+	}
+
+	/**
+	 * Action to run when a new blog is created on a network, to add plugin options and their
+	 * default values to the specified blog.
+	 *
+	 * @param int $blog_id Blog ID.
+	 */
+	public static function activate_multisite_blog( $blog_id ) {
+		// Add blog options using blog ID specified in call.
+		self::add_options_to_blog( $blog_id );
 	}
 
 	/**
@@ -68,17 +83,6 @@ class SSL_ALP_Activator {
 
 		// Switch back to previous blog.
 		restore_current_blog();
-	}
-
-	/**
-	 * Action to run when a new blog is created on a network, to add plugin options and their
-	 * default values to the specified blog.
-	 *
-	 * @param int $blog_id Blog ID.
-	 */
-	public static function activate_multisite_blog( $blog_id ) {
-		// Add blog options using blog ID specified in call.
-		self::add_options_to_blog( $blog_id );
 	}
 
 	/**
