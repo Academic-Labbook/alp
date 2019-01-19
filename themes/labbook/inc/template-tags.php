@@ -69,10 +69,9 @@ if ( ! function_exists( 'labbook_get_post_date' ) ) :
 	 * @param bool             $modified Show the modified date.
 	 * @param bool             $time     Show the time of day.
 	 * @param bool             $icon     Show calendar icon.
-	 * @param bool             $url      Wrap date in URL to post.
 	 * @return string
 	 */
-	function labbook_get_post_date( $post = null, $modified = false, $time = true, $icon = true, $url = true ) {
+	function labbook_get_post_date( $post = null, $modified = false, $time = true, $icon = true ) {
 		$datetime_fmt = labbook_get_date_format( $time );
 
 		// ISO 8601 formatted date.
@@ -94,15 +93,6 @@ if ( ! function_exists( 'labbook_get_post_date' ) ) :
 			esc_attr( $human_date ),
 			esc_attr( $date_str )
 		);
-
-		if ( $url ) {
-			// Wrap permalink around date.
-			$time_str = sprintf(
-				'<a href="%1$s" rel="bookmark">%2$s</a>',
-				esc_url( get_permalink( $post ) ),
-				$time_str
-			);
-		}
 
 		if ( $icon ) {
 			if ( $modified ) {
@@ -207,10 +197,6 @@ if ( ! function_exists( 'labbook_the_post_meta' ) ) :
 
 		// Allowed tags in date HTML.
 		$allowed_date_html = array(
-			'a'		=> array(
-				'href'	=> array(),
-				'rel'	=> array(),
-			),
 			'time'	=> array(
 				'class'		=> array(),
 				'datetime'	=> array(),
@@ -232,7 +218,7 @@ if ( ! function_exists( 'labbook_the_post_meta' ) ) :
 				printf(
 					/* translators: 1: post modification time */
 					esc_html__( ' (last edited %1$s)', 'labbook' ),
-					wp_kses( labbook_get_post_date( $post, true, true, true, false ), $allowed_date_html )
+					wp_kses( labbook_get_post_date( $post, true ), $allowed_date_html )
 				);
 			}
 
@@ -251,8 +237,9 @@ if ( ! function_exists( 'labbook_the_post_id_icon' ) ) :
 		$post = get_post( $post );
 
 		printf(
-			'<i class="fa fa-link" title="%1$s"></i>%2$s',
+			'<i class="fa fa-link" title="%1$s"></i><a href="%2$s" rel="bookmark">%3$s</a>',
 			esc_html__( 'ID', 'labbook' ),
+			esc_url( get_permalink( $post ) ),
 			esc_html( $post->ID )
 		);
 	}
