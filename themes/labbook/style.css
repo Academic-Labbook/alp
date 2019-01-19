@@ -1170,6 +1170,7 @@ a:hover, a:active {
 .entry-title {
     font-size: 1.9em;
     margin: 0 0 0.25em 0;
+    word-wrap: break-word;
 }
 
 /* permalink, default invisible */
