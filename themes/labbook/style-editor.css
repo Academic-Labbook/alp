@@ -199,7 +199,21 @@ hr {
     background-color: #ccc;
     border: 0;
     height: 1px;
-    margin-bottom: 1.5em;
+    margin: 1.5em 0;
+    margin-left: auto;
+    margin-right: auto;
+    width: 25%; /* default block editor separator is short; related bug: https://github.com/WordPress/gutenberg/issues/10569 */
+}
+
+/* wide separator */
+hr.is-style-wide {
+    width: 75%;
+}
+
+/* dotted separator */
+hr.is-style-dots {
+    /* default to full width */
+    width: 100%;
 }
 
 ul, ol {
