@@ -5,7 +5,7 @@ Tags: custom-background, custom-logo, custom-menu, editor-style, education, them
 
 Requires at least: 5.0.0
 Tested up to: 5.0.3
-Stable tag: 1.0.5
+Stable tag: 1.0.6
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -36,6 +36,14 @@ Labbook supports Academic Labbook Plugin - indeed, use of it is highly encourage
 of features provided in this theme.
 
 == Changelog ==
+
+= 1.0.6 - 2019-01-19 =
+* Added markup support in post titles.
+* Stopped long post titles overflowing the entry.
+* Removed post anchor appearing when hovering over title in favour of using the ID field as a
+  permalink.
+* Fix separator (`hr`) styling when using block editor separator.
+* Minor CSS fixes.
 
 = 1.0.5 - 2019-01-16 =
 * Changed edit summary list under posts and pages to a table.
