@@ -1173,28 +1173,6 @@ a:hover, a:active {
     word-wrap: break-word;
 }
 
-/* permalink, default invisible */
-a.entry-link {
-	float: right;
-	margin-left: 5px;
-    display: none;
-    border: none !important;
-}
-
-a.entry-link:hover {
-    background: none !important;
-}
-
-/* remove padding from entry link icon */
-a.entry-link .fa {
-    margin-right: 0;
-}
-
-/* display permalink when hovering over title */
-.entry-title:hover a.entry-link, .entry-section:hover {
-	display: inline;
-}
-
 .entry-content, .entry-summary {
     border-top: 1px solid rgba(0, 0, 0, 0.07);
     border-bottom: 1px solid rgba(0, 0, 0, 0.07);

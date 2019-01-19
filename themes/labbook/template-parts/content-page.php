@@ -14,7 +14,7 @@
 		<?php labbook_the_page_breadcrumbs(); ?>
 	</div>
 	<header class="entry-header">
-		<?php labbook_the_post_title( $post, false, false, true ); ?>
+		<?php labbook_the_post_title( $post, false, false ); ?>
 		<div class="entry-meta">
 			<?php labbook_the_post_meta(); ?>
 		</div><!-- .entry-meta -->

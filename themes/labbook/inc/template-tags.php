@@ -21,7 +21,7 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 	 * @param bool             $icon   Add post icon, if present.
 	 * @param bool             $anchor Add hover anchor with permalink.
 	 */
-	function labbook_the_post_title( $post = null, $url = true, $icon = true, $anchor = false ) {
+	function labbook_the_post_title( $post = null, $url = true, $icon = true ) {
 		$post = get_post( $post );
 
 		echo '<h2 class="entry-title">';
@@ -57,33 +57,7 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 			the_title();
 		}
 
-		if ( $anchor ) {
-			// Add hover anchor with permalink.
-			labbook_the_post_anchor( $post );
-		}
-
 		echo '</h2>';
-	}
-endif;
-
-if ( ! function_exists( 'labbook_the_post_anchor' ) ) :
-	/**
-	 * Print the post anchor.
-	 *
-	 * @param int|WP_Post|null $post Post ID or post object. Defaults to global $post.
-	 */
-	function labbook_the_post_anchor( $post = null ) {
-		$post = get_post( $post );
-
-		if ( is_null( $post ) ) {
-			return;
-		}
-
-		printf(
-			'<a class="entry-link" href="%1$s" title="%2$s"><i class="fa fa-link"></i></a>',
-			esc_url( get_permalink( $post ) ),
-			esc_attr__( 'Permalink', 'labbook' )
-		);
 	}
 endif;
 
@@ -95,7 +69,7 @@ if ( ! function_exists( 'labbook_get_post_date' ) ) :
 	 * @param bool             $modified Show the modified date.
 	 * @param bool             $time     Show the time of day.
 	 * @param bool             $icon     Show calendar icon.
-	 * @param bool             $url      Wrap date in URL to date archive page.
+	 * @param bool             $url      Wrap date in URL to post.
 	 * @return string
 	 */
 	function labbook_get_post_date( $post = null, $modified = false, $time = true, $icon = true, $url = true ) {
@@ -122,17 +96,10 @@ if ( ! function_exists( 'labbook_get_post_date' ) ) :
 		);
 
 		if ( $url ) {
-			// Year/month/day dates.
-			$year = $modified ? get_the_modified_time( 'Y', $post ) : get_post_time( 'Y', $post );
-			$month = $modified ? get_the_modified_time( 'm', $post ) : get_post_time( 'm', $post );
-			$day = $modified ? get_the_modified_time( 'j', $post ) : get_post_time( 'j', $post );
-
-			$day_url = get_day_link( $year, $month, $day );
-
-			// Wrap URL to date page.
+			// Wrap permalink around date.
 			$time_str = sprintf(
 				'<a href="%1$s" rel="bookmark">%2$s</a>',
-				esc_url( $day_url ),
+				esc_url( get_permalink( $post ) ),
 				$time_str
 			);
 		}
@@ -265,7 +232,7 @@ if ( ! function_exists( 'labbook_the_post_meta' ) ) :
 				printf(
 					/* translators: 1: post modification time */
 					esc_html__( ' (last edited %1$s)', 'labbook' ),
-					wp_kses( labbook_get_post_date( $post, true ), $allowed_date_html )
+					wp_kses( labbook_get_post_date( $post, true, true, true, false ), $allowed_date_html )
 				);
 			}
 
