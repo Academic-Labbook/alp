@@ -23,7 +23,6 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 	 */
 	function labbook_the_post_title( $post = null, $url = true, $icon = true, $anchor = false ) {
 		$post = get_post( $post );
-		$title = get_the_title( $post );
 
 		echo '<h2 class="entry-title">';
 
@@ -46,14 +45,16 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 
 		if ( $url ) {
 			// Wrap title in its permalink.
-			printf(
-				'<a href="%1$s" rel="bookmark">%2$s</a>',
-				esc_url( get_permalink( $post ) ),
-				esc_html( $title )
+			the_title(
+				sprintf(
+					'<a href="%1$s" rel="bookmark">',
+					esc_url( get_permalink( $post ) )
+				),
+				'</a>'
 			);
 		} else {
 			// Just display title.
-			echo esc_html( $title );
+			the_title();
 		}
 
 		if ( $anchor ) {
