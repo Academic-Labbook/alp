@@ -7,7 +7,7 @@ minimally invasive on the core WordPress functionality, which should allow you
 to install additional plugins as you like.
 
 Lots of documentation is provided on the [ALP website](https://alp.attackllama.com/).
-Before installing, please read and understand the `Future development plans in the context of WordPress upgrades`
+Before installing, please read and understand the `Development plans in the context of WordPress upgrades`
 section below. It explains how new features in WordPress will be tracked by ALP.
 
 ## What does ALP do?
@@ -85,7 +85,13 @@ outdated browsers, and this project is not concerned about losing sales from use
  - **Modular**: most/all features can be enabled or disabled, and work independently from each
    other.
 
-## Future development plans in the context of WordPress upgrades
+## Future development plans
+The basic behaviour of ALP is already in place, but the plan is to keep adding useful features
+as ALP is used by researchers and the developer gets feedback. Please take a look at the project's
+[issue tracker](https://github.com/SeanDS/alp/issues/) to view, comment on and add your own feature
+requests for future releases.
+
+### Development plans in the context of WordPress upgrades
 The intention is for ALP to track the latest improvements to WordPress and Gutenberg as much as
 possible. *Any feature that is provided by ALP that becomes available in WordPress Core will
 probably be removed from ALP quite soon after*. The author does not have enough time to support
