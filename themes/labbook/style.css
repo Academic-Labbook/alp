@@ -1160,6 +1160,12 @@ a:hover, a:active {
     padding: 1em 0.5em;
 }
 
+/* page-content used pages without items, e.g. 404 and content-none */
+.page-content {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+
 /*--------------------------------------------------------------
 ## Entries
 --------------------------------------------------------------*/
