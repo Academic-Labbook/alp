@@ -4,7 +4,7 @@ Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
 Requires at least: 5.0.0
 Tested up to: 5.0.3
 Requires PHP: 7.0.0
-Stable tag: 0.12.1
+Stable tag: 0.12.2
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -73,5 +73,8 @@ on the ALP website.
 
 == Changelog ==
 
-= 1.0.0 =
- - First public release.
+= 0.12.2 =
+ - Fixed bug whereby settings were not added to the database for new blogs when the plugin was
+   already network active.
+ - Added routines to clean up database if ALP is uninstalled.
+ - Added extra test.
