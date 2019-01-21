@@ -1,26 +1,27 @@
 <?php
-
-/*
-Plugin Name:  Academic Labbook Plugin
-Plugin URI:   https://alp.attackllama.com/
-Description:  Turn WordPress into a collaborative academic labbook.
-Version:      0.10.1
-Author:       Sean Leavey
-Author URI:   https://attackllama.com/
-License:      GPL3
-License URI:  https://www.gnu.org/licenses/gpl-3.0.en.html
-*/
+/**
+ * Plugin Name:  Academic Labbook
+ * Plugin URI:   https://alp.attackllama.com/
+ * Description:  Turn WordPress into a collaborative academic labbook.
+ * Version:      0.12.1
+ * Author:       Sean Leavey
+ * Author URI:   https://attackllama.com/
+ * License:      GPL3
+ * License URI:  https://www.gnu.org/licenses/gpl-3.0.en.html
+ *
+ * @package ssl-alp
+ */
 
 if ( ! defined( 'WPINC' ) ) {
-    // prevent direct access
-    exit;
+	// Prevent direct access.
+	exit;
 }
 
 /**
  * Current plugin version.
  */
 
-define( 'SSL_ALP_VERSION', '0.10.2' );
+define( 'SSL_ALP_VERSION', '0.12.1' );
 
 /**
  * Plugin name
@@ -53,34 +54,45 @@ define( 'SSL_ALP_SITE_TOOLS_MENU_SLUG', 'ssl-alp-admin-tools' );
 define( 'SSL_ALP_REST_ROUTE', 'ssl-alp/v1' );
 
 /**
+ * Default settings
+ */
+
+define( 'SSL_ALP_KATEX_VERSION', '0.10.0' );
+
+/**
  * Code to run on plugin activation and deactivation.
  */
 
-// import classes
-require_once SSL_ALP_BASE_DIR . 'includes/class-activator.php';
-require_once SSL_ALP_BASE_DIR . 'includes/class-deactivator.php';
-require_once SSL_ALP_BASE_DIR . 'includes/class-uninstaller.php';
+// Import classes.
+require_once SSL_ALP_BASE_DIR . 'includes/class-ssl-alp-activator.php';
+require_once SSL_ALP_BASE_DIR . 'includes/class-ssl-alp-deactivator.php';
+require_once SSL_ALP_BASE_DIR . 'includes/class-ssl-alp-uninstaller.php';
 
-// register hooks
+// Register special hooks.
 register_activation_hook( __FILE__, array( 'SSL_ALP_Activator', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'SSL_ALP_Deactivator', 'deactivate' ) );
 register_uninstall_hook( __FILE__, array( 'SSL_ALP_Uninstaller', 'uninstall' ) );
+
+// Run setup on new blogs created on network installations.
+add_action( 'wpmu_new_blog', array( 'SSL_ALP_Activator', 'activate_multisite_blog' ), 10, 1 );
+
+// Run uninstall on deleted blogs on network installations.
+add_action( 'delete_blog', array( 'SSL_ALP_Uninstaller', 'uninstall_multisite_blog' ), 10, 1 );
 
 /**
  * Core plugin class used to load modules.
  */
 
-require SSL_ALP_BASE_DIR . 'includes/class-alp.php';
-require SSL_ALP_BASE_DIR . 'includes/class-alp-module.php';
+require SSL_ALP_BASE_DIR . 'includes/class-ssl-alp.php';
+require SSL_ALP_BASE_DIR . 'includes/class-ssl-alp-module.php';
 
 /**
  * Execute plugin.
  */
-
 function ssl_alp_run() {
-    global $ssl_alp;
+	global $ssl_alp;
 
-    $ssl_alp = new SSL_ALP();
+	$ssl_alp = new SSL_ALP();
 	$ssl_alp->run();
 }
 

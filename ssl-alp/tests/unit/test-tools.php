@@ -12,16 +12,16 @@ class ToolsTest extends WP_UnitTestCase {
         global $ssl_alp;
 
         // by default, theme not active
-        $this->assertNotEquals( wp_get_theme()->name, 'Alpine' );
+        $this->assertNotEquals( wp_get_theme()->name, 'Labbook' );
 
         // backup current theme
         $previous_theme = get_stylesheet();
 
         // change theme
-        switch_theme( 'Alpine' );
+        switch_theme( 'Labbook' );
 
         // check theme now active
-        $this->assertEquals( wp_get_theme()->name, 'Alpine' );
+        $this->assertEquals( wp_get_theme()->name, 'Labbook' );
 
         // change back to default theme
         switch_theme( $previous_theme );

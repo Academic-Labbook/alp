@@ -4,9 +4,9 @@
  * Cross-references tests
  */
 class CrossReferencesTest extends WP_UnitTestCase {
-	public function setUp() {		
+	public function setUp() {
 		parent::setUp();
-		
+
 		$this->post_1 = $this->factory->post->create_and_get(
 			array(
 				'post_content'	=>	'This contains no cross-references.'
@@ -55,7 +55,7 @@ class CrossReferencesTest extends WP_UnitTestCase {
 
 		// rebuild references
 		$ssl_alp->references->rebuild_references();
-		
+
 		/**
 		 * test get_reference_to_posts can handle post IDs or objects
 		 */
@@ -201,7 +201,7 @@ class CrossReferencesTest extends WP_UnitTestCase {
 		);
 	}
 
-	function test_references_after_edit() {
+	function test_references_after_edit_and_revert() {
 		global $ssl_alp;
 
 		$editor = $this->factory->user->create( array( 'role' => 'editor' ) );
@@ -227,6 +227,23 @@ class CrossReferencesTest extends WP_UnitTestCase {
 			array(
 				'post_ID'		=>	$post->ID,
 				'content'		=>	sprintf(
+					'This is a <a href="%1$s">link</a>.',
+					get_permalink( $this->post_1 )
+				)
+			)
+		);
+
+		// one reference now
+		$this->assertEquals(
+			$ssl_alp->references->get_reference_to_posts( $post ),
+			array( $this->post_1 )
+		);
+
+		// edit post to add another reference
+		edit_post(
+			array(
+				'post_ID'		=>	$post->ID,
+				'content'		=>	sprintf(
 					'This is a <a href="%1$s">link</a>, and <a href="%2$s">another</a>.',
 					get_permalink( $this->post_1 ),
 					get_permalink( $this->post_2 )
@@ -234,10 +251,26 @@ class CrossReferencesTest extends WP_UnitTestCase {
 			)
 		);
 
-		// reference should show up
+		// two references now
 		$this->assertEquals(
 			$ssl_alp->references->get_reference_to_posts( $post ),
 			array( $this->post_1, $this->post_2 )
+		);
+
+		// there should be two revisions now
+		$revisions = wp_get_post_revisions( $post->ID );
+		$this->assertCount( 2, $revisions );
+
+		// earlier revision
+		$first_revision = end( $revisions );
+
+		// restore to earlier revision
+		wp_restore_post_revision( $first_revision->ID );
+
+		// only one reference like the first time
+		$this->assertEquals(
+			$ssl_alp->references->get_reference_to_posts( $post ),
+			array( $this->post_1 )
 		);
 	}
 

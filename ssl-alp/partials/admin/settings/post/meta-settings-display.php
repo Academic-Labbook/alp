@@ -1,9 +1,5 @@
-<fieldset>
-    <legend class="screen-reader-text"><span><?php _e( 'Hide edit controls', 'ssl-alp' ); ?></span></legend>
-    <?php _e( 'Hide the following controls from the post edit screen:', 'ssl-alp' ); ?>
-    <br/>
-    <label for="ssl_alp_disable_post_trackbacks_checkbox">
-        <input type="checkbox" name="ssl_alp_disable_post_trackbacks" id="ssl_alp_disable_post_trackbacks_checkbox" value="1" <?php checked( get_option( 'ssl_alp_disable_post_trackbacks' ) ); ?> />
-        <?php _e( 'Trackbacks', 'ssl-alp' ); ?>
-    </label>
-</fieldset>
+<label for="ssl_alp_disable_post_trackbacks_checkbox">
+    <input type="checkbox" name="ssl_alp_disable_post_trackbacks" id="ssl_alp_disable_post_trackbacks_checkbox" value="1" <?php checked( get_option( 'ssl_alp_disable_post_trackbacks' ) ); ?> />
+    <?php _e( 'Hide trackback controls on the post edit screen', 'ssl-alp' ); ?>
+</label>
+<p class="description"><?php _e( 'When enabled, post trackbacks are disabled and the control is hidden from the post edit screen. This feature is typically of little use to private sites.', 'ssl-alp' ); ?></p>
