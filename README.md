@@ -104,7 +104,7 @@ be given a new major version number.
 
 WordPress is in a period of transition: the new [Gutenberg](https://wordpress.org/gutenberg/) editor
 has introduced a completely different way of writing content. The feature roadmap shows a plan to
-eventually replace most of the configurable parts of WordPress with Gutenberb-based assets.
+eventually replace most of the configurable parts of WordPress with Gutenberg-based assets.
 
 Two changes of particular note are:
 
