@@ -1355,7 +1355,7 @@ a:hover, a:active {
 #post-revisions tr.post-revision-current,
 #post-revisions tr.post-revision-autosave,
 #post-revisions tr.post-revision-original {
-    background-color: #c4c4c4;
+    background-color: #eee;
 }
 
 #post-revisions .post-revision-abbr-col {
