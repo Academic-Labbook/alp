@@ -608,11 +608,13 @@ th {
 
 #primary a {
     border-bottom: #a8bfcf 1px solid;
+    margin-bottom: 1px; /* compensate for 2px border on hover */
 }
 
 #primary a:hover {
     border-bottom: #005a9c 2px solid;
     background-color:#efefef;
+    margin-bottom: 0px; /* compensate for 2px border on hover */
 }
 
 /*--------------------------------------------------------------
