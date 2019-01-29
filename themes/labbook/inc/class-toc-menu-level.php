@@ -128,7 +128,7 @@ if ( ! function_exists( 'labbook_generate_post_contents' ) ) :
 		 *
 		 * https://php.net/manual/en/domdocument.loadhtml.php#95251
 		 */
-		$post_content = '<?xml encoding="UTF-8">' . $post_content . '</body>';
+		$post_content = '<?xml encoding="' . esc_attr( get_bloginfo( 'charset' ) ) . '">' . $post_content . '</body>';
 
 		// Load HTML document.
 		$document->loadHTML( $post_content );
