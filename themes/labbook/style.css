@@ -617,6 +617,15 @@ th {
     margin-bottom: 0px; /* compensate for 2px border on hover */
 }
 
+/* avoid styling buttons that are inside links the way we style other links */
+#primary .wp-block-button a.wp-block-button__link:hover,
+#primary .wp-block-file a.wp-block-file__button:hover {
+    border-bottom: none;
+    background-color: #32373c; /* Gutenberg default */
+    margin-bottom: 2px; /* compensate for no border */
+    opacity: 0.85; /* Gutenberg default */
+}
+
 /*--------------------------------------------------------------
 ## Secondary (sidebar)
 --------------------------------------------------------------*/
