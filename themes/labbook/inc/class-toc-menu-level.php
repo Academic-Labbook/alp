@@ -120,8 +120,34 @@ if ( ! function_exists( 'labbook_generate_post_contents' ) ) :
 
 		$document = new DOMDocument();
 
+		/**
+		 * Append a charset to the document to avoid encoding errors (by default, loadHTML assumes
+		 * iso-8859-1, whereas WordPress uses UTF-8.
+		 *
+		 * The head is extracted again later.
+		 *
+		 * https://php.net/manual/en/domdocument.loadhtml.php#95251
+		 */
+		$post_content = '<?xml encoding="UTF-8">' . $post_content . '</body>';
+
 		// Load HTML document.
 		$document->loadHTML( $post_content );
+
+		/**
+		 * Extract XML encoding element.
+		 *
+		 * https://php.net/manual/en/domdocument.loadhtml.php#95251
+		 */
+
+		foreach ($document->childNodes as $item) {
+			if ($item->nodeType == XML_PI_NODE) {
+				// Remove XML encoding element.
+				$document->removeChild($item);
+			}
+		}
+
+		// Set encoding directly.
+		$document->encoding = 'UTF-8';
 
 		// Revert libxml error setting.
 		libxml_use_internal_errors( $prev_libxml_error_setting );
