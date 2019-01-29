@@ -325,11 +325,13 @@ li > ol {
 a {
     color: #0b789c;
     border-bottom: #a8bfcf 1px solid;
+    margin-bottom: 1px; /* compensate for 2px border on hover */
 }
 
 a:hover {
     border-bottom: #005a9c 2px solid;
     background-color:#efefef;
+    margin-bottom: 0px; /* compensate for 2px border on hover */
 }
 
 a:focus {
