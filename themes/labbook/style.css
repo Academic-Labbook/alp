@@ -1208,6 +1208,12 @@ a:hover, a:active {
     word-wrap: break-word;
 }
 
+/* show visited posts' titles in different colour */
+.entry-title a:visited {
+    color: #252525;
+    border-bottom: #404040 1px solid !important;
+}
+
 .entry-content, .entry-summary {
     border-top: 1px solid rgba(0, 0, 0, 0.07);
     border-bottom: 1px solid rgba(0, 0, 0, 0.07);
