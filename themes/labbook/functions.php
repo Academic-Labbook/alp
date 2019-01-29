@@ -77,9 +77,9 @@ if ( ! function_exists( 'labbook_setup' ) ) :
 		 * @link https://codex.wordpress.org/Theme_Logo
 		 */
 		add_theme_support( 'custom-logo', array(
-			'height'      => 155,
-			'width'       => 700,
-			'flex-width'  => false,
+			'height'      => 155, // Should match .site-branding CSS grid row height.
+			'width'       => 400,
+			'flex-width'  => true,
 			'flex-height' => false,
 		) );
 
