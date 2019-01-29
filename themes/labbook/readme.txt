@@ -5,7 +5,7 @@ Tags: custom-background, custom-logo, custom-menu, editor-style, education, them
 
 Requires at least: 5.0.0
 Tested up to: 5.0.3
-Stable tag: 1.0.6
+Stable tag: 1.0.7
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -36,6 +36,14 @@ Labbook supports Academic Labbook Plugin - indeed, use of it is highly encourage
 of features provided in this theme.
 
 == Changelog ==
+
+= 1.0.7 - 2019-01-29 =
+* Made visited post titles show a different colour to non-visited ones.
+* Fixed bug with contents generator, when the page content contained non-ASCII characters.
+* Added padding to text on content-none and 404 pages.
+* Made background on revisions tables for autosaves/current/original posts lighter.
+* Allow flexible header image widths.
+* Minor CSS fixes.
 
 = 1.0.6 - 2019-01-19 =
 * Added markup support in post titles.

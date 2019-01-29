@@ -7,7 +7,7 @@
  * @package Labbook
  */
 
-define( 'LABBOOK_VERSION', '1.0.6' );
+define( 'LABBOOK_VERSION', '1.0.7' );
 
 if ( ! function_exists( 'labbook_setup' ) ) :
 	/**
