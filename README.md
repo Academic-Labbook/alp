@@ -33,6 +33,8 @@ section below. It explains how new features in WordPress will be tracked by ALP.
    - *Subscriber* is unchanged
    - *Excluded* is added (for keeping ex-users' posts, comments, etc. on record but not giving them
      access)
+ - Overrides some default settings in the editor, such as to make images in posts link to their
+   full-sized versions.
  - Hides some WordPress branding and news
 
 ## Labbook theme
@@ -139,6 +141,7 @@ been pushed back to these plugins and WordPress itself:
 [14](https://github.com/WordPress/gutenberg/issues/8032)
 [15](https://github.com/WordPress/wordpress-importer/issues/40)
 [16](https://github.com/WordPress/gutenberg/issues/10834)
+[17](https://github.com/adamsilverstein/mathml-block/issues/12)
 
 ### Co-Authors Plus
 Authors: Mohammad Jangda, Daniel Bachhuber, Automattic, Shepherd Interactive, Mark Jaquith

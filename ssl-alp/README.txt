@@ -4,7 +4,7 @@ Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
 Requires at least: 5.0.0
 Tested up to: 5.0.3
 Requires PHP: 7.0.0
-Stable tag: 0.12.2
+Stable tag: 0.12.3
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -72,6 +72,9 @@ with maximum control. Please see [this guide](https://alp.attackllama.com/docume
 on the ALP website.
 
 == Changelog ==
+
+= 0.12.3 =
+ - Set new default (media file) for image link targets in block editor.
 
 = 0.12.2 =
  - Fixed bug whereby settings were not added to the database for new blogs when the plugin was
