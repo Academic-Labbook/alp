@@ -166,9 +166,6 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 
 		// Disable post trackbacks.
 		$loader->add_action( 'init', $this, 'disable_post_trackbacks' );
-
-		// Enqueue script to set default image targets in block editor.
-		$loader->add_action( 'enqueue_block_editor_assets', $this, 'enqueue_default_image_block_target_script' );
 	}
 
 	/**
@@ -322,18 +319,5 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 		}
 
 		remove_post_type_support( 'post', 'trackbacks' );
-	}
-
-	/**
-	 * Enqueue script to set the default image block link target.
-	 */
-	public function enqueue_default_image_block_target_script() {
-		wp_enqueue_script(
-			'modify-image-link-destination-default',
-        	SSL_ALP_BASE_URL . 'js/block-editor.js',
-        	array(
-				'wp-hooks',
-			)
-    	);
 	}
 }
