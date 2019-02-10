@@ -8,7 +8,7 @@ class CoauthorsTest extends WP_UnitTestCase {
 	protected static $author_ids;
 	protected static $editor_ids;
     protected static $admin_ids;
-    
+
 	public static function wpSetUpBeforeClass( $factory ) {
         self::$contributor_ids = $factory->user->create_many( 2, array( 'role' => 'contributor' ) );
 		self::$author_ids = $factory->user->create_many( 2, array( 'role' => 'author' ) );
@@ -16,6 +16,12 @@ class CoauthorsTest extends WP_UnitTestCase {
 		self::$admin_ids = $factory->user->create_many( 2, array( 'role' => 'administrator' ) );
 	}
 
+    /**
+     * Create a post with coauthors.
+     *
+     * Note: the $coauthors array must contain the $author to emulate front-end
+     * behaviour.
+     */
     private function create_coauthor_post( $author, $coauthors = array() ) {
         global $ssl_alp;
 
@@ -67,9 +73,9 @@ class CoauthorsTest extends WP_UnitTestCase {
 
     /**
      * Delete user(s) from blog on a multisite installation.
-     * 
+     *
      * This replicates the behaviour of wp-admin/network/users.php?action=dodelete.
-     * 
+     *
      * $user_ids should be an array of user ids to be deleted
      * $blog_users should be an array of user id => array( blog id => reassign user id ).
      * The reassign user id can be null, in which case no reassignment is made.
@@ -77,7 +83,7 @@ class CoauthorsTest extends WP_UnitTestCase {
     private function delete_users_multisite( $user_ids, $blog_users ) {
         // go to network admin user delete page
         $this->go_to( network_admin_url( 'network/users.php' ) );
-        
+
         /*
          * set expected postdata (required as `remove_user_from_blog` action inspects it)
          */
@@ -114,7 +120,7 @@ class CoauthorsTest extends WP_UnitTestCase {
 
     /**
      * Deletes user in different way depending on whether this is a single site or network
-     * 
+     *
      * Note: `delete_user` is already defined as a static method.
      */
     private function ssl_delete_user( $user_id, $reassign_id = null ) {
@@ -136,7 +142,7 @@ class CoauthorsTest extends WP_UnitTestCase {
      * Checks the specified user id is deleted. For single sites,
      * the user is checked to be deleted. For multisite, the user
      * is checked to no longer be a member of the current blog.
-     * 
+     *
      * This essentially checks the behaviour of `wp_delete_user` in
      * each case.
      */
@@ -262,11 +268,11 @@ class CoauthorsTest extends WP_UnitTestCase {
 			    'author' => $user->ID
             )
         );
-        
+
         // check user query
 		$this->assertEquals( 1, count( $query->posts ) );
         $this->assertEquals( $post->ID, $query->posts[ 0 ]->ID );
-        
+
         // check get_coauthors
         $this->assertEquals(
             $ssl_alp->coauthors->get_coauthors( $post ),
@@ -296,11 +302,11 @@ class CoauthorsTest extends WP_UnitTestCase {
 			    'author_name' => $user->user_login
             )
         );
-        
+
         // check user query
 		$this->assertEquals( 1, count( $query->posts ) );
         $this->assertEquals( $post->ID, $query->posts[ 0 ]->ID );
-        
+
         // check get_coauthors
         $this->assertEquals(
             $ssl_alp->coauthors->get_coauthors( $post ),
@@ -309,17 +315,17 @@ class CoauthorsTest extends WP_UnitTestCase {
             )
         );
     }
-    
+
 	public function test__author_name_arg_plus_tax_query__user_is_post_author() {
         global $ssl_alp;
 
         $user = $this->factory->user->create_and_get();
         $post = $this->create_coauthor_post($user, array( $user ) );
-        
+
         $ssl_alp->coauthors->set_coauthors( $post, array( $user ) );
-        
+
         wp_set_post_terms( $post->ID, 'test', 'post_tag' );
-        
+
 		$query = new WP_Query(
             array(
 			    'author_name' => $user->user_login,
@@ -330,7 +336,7 @@ class CoauthorsTest extends WP_UnitTestCase {
 		$this->assertEquals( 1, count( $query->posts ) );
 		$this->assertEquals( $post->ID, $query->posts[ 0 ]->ID );
     }
-    
+
 	public function tests__author_name_arg_plus_tax_query__is_coauthor() {
         global $ssl_alp;
 
@@ -347,7 +353,7 @@ class CoauthorsTest extends WP_UnitTestCase {
         );
 
         wp_set_post_terms( $post->ID, 'test', 'post_tag' );
-        
+
 		$query = new WP_Query(
             array(
 			    'author_name' => $user_2->user_login,
@@ -438,7 +444,7 @@ class CoauthorsTest extends WP_UnitTestCase {
         // create new users
         $user_1 = $this->factory->user->create_and_get();
         $user_2 = $this->factory->user->create_and_get();
-        
+
         // check terms were created
         $this->assertInstanceOf( 'WP_Term', $ssl_alp->coauthors->get_coauthor_term( $user_1 ) );
         $this->assertInstanceOf( 'WP_Term', $ssl_alp->coauthors->get_coauthor_term( $user_2 ) );
@@ -614,7 +620,7 @@ class CoauthorsTest extends WP_UnitTestCase {
     /**
      * Check that deleting a user that is a primary author of a post with multiple authors
      * doesn't also delete that post, when the user's posts are reassigned.
-     * 
+     *
      * In this case, the reassigned user is not a coauthor of the post so they should just
      * replace the deleted user's place in the coauthor list.
      */
@@ -657,7 +663,7 @@ class CoauthorsTest extends WP_UnitTestCase {
     /**
      * Check that deleting a user that is a primary author of a post with multiple authors
      * doesn't also delete that post, when the user's posts are reassigned.
-     * 
+     *
      * In this case, the reassigned user is a coauthor of the post, but with lower position
      * than the deleted user, so they should replace the deleted user's place in the coauthor
      * list.
@@ -742,7 +748,7 @@ class CoauthorsTest extends WP_UnitTestCase {
     /**
      * Check that deleting a user that is a secondary author of a post with multiple authors
      * doesn't also delete that post, when the user's posts are reassigned.
-     * 
+     *
      * In this case, the reassigned user is not a coauthor of the post so they should just
      * replace the deleted user's place in the coauthor list.
      */
@@ -785,7 +791,7 @@ class CoauthorsTest extends WP_UnitTestCase {
     /**
      * Check that deleting a user that is a secondary author of a post with multiple authors
      * doesn't also delete that post, when the user's posts are reassigned.
-     * 
+     *
      * In this case, the reassigned user is a coauthor of the post, but with lower position
      * than the deleted user, so they should replace the deleted user's place in the coauthor
      * list.
@@ -831,7 +837,7 @@ class CoauthorsTest extends WP_UnitTestCase {
     /**
      * Check that deleting a user that is a secondary author of a post with multiple authors
      * doesn't also delete that post, when the user's posts are reassigned.
-     * 
+     *
      * In this case, the reassigned user is a coauthor of the post, but with higher position
      * than the deleted user, so they should stay in their current position and the deleted
      * user should just be removed from the coauthors list.
@@ -1050,11 +1056,11 @@ class CoauthorsTest extends WP_UnitTestCase {
 
     /**
      * Test $user_id_editor editing a post created by $user_id_author
-     * 
+     *
      * `edit_post` raises a WPDieException if the user can't edit the post,
      * otherwise this function returns true.
      */
-    private function _do_test_edit_post( $user_id_author, $user_id_editor ) {        
+    private function _do_test_edit_post( $user_id_author, $user_id_editor ) {
         // create post as author user
         wp_set_current_user( $user_id_author );
         $post = $this->factory->post->create_and_get();
@@ -1067,7 +1073,7 @@ class CoauthorsTest extends WP_UnitTestCase {
 				'content'		=>	'New content.'
 			)
         );
-        
+
         return true;
     }
 
@@ -1164,5 +1170,209 @@ class CoauthorsTest extends WP_UnitTestCase {
         $this->assertTrue( $this->_do_test_edit_post( self::$author_ids[0], self::$admin_ids[1] ) );
         $this->assertTrue( $this->_do_test_edit_post( self::$editor_ids[0], self::$admin_ids[1] ) );
         $this->assertTrue( $this->_do_test_edit_post( self::$admin_ids[0], self::$admin_ids[1] ) );
+    }
+
+    /**
+     * Gets email addresses of the recipients of the emails sent when the
+     * specified comment is added to the specified post.
+     */
+    function create_comment_and_get_email_recipients( $comment_data, $post ) {
+        // Approve comments, triggering notifications.
+        add_filter( 'pre_comment_approved', '__return_true' );
+
+        // Reset mock mailer.
+        reset_phpmailer_instance();
+
+        // Add comment. Note: factory doesn't send emails etc. so must use direct WP function.
+        wp_new_comment( $comment_data );
+
+        $mailer = tests_retrieve_phpmailer_instance();
+
+        $recipients = array();
+
+        for ( $i = 0; $i < count( $mailer->mock_sent ); $i++ ) {
+            $recipients[] = $mailer->get_recipient( 'to', $i )->address;
+        }
+
+        // Undo filter.
+        remove_filter( 'pre_comment_approved', '__return_true' );
+
+        // Reset mock mailer.
+        reset_phpmailer_instance();
+
+        return $recipients;
+    }
+
+    /**
+     * When a post with coauthors is commented on by a non-coauthor, an email
+     * should be sent to all coauthors.
+     */
+    function test_comment_recipients_when_third_party_author_comments() {
+        $user_1 = $this->factory->user->create_and_get();
+        $user_2 = $this->factory->user->create_and_get();
+        $user_3 = $this->factory->user->create_and_get();
+
+        $post = $this->create_coauthor_post( $user_1, array( $user_1, $user_2 ) );
+
+        $comment = array(
+            'user_id'              => $user_3->ID,
+            'comment_post_ID'      => $post->ID,
+            'comment_author'       => $user_3->display_name,
+            'comment_author_url'   => '',
+            'comment_author_email' => $user_3->user_email,
+            'comment_type'         => '',
+            'comment_content'      => 'Comment',
+        );
+
+        $emails = $this->create_comment_and_get_email_recipients( $comment, $post );
+
+        $this->assertEquals(
+            array(
+                $user_1->user_email,
+                $user_2->user_email,
+            ),
+            $emails
+        );
+    }
+
+    /**
+     * When a post with coauthors is commented on by the primary author, an
+     * email should not be sent to the primary author, but to the other
+     * coauthors.
+     */
+    function test_comment_recipients_when_primary_author_comments() {
+        $user_1 = $this->factory->user->create_and_get();
+        $user_2 = $this->factory->user->create_and_get();
+        $user_3 = $this->factory->user->create_and_get();
+
+        $post = $this->create_coauthor_post( $user_1, array( $user_1, $user_2, $user_3 ) );
+
+        $comment = array(
+            'user_id'              => $user_1->ID,
+            'comment_post_ID'      => $post->ID,
+            'comment_author'       => $user_1->display_name,
+            'comment_author_url'   => '',
+            'comment_author_email' => $user_1->user_email,
+            'comment_type'         => '',
+            'comment_content'      => 'Comment',
+        );
+
+        // Email should not have been sent to primary author.
+        $this->assertEquals(
+            array(
+                $user_2->user_email,
+                $user_3->user_email,
+            ),
+            $this->create_comment_and_get_email_recipients( $comment, $post )
+        );
+    }
+
+    /**
+     * When a post with coauthors is commented on by the primary author, and the
+     * "notify authors" hook is true, the email should be sent to all coauthors.
+     */
+    function test_comment_recipients_when_primary_author_comments_notify_enabled() {
+        // Enable notify authors.
+        add_filter( 'comment_notification_notify_author', '__return_true' );
+
+        $user_1 = $this->factory->user->create_and_get();
+        $user_2 = $this->factory->user->create_and_get();
+        $user_3 = $this->factory->user->create_and_get();
+
+        $post = $this->create_coauthor_post( $user_1, array( $user_1, $user_2, $user_3 ) );
+
+        $comment = array(
+            'user_id'              => $user_1->ID,
+            'comment_post_ID'      => $post->ID,
+            'comment_author'       => $user_1->display_name,
+            'comment_author_url'   => '',
+            'comment_author_email' => $user_1->user_email,
+            'comment_type'         => '',
+            'comment_content'      => 'Comment',
+        );
+
+        $this->assertEquals(
+            array(
+                $user_1->user_email,
+                $user_2->user_email,
+                $user_3->user_email,
+            ),
+            $this->create_comment_and_get_email_recipients( $comment, $post )
+        );
+
+        // Remove notify authors hook.
+        remove_filter( 'comment_notification_notify_author', '__return_true' );
+    }
+
+    /**
+     * When a post with coauthors is commented on by a secondary author, an
+     * email should not be sent to that secondary author, but to the other
+     * coauthors.
+     */
+    function test_comment_recipients_when_secondary_author_comments() {
+        $user_1 = $this->factory->user->create_and_get();
+        $user_2 = $this->factory->user->create_and_get();
+        $user_3 = $this->factory->user->create_and_get();
+
+        $post = $this->create_coauthor_post( $user_1, array( $user_1, $user_2, $user_3 ) );
+
+        $comment = array(
+            'user_id'              => $user_2->ID,
+            'comment_post_ID'      => $post->ID,
+            'comment_author'       => $user_2->display_name,
+            'comment_author_url'   => '',
+            'comment_author_email' => $user_2->user_email,
+            'comment_type'         => '',
+            'comment_content'      => 'Comment',
+        );
+
+        $emails = $this->create_comment_and_get_email_recipients( $comment, $post );
+
+        $this->assertEquals(
+            array(
+                $user_1->user_email,
+                $user_3->user_email,
+            ),
+            $emails
+        );
+    }
+
+    /**
+     * When a post with coauthors is commented on by a secondary author, and the
+     * "notify authors" hook is true, the email should be sent to all coauthors.
+     */
+    function test_comment_recipients_when_secondary_author_comments_notify_enabled() {
+        // Enable notify authors.
+        add_filter( 'comment_notification_notify_author', '__return_true' );
+
+        $user_1 = $this->factory->user->create_and_get();
+        $user_2 = $this->factory->user->create_and_get();
+        $user_3 = $this->factory->user->create_and_get();
+
+        $post = $this->create_coauthor_post( $user_1, array( $user_1, $user_2, $user_3 ) );
+
+        $comment = array(
+            'user_id'              => $user_2->ID,
+            'comment_post_ID'      => $post->ID,
+            'comment_author'       => $user_2->display_name,
+            'comment_author_url'   => '',
+            'comment_author_email' => $user_2->user_email,
+            'comment_type'         => '',
+            'comment_content'      => 'Comment',
+        );
+
+        $emails = $this->create_comment_and_get_email_recipients( $comment, $post );
+
+        $this->assertEquals(
+            array(
+                $user_1->user_email,
+                $user_2->user_email,
+                $user_3->user_email,
+            ),
+            $emails
+        );
+
+        // Remove notify authors hook.
+        remove_filter( 'comment_notification_notify_author', '__return_true' );
     }
 }

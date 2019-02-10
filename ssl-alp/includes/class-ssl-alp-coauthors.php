@@ -1418,15 +1418,15 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Filter array of comment notification email addresses to add coauthors of post where comment
-	 * was made.
+	 * Filter array of comment notification email addresses to add coauthors of
+	 * post where comment was made.
 	 *
 	 * @param array $recipients Recipient email addresses.
 	 * @param int   $comment_id Comment ID.
 	 *
 	 * @return array
 	 */
-	public function filter_comment_notification_email_recipients( $recipients, $comment_id ) {
+	private function filter_comment_email_recipients( $recipients, $comment_id ) {
 		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
 			// Coauthors disabled.
 			return $recipients;
@@ -1435,54 +1435,66 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$comment = get_comment( $comment_id );
 		$post    = get_post( $comment->comment_post_ID );
 
-		if ( isset( $post ) ) {
-			$coauthors        = $this->get_coauthors( $post );
-			$extra_recipients = array();
+		if ( ! isset( $post ) ) {
+			// No post found, so return default.
+			return $recipients;
+		}
 
-			foreach ( $coauthors as $user ) {
-				if ( ! empty( $user->user_email ) ) {
-					$extra_recipients[] = $user->user_email;
-				}
+		$coauthors              = $this->get_coauthors( $post );
+		$extra_recipient_emails = array();
+
+		foreach ( $coauthors as $user ) {
+			if ( empty( $user->user_email ) ) {
+				// No email to notify.
+				continue;
 			}
 
-			$recipients = array_unique( array_merge( $recipients, $extra_recipients ) );
+			// Add coauthor to email list.
+			$extra_recipient_emails[] = $user->user_email;
+		}
+
+		// Merge in extra recipients.
+		$recipients = array_unique( array_merge( $recipients, $extra_recipient_emails ) );
+
+		return $recipients;
+	}
+
+	public function filter_comment_notification_email_recipients( $recipients, $comment_id ) {
+		// Pass through to shared recipient function.
+		$recipients = $this->filter_comment_email_recipients( $recipients, $comment_id );
+
+		$comment = get_comment( $comment_id );
+
+		// Determine whether to notify the author of a comment if they are a
+		// coauthor of the post.
+		$notify_author = apply_filters( 'comment_notification_notify_author', false, $comment->comment_ID );
+
+		if ( ! $notify_author ) {
+			foreach ( $recipients as $key => $email ) {
+				if ( $email === $comment->comment_author_email ) {
+					// Don't notify comment author.
+					unset( $recipients[ $key ] );
+
+					break;
+				}
+			}
 		}
 
 		return $recipients;
 	}
 
 	/**
-	 * Filter array of comment moderation email addresses to add coauthors of the post where the
-	 * comment was made.
+	 * Filter array of comment moderation email addresses to add coauthors of
+	 * post where comment was made.
 	 *
-	 * @param array          $recipients Recipient email addresses.
-	 * @param WP_Comment|int $comment    Comment.
+	 * @param array $recipients Recipient email addresses.
+	 * @param int   $comment_id Comment ID.
 	 *
 	 * @return array
 	 */
-	public function filter_comment_moderation_email_recipients( $recipients, $comment ) {
-		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
-			// Coauthors disabled.
-			return $recipients;
-		}
-
-		$comment = get_comment( $comment );
-		$post    = get_post( $comment->comment_post_ID );
-
-		if ( isset( $post ) ) {
-			$coauthors        = $this->get_coauthors( $post );
-			$extra_recipients = array();
-
-			foreach ( $coauthors as $user ) {
-				if ( ! empty( $user->user_email ) ) {
-					$extra_recipients[] = $user->user_email;
-				}
-			}
-
-			$recipients = array_unique( array_merge( $recipients, $extra_recipients ) );
-		}
-
-		return $recipients;
+	public function filter_comment_moderation_email_recipients( $recipients, $comment_id ) {
+		// Pass through to shared recipient function.
+		return $this->filter_comment_email_recipients( $recipients, $comment_id );
 	}
 
 	/**
