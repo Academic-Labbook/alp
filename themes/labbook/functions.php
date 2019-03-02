@@ -181,6 +181,20 @@ function labbook_scripts() {
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
 		wp_enqueue_script( 'comment-reply' );
 	}
+
+	if ( is_plugin_active( 'ssl-alp/alp.php' ) ) {
+		// Add support for read flags.
+		wp_enqueue_script(
+			'labbook-read-flags',
+			get_template_directory_uri() . '/js/read-flags.js',
+			array(
+				'wp-api',
+				'jquery',
+			),
+			LABBOOK_VERSION,
+			true
+		);
+	}
 }
 add_action( 'wp_enqueue_scripts', 'labbook_scripts' );
 

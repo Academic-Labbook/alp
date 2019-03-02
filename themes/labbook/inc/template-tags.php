@@ -26,10 +26,28 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 
 		echo '<h2 class="entry-title">';
 
+		// Default post read class.
+		$post_read_classes = array( 'entry-title-link-' . $post->ID );
+
 		if ( $icon ) {
 			// Display icon, if present.
 			if ( 'status' === get_post_format( $post ) ) {
 				$icon_class = 'fa fa-info-circle';
+			} elseif ( is_user_logged_in() ) {
+				// Show read/unread status.
+				$status = labbook_post_is_read( $post );
+
+				if ( is_null( $status ) or is_wp_error( $status ) ) {
+					// Can't determine read status.
+					$icon_class = '';
+				} elseif ( $status ) {
+					// Read.
+					$icon_class = 'fa fa-envelope-open logbook-read-button';
+					$post_read_classes[] = 'entry-read';
+				} else {
+					// Unread.
+					$icon_class = 'fa fa-envelope logbook-read-button';
+				}
 			} else {
 				// Don't show icon.
 				$icon_class = '';
@@ -37,8 +55,10 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 
 			if ( ! empty( $icon_class ) ) {
 				printf(
-					'<i class="%1$s"></i>',
-					esc_attr( $icon_class )
+					'<i class="%1$s" title="%2$s" data-post-id="%3$s"></i>',
+					esc_attr( $icon_class ),
+					esc_attr( __( 'Click to toggle read status', 'labbook' ) ),
+					esc_attr( $post->ID )
 				);
 			}
 		}
@@ -47,8 +67,9 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 			// Wrap title in its permalink.
 			the_title(
 				sprintf(
-					'<a href="%1$s" rel="bookmark">',
-					esc_url( get_permalink( $post ) )
+					'<a href="%1$s" class="%2$s" rel="bookmark">',
+					esc_url( get_permalink( $post ) ),
+					esc_attr( implode( ' ', $post_read_classes ) )
 				),
 				'</a>'
 			);
