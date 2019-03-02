@@ -95,6 +95,7 @@ class SSL_ALP_Activator {
 		add_option( 'ssl_alp_disable_post_trackbacks', true );
 		add_option( 'ssl_alp_enable_crossreferences', true );
 		add_option( 'ssl_alp_enable_edit_summaries', true );
+		add_option( 'ssl_alp_flag_read_posts', true );
 		add_option( 'ssl_alp_enable_tex', true );
 
 		// Add network options.

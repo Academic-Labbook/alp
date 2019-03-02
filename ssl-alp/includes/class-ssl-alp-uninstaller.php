@@ -107,6 +107,7 @@ class SSL_ALP_Uninstaller {
 		delete_option( 'ssl_alp_disable_post_trackbacks' );
 		delete_option( 'ssl_alp_enable_crossreferences' );
 		delete_option( 'ssl_alp_enable_edit_summaries' );
+		delete_option( 'ssl_alp_flag_read_posts' );
 		delete_option( 'ssl_alp_enable_tex' );
 
 		// Delete network options.
@@ -124,6 +125,7 @@ class SSL_ALP_Uninstaller {
 	private static function delete_taxonomies() {
 		self::delete_taxonomy( 'ssl_alp_coauthor' );
 		self::delete_taxonomy( 'ssl_alp_crossreference' );
+		self::delete_taxonomy( 'ssl_alp_read_flag' );
 	}
 
 	/**
