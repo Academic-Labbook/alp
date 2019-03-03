@@ -78,126 +78,132 @@ function labbook_customize_register( $wp_customize ) {
 	 * Revisions section
 	 */
 
-	$wp_customize->add_section(
-		'labbook_revision_options',
-		array(
-			'title'      => __( 'Revisions', 'labbook' ),
-			'priority'   => 82,
-			'capability' => 'edit_theme_options',
-			'panel'      => '',
-		)
-	);
+	if ( labbook_ssl_alp_edit_summaries_enabled() ) {
+		$wp_customize->add_section(
+			'labbook_revision_options',
+			array(
+				'title'      => __( 'Revisions', 'labbook' ),
+				'priority'   => 82,
+				'capability' => 'edit_theme_options',
+				'panel'      => '',
+			)
+		);
 
-	$wp_customize->add_setting(
-		'labbook_options[show_edit_summaries]',
-		array(
-			'default'           => $labbook_default_options['show_edit_summaries'],
-			'capability'        => 'edit_theme_options',
-			'sanitize_callback' => 'labbook_sanitize_checkbox',
-		)
-	);
+		$wp_customize->add_setting(
+			'labbook_options[show_edit_summaries]',
+			array(
+				'default'           => $labbook_default_options['show_edit_summaries'],
+				'capability'        => 'edit_theme_options',
+				'sanitize_callback' => 'labbook_sanitize_checkbox',
+			)
+		);
 
-	$wp_customize->add_control(
-		'labbook_options[show_edit_summaries]',
-		array(
-			'label'    		=> __( 'Show edit summaries', 'labbook' ),
-			'description'	=> __( 'Display a list of edit summaries under each post/page.', 'labbook' ),
-			'section'  		=> 'labbook_revision_options',
-			'type'     		=> 'checkbox',
-			'priority' 		=> 100,
-		)
-	);
+		$wp_customize->add_control(
+			'labbook_options[show_edit_summaries]',
+			array(
+				'label'    		=> __( 'Show edit summaries', 'labbook' ),
+				'description'	=> __( 'Display a list of edit summaries under each post/page.', 'labbook' ),
+				'section'  		=> 'labbook_revision_options',
+				'type'     		=> 'checkbox',
+				'priority' 		=> 100,
+			)
+		);
 
-	// Edit summaries per page.
-	$wp_customize->add_setting(
-		'labbook_options[edit_summaries_per_page]',
-		array(
-			'default'           	=> $labbook_default_options['edit_summaries_per_page'],
-			'capability'        	=> 'edit_theme_options',
-			'sanitize_callback'    	=> 'labbook_sanitize_number_absint',
-			'sanitize_js_callback' 	=> 'esc_attr',
-		)
-	);
+		// Edit summaries per page.
+		$wp_customize->add_setting(
+			'labbook_options[edit_summaries_per_page]',
+			array(
+				'default'           	=> $labbook_default_options['edit_summaries_per_page'],
+				'capability'        	=> 'edit_theme_options',
+				'sanitize_callback'    	=> 'labbook_sanitize_number_absint',
+				'sanitize_js_callback' 	=> 'esc_attr',
+			)
+		);
 
-	$wp_customize->add_control(
-		'labbook_options[edit_summaries_per_page]',
-		array(
-			'label'    		=> __( 'Edit summary page size', 'labbook' ),
-			'description'	=> __( 'Maximum number of edit summaries to display per page.', 'labbook' ),
-			'section'  		=> 'labbook_revision_options',
-			'type'     		=> 'text',
-			'priority'		=> 110,
-		)
-	);
+		$wp_customize->add_control(
+			'labbook_options[edit_summaries_per_page]',
+			array(
+				'label'    		=> __( 'Edit summary page size', 'labbook' ),
+				'description'	=> __( 'Maximum number of edit summaries to display per page.', 'labbook' ),
+				'section'  		=> 'labbook_revision_options',
+				'type'     		=> 'text',
+				'priority'		=> 110,
+			)
+		);
+	}
 
 	/**
 	 * Cross-references section.
 	 */
 
-	$wp_customize->add_section(
-		'labbook_reference_options',
-		array(
-			'title'      => __( 'References', 'labbook' ),
-			'priority'   => 84,
-			'capability' => 'edit_theme_options',
-			'panel'      => '',
-		)
-	);
+	if ( labbook_ssl_alp_crossreferences_enabled() ) {
+		$wp_customize->add_section(
+			'labbook_reference_options',
+			array(
+				'title'      => __( 'References', 'labbook' ),
+				'priority'   => 84,
+				'capability' => 'edit_theme_options',
+				'panel'      => '',
+			)
+		);
 
-	$wp_customize->add_setting(
-		'labbook_options[show_crossreferences]',
-		array(
-			'default'           => $labbook_default_options['show_crossreferences'],
-			'capability'        => 'edit_theme_options',
-			'sanitize_callback' => 'labbook_sanitize_checkbox',
-		)
-	);
+		$wp_customize->add_setting(
+			'labbook_options[show_crossreferences]',
+			array(
+				'default'           => $labbook_default_options['show_crossreferences'],
+				'capability'        => 'edit_theme_options',
+				'sanitize_callback' => 'labbook_sanitize_checkbox',
+			)
+		);
 
-	$wp_customize->add_control(
-		'labbook_options[show_crossreferences]',
-		array(
-			'label'    		=> __( 'Show cross-references', 'labbook' ),
-			'description'	=> __( 'Display a list of posts/pages that link to/from the current post/page.', 'labbook' ),
-			'section'  		=> 'labbook_reference_options',
-			'type'     		=> 'checkbox',
-			'priority' 		=> 100,
-		)
-	);
+		$wp_customize->add_control(
+			'labbook_options[show_crossreferences]',
+			array(
+				'label'    		=> __( 'Show cross-references', 'labbook' ),
+				'description'	=> __( 'Display a list of posts/pages that link to/from the current post/page.', 'labbook' ),
+				'section'  		=> 'labbook_reference_options',
+				'type'     		=> 'checkbox',
+				'priority' 		=> 100,
+			)
+		);
+	}
 
 	/**
 	 * Posts section.
 	 */
 
-	$wp_customize->add_section(
-		'labbook_post_options',
-		array(
-			'title'      => __( 'Posts', 'labbook' ),
-			'priority'   => 86,
-			'capability' => 'edit_theme_options',
-			'panel'      => '',
-		)
-	);
+	if ( labbook_ssl_alp_unread_flags_enabled() ) {
+		$wp_customize->add_section(
+			'labbook_post_options',
+			array(
+				'title'      => __( 'Posts', 'labbook' ),
+				'priority'   => 86,
+				'capability' => 'edit_theme_options',
+				'panel'      => '',
+			)
+		);
 
-	// Unread flag setting.
-	$wp_customize->add_setting(
-		'labbook_options[show_unread_flags]',
-		array(
-			'default'           => $labbook_default_options['show_unread_flags'],
-			'capability'        => 'edit_theme_options',
-			'sanitize_callback' => 'labbook_sanitize_checkbox',
-		)
-	);
+		// Unread flag setting.
+		$wp_customize->add_setting(
+			'labbook_options[show_unread_flags]',
+			array(
+				'default'           => $labbook_default_options['show_unread_flags'],
+				'capability'        => 'edit_theme_options',
+				'sanitize_callback' => 'labbook_sanitize_checkbox',
+			)
+		);
 
-	$wp_customize->add_control(
-		'labbook_options[show_unread_flags]',
-		array(
-			'label'    		=> __( 'Show unread posts', 'labbook' ),
-			'description'	=> __( 'Display an icon next to each post title designating whether or not it has been read. Users can also use this icon to toggle the post\'s read status.', 'labbook' ),
-			'section'  		=> 'labbook_post_options',
-			'type'     		=> 'checkbox',
-			'priority' 		=> 100,
-		)
-	);
+		$wp_customize->add_control(
+			'labbook_options[show_unread_flags]',
+			array(
+				'label'    		=> __( 'Show unread posts', 'labbook' ),
+				'description'	=> __( 'Display an icon next to each post title designating whether or not it has been read. Users can also use this icon to toggle the post\'s read status.', 'labbook' ),
+				'section'  		=> 'labbook_post_options',
+				'type'     		=> 'checkbox',
+				'priority' 		=> 100,
+			)
+		);
+	}
 
 	/**
 	 * Pages section.
