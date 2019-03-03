@@ -240,6 +240,66 @@ endif;
 add_filter( 'the_content', 'labbook_get_content_with_toc' );
 
 /**
+ * Check if coauthors provided by the ALP plugin are available and enabled.
+ */
+function labbook_ssl_alp_coauthors_enabled() {
+	if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
+		// Plugin is disabled.
+		return false;
+	} elseif ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
+		// Coauthors are disabled.
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Check if crossreferences provided by the ALP plugin are available and enabled.
+ */
+function labbook_ssl_alp_crossreferences_enabled() {
+	if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
+		// Plugin is disabled.
+		return false;
+	} elseif ( ! get_option( 'ssl_alp_enable_crossreferences' ) ) {
+		// Cross-references are disabled.
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Check if edit summaries provided by the ALP plugin are available and enabled.
+ */
+function labbook_ssl_alp_edit_summaries_enabled() {
+	if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
+		// Plugin is disabled.
+		return false;
+	} elseif ( ! get_option( 'ssl_alp_enable_edit_summaries' ) ) {
+		// Tracking of edit summaries is disabled.
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Check if unread flags provided by the ALP plugin are available and enabled.
+ */
+function labbook_ssl_alp_unread_flags_enabled() {
+	if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
+		// Plugin is disabled.
+		return false;
+	} elseif ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
+		// Unread flags are disabled.
+		return false;
+	}
+
+	return true;
+}
+
+/**
  * Page table of contents generator.
  */
 require get_template_directory() . '/inc/class-toc-menu-level.php';

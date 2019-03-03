@@ -34,19 +34,21 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 			if ( 'status' === get_post_format( $post ) ) {
 				$icon_class = 'fa fa-info-circle';
 			} elseif ( is_user_logged_in() ) {
-				// Show read/unread status.
-				$status = labbook_post_is_read( $post );
-
-				if ( is_null( $status ) or is_wp_error( $status ) ) {
-					// Can't determine read status.
+				if ( ! labbook_ssl_alp_unread_flags_enabled() ) {
+					// Unread flags disabled.
 					$icon_class = '';
-				} elseif ( $status ) {
-					// Read.
-					$icon_class = 'fa fa-envelope-open logbook-read-button';
-					$post_read_classes[] = 'entry-read';
 				} else {
-					// Unread.
-					$icon_class = 'fa fa-envelope logbook-read-button';
+					// Show read/unread status.
+					$status = labbook_post_is_read( $post );
+
+					if ( $status ) {
+						// Read.
+						$icon_class = 'fa fa-envelope-open logbook-read-button';
+						$post_read_classes[] = 'entry-read';
+					} else {
+						// Unread.
+						$icon_class = 'fa fa-envelope logbook-read-button';
+					}
 				}
 			} else {
 				// Don't show icon.
@@ -292,8 +294,7 @@ if ( ! function_exists( 'labbook_the_revisions_link' ) ) :
 	function labbook_the_revisions_link( $post = null ) {
 		global $ssl_alp;
 
-		if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
-			// Required functionality not available.
+		if ( ! labbook_ssl_alp_edit_summaries_enabled() ) {
 			return;
 		}
 
@@ -336,7 +337,7 @@ if ( ! function_exists( 'labbook_the_authors' ) ) :
 
 		$post = get_post( $post );
 
-		if ( is_plugin_active( 'ssl-alp/alp.php' ) && get_option( 'ssl_alp_allow_multiple_authors' ) ) {
+		if ( labbook_ssl_alp_coauthors_enabled() ) {
 			$authors = $ssl_alp->coauthors->get_coauthors( $post );
 		} else {
 			// Fall back to the_author if plugin is disabled.
@@ -798,14 +799,8 @@ if ( ! function_exists( 'labbook_the_references' ) ) :
 	function labbook_the_references( $post = null ) {
 		global $ssl_alp;
 
-		if ( ! labbook_get_option( 'show_crossreferences' ) ) {
+		if ( ! labbook_get_option( 'show_crossreferences' ) || ! labbook_ssl_alp_crossreferences_enabled() ) {
 			// Display is unavailable.
-			return;
-		} elseif ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
-			// Plugin is disabled.
-			return;
-		} elseif ( ! get_option( 'ssl_alp_enable_crossreferences' ) ) {
-			// Tracking of cross-references are disabled.
 			return;
 		}
 
