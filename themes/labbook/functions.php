@@ -183,13 +183,13 @@ function labbook_scripts() {
 	}
 
 	if ( is_plugin_active( 'ssl-alp/alp.php' ) ) {
-		// Add support for read flags.
+		// Add support for unread flags.
 		wp_enqueue_script(
-			'labbook-read-flags',
-			get_template_directory_uri() . '/js/read-flags.js',
+			'labbook-post-read-status',
+			get_template_directory_uri() . '/js/post-read-status.js',
 			array(
-				'wp-api',
 				'jquery',
+				'wp-api',
 			),
 			LABBOOK_VERSION,
 			true

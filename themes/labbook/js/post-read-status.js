@@ -13,7 +13,7 @@
         $button.addClass( 'logbook-read-button-loading' );
 
         // Endpoint from wpApiSetting variable passed from wp-api.
-        var endpoint = wpApiSettings.root + 'ssl-alp/v1/post-read-flag/';
+        var endpoint = wpApiSettings.root + 'ssl-alp/v1/post-read-status/';
 
         // Current read flag.
         var current_read_status = $button.hasClass( 'fa-envelope-open' );
@@ -28,7 +28,7 @@
             // Build post data.
             data: {
                 post_id: post_id,
-                flag: ! current_read_status,
+                read: ! current_read_status,
             }
         } ).done( function( data ) {
             // Update icon class.

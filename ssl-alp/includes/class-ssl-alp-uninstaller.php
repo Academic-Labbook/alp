@@ -107,7 +107,7 @@ class SSL_ALP_Uninstaller {
 		delete_option( 'ssl_alp_disable_post_trackbacks' );
 		delete_option( 'ssl_alp_enable_crossreferences' );
 		delete_option( 'ssl_alp_enable_edit_summaries' );
-		delete_option( 'ssl_alp_flag_read_posts' );
+		delete_option( 'ssl_alp_flag_unread_posts' );
 		delete_option( 'ssl_alp_enable_tex' );
 
 		// Delete network options.

@@ -31,11 +31,11 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	protected static $edit_summary_max_length = 100;
 
 	/**
-	 * Read flag term slug prefix.
+	 * Unread flag term slug prefix.
 	 *
 	 * @var string
 	 */
-	protected $read_flag_term_slug_prefix = 'ssl-alp-read-flag-';
+	protected $unread_flag_term_slug_prefix = 'ssl-alp-unread-flag-';
 
 	/**
 	 * Register settings.
@@ -50,10 +50,10 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			)
 		);
 
-		// Flag read posts.
+		// Flag unread posts.
 		register_setting(
 			SSL_ALP_SITE_SETTINGS_PAGE,
-			'ssl_alp_flag_read_posts',
+			'ssl_alp_flag_unread_posts',
 			array(
 				'type' => 'boolean',
 			)
@@ -122,22 +122,22 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		$loader->add_action( 'widgets_init', $this, 'register_revisions_widget' );
 
 		/**
-		 * Read flag support.
+		 * Unread flag support.
 		 */
 
-		// Register taxonomy for read flags.
-		$loader->add_action( 'init', $this, 'register_read_flag_taxonomy' );
+		// Register taxonomy for unread flags.
+		$loader->add_action( 'init', $this, 'register_unread_flag_taxonomy' );
 
-		// Register REST API endpoints for read flags.
-		$loader->add_action( 'rest_api_init', $this, 'rest_register_read_flag_routes' );
+		// Register REST API endpoints for unread flags.
+		$loader->add_action( 'rest_api_init', $this, 'rest_register_unread_flag_routes' );
 
-		// Set page to read when showing single page.
-		$loader->add_action( 'the_post', $this, 'set_post_read_flag_to_read', 10, 1 );
+		// Set post to read when showing single post.
+		$loader->add_action( 'the_post', $this, 'mark_post_as_read', 10, 1 );
 
-		// Reset read flags when a post is updated.
-		$loader->add_action( 'post_updated', $this, 'reset_post_read_flags', 10, 3 );
+		// Mark created/edited posts as unread for everyone except the author.
+		$loader->add_action( 'post_updated', $this, 'mark_post_as_unread_for_users_after_update', 10, 3 );
 
-		// Add "Read" filter to admin post list.
+		// Add "Unread" filter to admin post list.
 		$loader->add_filter( 'views_edit-post', $this, 'filter_edit_post_views', 10, 1 );
 
 		// Add bulk actions to mark posts as read/unread.
@@ -729,32 +729,32 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Get read flag term name.
+	 * Get unread flag term name.
 	 *
 	 * @param WP_User $user User object.
 	 * @return string
 	 */
-	private function get_read_flag_term_name( $user ) {
+	private function get_unread_flag_term_name( $user ) {
 		return $user->user_nicename;
 	}
 
 	/**
-	 * Get read flag term slug.
+	 * Get unread flag term slug.
 	 *
 	 * @param WP_User $user User object.
 	 * @return string
 	 */
-	private function get_read_flag_term_slug( $user ) {
-		return $this->read_flag_term_slug_prefix . $user->user_nicename;
+	private function get_unread_flag_term_slug( $user ) {
+		return $this->unread_flag_term_slug_prefix . $user->user_nicename;
 	}
 
 	/**
-	 * Get read flag term for specified user.
+	 * Get unread flag term for specified user.
 	 *
 	 * @param int|WP_User|null $user User ID or user object. Defaults to currently logged in user.
 	 * @return WP_Term|false
 	 */
-	private function get_user_read_flag_term( $user = null ) {
+	private function get_user_unread_flag_term( $user = null ) {
 		if ( $user instanceof WP_User ) {
 			// Do nothing.
 		} elseif ( is_numeric( $user ) ) {
@@ -770,41 +770,40 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			return false;
 		}
 
-		$term_name = $this->get_read_flag_term_name( $user );
-
-		$term = get_term_by( 'name', $term_name, 'ssl_alp_read_flag' );
+		$term_name = $this->get_unread_flag_term_name( $user );
+		$term = get_term_by( 'name', $term_name, 'ssl_alp_unread_flag' );
 
 		if ( ! $term ) {
 			// Term doesn't yet exist.
 			$args = array(
-				'slug' => $this->get_read_flag_term_slug( $user ),
+				'slug' => $this->get_unread_flag_term_slug( $user ),
 			);
 
 			// Insert term using slugified username as term name.
-			$new_term_data = wp_insert_term( $term_name, 'ssl_alp_read_flag', $args );
+			$new_term_data = wp_insert_term( $term_name, 'ssl_alp_unread_flag', $args );
 
 			if ( is_wp_error( $new_term_data ) ) {
 				return false;
 			}
 
-			$term = get_term_by( 'id', $new_term_data['term_id'], 'ssl_alp_read_flag' );
+			$term = get_term_by( 'id', $new_term_data['term_id'], 'ssl_alp_unread_flag' );
 		}
 
 		return $term;
 	}
 
 	/**
-	 * Register taxonomy for read flags.
+	 * Register taxonomy for unread flags.
 	 */
-	public function register_read_flag_taxonomy() {
-		if ( ! get_option( 'ssl_alp_flag_read_posts' ) ) {
-			// Read flags disabled.
+	public function register_unread_flag_taxonomy() {
+		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
+			// Unread flags disabled.
 			return;
 		}
 
 		// Register new taxonomy so that we can store all of the relationships.
 		$args = array(
-			'label'                 => __( 'Read Flag', 'ssl-alp' ),
+			'label'                 => __( 'Unread Flag', 'ssl-alp' ),
 			'query_var'             => false,
 			'rewrite'               => false,
 			'public'                => false,
@@ -812,25 +811,25 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		);
 
 		// Create read flag taxonomy for posts.
-		register_taxonomy( 'ssl_alp_read_flag', 'post', $args );
+		register_taxonomy( 'ssl_alp_unread_flag', 'post', $args );
 	}
 
 	/**
-	 * Register REST API route for setting read flag.
+	 * Register REST API route for setting unread flag.
 	 *
-	 * This provides a simple interface to set a user's post read status. It
+	 * This provides a simple interface to set a user's post unread status. It
 	 * bypasses the endpoint defined by the taxonomy (when enabled by
 	 * `show_in_rest`) because otherwise the user would need edit permission to
-	 * set the read flag term.
+	 * set the unread flag term.
 	 */
-	public function rest_register_read_flag_routes() {
+	public function rest_register_unread_flag_routes() {
 		register_rest_route(
 			SSL_ALP_REST_ROUTE,
-			'/post-read-flag',
+			'/post-read-status',
 			array(
 				array(
 					'methods'				=> 'GET',
-					'callback'				=> array( $this, 'rest_get_read_flag' ),
+					'callback'				=> array( $this, 'rest_get_post_read_status' ),
 					'args'					=> array(
 						'post_id'    => array(
 							'required'          => true,
@@ -850,9 +849,9 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 				),
 				array(
 					'methods'				=> 'POST',
-					'callback'				=> array( $this, 'rest_set_read_flag' ),
+					'callback'				=> array( $this, 'rest_set_post_read_status' ),
 					'args'					=> array(
-						'flag' => array(
+						'read' => array(
 							'required'          => true,
 							'sanitize_callback' => 'rest_sanitize_boolean',
 						),
@@ -877,13 +876,13 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Check user permission to edit a read flag.
+	 * Check user permission to edit an unread flag.
 	 *
 	 * @param int|WP_User|null $user User ID or user object. Defaults to currently logged in user.
 	 * @return bool false if $target_user is not the current user and the
 	 * 				current user is not able to edit users, true otherwise.
 	 */
-	private function check_read_flag_permission( $user = null ) {
+	private function check_unread_flag_permission( $user = null ) {
 		if ( $user instanceof WP_User ) {
 			// Do nothing.
 		} elseif ( is_int( $user ) ) {
@@ -908,41 +907,41 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Get read flag via REST API.
+	 * Get post read status via REST API.
 	 *
 	 * @param WP_REST_Request $data REST request data.
 	 * @return WP_REST_Response|WP_Error
 	 */
-	public function rest_get_read_flag( WP_REST_Request $data ) {
+	public function rest_get_post_read_status( WP_REST_Request $data ) {
 		if ( is_null( $data['post_id'] ) ) {
 			// Invalid data.
-			return $this->read_flag_invalid_data_error();
+			return $this->unread_flag_invalid_data_error();
 		}
 
 		return rest_ensure_response( $this->get_post_read_status( $data['post_id'], $data['user_id'] ) );
 	}
 
 	/**
-	 * Set read flag received via REST API.
+	 * Set post read status via REST API.
 	 *
 	 * @param WP_REST_Request $data REST request data.
 	 * @return WP_REST_Response|WP_Error
 	 */
-	public function rest_set_read_flag( WP_REST_Request $data ) {
-		if ( is_null( $data['post_id'] ) || is_null( $data['flag'] ) ) {
+	public function rest_set_post_read_status( WP_REST_Request $data ) {
+		if ( is_null( $data['post_id'] ) || is_null( $data['read'] ) ) {
 			// Invalid data.
-			return $this->read_flag_invalid_data_error();
+			return $this->unread_flag_invalid_data_error();
 		}
 
-		return rest_ensure_response( $this->set_post_read_status( $data['flag'], $data['post_id'], $data['user_id'] ) );
+		return rest_ensure_response( $this->set_post_read_status( $data['read'], $data['post_id'], $data['user_id'] ) );
 	}
 
 	/**
 	 * Invalid data REST error.
 	 */
-	private function read_flag_invalid_data_error() {
+	private function unread_flag_invalid_data_error() {
 		return new WP_Error(
-			'post_read_flag_invalid_data',
+			'post_unread_flag_invalid_data',
 			__( 'The specified data is invalid.', 'ssl-alp' ),
 			array(
 				'status' => 400, // Bad request.
@@ -953,10 +952,10 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	/**
 	 * No permission REST error.
 	 */
-	private function read_flag_no_permission_error() {
+	private function unread_flag_no_permission_error() {
 		return new WP_Error(
-			'post_read_flag_cannot_read',
-			__( 'Sorry, you are not allowed to view this read flag.', 'ssl-alp' ),
+			'post_unread_flag_cannot_read',
+			__( 'Sorry, you are not allowed to view this unread flag.', 'ssl-alp' ),
 			array(
 				'status' => rest_authorization_required_code(),
 			)
@@ -966,9 +965,9 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	/**
 	 * Post not found REST error.
 	 */
-	private function read_flag_post_not_found_error() {
+	private function unread_flag_post_not_found_error() {
 		return new WP_Error(
-			'post_read_flag_post_not_found',
+			'post_unread_flag_post_not_found',
 			__( 'Post not found.', 'ssl-alp' ),
 			array(
 				'status' => 400,
@@ -979,9 +978,9 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	/**
 	 * User not found REST error.
 	 */
-	private function read_flag_user_not_found_error() {
+	private function unread_flag_user_not_found_error() {
 		return new WP_Error(
-			'post_read_flag_invalid_user',
+			'post_unread_flag_invalid_user',
 			__( 'User not found.', 'ssl-alp' ),
 			array(
 				'status' => 400,
@@ -992,10 +991,10 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	/**
 	 * Term not found REST error.
 	 */
-	private function read_flag_term_not_found_error() {
+	private function unread_flag_term_not_found_error() {
 		return new WP_Error(
-			'post_read_flag_term_not_found',
-			__( 'User read flag term not found.', 'ssl-alp' ),
+			'post_unread_flag_term_not_found',
+			__( 'User unread flag term not found.', 'ssl-alp' ),
 			array(
 				'status' => 500,
 			)
@@ -1003,64 +1002,129 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Reset post read flags when a post is updated.
-	 *
-	 * @param int     $post_id     Post ID.
-	 * @param WP_Post $post_after  New post.
-	 * @param WP_Post $post_before Previous post.
+	 * Unknown REST error.
 	 */
-	public function reset_post_read_flags( $post_id, $post_after, $post_before ) {
-		if ( ! get_option( 'ssl_alp_flag_read_posts' ) ) {
-			// Read flags disabled.
-			return;
-		}
+	private function unread_flag_unknown_error() {
+		return new WP_Error(
+			'post_unread_flag_unknown_error',
+			__( 'Unknown error.', 'ssl-alp' ),
+			array(
+				'status' => 500,
+			)
+		);
+	}
 
-		if ( ! class_exists( 'Text_Diff', false ) ) {
-			require( ABSPATH . WPINC . '/wp-diff.php' );
-		}
+	/**
+	 * Set post read status for users, optionally ignoring one.
+	 *
+	 * @param bool             $read Read status to set.
+	 * @param int|WP_Post|null $post Post ID or post object. Defaults to global $post.
+	 * @param int|WP_User|null $user User ID or user object to ignore. Defaults to none.
+	 */
+	private function set_users_post_read_status( $read, $post, $ignore_user = null ) {
+		// Get post.
+		$post = get_post( $post );
 
-		$old_string  = normalize_whitespace( $post_before->post_content );
-		$new_string = normalize_whitespace( $post_after->post_content );
-
-		$old_lines  = explode( "\n", $old_string );
-		$new_lines = explode( "\n", $new_string );
-
-		// Compute text difference between old and new posts.
-		$diff = new Text_Diff( $old_lines, $new_lines );
-
-		// Post content is deemed changed if there are new or deleted lines.
-		$changed = $diff->countAddedLines() > 1 || $diff->countDeletedLines() > 1;
-
-		if ( ! $changed ) {
+		if ( is_null( $post ) ) {
 			return;
 		}
 
 		// Get all users.
 		$users = get_users();
 
-		// Remove each user's read flag.
+		if ( is_int( $ignore_user ) ) {
+			// Get user by their ID.
+			$ignore_user = get_user_by( 'id', $ignore_user );
+		}
+
+		$should_ignore = $ignore_user instanceof WP_User;
+
+		// Set each user's read status.
 		foreach( $users as $user ) {
-			$this->set_post_read_status( false, $post_after, $user );
+			if ( $should_ignore && $user->ID === $ignore_user->ID ) {
+				// Ignore user.
+				continue;
+			}
+
+			$this->set_post_read_status( $read, $post, $user );
 		}
 	}
 
 	/**
-	 * Get post read flag for specified post and user.
+	 * Mark post as unread for all users except the editor after publication or
+	 * an update, if changes have been made.
+	 *
+	 * @param int     $post_id     Post ID.
+	 * @param WP_Post $post_after  New post.
+	 * @param WP_Post $post_before Previous post (the auto-draft in the case of
+	 *                             new posts)
+	 */
+	public function mark_post_as_unread_for_users_after_update( $post_id, $post_after, $post_before ) {
+		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
+			// Unread flags disabled.
+			return;
+		}
+
+		if ( 'publish' !== $post_after->post_status ) {
+			// Don't change anything on unpublished posts.
+			return;
+		}
+
+		// Prior post statuses which don't need a change check.
+		$no_check_statuses = array(
+			'draft',
+			'auto-draft',
+			'pending',
+			'private',
+			'future',
+		);
+
+		if ( ! in_array( $post_before->post_status, $no_check_statuses, true ) ) {
+			// The post has been updated from a previous version - check if it
+			// has changed sufficiently to mark as unread.
+
+			if ( ! class_exists( 'Text_Diff', false ) ) {
+				require( ABSPATH . WPINC . '/wp-diff.php' );
+			}
+
+			$old_string  = normalize_whitespace( $post_before->post_content );
+			$new_string = normalize_whitespace( $post_after->post_content );
+
+			$old_lines  = explode( "\n", $old_string );
+			$new_lines = explode( "\n", $new_string );
+
+			// Compute text difference between old and new posts.
+			$diff = new Text_Diff( $old_lines, $new_lines );
+
+			// Post content is deemed changed if there are new or deleted lines.
+			$changed = $diff->countAddedLines() > 1 || $diff->countDeletedLines() > 1;
+
+			if ( ! $changed ) {
+				return;
+			}
+		}
+
+		// Set post as unread for all users except current user.
+		$this->set_users_post_read_status( false, $post_after, wp_get_current_user() );
+	}
+
+	/**
+	 * Get post read status for specified post and user.
 	 *
 	 * @param int|WP_Post|null $post Post ID or post object. Defaults to global $post.
 	 * @param int|WP_User|null $user User ID or user object. Defaults to currently logged in user.
 	 * @return bool|WP_Error
 	 */
 	public function get_post_read_status( $post, $user = null ) {
-		if ( ! get_option( 'ssl_alp_flag_read_posts' ) ) {
-			// Read flags disabled.
-			return $this->read_flag_no_permission_error();
+		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
+			// Unread flags disabled.
+			return $this->unread_flag_no_permission_error();
 		}
 
 		$post = get_post( $post );
 
 		if ( is_null( $post ) ) {
-			return $this->read_flag_post_not_found_error();
+			return $this->unread_flag_post_not_found_error();
 		}
 
 		if ( $user instanceof WP_User ) {
@@ -1075,23 +1139,23 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		if ( ! $user ) {
 			// Invalid user.
-			return $this->read_flag_user_not_found_error();
+			return $this->unread_flag_user_not_found_error();
 		}
 
-		if ( ! $this->check_read_flag_permission( $user ) ) {
+		if ( ! $this->check_unread_flag_permission( $user ) ) {
 			// No permission.
-			return $this->read_flag_no_permission_error();
+			return $this->unread_flag_no_permission_error();
 		}
 
-		$user_read_flag_term = $this->get_user_read_flag_term( $user );
+		$user_unread_flag_term = $this->get_user_unread_flag_term( $user );
 
-		if ( ! $user_read_flag_term ) {
+		if ( ! $user_unread_flag_term ) {
 			// No term found. Not much we can do.
-			return $this->read_flag_term_not_found_error();
+			return $this->unread_flag_term_not_found_error();
 		}
 
-		// The term is assigned to the post if the post is read.
-		return has_term( $user_read_flag_term->name, 'ssl_alp_read_flag', $post );
+		// The term is assigned to the post if the post is unread.
+		return ! has_term( $user_unread_flag_term->name, 'ssl_alp_unread_flag', $post );
 	}
 
 	/**
@@ -1100,18 +1164,18 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * @param bool             $read Read status to set.
 	 * @param int|WP_Post|null $post Post ID or post object. Defaults to global $post.
 	 * @param int|WP_User|null $user User ID or user object. Defaults to currently logged in user.
-	 * @return bool|WP_Error
+	 * @return bool|WP_Error New read status, or error.
 	 */
 	private function set_post_read_status( $read, $post = null, $user = null ) {
-		if ( ! get_option( 'ssl_alp_flag_read_posts' ) ) {
-			// Read flags disabled.
-			return $this->read_flag_no_permission_error();
+		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
+			// Unread flags disabled.
+			return $this->unread_flag_no_permission_error();
 		}
 
 		$post = get_post( $post );
 
 		if ( is_null( $post ) ) {
-			return $this->read_flag_post_not_found_error();
+			return $this->unread_flag_post_not_found_error();
 		}
 
 		if ( $user instanceof WP_User ) {
@@ -1126,53 +1190,47 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		if ( ! $user ) {
 			// Invalid user.
-			return $this->read_flag_user_not_found_error();
+			return $this->unread_flag_user_not_found_error();
 		}
 
-		if ( ! $this->check_read_flag_permission( $user ) ) {
+		if ( ! $this->check_unread_flag_permission( $user ) ) {
 			// No permission.
-			return $this->read_flag_no_permission_error();
+			return $this->unread_flag_no_permission_error();
 		}
 
-		$user_read_flag_term = $this->get_user_read_flag_term( $user );
+		$user_unread_flag_term = $this->get_user_unread_flag_term( $user );
 
-		if ( ! $user_read_flag_term ) {
+		if ( ! $user_unread_flag_term ) {
 			// No term found. Not much we can do.
-			return $this->read_flag_term_not_found_error();
+			return $this->unread_flag_term_not_found_error();
 		}
 
 		if ( $read ) {
-			// Set read flag.
-			$success = wp_set_post_terms( $post->ID, array( $user_read_flag_term->name ), 'ssl_alp_read_flag', true );
+			// Remove unread flag.
+			$success = wp_remove_object_terms( $post->ID, array( $user_unread_flag_term->name ), 'ssl_alp_unread_flag' );
 		} else {
-			// Remove read flag.
-			$success = wp_remove_object_terms( $post->ID, array( $user_read_flag_term->name ), 'ssl_alp_read_flag' );
+			// Set unread flag.
+			$success = wp_set_post_terms( $post->ID, array( $user_unread_flag_term->name ), 'ssl_alp_unread_flag', true );
 		}
 
 		if ( is_wp_error( $success ) ) {
 			return $success;
 		} elseif ( ! $success ) {
 			// Unknown error from wp_set_post_terms or wp_remove_object_terms.
-			return new WP_Error(
-				'post_read_flag_unknown_error',
-				__( 'Unknown error.', 'ssl-alp' ),
-				array(
-					'status' => 500,
-				)
-			);
+			return $this->unread_flag_unknown_error();
 		}
 
 		return $read;
 	}
 
 	/**
-	 * Set post read flag to "read" on the specified post and user.
+	 * Set post as read (by deleting the unread flag) for the specified user.
 	 *
 	 * @param int|WP_Post|null $post Post ID or post object. Defaults to global $post.
 	 * @param int|WP_User|null $user User ID or user object. Defaults to currently logged in user.
 	 * @return bool|WP_Error
 	 */
-	public function set_post_read_flag_to_read( $post, $user = null ) {
+	public function mark_post_as_read( $post, $user = null ) {
 		if ( ! is_single( $post ) ) {
 			return;
 		}
@@ -1181,49 +1239,49 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Filter the views listed on the admin post list to add "Read" view.
+	 * Filter the views listed on the admin post list to add "Unread" view.
 	 *
 	 * @param array $views Post list views.
 	 * @return array Post list views with new column added.
 	 */
 	public function filter_edit_post_views( $views ) {
-		if ( ! get_option( 'ssl_alp_flag_read_posts' ) ) {
-			// Read flags disabled.
+		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
+			// Unread flags disabled.
 			return $views;
 		}
 
 		// Current user.
 		$user = wp_get_current_user();
 
-		// Read flag term.
-		$read_flag_term = $this->get_user_read_flag_term( $user );
+		// Unread flag term.
+		$unread_flag_term = $this->get_user_unread_flag_term( $user );
 
-		// Number of read posts.
-		$read_count = $read_flag_term->count;
+		// Number of unread posts.
+		$unread_count = $unread_flag_term->count;
 
-		// Get current user's read flag term slug.
-		$read_flag_slug = $read_flag_term->slug;
+		// Get current user's unread flag term slug.
+		$unread_flag_slug = $unread_flag_term->slug;
 
 		// Build URL arguments.
-		$read_flag_args = array(
-			'taxonomy' => 'ssl_alp_read_flag',
-			'term'     => $read_flag_slug,
+		$unread_flag_args = array(
+			'taxonomy' => 'ssl_alp_unread_flag',
+			'term'     => $unread_flag_slug,
 		);
 
 		// Check if the current page is the "Mine" view.
-		if ( ! empty( $_REQUEST['taxonomy'] ) && 'ssl_alp_read_flag' === $_REQUEST['taxonomy'] && ! empty( $_REQUEST['term'] ) && $_REQUEST['term'] === $read_flag_slug ) {
+		if ( ! empty( $_REQUEST['taxonomy'] ) && 'ssl_alp_unread_flag' === $_REQUEST['taxonomy'] && ! empty( $_REQUEST['term'] ) && $_REQUEST['term'] === $unread_flag_slug ) {
 			$class = 'current';
 		} else {
 			$class = '';
 		}
 
-		// Add "Read" view to end.
-		$views['read'] = sprintf(
+		// Add "Unread" view to end.
+		$views['unread'] = sprintf(
 			'<a class="%s" href="%s">%s <span class="count">(%s)</span></a>',
 			esc_attr( $class ),
-			esc_url( add_query_arg( array_map( 'rawurlencode', $read_flag_args ), admin_url( 'edit.php' ) ) ),
-			esc_html__( 'Read', 'ssl_alp' ),
-			esc_html( $read_count )
+			esc_url( add_query_arg( array_map( 'rawurlencode', $unread_flag_args ), admin_url( 'edit.php' ) ) ),
+			esc_html__( 'Unread', 'ssl_alp' ),
+			esc_html( $unread_count )
 		);
 
 		return $views;
@@ -1236,8 +1294,8 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * @return array New actions.
 	 */
 	public function register_read_unread_bulk_actions( $actions ) {
-		if ( ! get_option( 'ssl_alp_flag_read_posts' ) ) {
-			// Read flags disabled.
+		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
+			// Unread flags disabled.
 			return $actions;
 		}
 
@@ -1251,8 +1309,8 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * Handle read/unread bulk action.
 	 */
 	public function handle_read_unread_bulk_actions( $redirect_to, $doaction, $post_ids ) {
-		if ( ! get_option( 'ssl_alp_flag_read_posts' ) ) {
-			// Read flags disabled.
+		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
+			// Unread flags disabled.
 			return $redirect_to;
 		}
 
@@ -1284,8 +1342,8 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * Add admin notice after posts have been set as read or unread.
 	 */
 	public function read_unread_admin_notice() {
-		if ( ! get_option( 'ssl_alp_flag_read_posts' ) ) {
-			// Read flags disabled.
+		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
+			// Unread flags disabled.
 			return;
 		}
 
