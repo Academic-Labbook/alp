@@ -832,11 +832,13 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		$args = array(
 			'label'                 => __( 'Unread', 'ssl-alp' ),
 			'query_var'             => false,
-			'rewrite'               => false, // Rewrites are handled elsewhere.
-			'public'                => true,  // Allow public display.
-			'show_in_menu'          => false, // Hide tag editor from admin post menu.
-			'show_ui'               => false, // Disallow editing of tags.
-			'show_in_rest'          => false, // Flags set via custom endpoint instead.
+			'rewrite'               => false,    // Rewrites are handled elsewhere.
+			'public'                => true,     // Allow public display.
+			'show_ui'               => false,    // Disallow editing of tags.
+			'show_in_menu'          => false,    // Hide tag editor from admin post menu.
+			'show_in_nav_menus'     => false,
+			'show_in_rest'          => false,    // Flags set via custom endpoint instead.
+			'query_var'             => 'unread', // Allow ?unread=... query.
 		);
 
 		// Create read flag taxonomy for posts.
@@ -861,7 +863,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	public static function add_unread_post_rewrite_rules() {
 		add_rewrite_rule(
 			'^unread/?(.*)/?$',
-			'index.php?taxonomy=ssl_alp_unread_flag&term=' . self::$unread_flag_term_slug_prefix . '$matches[1]',
+			'index.php?unread=' . self::$unread_flag_term_slug_prefix . '$matches[1]',
 			'top' // Required to avoid page matching rule.
 		);
 	}
@@ -879,12 +881,18 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			return;
 		}
 
+		if ( get_option( 'permalink_structure' ) ) {
+			$url = get_site_url( null, 'unread/' );
+		} else {
+			$url = get_site_url( null, '?unread=' . $this->get_unread_flag_term_slug() );
+		}
+
 		$wp_admin_bar->add_menu(
 			array(
 				'parent' => 'top-secondary', // On the right side
 				'title'  => __( 'Unread Posts', 'ssl-alp' ),
 				'id'     => 'ssl-alp-unread-posts-link',
-				'href'   => get_site_url( null, 'unread/' ),
+				'href'   => $url,
 				'meta'   => array(
 					'title'  => esc_html__( 'View unread posts', 'ssl-alp' ),
 				),
@@ -903,15 +911,14 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		if ( ! is_user_logged_in() ) {
 			// Cannot show useful unread posts page.
-			set_query_var( 'taxonomy', '' );
-			set_query_var( 'term', '' );
+			set_query_var( 'unread', '' );
 
 			return;
 		}
 
-		if ( 'ssl_alp_unread_flag' === get_query_var( 'taxonomy' ) && self::$unread_flag_term_slug_prefix === get_query_var( 'term' ) ) {
-			// Set default term to user.
-			set_query_var( 'term', $this->get_unread_flag_term_slug() );
+		if ( self::$unread_flag_term_slug_prefix === get_query_var( 'unread' ) ) {
+			// No unread term is set - use current user's.
+			set_query_var( 'unread', $this->get_unread_flag_term_slug() );
 		}
 	}
 
