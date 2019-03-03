@@ -15,8 +15,12 @@
         // Endpoint from wpApiSetting variable passed from wp-api.
         var endpoint = wpApiSettings.root + 'ssl-alp/v1/post-read-status/';
 
+        // Read and unread icon classes.
+        var read_class = $button.data( 'read-class' );
+        var unread_class = $button.data( 'unread-class' );
+
         // Current read flag.
-        var current_read_status = $button.hasClass( 'fa-envelope-open' );
+        var current_read_status = $entry_link.hasClass( 'entry-read' );
 
         $.ajax( {
             url: endpoint,
@@ -34,15 +38,16 @@
             // Update icon class.
             if ( current_read_status ) {
                 // Read -> unread.
-                $button.removeClass( 'fa-envelope-open' );
-                $button.addClass( 'fa-envelope' );
+                $button.removeClass( read_class );
+                $button.addClass( unread_class );
 
                 $entry_link.removeClass( 'entry-read' );
             } else {
                 // Unread -> read.
-                $button.removeClass( 'fa-envelope' );
-                $button.addClass( 'fa-envelope-open' );
+                $button.removeClass( unread_class );
+                $button.addClass( read_class );
 
+                console.log("Hi");
                 $entry_link.addClass( 'entry-read' );
             }
         } ).always( function() {

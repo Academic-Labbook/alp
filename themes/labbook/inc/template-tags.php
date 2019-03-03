@@ -26,30 +26,43 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 
 		echo '<h2 class="entry-title">';
 
+		// Post read/unread status.
+		$post_is_read = labbook_post_is_read( $post );
+
 		// Default post read class.
 		$post_read_classes = array( 'entry-title-link-' . $post->ID );
 
+		if ( $post_is_read ) {
+			$post_read_classes[] = 'entry-read';
+		}
+
 		if ( $icon ) {
-			// Display icon, if present.
 			if ( 'status' === get_post_format( $post ) ) {
-				$icon_class = 'fa fa-info-circle';
+				$icon_class = 'fa fa-info-circle logbook-read-button';
+
+				// Icon details.
+				$description = __( 'Status update (click to toggle read status)', 'ssl-alp' );
+				$read_class = 'fa-info-circle';
+				$unread_class = 'fa-info-circle';
 			} elseif ( is_user_logged_in() ) {
 				if ( ! labbook_get_option( 'show_unread_flags' ) || ! labbook_ssl_alp_unread_flags_enabled() ) {
 					// Unread flags disabled/unavailable
 					$icon_class = '';
 				} else {
-					// Show read/unread status.
-					$status = labbook_post_is_read( $post );
-
-					if ( $status ) {
+					if ( $post_is_read ) {
 						// Read.
 						$icon_class = 'fa fa-envelope-open logbook-read-button';
-						$post_read_classes[] = 'entry-read';
 					} else {
 						// Unread.
 						$icon_class = 'fa fa-envelope logbook-read-button';
 					}
+
+					$read_class = 'fa-envelope-open';
+					$unread_class = 'fa-envelope';
 				}
+
+				// Icon description.
+				$description = __( 'Post (click to toggle read status)', 'labbook' );
 			} else {
 				// Don't show icon.
 				$icon_class = '';
@@ -57,10 +70,12 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 
 			if ( ! empty( $icon_class ) ) {
 				printf(
-					'<i class="%1$s" title="%2$s" data-post-id="%3$s"></i>',
+					'<i class="%1$s" title="%2$s" data-post-id="%3$s" data-read-class="%4$s" data-unread-class="%5$s"></i>',
 					esc_attr( $icon_class ),
-					esc_attr( __( 'Click to toggle read status', 'labbook' ) ),
-					esc_attr( $post->ID )
+					esc_attr( $description ),
+					esc_attr( $post->ID ),
+					$read_class,
+					$unread_class
 				);
 			}
 		}
