@@ -881,6 +881,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			array(
 				'parent' => 'top-secondary', // On the right side
 				'title'  => __( 'Unread Posts', 'ssl-alp' ),
+				'id'     => 'ssl-alp-unread-posts-link',
 				'href'   => get_site_url( null, 'unread/' ),
 				'meta'   => array(
 					'title'  => esc_html__( 'View unread posts', 'ssl-alp' ),
