@@ -834,6 +834,8 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			'query_var'             => false,
 			'rewrite'               => false, // Rewrites are handled elsewhere.
 			'public'                => true,  // Allow public display.
+			'show_in_menu'          => false, // Hide tag editor from admin post menu.
+			'show_ui'               => false, // Disallow editing of tags.
 			'show_in_rest'          => false, // Flags set via custom endpoint instead.
 		);
 
