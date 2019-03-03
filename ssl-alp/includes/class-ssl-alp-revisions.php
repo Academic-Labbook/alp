@@ -1391,14 +1391,17 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			$class = '';
 		}
 
-		// Add "Unread" view to end.
-		$views['unread'] = sprintf(
+		// "Unread" view.
+		$unread = sprintf(
 			'<a class="%s" href="%s">%s <span class="count">(%s)</span></a>',
 			esc_attr( $class ),
 			esc_url( add_query_arg( array_map( 'rawurlencode', $unread_flag_args ), admin_url( 'edit.php' ) ) ),
 			esc_html__( 'Unread', 'ssl_alp' ),
 			esc_html( $unread_count )
 		);
+
+		// Add after first item.
+		array_splice( $views, 1, 0, array( $unread ) );
 
 		return $views;
 	}
