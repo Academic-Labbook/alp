@@ -137,7 +137,14 @@ class SSL_ALP_Activator {
 	 * Flush rewrite rules.
 	 */
 	private static function flush_rewrite_rules() {
-		global $ssl_alp;
+		global $ssl_alp, $wp_rewrite;
+
+		if ( ! $wp_rewrite instanceof WP_Rewrite ) {
+			// ALP is probably running as an mu-plugin (e.g. during a test),
+			// which doesn't provide the necessary functions to add rewrite
+			// rules by this point in the execution.
+			return;
+		}
 
 		// Add rewrite rules.
 		SSL_ALP_Revisions::add_unread_post_rewrite_rules();
