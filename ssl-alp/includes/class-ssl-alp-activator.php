@@ -39,11 +39,17 @@ class SSL_ALP_Activator {
 	/**
 	 * Action to run when a new blog is created on a network, to activate it.
 	 *
-	 * @param int $blog_id Blog ID.
+	 * @param WP_Site|int $blog Blog object or ID.
 	 */
-	public static function activate_multisite_blog( $blog_id ) {
+	public static function activate_multisite_blog( $blog ) {
+		$blog = get_site( $blog );
+
+		if ( is_null( $blog ) ) {
+			return;
+		}
+
 		// Activate blog using blog ID specified in call.
-		self::activate_blog_on_network( $blog_id );
+		self::activate_blog_on_network( $blog );
 	}
 
 	/**
@@ -60,23 +66,35 @@ class SSL_ALP_Activator {
 
 		// Loop over all blogs on the network.
 		foreach ( $wpdb->get_col( "SELECT blog_id FROM {$wpdb->blogs}" ) as $blog_id ) {
+			$blog = get_site( $blog_id );
+
+			if ( is_null( $blog ) ) {
+				return;
+			}
+
 			// Activate this blog.
-			self::activate_blog_on_network( $blog_id );
+			self::activate_blog_on_network( $blog );
 		}
 	}
 
 	/**
 	 * Activate single blog on a network.
 	 *
-	 * @param int $blog_id Blog ID.
+	 * @param WP_Site|int $blog Blog object or ID.
 	 */
-	private static function activate_blog_on_network( $blog_id ) {
+	private static function activate_blog_on_network( $blog ) {
 		if ( ! is_multisite() ) {
 			return;
 		}
 
+		$blog = get_site( $blog );
+
+		if ( is_null( $blog ) ) {
+			return;
+		}
+
 		// Switch to the blog.
-		switch_to_blog( $blog_id );
+		switch_to_blog( $blog->blog_id );
 
 		// Activate single site.
 		self::activate_single();

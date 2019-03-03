@@ -1,8 +1,8 @@
 === Academic Labbook ===
 Contributors: seanleavey
 Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
-Requires at least: 5.0.0
-Tested up to: 5.0.3
+Requires at least: 5.1.0
+Tested up to: 5.1.0
 Requires PHP: 7.0.0
 Stable tag: 0.12.3
 License: GNU General Public License v3 or later

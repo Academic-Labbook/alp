@@ -74,10 +74,10 @@ register_deactivation_hook( __FILE__, array( 'SSL_ALP_Deactivator', 'deactivate'
 register_uninstall_hook( __FILE__, array( 'SSL_ALP_Uninstaller', 'uninstall' ) );
 
 // Run setup on new blogs created on network installations.
-add_action( 'wpmu_new_blog', array( 'SSL_ALP_Activator', 'activate_multisite_blog' ), 10, 1 );
+add_action( 'wp_initialize_site', array( 'SSL_ALP_Activator', 'activate_multisite_blog' ), 10, 1 );
 
 // Run uninstall on deleted blogs on network installations.
-add_action( 'delete_blog', array( 'SSL_ALP_Uninstaller', 'uninstall_multisite_blog' ), 10, 1 );
+add_action( 'wp_uninitialize_site', array( 'SSL_ALP_Uninstaller', 'uninstall_multisite_blog' ), 10, 1 );
 
 /**
  * Core plugin class used to load modules.
