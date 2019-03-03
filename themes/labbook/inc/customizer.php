@@ -165,6 +165,41 @@ function labbook_customize_register( $wp_customize ) {
 	);
 
 	/**
+	 * Posts section.
+	 */
+
+	$wp_customize->add_section(
+		'labbook_post_options',
+		array(
+			'title'      => __( 'Posts', 'labbook' ),
+			'priority'   => 86,
+			'capability' => 'edit_theme_options',
+			'panel'      => '',
+		)
+	);
+
+	// Unread flag setting.
+	$wp_customize->add_setting(
+		'labbook_options[show_unread_flags]',
+		array(
+			'default'           => $labbook_default_options['show_unread_flags'],
+			'capability'        => 'edit_theme_options',
+			'sanitize_callback' => 'labbook_sanitize_checkbox',
+		)
+	);
+
+	$wp_customize->add_control(
+		'labbook_options[show_unread_flags]',
+		array(
+			'label'    		=> __( 'Show unread posts', 'labbook' ),
+			'description'	=> __( 'Display an icon next to each post title designating whether or not it has been read. Users can also use this icon to toggle the post\'s read status.', 'labbook' ),
+			'section'  		=> 'labbook_post_options',
+			'type'     		=> 'checkbox',
+			'priority' 		=> 100,
+		)
+	);
+
+	/**
 	 * Pages section.
 	 */
 
@@ -172,7 +207,7 @@ function labbook_customize_register( $wp_customize ) {
 		'labbook_page_options',
 		array(
 			'title'      => __( 'Pages', 'labbook' ),
-			'priority'   => 86,
+			'priority'   => 88,
 			'capability' => 'edit_theme_options',
 			'panel'      => '',
 		)

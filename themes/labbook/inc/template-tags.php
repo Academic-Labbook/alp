@@ -26,10 +26,30 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 
 		echo '<h2 class="entry-title">';
 
+		// Default post read class.
+		$post_read_classes = array( 'entry-title-link-' . $post->ID );
+
 		if ( $icon ) {
 			// Display icon, if present.
 			if ( 'status' === get_post_format( $post ) ) {
 				$icon_class = 'fa fa-info-circle';
+			} elseif ( is_user_logged_in() ) {
+				if ( ! labbook_get_option( 'show_unread_flags' ) || ! labbook_ssl_alp_unread_flags_enabled() ) {
+					// Unread flags disabled/unavailable
+					$icon_class = '';
+				} else {
+					// Show read/unread status.
+					$status = labbook_post_is_read( $post );
+
+					if ( $status ) {
+						// Read.
+						$icon_class = 'fa fa-envelope-open logbook-read-button';
+						$post_read_classes[] = 'entry-read';
+					} else {
+						// Unread.
+						$icon_class = 'fa fa-envelope logbook-read-button';
+					}
+				}
 			} else {
 				// Don't show icon.
 				$icon_class = '';
@@ -37,8 +57,10 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 
 			if ( ! empty( $icon_class ) ) {
 				printf(
-					'<i class="%1$s"></i>',
-					esc_attr( $icon_class )
+					'<i class="%1$s" title="%2$s" data-post-id="%3$s"></i>',
+					esc_attr( $icon_class ),
+					esc_attr( __( 'Click to toggle read status', 'labbook' ) ),
+					esc_attr( $post->ID )
 				);
 			}
 		}
@@ -47,8 +69,9 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 			// Wrap title in its permalink.
 			the_title(
 				sprintf(
-					'<a href="%1$s" rel="bookmark">',
-					esc_url( get_permalink( $post ) )
+					'<a href="%1$s" class="%2$s" rel="bookmark">',
+					esc_url( get_permalink( $post ) ),
+					esc_attr( implode( ' ', $post_read_classes ) )
 				),
 				'</a>'
 			);
@@ -271,8 +294,7 @@ if ( ! function_exists( 'labbook_the_revisions_link' ) ) :
 	function labbook_the_revisions_link( $post = null ) {
 		global $ssl_alp;
 
-		if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
-			// Required functionality not available.
+		if ( ! labbook_ssl_alp_edit_summaries_enabled() ) {
 			return;
 		}
 
@@ -315,7 +337,7 @@ if ( ! function_exists( 'labbook_the_authors' ) ) :
 
 		$post = get_post( $post );
 
-		if ( is_plugin_active( 'ssl-alp/alp.php' ) && get_option( 'ssl_alp_allow_multiple_authors' ) ) {
+		if ( labbook_ssl_alp_coauthors_enabled() ) {
 			$authors = $ssl_alp->coauthors->get_coauthors( $post );
 		} else {
 			// Fall back to the_author if plugin is disabled.
@@ -777,14 +799,8 @@ if ( ! function_exists( 'labbook_the_references' ) ) :
 	function labbook_the_references( $post = null ) {
 		global $ssl_alp;
 
-		if ( ! labbook_get_option( 'show_crossreferences' ) ) {
+		if ( ! labbook_get_option( 'show_crossreferences' ) || ! labbook_ssl_alp_crossreferences_enabled() ) {
 			// Display is unavailable.
-			return;
-		} elseif ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
-			// Plugin is disabled.
-			return;
-		} elseif ( ! get_option( 'ssl_alp_enable_crossreferences' ) ) {
-			// Tracking of cross-references are disabled.
 			return;
 		}
 

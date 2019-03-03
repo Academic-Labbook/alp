@@ -181,6 +181,20 @@ function labbook_scripts() {
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
 		wp_enqueue_script( 'comment-reply' );
 	}
+
+	if ( labbook_get_option( 'show_unread_flags' ) && labbook_ssl_alp_unread_flags_enabled() ) {
+		// Add support for unread flags.
+		wp_enqueue_script(
+			'labbook-post-read-status',
+			get_template_directory_uri() . '/js/post-read-status.js',
+			array(
+				'jquery',
+				'wp-api',
+			),
+			LABBOOK_VERSION,
+			true
+		);
+	}
 }
 add_action( 'wp_enqueue_scripts', 'labbook_scripts' );
 
@@ -224,6 +238,66 @@ if ( ! function_exists( 'labbook_get_content_with_toc' ) ) :
 	}
 endif;
 add_filter( 'the_content', 'labbook_get_content_with_toc' );
+
+/**
+ * Check if coauthors provided by the ALP plugin are available and enabled.
+ */
+function labbook_ssl_alp_coauthors_enabled() {
+	if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
+		// Plugin is disabled.
+		return false;
+	} elseif ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
+		// Coauthors are disabled.
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Check if crossreferences provided by the ALP plugin are available and enabled.
+ */
+function labbook_ssl_alp_crossreferences_enabled() {
+	if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
+		// Plugin is disabled.
+		return false;
+	} elseif ( ! get_option( 'ssl_alp_enable_crossreferences' ) ) {
+		// Cross-references are disabled.
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Check if edit summaries provided by the ALP plugin are available and enabled.
+ */
+function labbook_ssl_alp_edit_summaries_enabled() {
+	if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
+		// Plugin is disabled.
+		return false;
+	} elseif ( ! get_option( 'ssl_alp_enable_edit_summaries' ) ) {
+		// Tracking of edit summaries is disabled.
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Check if unread flags provided by the ALP plugin are available and enabled.
+ */
+function labbook_ssl_alp_unread_flags_enabled() {
+	if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
+		// Plugin is disabled.
+		return false;
+	} elseif ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
+		// Unread flags are disabled.
+		return false;
+	}
+
+	return true;
+}
 
 /**
  * Page table of contents generator.

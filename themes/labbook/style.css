@@ -1209,7 +1209,7 @@ a:hover, a:active {
 }
 
 /* show visited posts' titles in different colour */
-.entry-title a:visited {
+.entry-title a.entry-read {
     color: #252525;
     border-bottom: #404040 1px solid !important;
 }
