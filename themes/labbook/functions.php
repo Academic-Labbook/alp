@@ -182,7 +182,7 @@ function labbook_scripts() {
 		wp_enqueue_script( 'comment-reply' );
 	}
 
-	if ( is_plugin_active( 'ssl-alp/alp.php' ) ) {
+	if ( labbook_get_option( 'show_unread_flags' ) && labbook_ssl_alp_unread_flags_enabled() ) {
 		// Add support for unread flags.
 		wp_enqueue_script(
 			'labbook-post-read-status',

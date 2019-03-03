@@ -34,8 +34,8 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 			if ( 'status' === get_post_format( $post ) ) {
 				$icon_class = 'fa fa-info-circle';
 			} elseif ( is_user_logged_in() ) {
-				if ( ! labbook_ssl_alp_unread_flags_enabled() ) {
-					// Unread flags disabled.
+				if ( ! labbook_get_option( 'show_unread_flags' ) || ! labbook_ssl_alp_unread_flags_enabled() ) {
+					// Unread flags disabled/unavailable
 					$icon_class = '';
 				} else {
 					// Show read/unread status.
