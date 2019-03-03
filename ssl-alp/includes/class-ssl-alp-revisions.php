@@ -1463,7 +1463,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		if ( ! empty( $_REQUEST['posts_marked_read'] ) ) {
 			$count = intval( $_REQUEST['posts_marked_read'] );
 
-			echo '<div id="message" class="updated fade">';
+			echo '<div id="message" class="updated"><p>';
 
 			printf(
 				_n(
@@ -1475,11 +1475,11 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 				$count
 			);
 
-			echo '</div>';
+			echo '</p></div>';
 		} elseif ( ! empty( $_REQUEST['posts_marked_unread'] ) ) {
 			$count = intval( $_REQUEST['posts_marked_unread'] );
 
-			echo '<div id="message" class="updated fade">';
+			echo '<div id="message" class="updated"><p>';
 
 			printf(
 				_n(
@@ -1491,7 +1491,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 				$count
 			);
 
-			echo '</div>';
+			echo '</p></div>';
 		} else {
 			return;
 		}
