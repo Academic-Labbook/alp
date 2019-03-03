@@ -35,7 +35,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 *
 	 * @var string
 	 */
-	protected $unread_flag_term_slug_prefix = 'ssl-alp-unread-flag-';
+	protected static $unread_flag_term_slug_prefix = 'ssl-alp-unread-flag-';
 
 	/**
 	 * Register settings.
@@ -127,6 +127,15 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		// Register taxonomy for unread flags.
 		$loader->add_action( 'init', $this, 'register_unread_flag_taxonomy' );
+
+		// Add rewrite rule to page with unread posts.
+		$loader->add_action( 'init', $this, 'register_unread_post_rewrite_rules' );
+
+		// Add link to unread posts on toolbar.
+		$loader->add_action( 'wp_before_admin_bar_render', $this, 'add_unread_posts_admin_bar_link' );
+
+		// Set default unread posts page to current user.
+		$loader->add_action( 'pre_get_posts', $this, 'set_default_unread_posts_user' );
 
 		// Register REST API endpoints for unread flags.
 		$loader->add_action( 'rest_api_init', $this, 'rest_register_unread_flag_routes' );
@@ -741,11 +750,29 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	/**
 	 * Get unread flag term slug.
 	 *
-	 * @param WP_User $user User object.
-	 * @return string
+	 * Note: the rewrite rule also uses this structure, and must be updated if
+	 * this structure is also updated.
+	 *
+	 * @param int|WP_User|null $user User ID or user object. Defaults to currently logged in user.
+	 * @return string|null
 	 */
-	private function get_unread_flag_term_slug( $user ) {
-		return $this->unread_flag_term_slug_prefix . $user->user_nicename;
+	private function get_unread_flag_term_slug( $user = null ) {
+		if ( $user instanceof WP_User ) {
+			// Do nothing.
+		} elseif ( is_numeric( $user ) ) {
+			// Get user by their ID.
+			$user = get_user_by( 'id', $user );
+		} else {
+			// Try to get logged in user.
+			$user = wp_get_current_user();
+		}
+
+		if ( ! is_object( $user ) ) {
+			// Invalid user.
+			return;
+		}
+
+		return self::$unread_flag_term_slug_prefix . $user->user_nicename;
 	}
 
 	/**
@@ -803,15 +830,86 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		// Register new taxonomy so that we can store all of the relationships.
 		$args = array(
-			'label'                 => __( 'Unread Flag', 'ssl-alp' ),
+			'label'                 => __( 'Unread', 'ssl-alp' ),
 			'query_var'             => false,
-			'rewrite'               => false,
-			'public'                => false,
+			'rewrite'               => false, // Rewrites are handled elsewhere.
+			'public'                => true,  // Allow public display.
 			'show_in_rest'          => false, // Flags set via custom endpoint instead.
 		);
 
 		// Create read flag taxonomy for posts.
 		register_taxonomy( 'ssl_alp_unread_flag', 'post', $args );
+	}
+
+	/**
+	 * Add rewrite rule to display unread posts for each user.
+	 */
+	public function register_unread_post_rewrite_rules() {
+		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
+			// Unread flags disabled.
+			return;
+		}
+
+		$this->add_unread_post_rewrite_rules();
+	}
+
+	/**
+	 * Register rewrite rules for unread flags.
+	 */
+	public static function add_unread_post_rewrite_rules() {
+		add_rewrite_rule(
+			'^unread/?(.*)/?$',
+			'index.php?taxonomy=ssl_alp_unread_flag&term=' . self::$unread_flag_term_slug_prefix . '$matches[1]',
+			'top' // Required to avoid page matching rule.
+		);
+	}
+
+	/**
+	 * Add link to unread posts page in admin bar.
+	 *
+	 * @global $wp_admin_bar
+	 */
+	public function add_unread_posts_admin_bar_link() {
+		global $wp_admin_bar;
+
+		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
+			// Unread flags disabled.
+			return;
+		}
+
+		$wp_admin_bar->add_menu(
+			array(
+				'parent' => 'top-secondary', // On the right side
+				'title'  => __( 'Unread Posts', 'ssl-alp' ),
+				'href'   => get_site_url( null, 'unread/' ),
+				'meta'   => array(
+					'title'  => esc_html__( 'View unread posts', 'ssl-alp' ),
+				),
+			)
+		);
+	}
+
+	/**
+	 * Set the default unread posts page user if it is not set.
+	 */
+	public function set_default_unread_posts_user() {
+		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
+			// Unread flags disabled.
+			return;
+		}
+
+		if ( ! is_user_logged_in() ) {
+			// Cannot show useful unread posts page.
+			set_query_var( 'taxonomy', '' );
+			set_query_var( 'term', '' );
+
+			return;
+		}
+
+		if ( 'ssl_alp_unread_flag' === get_query_var( 'taxonomy' ) && self::$unread_flag_term_slug_prefix === get_query_var( 'term' ) ) {
+			// Set default term to user.
+			set_query_var( 'term', $this->get_unread_flag_term_slug() );
+		}
 	}
 
 	/**
@@ -823,6 +921,11 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * set the unread flag term.
 	 */
 	public function rest_register_unread_flag_routes() {
+		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
+			// Unread flags disabled.
+			return;
+		}
+
 		register_rest_route(
 			SSL_ALP_REST_ROUTE,
 			'/post-read-status',
@@ -1022,6 +1125,11 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * @param int|WP_User|null $user User ID or user object to ignore. Defaults to none.
 	 */
 	private function set_users_post_read_status( $read, $post, $ignore_user = null ) {
+		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
+			// Unread flags disabled.
+			return;
+		}
+
 		// Get post.
 		$post = get_post( $post );
 
@@ -1231,6 +1339,11 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * @return bool|WP_Error
 	 */
 	public function mark_post_as_read( $post, $user = null ) {
+		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
+			// Unread flags disabled.
+			return;
+		}
+
 		if ( ! is_single( $post ) ) {
 			return;
 		}
