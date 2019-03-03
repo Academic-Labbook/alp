@@ -57,7 +57,7 @@ define( 'SSL_ALP_REST_ROUTE', 'ssl-alp/v1' );
  * Default settings
  */
 
-define( 'SSL_ALP_KATEX_VERSION', '0.10.0' );
+define( 'SSL_ALP_KATEX_VERSION', '0.10.1' );
 
 /**
  * Code to run on plugin activation and deactivation.
