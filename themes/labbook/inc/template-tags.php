@@ -37,17 +37,25 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 		}
 
 		if ( $icon ) {
-			if ( 'status' === get_post_format( $post ) ) {
-				$icon_class = 'fa fa-info-circle logbook-read-button';
+			if ( ! is_user_logged_in() || ! labbook_get_option( 'show_unread_flags' ) || ! labbook_ssl_alp_unread_flags_enabled() ) {
+				// No support for unread flags.
 
-				// Icon details.
-				$description = __( 'Status update (click to toggle read status)', 'ssl-alp' );
-				$read_class = 'fa-info-circle';
-				$unread_class = 'fa-info-circle';
-			} elseif ( is_user_logged_in() ) {
-				if ( ! labbook_get_option( 'show_unread_flags' ) || ! labbook_ssl_alp_unread_flags_enabled() ) {
-					// Unread flags disabled/unavailable
+				if ( 'status' === get_post_format( $post ) ) {
+					$icon_class = 'fa fa-info-circle';
+					$icon_description = __( 'Status update', 'labbook' );
+				} else {
+					// Don't show icon.
 					$icon_class = '';
+				}
+
+				$read_class = '';
+				$unread_class = '';
+			} else {
+				if ( 'status' === get_post_format( $post ) ) {
+					$icon_class = 'fa fa-info-circle logbook-read-button';
+					$icon_description = __( 'Status update (click to toggle read status)', 'labbook' );
+					$read_class = 'fa-info-circle';
+					$unread_class = 'fa-info-circle';
 				} else {
 					if ( $post_is_read ) {
 						// Read.
@@ -57,22 +65,17 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 						$icon_class = 'fa fa-envelope logbook-read-button';
 					}
 
+					$icon_description = __( 'Post (click to toggle read status)', 'labbook' );
 					$read_class = 'fa-envelope-open';
 					$unread_class = 'fa-envelope';
 				}
-
-				// Icon description.
-				$description = __( 'Post (click to toggle read status)', 'labbook' );
-			} else {
-				// Don't show icon.
-				$icon_class = '';
 			}
 
 			if ( ! empty( $icon_class ) ) {
 				printf(
 					'<i class="%1$s" title="%2$s" data-post-id="%3$s" data-read-class="%4$s" data-unread-class="%5$s"></i>',
 					esc_attr( $icon_class ),
-					esc_attr( $description ),
+					esc_attr( $icon_description ),
 					esc_attr( $post->ID ),
 					$read_class,
 					$unread_class
