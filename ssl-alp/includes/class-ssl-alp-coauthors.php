@@ -685,30 +685,25 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * When we update the terms at all, we should update the published post
 	 * count for each author.
 	 *
-	 * @param array  $tt_ids   Term taxonomy IDs.
-	 * @param string $taxonomy Taxonomy name.
-	 *
-	 * @global $wpdb
+	 * @param array       $tt_ids   Term taxonomy IDs.
+	 * @param WP_Taxonomy $taxonomy Taxonomy.
 	 */
 	public function update_users_posts_count( $tt_ids, $taxonomy ) {
-		global $wpdb;
-
-		$tt_ids   = implode( ', ', array_map( 'intval', $tt_ids ) );
-		$term_ids = $wpdb->get_results(
-			"
-			SELECT term_id
-			FROM {$wpdb->term_taxonomy}
-			WHERE term_taxonomy_id IN ({$tt_ids})
-			"
-		);
-
-		foreach ( (array) $term_ids as $term_id_result ) {
-			$term = get_term_by( 'id', $term_id_result->term_id, 'ssl_alp_coauthor' );
-			$this->update_author_term_post_count( $term );
+		if ( 'ssl_alp_coauthor' !== $taxonomy->name ) {
+			return;
 		}
 
-		$tt_ids = explode( ', ', $tt_ids );
-		clean_term_cache( $tt_ids, '', false );
+		$terms = get_terms(
+			array(
+				'taxonomy'         => $taxonomy->name,
+				'term_taxonomy_id' => $tt_ids,
+				'hide_empty'       => false,
+			)
+		);
+
+		foreach ( (array) $terms as $term ) {
+			$this->update_author_term_post_count( $term );
+		}
 	}
 
 	/**
@@ -749,6 +744,9 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 		$count = $wpdb->query( $query );
 		$wpdb->update( $wpdb->term_taxonomy, array( 'count' => $count ), array( 'term_taxonomy_id' => $term->term_taxonomy_id ) );
+
+		// Invalidate term cache.
+		clean_term_cache( $term->term_id, 'ssl_alp_coauthor', false );
 	}
 
 	/**
