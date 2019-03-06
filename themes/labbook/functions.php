@@ -26,7 +26,7 @@ if ( ! function_exists( 'labbook_check_php_version' ) ) :
 		if ( version_compare( phpversion(), LABBOOK_MINIMUM_PHP_VERSION, '<') ) {
 			function labbook_version_too_low_admin_notice() {
 				echo '<div class="update-nag">';
-				_e( 'Labbook cannot run on the currently installed PHP version.', 'labbook' );
+				esc_html_e( 'Labbook cannot run on the currently installed PHP version.', 'labbook' );
 				echo '<br/>';
 				printf(
 					/* translators: 1: current PHP version, 2: required PHP version */
