@@ -41,9 +41,6 @@ of features provided in this theme.
 * Stopped theme customizer settings from showing if ALP is not enabled or if the corresponding
   option providing the functionality relied upon by the theme is not enabled.
 * Fixed bug with timezones when displaying revision dates.
-* Fixed bug with user widget in non-dropdown mode not showing all authors, and with dropdown mode
-  showing authors with zero posts.
-* Updated KaTeX to 0.10.1.
 * Enforced minimum PHP version (7.0.0) on activation.
 
 = 1.0.7 - 2019-01-29 =
