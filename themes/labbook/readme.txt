@@ -3,7 +3,7 @@ Contributors: seanleavey
 Tags: custom-background, custom-logo, custom-menu, editor-style, education, theme-options, threaded-comments, translation-ready, two-columns
 Requires at least: 5.0.0
 Tested up to: 5.0.3
-Stable tag: 1.0.7
+Stable tag: 1.1.0
 Requires PHP: 7.0.0
 License: GNU General Public License v3 or later
 License URI: LICENCE
@@ -35,6 +35,16 @@ Labbook supports Academic Labbook Plugin - indeed, use of it is highly encourage
 of features provided in this theme.
 
 == Changelog ==
+
+= 1.1.0 - 2019-03-06 =
+* Added support for setting read flags (Academic Labbook Plugin feature) via AJAX.
+* Stopped theme customizer settings from showing if ALP is not enabled or if the corresponding
+  option providing the functionality relied upon by the theme is not enabled.
+* Fixed bug with timezones when displaying revision dates.
+* Fixed bug with user widget in non-dropdown mode not showing all authors, and with dropdown mode
+  showing authors with zero posts.
+* Updated KaTeX to 0.10.1.
+* Enforced minimum PHP version (7.0.0) on activation.
 
 = 1.0.7 - 2019-01-29 =
 * Made visited post titles show a different colour to non-visited ones.
