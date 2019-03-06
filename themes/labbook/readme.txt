@@ -1,11 +1,10 @@
 === Labbook ===
-
 Contributors: seanleavey
 Tags: custom-background, custom-logo, custom-menu, editor-style, education, theme-options, threaded-comments, translation-ready, two-columns
-
 Requires at least: 5.0.0
 Tested up to: 5.0.3
 Stable tag: 1.0.7
+Requires PHP: 7.0.0
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
