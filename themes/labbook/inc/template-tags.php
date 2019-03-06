@@ -971,8 +971,8 @@ if ( ! function_exists( 'labbook_the_toc' ) ) :
 	/**
 	 * Print the table of contents.
 	 *
-	 * @param TOC_Menu_Level $contents   The table of contents hierarchy.
-	 * @param int            $max_levels Maximum heading level to display.
+	 * @param Labbook_TOC_Menu_Level $contents   The table of contents hierarchy.
+	 * @param int                    $max_levels Maximum heading level to display.
 	 */
 	function labbook_the_toc( $contents, $max_levels ) {
 		if ( ! is_int( $max_levels ) || $max_levels < 0 ) {

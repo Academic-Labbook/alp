@@ -8,7 +8,7 @@
  /**
   * Table of contents menu level.
   */
-class TOC_Menu_Level {
+class Labbook_TOC_Menu_Level {
 	/**
 	 * Parent menu.
 	 *
@@ -101,8 +101,8 @@ if ( ! function_exists( 'labbook_generate_post_contents' ) ) :
 	 * Build a table of contents for the specified page, and return the page
 	 * with heading IDs injected where appropriate.
 	 *
-	 * @param string         $post_content Post content.
-	 * @param TOC_Menu_Level $toc          Variable to store generated menus.
+	 * @param string                 $post_content Post content.
+	 * @param Labbook_TOC_Menu_Level $toc          Variable to store generated menus.
 	 */
 	function labbook_generate_post_contents( $post_content, &$toc ) {
 		if ( ! extension_loaded( 'dom' ) ) {
@@ -153,7 +153,7 @@ if ( ! function_exists( 'labbook_generate_post_contents' ) ) :
 		libxml_use_internal_errors( $prev_libxml_error_setting );
 
 		// Create root list container.
-		$toc = new TOC_Menu_Level();
+		$toc = new Labbook_TOC_Menu_Level();
 		$toc->is_root = true;
 
 		// Set parent container to root.
@@ -206,7 +206,7 @@ if ( ! function_exists( 'labbook_generate_post_contents' ) ) :
 				for ( $i = $last_level; $i < $current_level; $i++ ) {
 					// New parent should now be the last child of the current parent.
 					if ( is_null( $head->last_child ) ) {
-						$head->add_child_menu( new TOC_Menu_Level() );
+						$head->add_child_menu( new Labbook_TOC_Menu_Level() );
 					}
 
 					$head = &$head->last_child;
@@ -223,7 +223,7 @@ if ( ! function_exists( 'labbook_generate_post_contents' ) ) :
 			$header->setAttribute( 'id', $header_id );
 
 			// Add new child to parent.
-			$child = new TOC_Menu_Level();
+			$child = new Labbook_TOC_Menu_Level();
 			$child->set_menu_data(
 				array(
 					'id'	=> $header_id,

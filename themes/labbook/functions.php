@@ -340,7 +340,7 @@ function labbook_ssl_alp_unread_flags_enabled() {
 /**
  * Page table of contents generator.
  */
-require get_template_directory() . '/inc/class-toc-menu-level.php';
+require get_template_directory() . '/inc/class-labbook-toc-menu-level.php';
 
 /**
  * Functions which enhance the theme by hooking into WordPress.
