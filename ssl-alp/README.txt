@@ -4,7 +4,7 @@ Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
 Requires at least: 5.1.0
 Tested up to: 5.1.0
 Requires PHP: 7.0.0
-Stable tag: 0.12.3
+Stable tag: 0.13.0
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -72,6 +72,16 @@ with maximum control. Please see [this guide](https://alp.attackllama.com/docume
 on the ALP website.
 
 == Changelog ==
+
+= 0.13.0 =
+ - Added support for read flags, letting users keep track of posts they've read or not read and
+   allowing them to change this flag per-post and view a list of unread posts (requires Labbook
+   theme 1.1.0 or greater for front-end support).
+ - Fixed bug whereby coauthors were sent notifications for their own comments.
+ - Fixed bug with user widget in non-dropdown mode not showing all authors, and with dropdown mode
+   showing authors with zero posts.
+ - Removed new default media file feature until Gutenberg bug is fixed.
+ - Updated KaTeX to 0.10.1.
 
 = 0.12.3 =
  - Set new default (media file) for image link targets in block editor.

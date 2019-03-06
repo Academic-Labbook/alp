@@ -19,7 +19,6 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 	 * @param int|WP_Post|null $post   Post ID or post object. Defaults to global $post.
 	 * @param bool             $url    Make title into permalink.
 	 * @param bool             $icon   Add post icon, if present.
-	 * @param bool             $anchor Add hover anchor with permalink.
 	 */
 	function labbook_the_post_title( $post = null, $url = true, $icon = true ) {
 		$post = get_post( $post );
@@ -39,7 +38,6 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 		if ( $icon ) {
 			if ( ! is_user_logged_in() || ! labbook_get_option( 'show_unread_flags' ) || ! labbook_ssl_alp_unread_flags_enabled() ) {
 				// No support for unread flags.
-
 				if ( 'status' === get_post_format( $post ) ) {
 					$icon_class = 'fa fa-info-circle';
 					$icon_description = __( 'Status update', 'labbook' );
@@ -77,11 +75,11 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 					esc_attr( $icon_class ),
 					esc_attr( $icon_description ),
 					esc_attr( $post->ID ),
-					$read_class,
-					$unread_class
+					esc_attr( $read_class ),
+					esc_attr( $unread_class )
 				);
 			}
-		}
+		} // End if().
 
 		if ( $url ) {
 			// Wrap title in its permalink.
@@ -971,8 +969,8 @@ if ( ! function_exists( 'labbook_the_toc' ) ) :
 	/**
 	 * Print the table of contents.
 	 *
-	 * @param TOC_Menu_Level $contents   The table of contents hierarchy.
-	 * @param int            $max_levels Maximum heading level to display.
+	 * @param Labbook_TOC_Menu_Level $contents   The table of contents hierarchy.
+	 * @param int                    $max_levels Maximum heading level to display.
 	 */
 	function labbook_the_toc( $contents, $max_levels ) {
 		if ( ! is_int( $max_levels ) || $max_levels < 0 ) {
