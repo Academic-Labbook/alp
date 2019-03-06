@@ -258,6 +258,29 @@ class SSL_ALP_Uninstaller {
 	 * Delete user metas.
 	 */
 	private static function delete_user_metas() {
-		// No user meta defined by plugin.
+		self::delete_user_meta( 'ssl_alp_revisions_per_page' );
+		// Screen column settings on revisions list table.
+		self::delete_user_meta( 'manageposts_page_ssl-alp-admin-revisionscolumnshidden' );
+	}
+
+	/**
+	 * Delete user meta.
+	 *
+	 * @param string $meta_key User meta key.
+	 *
+	 * @global $wpdb
+	 */
+	private static function delete_user_meta( $meta_key ) {
+		global $wpdb;
+
+		$wpdb->delete(
+			$wpdb->usermeta,
+			array(
+				'meta_key' => $meta_key,
+			),
+			array(
+				'%s',
+			)
+		);
 	}
 }

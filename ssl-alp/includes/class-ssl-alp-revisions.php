@@ -37,6 +37,8 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 */
 	protected static $unread_flag_term_slug_prefix = 'ssl-alp-unread-flag-';
 
+	protected $revisions_list_table;
+
 	/**
 	 * Register settings.
 	 */
@@ -111,8 +113,14 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		// Modify revision screen data to show edit summary.
 		$loader->add_filter( 'wp_prepare_revision_for_js', $this, 'prepare_revision_for_js', 10, 2 );
 
-		// when restoring a revision, point the new revision to the source revision.
+		// When restoring a revision, point the new revision to the source revision.
 		$loader->add_action( 'wp_restore_post_revision', $this, 'restore_post_revision_meta', 10, 2 );
+
+		// Add admin revisions tables.
+		$loader->add_action( 'admin_menu', $this, 'add_revisions_page' );
+
+		// Save admin revisions table per page option.
+		$loader->add_filter( 'set-screen-option', $this, 'save_revisions_per_page_option', 10, 3 );
 
 		/**
 		 * Revisions widget.
@@ -655,6 +663,74 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		}
 
 		return $revision->post_date === $parent->post_date;
+	}
+
+	/**
+	 * Add revisions page to admin menu.
+	 */
+	public function add_revisions_page() {
+		$hook_suffix = add_posts_page(
+			__( 'Revisions', 'ssl-alp' ),
+			__( 'Revisions', 'ssl-alp' ),
+			'read',
+			SSL_ALP_REVISIONS_MENU_SLUG,
+			array( $this, 'output_admin_revisions_page' )
+		);
+
+		if ( $hook_suffix ) {
+			// Add callback for loading the page.
+			add_action( "load-{$hook_suffix}", array( $this, 'load_revisions_page_screen_options' ) );
+		}
+	}
+
+	public function load_revisions_page_screen_options() {
+		$arguments = array(
+			'label'   => __( 'Revisions Per Page', 'ssl-alp' ),
+			'default' => 20,
+			'option'  => 'ssl_alp_revisions_per_page'
+		);
+
+		add_screen_option( 'per_page', $arguments );
+
+		/*
+		 * Instantiate the revisions list table. Creating the instance here allow the core
+		 * WP_List_Table class to automatically load the table columns in the screen options panel.
+		 */
+		$this->revisions_list_table = new SSL_ALP_Revisions_List_Table();
+	}
+
+	/**
+	 * Callback function for the admin revisions page.
+	 */
+	public function output_admin_revisions_page() {
+		// Check user has permissions.
+		if ( ! current_user_can( 'read' ) ) {
+			wp_die(
+				'<h1>' . esc_html__( 'You need a higher level of permission.', 'ssl-alp' ) . '</h1>' .
+				'<p>' . esc_html__( 'Sorry, you are not allowed to view revisions.', 'ssl-alp' ) . '</p>',
+				403
+			);
+		}
+
+		$this->revisions_list_table->prepare_items();
+
+		// Render revisions table.
+		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/revisions/revisions-table-display.php';
+	}
+
+	/**
+	 * Save revisions per page screen option when saved by the user.
+	 *
+	 * @param bool    $keep   Whether to save or skip saving the screen option value. Default false.
+	 * @param string  $option The option name.
+	 * @param int     $value  The number of rows to use.
+	 */
+	public function save_revisions_per_page_option( $keep, $option, $value ) {
+		if ( 'ssl_alp_revisions_per_page' == $option ) {
+			return $value;
+		}
+
+		return $keep;
 	}
 
 	/**

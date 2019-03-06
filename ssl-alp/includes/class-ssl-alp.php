@@ -142,6 +142,7 @@ class SSL_ALP {
 
 		require_once SSL_ALP_BASE_DIR . 'includes/class-ssl-alp-revisions.php';
 		require_once SSL_ALP_BASE_DIR . 'includes/class-ssl-alp-revisions-widget.php';
+		require_once SSL_ALP_BASE_DIR . 'includes/class-ssl-alp-revisions-list-table.php';
 
 		$this->revisions = new SSL_ALP_Revisions( $this );
 
