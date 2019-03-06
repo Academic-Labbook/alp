@@ -77,8 +77,8 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 					esc_attr( $icon_class ),
 					esc_attr( $icon_description ),
 					esc_attr( $post->ID ),
-					$read_class,
-					$unread_class
+					esc_attr( $read_class ),
+					esc_attr( $unread_class )
 				);
 			}
 		}
