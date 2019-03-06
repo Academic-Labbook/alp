@@ -41,11 +41,17 @@ class SSL_ALP_Uninstaller {
 	/**
 	 * Action to run when a blog is deleted on a network, to delete plugin options and terms.
 	 *
-	 * @param int $blog_id Blog ID.
+	 * @param WP_Site|int $blog Blog object or ID.
 	 */
-	public static function uninstall_multisite_blog( $blog_id ) {
-		// Add blog options using blog ID specified in call.
-		self::delete_data_from_blog( $blog_id );
+	public static function uninstall_multisite_blog( $blog ) {
+		$blog = get_site( $blog );
+
+		if ( is_null( $blog ) ) {
+			return;
+		}
+
+		// Delete blog data.
+		self::delete_data_from_blog( $blog );
 	}
 
 	/**
@@ -62,23 +68,35 @@ class SSL_ALP_Uninstaller {
 
 		// Loop over all blogs on the network.
 		foreach ( $wpdb->get_col( "SELECT blog_id FROM {$wpdb->blogs}" ) as $blog_id ) {
+			$blog = get_site( $blog_id );
+
+			if ( is_null( $blog ) ) {
+				return;
+			}
+
 			// Delete data from this blog.
-			self::delete_data_from_blog( $blog_id );
+			self::delete_data_from_blog( $blog );
 		}
 	}
 
 	/**
 	 * Delete plugin data from the specified blog.
 	 *
-	 * @param int $blog_id Blog ID.
+	 * @param WP_Site|int $blog Blog object or ID.
 	 */
-	private static function delete_data_from_blog( $blog_id ) {
+	private static function delete_data_from_blog( $blog ) {
 		if ( ! is_multisite() ) {
 			return;
 		}
 
+		$blog = get_site( $blog );
+
+		if ( is_null( $blog ) ) {
+			return;
+		}
+
 		// Switch to the blog.
-		switch_to_blog( $blog_id );
+		switch_to_blog( $blog->blog_id );
 
 		// Delete data from this blog.
 		self::delete_data();
@@ -107,6 +125,7 @@ class SSL_ALP_Uninstaller {
 		delete_option( 'ssl_alp_disable_post_trackbacks' );
 		delete_option( 'ssl_alp_enable_crossreferences' );
 		delete_option( 'ssl_alp_enable_edit_summaries' );
+		delete_option( 'ssl_alp_flag_unread_posts' );
 		delete_option( 'ssl_alp_enable_tex' );
 
 		// Delete network options.
@@ -124,6 +143,7 @@ class SSL_ALP_Uninstaller {
 	private static function delete_taxonomies() {
 		self::delete_taxonomy( 'ssl_alp_coauthor' );
 		self::delete_taxonomy( 'ssl_alp_crossreference' );
+		self::delete_taxonomy( 'ssl_alp_read_flag' );
 	}
 
 	/**

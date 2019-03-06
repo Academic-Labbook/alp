@@ -48,25 +48,33 @@ class SSL_ALP_Coauthors_Widget extends WP_Widget {
 		// Default dropdown ID.
 		$dropdown_id = 'ssl_alp_users_dropdown';
 
-		if ( $dropdown ) {
-			// Unfortunately wp_dropdown_users doesn't support displaying post counts, so we have to
-			// do it ourselves.
-			$users = get_users(
-				array(
-					'fields'  => array(
-						'ID',
-						'display_name',
-					),
-					'order'   => 'ASC',
-					'orderby' => 'display_name',
-				)
-			);
+		// Get all users.
+		$users = get_users(
+			array(
+				'order'   => 'ASC',
+				'orderby' => 'display_name',
+			)
+		);
 
-			// Get user post counts.
-			$user_ids    = wp_list_pluck( $users, 'ID' );
-			$post_counts = $ssl_alp->coauthors->count_many_users_posts( $user_ids );
+		// Empty list of user post counts.
+		$user_post_counts = array();
 
-			if ( ! empty( $users ) ) {
+		// Get users with non-zero post counts. This matches the behaviour of wp_list_authors.
+		foreach ( (array) $users as $id => $user ) {
+			$post_count = $ssl_alp->coauthors->get_user_post_count( $user );
+
+			if ( is_null( $post_count ) || 0 === intval( $post_count ) ) {
+				// Remove user from list.
+				unset( $users[ $id ] );
+			} else {
+				$user_post_counts[ $user->ID ] = $post_count;
+			}
+		}
+
+		if ( empty( $users ) ) {
+			echo '<p>' . __( 'There are not users', 'ssl-alp' ) . '</p>';
+		} else {
+			if ( $dropdown ) {
 				// Enqueue script to take the user to the author's page.
 				wp_enqueue_script(
 					'ssl-alp-user-widget-js',
@@ -95,9 +103,6 @@ class SSL_ALP_Coauthors_Widget extends WP_Widget {
 				);
 
 				foreach ( (array) $users as $user ) {
-					$name       = esc_html( $user->display_name );
-					$post_count = $post_counts[ $user->ID ];
-
 					printf(
 						'<option value="%1$s">',
 						esc_attr( $user->ID )
@@ -106,8 +111,8 @@ class SSL_ALP_Coauthors_Widget extends WP_Widget {
 					printf(
 						/* translators: 1: user display name, 2: user post count */
 						esc_html_x( '%1$s (%2$d)', 'User list', 'ssl-alp' ),
-						esc_html( $name ),
-						esc_html( $post_count )
+						esc_html( $user->display_name ),
+						esc_html( $user_post_counts[ $user->ID ] )
 					);
 
 					echo '</option>';
@@ -115,18 +120,32 @@ class SSL_ALP_Coauthors_Widget extends WP_Widget {
 
 				echo '</select>';
 				echo '</form>';
+			} else {
+				echo '<ul>';
+
+				foreach ( (array) $users as $user ) {
+					echo '<li>';
+
+					$link = sprintf(
+						'<a href="%1$s" title="%2$s">%3$s</a>',
+						get_author_posts_url( $user->ID, $user->user_nicename ),
+						/* translators: %s: author's display name */
+						esc_attr( sprintf( __( 'Posts by %s', 'ssl-alp' ), $user->display_name ) ),
+						esc_html( $user->display_name )
+					);
+
+					printf(
+						/* translators: 1: author posts link, 2: author post count */
+						'%1$s (%2$s)',
+						$link,
+						esc_html( $user_post_counts[ $user->ID ] )
+					);
+
+					echo '</li>';
+				}
+
+				echo '</ul>';
 			}
-		} else {
-			echo '<ul>';
-
-			wp_list_authors(
-				array(
-					'optioncount' => true,
-					'show'        => false, // Use display_name.
-				)
-			);
-
-			echo '</ul>';
 		}
 
 		echo $args['after_widget'];

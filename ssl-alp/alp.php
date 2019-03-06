@@ -3,7 +3,7 @@
  * Plugin Name:  Academic Labbook
  * Plugin URI:   https://alp.attackllama.com/
  * Description:  Turn WordPress into a collaborative academic labbook.
- * Version:      0.12.3
+ * Version:      0.13.0
  * Author:       Sean Leavey
  * Author URI:   https://attackllama.com/
  * License:      GPL3
@@ -21,7 +21,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Current plugin version.
  */
 
-define( 'SSL_ALP_VERSION', '0.12.3' );
+define( 'SSL_ALP_VERSION', '0.13.0' );
 
 /**
  * Plugin name
@@ -57,7 +57,7 @@ define( 'SSL_ALP_REST_ROUTE', 'ssl-alp/v1' );
  * Default settings
  */
 
-define( 'SSL_ALP_KATEX_VERSION', '0.10.0' );
+define( 'SSL_ALP_KATEX_VERSION', '0.10.1' );
 
 /**
  * Code to run on plugin activation and deactivation.
@@ -74,10 +74,10 @@ register_deactivation_hook( __FILE__, array( 'SSL_ALP_Deactivator', 'deactivate'
 register_uninstall_hook( __FILE__, array( 'SSL_ALP_Uninstaller', 'uninstall' ) );
 
 // Run setup on new blogs created on network installations.
-add_action( 'wpmu_new_blog', array( 'SSL_ALP_Activator', 'activate_multisite_blog' ), 10, 1 );
+add_action( 'wp_initialize_site', array( 'SSL_ALP_Activator', 'activate_multisite_blog' ), 10, 1 );
 
 // Run uninstall on deleted blogs on network installations.
-add_action( 'delete_blog', array( 'SSL_ALP_Uninstaller', 'uninstall_multisite_blog' ), 10, 1 );
+add_action( 'wp_uninitialize_site', array( 'SSL_ALP_Uninstaller', 'uninstall_multisite_blog' ), 10, 1 );
 
 /**
  * Core plugin class used to load modules.

@@ -7,7 +7,47 @@
  * @package Labbook
  */
 
-define( 'LABBOOK_VERSION', '1.0.7' );
+// Theme version.
+define( 'LABBOOK_VERSION', '1.1.0' );
+
+// Required PHP version.
+define( 'LABBOOK_MINIMUM_PHP_VERSION', '7.0.0' );
+
+if ( ! function_exists( 'labbook_check_php_version' ) ) :
+	/**
+	 * Detect current PHP version and prevent theme switch if not recent enough.
+	 *
+	 * @param string   $old_name  Old theme name.
+	 * @param WP_Theme $old_theme Old theme object.
+	 */
+	function labbook_check_php_version( $old_name, $old_theme ) {
+		// Compare versions.
+		if ( version_compare( phpversion(), LABBOOK_MINIMUM_PHP_VERSION, '<' ) ) {
+			/**
+			 * Notify admin that their PHP version is too low and return to the previous theme.
+			 */
+			function labbook_version_too_low_admin_notice() {
+				echo '<div class="update-nag">';
+				esc_html_e( 'Labbook cannot run on the currently installed PHP version.', 'labbook' );
+				echo '<br/>';
+				printf(
+					/* translators: 1: current PHP version, 2: required PHP version */
+					esc_html__( 'Actual version is: %1$s, required version is: %2$s.', 'labbook' ),
+					esc_html( phpversion() ),
+					esc_html( LABBOOK_MINIMUM_PHP_VERSION )
+				);
+				echo '</div>';
+			}
+
+			// Theme not activated info message.
+			add_action( 'admin_notices', 'labbook_version_too_low_admin_notice' );
+
+			// Switch back to previous theme.
+			switch_theme( $old_theme->stylesheet );
+		}
+	}
+endif;
+add_action( 'after_switch_theme', 'labbook_check_php_version' );
 
 if ( ! function_exists( 'labbook_setup' ) ) :
 	/**
@@ -181,6 +221,20 @@ function labbook_scripts() {
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
 		wp_enqueue_script( 'comment-reply' );
 	}
+
+	if ( labbook_get_option( 'show_unread_flags' ) && labbook_ssl_alp_unread_flags_enabled() ) {
+		// Add support for unread flags.
+		wp_enqueue_script(
+			'labbook-post-read-status',
+			get_template_directory_uri() . '/js/post-read-status.js',
+			array(
+				'jquery',
+				'wp-api',
+			),
+			LABBOOK_VERSION,
+			true
+		);
+	}
 }
 add_action( 'wp_enqueue_scripts', 'labbook_scripts' );
 
@@ -226,9 +280,69 @@ endif;
 add_filter( 'the_content', 'labbook_get_content_with_toc' );
 
 /**
+ * Check if coauthors provided by the ALP plugin are available and enabled.
+ */
+function labbook_ssl_alp_coauthors_enabled() {
+	if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
+		// Plugin is disabled.
+		return false;
+	} elseif ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
+		// Coauthors are disabled.
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Check if crossreferences provided by the ALP plugin are available and enabled.
+ */
+function labbook_ssl_alp_crossreferences_enabled() {
+	if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
+		// Plugin is disabled.
+		return false;
+	} elseif ( ! get_option( 'ssl_alp_enable_crossreferences' ) ) {
+		// Cross-references are disabled.
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Check if edit summaries provided by the ALP plugin are available and enabled.
+ */
+function labbook_ssl_alp_edit_summaries_enabled() {
+	if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
+		// Plugin is disabled.
+		return false;
+	} elseif ( ! get_option( 'ssl_alp_enable_edit_summaries' ) ) {
+		// Tracking of edit summaries is disabled.
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Check if unread flags provided by the ALP plugin are available and enabled.
+ */
+function labbook_ssl_alp_unread_flags_enabled() {
+	if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
+		// Plugin is disabled.
+		return false;
+	} elseif ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
+		// Unread flags are disabled.
+		return false;
+	}
+
+	return true;
+}
+
+/**
  * Page table of contents generator.
  */
-require get_template_directory() . '/inc/class-toc-menu-level.php';
+require get_template_directory() . '/inc/class-labbook-toc-menu-level.php';
 
 /**
  * Functions which enhance the theme by hooking into WordPress.
