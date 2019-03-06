@@ -136,13 +136,13 @@ if ( ! function_exists( 'labbook_generate_post_contents' ) ) :
 		/**
 		 * Extract XML encoding element.
 		 *
-		 * https://php.net/manual/en/domdocument.loadhtml.php#95251
+		 * See https://php.net/manual/en/domdocument.loadhtml.php#95251.
 		 */
 
-		foreach ($document->childNodes as $item) {
-			if ($item->nodeType == XML_PI_NODE) {
+		foreach ( $document->childNodes as $item ) {
+			if ( XML_PI_NODE === $item->nodeType ) {
 				// Remove XML encoding element.
-				$document->removeChild($item);
+				$document->removeChild( $item );
 			}
 		}
 

@@ -18,12 +18,14 @@ if ( ! function_exists( 'labbook_check_php_version' ) ) :
 	 * Detect current PHP version and prevent theme switch if not recent enough.
 	 *
 	 * @param string   $old_name  Old theme name.
-	 * @param WP_Theme $old_theme Old theme object. This may not be passed if the old theme is
-	 *                            deleted.
+	 * @param WP_Theme $old_theme Old theme object.
 	 */
-	function labbook_check_php_version( $old_name, $old_theme = null ) {
+	function labbook_check_php_version( $old_name, $old_theme ) {
 		// Compare versions.
-		if ( version_compare( phpversion(), LABBOOK_MINIMUM_PHP_VERSION, '<') ) {
+		if ( version_compare( phpversion(), LABBOOK_MINIMUM_PHP_VERSION, '<' ) ) {
+			/**
+			 * Notify admin that their PHP version is too low and return to the previous theme.
+			 */
 			function labbook_version_too_low_admin_notice() {
 				echo '<div class="update-nag">';
 				esc_html_e( 'Labbook cannot run on the currently installed PHP version.', 'labbook' );
@@ -41,7 +43,7 @@ if ( ! function_exists( 'labbook_check_php_version' ) ) :
 			add_action( 'admin_notices', 'labbook_version_too_low_admin_notice' );
 
 			// Switch back to previous theme.
-			switch_theme( $old_name );
+			switch_theme( $old_theme->stylesheet );
 		}
 	}
 endif;
