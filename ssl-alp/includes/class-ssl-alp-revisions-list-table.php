@@ -147,19 +147,50 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 	 * @return string Row actions output for revisions.
 	 */
 	protected function handle_row_actions( $revision, $column_name, $primary ) {
+		global $ssl_alp;
+
 		if ( $primary !== $column_name ) {
 			return '';
 		}
 
 		$actions = array();
 
+		/**
+		 * Note: interns are not shown the edit link below (it is empty) because they fail
+		 * the edit_post permission check against the *revision* here. This is a subtle bug
+		 * that would take a lot of effort to fix.
+		 *
+		 * Instead, interns simply aren't shown the revision link.
+		 */
+		$edit_link = get_edit_post_link( $revision->ID );
+
+		if ( ! empty( $edit_link ) && $ssl_alp->revisions->current_user_can_view_revision( $revision ) ) {
+			$actions['view_diff'] = sprintf(
+				'<a href="%1$s" aria-label="%2$s">%3$s</a>',
+				esc_url( $edit_link ),
+				esc_attr(
+					sprintf(
+						/* translators: %s: revision parent post title */
+						__( 'View changes to &#8220;%s&#8221;', 'ssl-alp' ),
+						$revision->post_title
+					)
+				),
+				__( 'View Changes', 'ssl-alp' )
+			);
+		}
+
 		if ( current_user_can( 'delete_post', $revision->post_parent ) ) {
 			$actions['delete'] = sprintf(
-				'<a href="%s" class="submitdelete" aria-label="%s">%s</a>',
+				'<a href="%1$s" class="submitdelete" aria-label="%2$s">%3$s</a>',
 				'',
-				/* translators: %s: revision parent post title */
-				esc_attr( sprintf( __( 'Delete &#8220;%s&#8221; permanently', 'ssl-alp' ), $revision->post_title ) ),
-				__( 'Delete Permanently' )
+				esc_attr(
+					sprintf(
+						/* translators: %s: revision parent post title */
+						__( 'Delete &#8220;%s&#8221; permanently', 'ssl-alp' ),
+						$revision->post_title
+					)
+				),
+				__( 'Delete Permanently', 'ssl-alp' )
 			);
 		}
 
