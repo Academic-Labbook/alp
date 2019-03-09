@@ -50,17 +50,17 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 				$unread_class = '';
 			} else {
 				if ( 'status' === get_post_format( $post ) ) {
-					$icon_class = 'fa fa-info-circle logbook-read-button';
+					$icon_class = 'fa fa-info-circle labbook-read-button';
 					$icon_description = __( 'Status update (click to toggle read status)', 'labbook' );
 					$read_class = 'fa-info-circle';
 					$unread_class = 'fa-info-circle';
 				} else {
 					if ( $post_is_read ) {
 						// Read.
-						$icon_class = 'fa fa-envelope-open logbook-read-button';
+						$icon_class = 'fa fa-envelope-open labbook-read-button';
 					} else {
 						// Unread.
-						$icon_class = 'fa fa-envelope logbook-read-button';
+						$icon_class = 'fa fa-envelope labbook-read-button';
 					}
 
 					$icon_description = __( 'Post (click to toggle read status)', 'labbook' );
