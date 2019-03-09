@@ -61,7 +61,7 @@ Nicolas Gallagher and Jonathan Neal https://necolas.github.io/normalize.css/
  * 2. Prevent adjustments of font size after orientation changes in iOS.
  */
 
-html {
+ html {
     line-height: 1.15; /* 1 */
     -webkit-text-size-adjust: 100%; /* 2 */
 }
@@ -1139,6 +1139,30 @@ a:hover, a:active {
 	width: 100%;
 }
 
+/* advanced search form */
+.advanced-search-form {
+    padding-left: 0.5em;
+    padding-bottom: 2em;
+}
+
+.advanced-search td, .advanced-search th {
+    border-color: #a7a7a7;
+}
+
+.advanced-search-date-range {
+    border: none;
+}
+
+/* advanced search criteria */
+table.advanced-search-criteria {
+    table-layout: fixed;
+    font-size: 95%;
+}
+
+table.advanced-search-criteria select {
+    width: 100%;
+}
+
 /*--------------------------------------------------------------
 # Posts and pages
 --------------------------------------------------------------*/
@@ -1198,7 +1222,7 @@ a:hover, a:active {
 	margin-right: 0.5em;
 }
 
-.logbook-read-button {
+.labbook-read-button {
     cursor: pointer;
 }
 

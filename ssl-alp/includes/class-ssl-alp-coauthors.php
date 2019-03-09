@@ -43,14 +43,43 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	public function register_hooks() {
 		$loader = $this->get_loader();
 
-		// Register the authors widget.
-		$loader->add_action( 'widgets_init', $this, 'register_users_widget' );
+		/**
+		 * Core coauthor behaviour.
+		 */
 
 		// Register authors taxonomy.
 		$loader->add_action( 'init', $this, 'register_taxonomy' );
 
 		// Remove single author support from supported post types.
 		$loader->add_action( 'init', $this, 'remove_author_support' );
+
+		// Set the current user as the default coauthor on new drafts.
+		$loader->add_action( 'save_post', $this, 'add_user_to_draft', 10, 2 );
+
+		// Check and if necessary update the primary author when post coauthor terms are set.
+		$loader->add_action( 'set_object_terms', $this, 'check_post_author', 10, 4 );
+
+		// Modify SQL queries to include coauthors where appropriate.
+		$loader->add_filter( 'posts_where', $this, 'posts_where_filter', 10, 2 );
+		$loader->add_filter( 'posts_join', $this, 'posts_join_filter', 10, 2 );
+		$loader->add_filter( 'posts_groupby', $this, 'posts_groupby_filter', 10, 2 );
+
+		// Allow public coauthor query vars.
+		$loader->add_filter( 'query_vars', $this, 'whitelist_coauthor_search_query_vars' );
+
+		// Support coauthor querystrings in WP_Query.
+		$loader->add_action( 'parse_tax_query', $this, 'parse_coauthor_query_vars' );
+
+		// Filter to send comment notification/moderation emails to multiple authors.
+		$loader->add_filter( 'comment_notification_recipients', $this, 'filter_comment_notification_email_recipients', 10, 2 );
+		$loader->add_filter( 'comment_moderation_recipients', $this, 'filter_comment_moderation_email_recipients', 10, 2 );
+
+		/**
+		 * User administration hooks.
+		 */
+
+		// Create user term when user logs in for the first time (required where ALP is not network active).
+		$loader->add_action( 'wp_login', $this, 'check_coauthor_term_on_login', 10, 2 );
 
 		// Stop deletion of user's posts when their account is deleted (this is handled separately by `delete_user_action`).
 		$loader->add_filter( 'post_types_to_delete_with_user', $this, 'filter_post_types_to_delete_with_user' );
@@ -59,19 +88,27 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$loader->add_action( 'user_register', $this, 'add_coauthor_term', 10, 1 );
 		$loader->add_action( 'add_user_to_blog', $this, 'add_coauthor_term', 10, 1 );
 		$loader->add_action( 'profile_update', $this, 'update_coauthor_term', 10, 2 );
-		// Create user term when user logs in for the first time (required where ALP is not network active).
-		$loader->add_action( 'wp_login', $this, 'check_coauthor_term_on_login', 10, 2 );
 
-		// Hooks to modify the published post number count on the Users WP List Table.
-		// These are required because the count_many_users_posts() function has no hooks.
-		$loader->add_filter( 'manage_users_columns', $this, 'filter_manage_users_columns' );
-		$loader->add_filter( 'manage_users_custom_column', $this, 'filter_manage_users_custom_column', 10, 3 );
+		// Delete or reassign user terms from posts when a user is deleted on a single site installation.
+		$loader->add_action( 'delete_user', $this, 'delete_user_action', 10, 2 );
+
+		// Delete or reassign user terms from posts when a user is deleted on a network site installation.
+		$loader->add_action( 'remove_user_from_blog', $this, 'remove_user_from_blog', 10, 3 );
 
 		// Filter to allow coauthors to edit posts and stop users deleting coauthor terms.
 		$loader->add_filter( 'user_has_cap', $this, 'filter_user_has_cap', 10, 4 );
 
 		// Stop super admins deleting coauthor terms.
 		$loader->add_filter( 'map_meta_cap', $this, 'filter_capabilities', 10, 4 );
+
+		/**
+		 * Display hooks.
+		 */
+
+		// Hooks to modify the published post number count on the Users WP List Table.
+		// These are required because the count_many_users_posts() function has no hooks.
+		$loader->add_filter( 'manage_users_columns', $this, 'filter_manage_users_columns' );
+		$loader->add_filter( 'manage_users_custom_column', $this, 'filter_manage_users_custom_column', 10, 3 );
 
 		// Override the default "Mine" filter on the admin post list.
 		$loader->add_filter( 'views_edit-post', $this, 'filter_edit_post_views', 10, 1 );
@@ -82,33 +119,20 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// every count event.
 		$loader->add_filter( 'get_usernumposts', $this, 'filter_count_user_posts', 10, 2 );
 
-		// Modify SQL queries to include coauthors.
-		$loader->add_filter( 'posts_where', $this, 'posts_where_filter', 10, 2 );
-		$loader->add_filter( 'posts_join', $this, 'posts_join_filter', 10, 2 );
-		$loader->add_filter( 'posts_groupby', $this, 'posts_groupby_filter', 10, 2 );
-
-		// Set the current user as the default coauthor on new drafts.
-		$loader->add_action( 'save_post', $this, 'add_user_to_draft', 10, 2 );
-
-		// Check and if necessary update the primary author when post coauthor terms are set.
-		$loader->add_action( 'set_object_terms', $this, 'check_post_author', 10, 4 );
-
-		// Delete or reassign user terms from posts when a user is deleted on a single site installation.
-		$loader->add_action( 'delete_user', $this, 'delete_user_action', 10, 2 );
-		// Delete or reassign user terms from posts when a user is deleted on a network site installation.
-		$loader->add_action( 'remove_user_from_blog', $this, 'remove_user_from_blog', 10, 3 );
-
 		// Make sure we've correctly set author data on author pages.
 		// Use posts_selection since it's after WP_Query has built the request and before it's queried any posts.
 		$loader->add_action( 'posts_selection', $this, 'fix_author_page', 10, 0 );
 		$loader->add_filter( 'the_author', $this, 'fix_author_page_filter', 10, 1 );
 
-		// Filter to send comment notification/moderation emails to multiple authors.
-		$loader->add_filter( 'comment_notification_recipients', $this, 'filter_comment_notification_email_recipients', 10, 2 );
-		$loader->add_filter( 'comment_moderation_recipients', $this, 'filter_comment_moderation_email_recipients', 10, 2 );
-
-		// Filter the display of coauthor terms.
+		// Filter the display of coauthor terms in the admin post list.
 		$loader->add_filter( 'ssl_alp_coauthor_name', $this, 'filter_coauthor_term_display', 10, 3 );
+
+		/**
+		 * Authors widget.
+		 */
+
+		// Register the authors widget.
+		$loader->add_action( 'widgets_init', $this, 'register_users_widget' );
 	}
 
 	/**
@@ -1114,6 +1138,125 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// Update post's coauthors.
 		wp_set_post_terms( $post->ID, $coauthor_term_ids, 'ssl_alp_coauthor', false );
 	}
+
+    /**
+     * Whitelist coauthor query vars.
+	 *
+	 * This allows coauthored posts to be queried publicly.
+     *
+     * @param string[] $public_query_vars Array of public query vars.
+     */
+    public function whitelist_coauthor_search_query_vars( $public_query_vars ) {
+		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
+			// Coauthors disabled.
+			return;
+		}
+
+        // Custom query vars to make public. These are sanitised and handled by
+        // `parse_coauthor_query_vars`.
+        $custom_query_vars = array(
+			'ssl_alp_coauthor__and',
+			'ssl_alp_coauthor__in',
+            'ssl_alp_coauthor__not_in',
+        );
+
+		// Merge new query vars into existing ones.
+        return wp_parse_args( $custom_query_vars, $public_query_vars );
+    }
+
+    /**
+     * Sanitise coauthor querystrings and inject them as taxonomy filters into WP_Query.
+     *
+     * This detects values submitted through the custom search function and turns them into the
+     * filters expected by WP_Query.
+     *
+     * @param WP_Query $query The query.
+     */
+    public function parse_coauthor_query_vars( $query ) {
+		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
+			// Coauthors disabled.
+			return;
+		}
+
+        // Taxonomy query.
+        $tax_query = array();
+
+		// Sanitize submitted values.
+		$this->sanitize_coauthor_querystring( $query, 'ssl_alp_coauthor__and' );
+		$this->sanitize_coauthor_querystring( $query, 'ssl_alp_coauthor__in' );
+		$this->sanitize_coauthor_querystring( $query, 'ssl_alp_coauthor__not_in' );
+
+		// Get coauthor query vars.
+		$coauthor_and = $query->get( 'ssl_alp_coauthor__and' );
+		$coauthor_in = $query->get( 'ssl_alp_coauthor__in' );
+        $coauthor_not_in = $query->get( 'ssl_alp_coauthor__not_in' );
+
+		if ( ! empty( $coauthor_and ) && 1 === count( $coauthor_and ) ) {
+			// There is only one AND term specified, so merge it into IN.
+			$coauthor_in[] = absint( reset( $coauthor_and ) );
+			$coauthor_and = array();
+		}
+
+        if ( ! empty( $coauthor_and ) ) {
+            // Coauthor AND search criterion specified.
+            $tax_query[] = array(
+				'relation' => 'AND', // Note, this is different from how parse_tax_query handles
+									 // e.g. tag__and because we have to inject the tax query after
+									 // WP_Tax_Query has already been instantiated, which normally
+									 // applies the relation as part of its instantiation.
+				array(
+					'taxonomy'         => 'ssl_alp_coauthor',
+					'terms'            => $coauthor_and,
+					'field'            => 'term_taxonomy_id',
+					'operator'		   => 'AND',
+					'include_children' => false,
+				),
+            );
+        }
+
+        if ( ! empty( $coauthor_in ) ) {
+            // Coauthor IN search criterion specified.
+            $tax_query[] = array(
+                'taxonomy'         => 'ssl_alp_coauthor',
+                'terms'            => $coauthor_in,
+                'field'            => 'term_taxonomy_id',
+                'include_children' => false,
+            );
+		}
+
+        if ( ! empty( $coauthor_not_in ) ) {
+            // Coauthor NOT IN search criterion specified.
+            $tax_query[] = array(
+                'taxonomy'         => 'ssl_alp_coauthor',
+                'terms'            => $coauthor_not_in,
+                'field'            => 'term_taxonomy_id',
+                'operator'         => 'NOT IN',
+                'include_children' => false,
+            );
+        }
+
+        // Sanitize new taxonomy filters.
+        $tax_query = $query->tax_query->sanitize_query( $tax_query );
+
+        // Merge new taxonomy filters into existing ones.
+        $query->tax_query->queries = wp_parse_args( $tax_query, $query->tax_query->queries );
+    }
+
+    /**
+     * Sanitize coauthor querystring, returning an array of integers.
+     *
+     * Used for coauthor__in and coauthor__not_in.
+     *
+	 * @param WP_Query $query     Query object.
+     * @param string   $query_var Query var whose contents to sanitize.
+     */
+    private function sanitize_coauthor_querystring( $query, $query_var ) {
+		$querystring = $query->get( $query_var, array() );
+		$querystring = array_map( 'absint', array_unique( (array) $querystring ) );
+
+		// Update querystring.
+		$query->set( $query_var, $querystring );
+    }
 
 	/**
 	 * Action taken when user is deleted. This function does the deleting/reassigning of
