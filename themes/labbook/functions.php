@@ -17,10 +17,10 @@ if ( ! function_exists( 'labbook_check_php_version' ) ) :
 	/**
 	 * Detect current PHP version and prevent theme switch if not recent enough.
 	 *
-	 * @param string   $old_name  Old theme name.
-	 * @param WP_Theme $old_theme Old theme object.
+	 * @param string        $old_name  Old theme name.
+	 * @param WP_Theme|null $old_theme Old theme object. Note: not always passed.
 	 */
-	function labbook_check_php_version( $old_name, $old_theme ) {
+	function labbook_check_php_version( $old_name, $old_theme = null ) {
 		// Compare versions.
 		if ( version_compare( phpversion(), LABBOOK_MINIMUM_PHP_VERSION, '<' ) ) {
 			/**
@@ -43,7 +43,7 @@ if ( ! function_exists( 'labbook_check_php_version' ) ) :
 			add_action( 'admin_notices', 'labbook_version_too_low_admin_notice' );
 
 			// Switch back to previous theme.
-			switch_theme( $old_theme->stylesheet );
+			switch_theme( $old_name );
 		}
 	}
 endif;
