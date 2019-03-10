@@ -53,7 +53,13 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 		$setting_menu_slug = 'settings_page_' . SSL_ALP_NETWORK_SETTINGS_MENU_SLUG . '-network';
 
 		if ( $setting_menu_slug === $screen->id ) {
-			wp_enqueue_script( 'ssl-alp-tex-settings-js', SSL_ALP_BASE_URL . 'js/admin-tex.js', array( 'jquery' ), $this->get_version(), true );
+			wp_enqueue_script(
+				'ssl-alp-tex-settings-js',
+				SSL_ALP_BASE_URL . 'js/admin-network-settings-tex.js',
+				array( 'jquery' ),
+				$this->get_version(),
+				true
+			);
 		}
 
 		if ( get_option( 'ssl_alp_enable_tex' ) ) {
