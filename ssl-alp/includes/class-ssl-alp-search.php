@@ -66,6 +66,25 @@ class SSL_ALP_Search extends SSL_ALP_Module {
 		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/site/search-settings-display.php';
     }
 
+	/**
+	 * Enqueue scripts in the admin header.
+	 */
+	public function enqueue_admin_scripts() {
+        $screen = get_current_screen();
+
+        $setting_menu_slug = 'settings_page_' . SSL_ALP_SITE_SETTINGS_MENU_SLUG;
+
+		if ( $setting_menu_slug === $screen->id ) {
+			wp_enqueue_script(
+                'ssl-alp-search-settings-js',
+                SSL_ALP_BASE_URL . 'js/admin-settings-search.js',
+                array( 'jquery' ),
+                $this->get_version(),
+                true
+            );
+		}
+	}
+
     /**
      * Check if the current user can make advanced searches.
      */
