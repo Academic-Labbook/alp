@@ -23,7 +23,7 @@ get_header();
 			</header><!-- .page-header -->
 
 		<?php
-			get_template_part( 'template-parts/search-advanced' );
+			labbook_the_advanced_search_form();
 
 		else :
 
@@ -65,7 +65,7 @@ get_header();
 				<?php
 
 				/* Show advanced search form. */
-				get_template_part( 'template-parts/search-advanced' );
+				labbook_the_advanced_search_form();
 
 			else :
 

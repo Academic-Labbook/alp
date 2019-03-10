@@ -40,7 +40,7 @@
 
 			<?php
 			/* Show advanced search form. */
-			get_template_part( 'template-parts/search-advanced' );
+			labbook_the_advanced_search_form();
 
 		else :
 			?>
@@ -48,7 +48,7 @@
 			<p><?php esc_html_e( 'It seems we can&rsquo;t find what you&rsquo;re looking for. Perhaps searching can help.', 'labbook' ); ?></p>
 			<?php
 			/* Show advanced search form. */
-			get_template_part( 'template-parts/search-advanced' );
+			labbook_the_advanced_search_form();
 
 		endif;
 		?>

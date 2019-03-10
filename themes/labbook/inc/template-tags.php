@@ -1012,3 +1012,385 @@ if ( ! function_exists( 'labbook_the_toc' ) ) :
 		}
 	}
 endif;
+
+if ( ! function_exists( 'labbook_the_advanced_search_form' ) ) :
+	/**
+	 * Print the advanced search form.
+	 */
+	function labbook_the_advanced_search_form() {
+		global $ssl_alp;
+
+		if ( ! labbook_ssl_alp_advanced_search_enabled() ) {
+			// Show standard search form.
+			get_search_form();
+
+			return;
+		}
+
+		printf(
+			'<form role="search" method="get" id="advanced-search-form" class="search-form advanced-search-form" action="%1$s">',
+			esc_url( home_url( '/' ) )
+		);
+
+		echo '<div class="advanced-search">';
+
+		printf(
+			'<h3>%1$s</h3>',
+			esc_html__( 'Keywords', 'labbook' )
+		);
+
+		echo '<div>';
+
+		printf(
+			'<label class="screen-reader-text" for="s">%1$s</label>',
+			esc_html_x( 'Search for:', 'label', 'labbook' )
+		);
+
+        printf(
+			'<input type="text" value="%1$s" name="s" id="s" placeholder="%2$s" class="search-field" />',
+			get_search_query(),
+			esc_attr( labbook_get_option( 'search_placeholder' ) )
+		);
+
+		printf(
+			'<input type="submit" class="search-submit screen-reader-text" id="searchsubmit" value="%1$s" />',
+			esc_attr_x( 'Search', 'submit button', 'labbook' )
+		);
+
+		echo '</div>';
+
+		printf(
+			'<h3>%1$s</h3>',
+			esc_html__( 'Publication date', 'labbook' )
+		);
+
+		labbook_the_advanced_search_date_fieldset();
+
+		printf(
+			'<h3>%1$s</h3>',
+			esc_html__( 'Authors', 'labbook' )
+		);
+
+		labbook_the_advanced_search_author_filter_table();
+
+		printf(
+			'<h3>%1$s</h3>',
+			esc_html__( 'Categories', 'labbook' )
+		);
+
+		labbook_the_advanced_search_category_filter_table();
+
+		printf(
+			'<h3>%1$s</h3>',
+			esc_html__( 'Tags', 'labbook' )
+		);
+
+		labbook_the_advanced_search_tag_filter_table();
+
+		printf(
+			'<input type="submit" value="%1$s"/>',
+			esc_html__( 'Search', 'labbook')
+		);
+
+		echo '</div>';
+		echo '</form>';
+	}
+endif;
+
+if ( ! function_exists( 'labbook_the_advanced_search_select' ) ) :
+	/**
+	 * Print advanced search select widget.
+	 *
+	 * @param string            $name     The select name.
+	 * @param array             $items    The items to display. Keys are option values, values are text.
+	 * @param string|array|null $selected The value(s) of the selected item(s), or null.
+	 * @param bool              $blank    Include a blank entry at the start.
+	 * @param bool|null         $multiple Multiple select mode.
+	 * @param int|null          $size     Entry size.
+	 */
+	function labbook_the_advanced_search_select( $name, $items, $selected = null, $blank = true, $multiple = null, $size = null ) {
+		printf(
+			'<select name="%1$s"%2$s%3$s>',
+			$name,
+			( true === $multiple ) ? ' multiple="true"' : '',
+			( ! is_null( $size ) ) ? ' size="' . absint( $size ) . '"' : ''
+		);
+
+		if ( $blank ) {
+        	echo '<option value=""></option>';
+		}
+
+		foreach ( $items as $value => $item ) {
+			$item_selected = false;
+
+			if ( ! is_null( $selected ) ) {
+				if ( is_array( $selected ) ) {
+					if ( in_array( $value, $selected ) ) { // Fuzzy compare required.
+						$item_selected = true;
+					}
+				} elseif ( $value == $selected ) { // Fuzzy compare required.
+					$item_selected = true;
+				}
+			}
+
+            printf(
+				'<option value="%1$s"%2$s>%3$s</option>',
+				esc_attr( $value ),
+				$item_selected ? ' selected="true"' : '',
+				esc_html( $item )
+			);
+		}
+
+		echo '</select>';
+	}
+endif;
+
+if ( ! function_exists( 'labbook_the_advanced_search_date_fieldset' ) ) :
+	/**
+	 * Print the advanced search date fieldset.
+	 */
+	function labbook_the_advanced_search_date_fieldset() {
+		// Get oldest post to work out date ranges.
+		$oldest_posts = get_posts(
+			array(
+				'numberposts' => 1,
+				'order'       => 'ASC',
+				'orderby'     => 'date',
+			)
+		);
+
+		$current_year = absint( date( 'Y' ) );
+
+		if ( ! empty( $oldest_posts ) ) {
+			$oldest_year = absint( date( 'Y', strtotime( $oldest_posts[0]->post_date ) ) );
+		} else {
+			// No posts. Use current year.
+			$oldest_year = $current_year;
+		}
+
+		// Date ranges, converted to string for ease of comparison.
+		$year_range  = range( $oldest_year, $current_year );
+		$month_range = range( 1, 12 );
+		$day_range   = range( 1, 31 );
+
+		// Make arrays with keys == values.
+		$years = array_combine( $year_range, $year_range );
+		$months = array_combine( $month_range, $month_range );
+		$days = array_combine( $day_range, $day_range );
+
+		// Selected dates.
+		$selected_after_year   = get_query_var( 'ssl_alp_after_year' );
+		$selected_after_month  = get_query_var( 'ssl_alp_after_month' );
+		$selected_after_day    = get_query_var( 'ssl_alp_after_day' );
+		$selected_before_year  = get_query_var( 'ssl_alp_before_year' );
+		$selected_before_month = get_query_var( 'ssl_alp_before_month' );
+		$selected_before_day   = get_query_var( 'ssl_alp_before_day' );
+
+		echo '<fieldset class="advanced-search-date-range">';
+
+		esc_html_e( 'From', 'labbook' );
+		echo '&nbsp;';
+
+		labbook_the_advanced_search_select( 'ssl_alp_after_year', $years, $selected_after_year );
+		labbook_the_advanced_search_select( 'ssl_alp_after_month', $months, $selected_after_month );
+		labbook_the_advanced_search_select( 'ssl_alp_after_day', $days, $selected_after_day );
+
+		echo '&nbsp;';
+		esc_html_e( 'to', 'labbook' );
+		echo '&nbsp;';
+
+		labbook_the_advanced_search_select( 'ssl_alp_before_year', $years, $selected_before_year );
+		labbook_the_advanced_search_select( 'ssl_alp_before_month', $months, $selected_before_month );
+		labbook_the_advanced_search_select( 'ssl_alp_before_day', $days, $selected_before_day );
+
+        echo '</fieldset>';
+	}
+endif;
+
+if ( ! function_exists( 'labbook_the_advanced_search_author_filter_table' ) ) :
+	/**
+	 * Print advanced search author filter table.
+	 */
+	function labbook_the_advanced_search_author_filter_table() {
+		global $ssl_alp;
+
+		echo '<table class="advanced-search-criteria">';
+
+		if ( labbook_ssl_alp_coauthors_enabled() ) {
+			// Get users with coauthored posts.
+			$authors = get_users(
+				array(
+					'order'   => 'ASC',
+					'orderby' => 'display_name',
+				)
+			);
+
+			// Author list items.
+			$author_list = array();
+
+			// Get users with non-zero post counts. This matches the behaviour of wp_list_authors.
+			foreach ( (array) $authors as $id => $author ) {
+				$post_count = $ssl_alp->coauthors->get_user_post_count( $author );
+
+				if ( is_null( $post_count ) || 0 === intval( $post_count ) ) {
+					// Skip user with zero posts.
+					continue;
+				}
+
+				// Get coauthor term.
+				$coauthor_term = $ssl_alp->coauthors->get_coauthor_term( $author );
+
+				$author_list[ $coauthor_term->term_taxonomy_id ] = $author->display_name;
+			}
+
+			// Selected filter criteria.
+			$selected_coauthor_and    = get_query_var( 'ssl_alp_coauthor__and', array() );
+			$selected_coauthor_in     = get_query_var( 'ssl_alp_coauthor__in', array() );
+			$selected_coauthor_not_in = get_query_var( 'ssl_alp_coauthor__not_in', array() );
+
+			printf(
+				'<tr><th>%1$s</th><th>%2$s</th><th>%3$s</th></tr>',
+				esc_attr( 'Posts with all of these authors', 'labbook' ),
+				esc_attr( 'Posts with any of these authors', 'labbook' ),
+				esc_attr( 'Posts with none of these authors', 'labbook' )
+			);
+
+			echo '<tr>';
+			echo '<td>';
+			labbook_the_advanced_search_select( 'ssl_alp_coauthor__and[]', $author_list, $selected_coauthor_and, false, true, 10 );
+			echo '</td>';
+			echo '<td>';
+			labbook_the_advanced_search_select( 'ssl_alp_coauthor__in[]', $author_list, $selected_coauthor_in, false, true, 10 );
+			echo '</td>';
+			echo '<td>';
+			labbook_the_advanced_search_select( 'ssl_alp_coauthor__not_in[]', $author_list, $selected_coauthor_not_in, false, true, 10 );
+			echo '</td>';
+			echo '</tr>';
+		} else {
+			// Get users with published posts.
+			$authors = get_users(
+				array(
+					'has_published_posts' => true,
+					'order'               => 'ASC',
+					'orderby'             => 'display_name',
+				)
+			);
+
+			// Author list items.
+			$author_list = array();
+
+			foreach ( (array) $authors as $author ) {
+				$author_list[ $author->ID ] = $author->display_name;
+			}
+
+			// Use core querystrings.
+			$selected_author_in     = get_query_var( 'author__in', array() );
+			$selected_author_not_in = get_query_var( 'author__not_in', array() );
+
+			printf(
+				'<tr><th>%1$s</th><th>%2$s</th></tr>',
+				esc_attr( 'Posts with any of these authors', 'labbook' ),
+				esc_attr( 'Posts with none of these authors', 'labbook' )
+			);
+
+			echo '<tr>';
+			echo '<td>';
+			labbook_the_advanced_search_select( 'author__in[]', $author_list, $selected_author_in, false, true, 10 );
+			echo '</td>';
+			echo '<td>';
+			labbook_the_advanced_search_select( 'author__not_in[]', $author_list, $selected_author_not_in, false, true, 10 );
+			echo '</td>';
+			echo '</tr>';
+		}
+
+		echo '</table>';
+	}
+endif;
+
+if ( ! function_exists( 'labbook_the_advanced_search_category_filter_table' ) ) :
+	/**
+	 * Print advanced search category filter table.
+	 */
+	function labbook_the_advanced_search_category_filter_table() {
+		echo '<table class="advanced-search-criteria">';
+
+		$categories = get_categories();
+
+		// Category list items.
+		$category_list = array();
+
+		foreach ( (array) $categories as $id => $category ) {
+			$category_list[ $category->term_id ] = $category->name;
+		}
+
+		// Get term querystrings.
+		$selected_category_and    = get_query_var( 'category__and', array() );
+		$selected_category_in     = get_query_var( 'category__in', array() );
+		$selected_category_not_in = get_query_var( 'category__not_in', array() );
+
+		printf(
+			'<tr><th>%1$s</th><th>%2$s</th><th>%3$s</th></tr>',
+			esc_attr( 'Posts with all of these categories', 'labbook' ),
+			esc_attr( 'Posts with any of these categories', 'labbook' ),
+			esc_attr( 'Posts with none of these categories', 'labbook' )
+		);
+
+		echo '<tr>';
+		echo '<td>';
+		labbook_the_advanced_search_select( 'category__and[]', $category_list, $selected_category_and, false, true, 10 );
+		echo '</td>';
+		echo '<td>';
+		labbook_the_advanced_search_select( 'category__in[]', $category_list, $selected_category_in, false, true, 10 );
+		echo '</td>';
+		echo '<td>';
+		labbook_the_advanced_search_select( 'category__not_in[]', $category_list, $selected_category_not_in, false, true, 10 );
+		echo '</td>';
+		echo '</tr>';
+
+		echo '</table>';
+}
+endif;
+
+if ( ! function_exists( 'labbook_the_advanced_search_tag_filter_table' ) ) :
+	/**
+	 * Print advanced search tag filter table.
+	 */
+	function labbook_the_advanced_search_tag_filter_table() {
+		echo '<table class="advanced-search-criteria">';
+
+		$tags = get_tags();
+
+		// Tag list items.
+		$tag_list = array();
+
+		foreach ( (array) $tags as $id => $tag ) {
+			$tag_list[ $tag->term_id ] = $tag->name;
+		}
+
+		// Get term querystrings.
+		$selected_tag_and    = get_query_var( 'tag__and', array() );
+		$selected_tag_in     = get_query_var( 'tag__in', array() );
+		$selected_tag_not_in = get_query_var( 'tag__not_in', array() );
+
+		printf(
+			'<tr><th>%1$s</th><th>%2$s</th><th>%3$s</th></tr>',
+			esc_attr( 'Posts with all of these tags', 'labbook' ),
+			esc_attr( 'Posts with any of these tags', 'labbook' ),
+			esc_attr( 'Posts with none of these tags', 'labbook' )
+		);
+
+		echo '<tr>';
+		echo '<td>';
+		labbook_the_advanced_search_select( 'tag__and[]', $tag_list, $selected_tag_and, false, true, 10 );
+		echo '</td>';
+		echo '<td>';
+		labbook_the_advanced_search_select( 'tag__in[]', $tag_list, $selected_tag_in, false, true, 10 );
+		echo '</td>';
+		echo '<td>';
+		labbook_the_advanced_search_select( 'tag__not_in[]', $tag_list, $selected_tag_not_in, false, true, 10 );
+		echo '</td>';
+		echo '</tr>';
+
+		echo '</table>';
+}
+endif;
