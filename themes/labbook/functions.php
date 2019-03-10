@@ -8,7 +8,7 @@
  */
 
 // Theme version.
-define( 'LABBOOK_VERSION', '1.1.0' );
+define( 'LABBOOK_VERSION', '1.1.1' );
 
 // Required PHP version.
 define( 'LABBOOK_MINIMUM_PHP_VERSION', '7.0.0' );
@@ -17,10 +17,10 @@ if ( ! function_exists( 'labbook_check_php_version' ) ) :
 	/**
 	 * Detect current PHP version and prevent theme switch if not recent enough.
 	 *
-	 * @param string   $old_name  Old theme name.
-	 * @param WP_Theme $old_theme Old theme object.
+	 * @param string        $old_name  Old theme name.
+	 * @param WP_Theme|null $old_theme Old theme object. Note: not always passed.
 	 */
-	function labbook_check_php_version( $old_name, $old_theme ) {
+	function labbook_check_php_version( $old_name, $old_theme = null ) {
 		// Compare versions.
 		if ( version_compare( phpversion(), LABBOOK_MINIMUM_PHP_VERSION, '<' ) ) {
 			/**
@@ -43,7 +43,7 @@ if ( ! function_exists( 'labbook_check_php_version' ) ) :
 			add_action( 'admin_notices', 'labbook_version_too_low_admin_notice' );
 
 			// Switch back to previous theme.
-			switch_theme( $old_theme->stylesheet );
+			switch_theme( $old_name );
 		}
 	}
 endif;
@@ -78,35 +78,49 @@ if ( ! function_exists( 'labbook_setup' ) ) :
 		add_theme_support( 'title-tag' );
 
 		// This theme uses wp_nav_menu() in two locations.
-		register_nav_menus( array(
-			'site-menu' => esc_html__( 'Primary', 'labbook' ),
-			'network-menu' => esc_html__( 'Network', 'labbook' ),
-		) );
+		register_nav_menus(
+			array(
+				'site-menu'    => esc_html__( 'Primary', 'labbook' ),
+				'network-menu' => esc_html__( 'Network', 'labbook' ),
+			)
+		);
 
 		/*
 		 * Switch default core markup for search form, comment form, and comments
 		 * to output valid HTML5.
 		 */
-		add_theme_support( 'html5', array(
-			'search-form',
-			'comment-form',
-			'comment-list',
-			'gallery',
-			'caption',
-		) );
+		add_theme_support(
+			'html5',
+			array(
+				'search-form',
+				'comment-form',
+				'comment-list',
+				'gallery',
+				'caption',
+			)
+		);
 
 		/*
 		 * Enable support for Post Formats.
 		 */
-		add_theme_support( 'post-formats', array(
-			'status'
-		) );
+		add_theme_support(
+			'post-formats',
+			array(
+				'status',
+			)
+		);
 
 		// Set up the WordPress core custom background feature.
-		add_theme_support( 'custom-background', apply_filters( 'labbook_custom_background_args', array(
-			'default-color' => 'ffffff',
-			'default-image' => '',
-		) ) );
+		add_theme_support(
+			'custom-background',
+			apply_filters(
+				'labbook_custom_background_args',
+				array(
+					'default-color' => 'ffffff',
+					'default-image' => '',
+				)
+			)
+		);
 
 		// Add theme support for selective refresh for widgets.
 		add_theme_support( 'customize-selective-refresh-widgets' );
@@ -116,12 +130,15 @@ if ( ! function_exists( 'labbook_setup' ) ) :
 		 *
 		 * @link https://codex.wordpress.org/Theme_Logo
 		 */
-		add_theme_support( 'custom-logo', array(
-			'height'      => 155, // Should match .site-branding CSS grid row height.
-			'width'       => 400,
-			'flex-width'  => true,
-			'flex-height' => false,
-		) );
+		add_theme_support(
+			'custom-logo',
+			array(
+				'height'      => 155, // Should match .site-branding CSS grid row height.
+				'width'       => 400,
+				'flex-width'  => true,
+				'flex-height' => false,
+			)
+		);
 
 		/**
 		 * Add support for styling the post editor.
@@ -172,15 +189,17 @@ add_action( 'after_setup_theme', 'labbook_content_width', 0 );
  * @link https://developer.wordpress.org/themes/functionality/sidebars/#registering-a-sidebar
  */
 function labbook_widgets_init() {
-	register_sidebar( array(
-		'name'          => esc_html__( 'Sidebar', 'labbook' ),
-		'id'            => 'sidebar-1',
-		'description'   => esc_html__( 'Add widgets here.', 'labbook' ),
-		'before_widget' => '<section id="%1$s" class="widget %2$s">',
-		'after_widget'  => '</section>',
-		'before_title'  => '<h2 class="widget-title">',
-		'after_title'   => '</h2>',
-	) );
+	register_sidebar(
+		array(
+			'name'          => esc_html__( 'Sidebar', 'labbook' ),
+			'id'            => 'sidebar-1',
+			'description'   => esc_html__( 'Add widgets here.', 'labbook' ),
+			'before_widget' => '<section id="%1$s" class="widget %2$s">',
+			'after_widget'  => '</section>',
+			'before_title'  => '<h2 class="widget-title">',
+			'after_title'   => '</h2>',
+		)
+	);
 }
 add_action( 'widgets_init', 'labbook_widgets_init' );
 
@@ -238,6 +257,43 @@ function labbook_scripts() {
 }
 add_action( 'wp_enqueue_scripts', 'labbook_scripts' );
 
+if ( ! function_exists( 'labbook_add_advanced_search_query_var' ) ) :
+	/**
+	 * Add support for the advanced search query var.
+	 *
+	 * @param string[] $query_vars Array of current query variables.
+	 */
+	function labbook_add_advanced_search_query_var( $query_vars ) {
+		$query_vars[] = 'labbook_advanced_search';
+
+		return $query_vars;
+	}
+endif;
+add_filter( 'query_vars', 'labbook_add_advanced_search_query_var' );
+
+if ( ! function_exists( 'labbook_show_advanced_search_form' ) ) :
+	/**
+	 * Show the advanced search form on the search page.
+	 *
+	 * This shows the advanced search form instead of search results. In any case, search results
+	 * are followed by the advanced search form; this function exists to show the advanced search
+	 * page without showing an empty search result alongside it.
+	 *
+	 * @param string $original_template Original template.
+	 */
+	function labbook_show_advanced_search_form( $original_template ) {
+		if ( get_query_var( 'labbook_advanced_search' ) && labbook_ssl_alp_advanced_search_enabled() ) {
+			// Show advanced search form instead of search results.
+			define( 'LABBOOK_PAGE_SHOW_ADVANCED_SEARCH_FORM', true );
+
+			return get_search_template();
+		} else {
+			return $original_template;
+		}
+	}
+endif;
+add_action( 'template_include', 'labbook_show_advanced_search_form' );
+
 if ( ! function_exists( 'labbook_get_content_with_toc' ) ) :
 	/**
 	 * Insert table of contents into post.
@@ -269,7 +325,7 @@ if ( ! function_exists( 'labbook_get_content_with_toc' ) ) :
 
 		?>
 		<div class="entry-toc entry-toc-<?php the_ID(); ?>">
-			<h3 class="entry-toc-title"><?php esc_html_e( 'Contents', 'labbook' ) ?></h3>
+			<h3 class="entry-toc-title"><?php esc_html_e( 'Contents', 'labbook' ); ?></h3>
 			<?php labbook_the_toc( $hierarchy, labbook_get_option( 'table_of_contents_max_depth' ) ); ?>
 		</div>
 		<?php
@@ -278,6 +334,20 @@ if ( ! function_exists( 'labbook_get_content_with_toc' ) ) :
 	}
 endif;
 add_filter( 'the_content', 'labbook_get_content_with_toc' );
+
+/**
+ * Check if advanced search capabilities provided by the ALP plugin are available and enabled.
+ */
+function labbook_ssl_alp_advanced_search_enabled() {
+	global $ssl_alp;
+
+	if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
+		// Plugin is disabled.
+		return false;
+	}
+
+	return $ssl_alp->search->current_user_can_advanced_search();
+}
 
 /**
  * Check if coauthors provided by the ALP plugin are available and enabled.
@@ -345,6 +415,11 @@ function labbook_ssl_alp_unread_flags_enabled() {
 require get_template_directory() . '/inc/class-labbook-toc-menu-level.php';
 
 /**
+ * Hierarchical taxonomy term select list builder.
+ */
+require get_template_directory() . '/inc/class-labbook-search-term-walker.php';
+
+/**
  * Functions which enhance the theme by hooking into WordPress.
  */
 require get_template_directory() . '/inc/template-functions.php';
@@ -362,4 +437,4 @@ require get_template_directory() . '/inc/customizer.php';
 /**
  * Admin functions (for is_plugin_active)
  */
-include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+require_once ABSPATH . 'wp-admin/includes/plugin.php';

@@ -15,7 +15,12 @@ section below. It explains how new features in WordPress will be tracked by ALP.
  - Provides change logs for posts and pages with user-defined comments
  - Shows list of cross-references made between posts and pages
  - Provides TeX block for rendering mathematical markup
+ - Tracks whether posts have been read or not by logged-in users, and allows users to view a list
+   of unread posts and change the read/unread status of posts
+ - Adds advanced search capabilities, letting users search for posts by coauthors, categories, tags
+   and dates
  - Option to force users to be logged in to view
+   - Option to disallow non-logged-in users from making computationally expensive searches
    - Feeds still accessible using HTTP authentication
    - Images still accessible with direct link (not possible to block without server configuration)
    - XML-RPC interface disabled
@@ -48,6 +53,7 @@ Features:
    coauthored
  - Provides recent revisions sidebar widget showing recently edited posts and pages
  - Shows cross-references (links in the post body) between posts and pages under each post or page
+ - Allows posts to be set as read or unread
  - Supports display of an institute logo and icon
  - Provides two menu locations for providing links to site or external pages or URLs
  - Provides customisable copyright notice and ability to hide branding
@@ -136,10 +142,12 @@ been pushed back to these plugins and WordPress itself:
 [11](https://github.com/WordPress/gutenberg/issues/6688),
 [12](https://github.com/WordPress/gutenberg/issues/6703),
 [13](https://github.com/WordPress/gutenberg/issues/6704),
-[14](https://github.com/WordPress/gutenberg/issues/8032)
-[15](https://github.com/WordPress/wordpress-importer/issues/40)
-[16](https://github.com/WordPress/gutenberg/issues/10834)
-[17](https://github.com/adamsilverstein/mathml-block/issues/12)
+[14](https://github.com/WordPress/gutenberg/issues/8032),
+[15](https://github.com/WordPress/wordpress-importer/issues/40),
+[16](https://github.com/WordPress/gutenberg/issues/10834),
+[17](https://github.com/adamsilverstein/mathml-block/issues/12),
+[18](https://github.com/WordPress/gutenberg/issues/13749),
+[19](https://core.trac.wordpress.org/ticket/46459)
 
 ### Co-Authors Plus
 Authors: Mohammad Jangda, Daniel Bachhuber, Automattic, Shepherd Interactive, Mark Jaquith
