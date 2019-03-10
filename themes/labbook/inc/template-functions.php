@@ -49,7 +49,7 @@ if ( ! function_exists( 'labbook_get_theme_option_defaults' ) ) :
 	function labbook_get_theme_option_defaults() {
 		return array(
 			'content_layout'               		=> 'excerpt',
-			'search_placeholder'           		=> esc_html__( 'Search...', 'labbook' ),
+			'search_placeholder'           		=> esc_html__( 'Quick search...', 'labbook' ),
 			'excerpt_length'               		=> 55, // WordPress default.
 			'copyright_text'               		=> '',
 			'show_page_breadcrumbs'				=> true,

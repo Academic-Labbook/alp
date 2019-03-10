@@ -1226,7 +1226,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 				array(
 					'taxonomy'         => 'ssl_alp_coauthor',
 					'terms'            => $coauthor_and,
-					'field'            => 'term_taxonomy_id',
+					'field'            => 'term_id',
 					'operator'		   => 'AND',
 					'include_children' => false,
 				),
@@ -1238,7 +1238,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
             $tax_query[] = array(
                 'taxonomy'         => 'ssl_alp_coauthor',
                 'terms'            => $coauthor_in,
-                'field'            => 'term_taxonomy_id',
+                'field'            => 'term_id',
                 'include_children' => false,
             );
 		}
@@ -1248,7 +1248,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
             $tax_query[] = array(
                 'taxonomy'         => 'ssl_alp_coauthor',
                 'terms'            => $coauthor_not_in,
-                'field'            => 'term_taxonomy_id',
+                'field'            => 'term_id',
                 'operator'         => 'NOT IN',
                 'include_children' => false,
             );

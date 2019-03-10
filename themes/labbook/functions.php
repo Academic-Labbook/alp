@@ -396,6 +396,11 @@ function labbook_ssl_alp_unread_flags_enabled() {
 require get_template_directory() . '/inc/class-labbook-toc-menu-level.php';
 
 /**
+ * Hierarchical taxonomy term select list builder.
+ */
+require get_template_directory() . '/inc/class-labbook-search-term-walker.php';
+
+/**
  * Functions which enhance the theme by hooking into WordPress.
  */
 require get_template_directory() . '/inc/template-functions.php';

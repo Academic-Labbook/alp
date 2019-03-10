@@ -1049,13 +1049,22 @@ if ( ! function_exists( 'labbook_the_advanced_search_form' ) ) :
         printf(
 			'<input type="text" value="%1$s" name="s" id="s" placeholder="%2$s" class="search-field" />',
 			get_search_query(),
-			esc_attr( labbook_get_option( 'search_placeholder' ) )
+			esc_attr( __( 'Search...', 'labbook' ) )
 		);
 
 		printf(
 			'<input type="submit" class="search-submit screen-reader-text" id="searchsubmit" value="%1$s" />',
 			esc_attr_x( 'Search', 'submit button', 'labbook' )
 		);
+
+		echo '<p class="advanced-search-hint">';
+		echo wp_kses(
+			__( 'Matches words and phrases in titles, excerpts and content. Match exact phrases by wrapping them in double quotes, e.g. <code>"lab work"</code>. Exclude words by prepending hyphens, e.g. <code>-word</code>.', 'labbook' ),
+			array(
+				'code' => array(),
+			)
+		);
+		echo '</p>';
 
 		echo '</div>';
 
@@ -1087,6 +1096,15 @@ if ( ! function_exists( 'labbook_the_advanced_search_form' ) ) :
 
 		labbook_the_advanced_search_tag_filter_table();
 
+		echo '<p class="advanced-search-hint">';
+		echo wp_kses(
+			__( 'You can select multiple items from the lists above using <kbd>Ctrl</kbd>.', 'labbook' ),
+			array(
+				'kbd' => array(),
+			)
+		);
+		echo '</p>';
+
 		printf(
 			'<input type="submit" value="%1$s"/>',
 			esc_html__( 'Search', 'labbook')
@@ -1097,9 +1115,9 @@ if ( ! function_exists( 'labbook_the_advanced_search_form' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'labbook_the_advanced_search_select' ) ) :
+if ( ! function_exists( 'labbook_the_advanced_search_dropdown' ) ) :
 	/**
-	 * Print advanced search select widget.
+	 * Print advanced search select dropdown.
 	 *
 	 * @param string            $name     The select name.
 	 * @param array             $items    The items to display. Keys are option values, values are text.
@@ -1108,7 +1126,7 @@ if ( ! function_exists( 'labbook_the_advanced_search_select' ) ) :
 	 * @param bool|null         $multiple Multiple select mode.
 	 * @param int|null          $size     Entry size.
 	 */
-	function labbook_the_advanced_search_select( $name, $items, $selected = null, $blank = true, $multiple = null, $size = null ) {
+	function labbook_the_advanced_search_dropdown( $name, $items, $selected = null, $blank = true, $multiple = null, $size = null ) {
 		printf(
 			'<select name="%1$s"%2$s%3$s>',
 			$name,
@@ -1140,6 +1158,53 @@ if ( ! function_exists( 'labbook_the_advanced_search_select' ) ) :
 				esc_html( $item )
 			);
 		}
+
+		echo '</select>';
+	}
+endif;
+
+if ( ! function_exists( 'labbook_the_advanced_search_term_multiselect' ) ) :
+	/**
+	 * Print advanced search term select list.
+	 *
+	 * @param string $name  The select name.
+	 * @param array  $items The items to display. Keys are option values, values are text.
+	 * @param array  $args  Extra arguments.
+	 */
+	function labbook_the_advanced_search_term_multiselect( $name, $items, $args = array() ) {
+		$defaults = array(
+			'name_field'     => 'name',
+			'value_field'    => 'term_id',
+			'value_callback' => null,
+			'count_field'    => 'count',
+			'count_callback' => null,
+			'show_count'     => true,
+			'selected'       => null,
+			'multiple'       => true,
+			'size'           => 10,
+			'depth'          => 0, // No limit.
+		);
+
+		$args = wp_parse_args( $args, $defaults );
+
+		$walker = new Labbook_Search_Term_Walker;
+
+		printf(
+			'<select name="%1$s"%2$s%3$s>',
+			$name,
+			( true === $args['multiple'] ) ? ' multiple="true"' : '',
+			( ! is_null( $args['size'] ) ) ? ' size="' . absint( $args['size'] ) . '"' : ''
+		);
+
+		$depth = intval( $args['depth'] );
+
+		// Remove used arguments.
+		unset( $args['multiple'] );
+		unset( $args['size'] );
+		unset( $args['depth'] );
+
+		// Create hierarchical list.
+		echo $walker->walk( $items, $depth, $args );
 
 		echo '</select>';
 	}
@@ -1191,17 +1256,17 @@ if ( ! function_exists( 'labbook_the_advanced_search_date_fieldset' ) ) :
 		esc_html_e( 'From', 'labbook' );
 		echo '&nbsp;';
 
-		labbook_the_advanced_search_select( 'ssl_alp_after_year', $years, $selected_after_year );
-		labbook_the_advanced_search_select( 'ssl_alp_after_month', $months, $selected_after_month );
-		labbook_the_advanced_search_select( 'ssl_alp_after_day', $days, $selected_after_day );
+		labbook_the_advanced_search_dropdown( 'ssl_alp_after_year', $years, $selected_after_year );
+		labbook_the_advanced_search_dropdown( 'ssl_alp_after_month', $months, $selected_after_month );
+		labbook_the_advanced_search_dropdown( 'ssl_alp_after_day', $days, $selected_after_day );
 
 		echo '&nbsp;';
 		esc_html_e( 'to', 'labbook' );
 		echo '&nbsp;';
 
-		labbook_the_advanced_search_select( 'ssl_alp_before_year', $years, $selected_before_year );
-		labbook_the_advanced_search_select( 'ssl_alp_before_month', $months, $selected_before_month );
-		labbook_the_advanced_search_select( 'ssl_alp_before_day', $days, $selected_before_day );
+		labbook_the_advanced_search_dropdown( 'ssl_alp_before_year', $years, $selected_before_year );
+		labbook_the_advanced_search_dropdown( 'ssl_alp_before_month', $months, $selected_before_month );
+		labbook_the_advanced_search_dropdown( 'ssl_alp_before_day', $days, $selected_before_day );
 
         echo '</fieldset>';
 	}
@@ -1225,22 +1290,13 @@ if ( ! function_exists( 'labbook_the_advanced_search_author_filter_table' ) ) :
 				)
 			);
 
-			// Author list items.
-			$author_list = array();
-
-			// Get users with non-zero post counts. This matches the behaviour of wp_list_authors.
+			// Remove users with zero post counts. This matches the behaviour of wp_list_authors.
 			foreach ( (array) $authors as $id => $author ) {
 				$post_count = $ssl_alp->coauthors->get_user_post_count( $author );
 
-				if ( is_null( $post_count ) || 0 === intval( $post_count ) ) {
-					// Skip user with zero posts.
-					continue;
+				if ( is_null( $post_count ) || 0 === absint( $post_count ) ) {
+					unset( $authors[ $id ] );
 				}
-
-				// Get coauthor term.
-				$coauthor_term = $ssl_alp->coauthors->get_coauthor_term( $author );
-
-				$author_list[ $coauthor_term->term_taxonomy_id ] = $author->display_name;
 			}
 
 			// Selected filter criteria.
@@ -1257,13 +1313,43 @@ if ( ! function_exists( 'labbook_the_advanced_search_author_filter_table' ) ) :
 
 			echo '<tr>';
 			echo '<td>';
-			labbook_the_advanced_search_select( 'ssl_alp_coauthor__and[]', $author_list, $selected_coauthor_and, false, true, 10 );
+			labbook_the_advanced_search_term_multiselect(
+				'ssl_alp_coauthor__and[]',
+				$authors,
+				array(
+					'name_field'     => 'display_name',
+					'value_callback' => 'labbook_get_coauthor_term_id',
+					'count_callback' => 'labbook_get_coauthor_post_count',
+					'depth'          => -1, // Flat.
+					'selected'       => $selected_coauthor_and,
+				)
+			);
 			echo '</td>';
 			echo '<td>';
-			labbook_the_advanced_search_select( 'ssl_alp_coauthor__in[]', $author_list, $selected_coauthor_in, false, true, 10 );
+			labbook_the_advanced_search_term_multiselect(
+				'ssl_alp_coauthor__in[]',
+				$authors,
+				array(
+					'name_field'     => 'display_name',
+					'value_callback' => 'labbook_get_coauthor_term_id',
+					'count_callback' => 'labbook_get_coauthor_post_count',
+					'depth'          => -1, // Flat.
+					'selected'       => $selected_coauthor_in,
+				)
+			);
 			echo '</td>';
 			echo '<td>';
-			labbook_the_advanced_search_select( 'ssl_alp_coauthor__not_in[]', $author_list, $selected_coauthor_not_in, false, true, 10 );
+			labbook_the_advanced_search_term_multiselect(
+				'ssl_alp_coauthor__not_in[]',
+				$authors,
+				array(
+					'name_field'     => 'display_name',
+					'value_callback' => 'labbook_get_coauthor_term_id',
+					'count_callback' => 'labbook_get_coauthor_post_count',
+					'depth'          => -1, // Flat.
+					'selected'       => $selected_coauthor_not_in,
+				)
+			);
 			echo '</td>';
 			echo '</tr>';
 		} else {
@@ -1275,13 +1361,6 @@ if ( ! function_exists( 'labbook_the_advanced_search_author_filter_table' ) ) :
 					'orderby'             => 'display_name',
 				)
 			);
-
-			// Author list items.
-			$author_list = array();
-
-			foreach ( (array) $authors as $author ) {
-				$author_list[ $author->ID ] = $author->display_name;
-			}
 
 			// Use core querystrings.
 			$selected_author_in     = get_query_var( 'author__in', array() );
@@ -1295,15 +1374,74 @@ if ( ! function_exists( 'labbook_the_advanced_search_author_filter_table' ) ) :
 
 			echo '<tr>';
 			echo '<td>';
-			labbook_the_advanced_search_select( 'author__in[]', $author_list, $selected_author_in, false, true, 10 );
+			labbook_the_advanced_search_term_multiselect(
+				'author__in[]',
+				$authors,
+				array(
+					'name_field'     => 'display_name',
+					'value_field'    => 'ID',
+					'count_field'    => 'labbook_get_author_post_count',
+					'depth'          => -1, // Flat.
+					'selected'       => $selected_author_in,
+				)
+			);
 			echo '</td>';
 			echo '<td>';
-			labbook_the_advanced_search_select( 'author__not_in[]', $author_list, $selected_author_not_in, false, true, 10 );
+			labbook_the_advanced_search_term_multiselect(
+				'author__not_in[]',
+				$authors,
+				array(
+					'name_field'     => 'display_name',
+					'value_field'    => 'ID',
+					'count_field'    => 'labbook_get_author_post_count',
+					'depth'          => -1, // Flat.
+					'selected'       => $selected_author_not_in,
+				)
+			);
 			echo '</td>';
 			echo '</tr>';
 		}
 
 		echo '</table>';
+	}
+endif;
+
+if ( ! function_exists( 'labbook_get_coauthor_term_id' ) ) :
+	/**
+	 * Get term ID for specified user.
+	 *
+	 * @param WP_User $user User object.
+	 */
+	function labbook_get_coauthor_term_id( $user ) {
+		global $ssl_alp;
+
+		$term = $ssl_alp->coauthors->get_coauthor_term( $user );
+
+		return $term->term_id;
+	}
+endif;
+
+if ( ! function_exists( 'labbook_get_coauthor_post_count' ) ) :
+	/**
+	 * Get coauthor post count.
+	 *
+	 * @param WP_User $user User object.
+	 */
+	function labbook_get_coauthor_post_count( $user ) {
+		global $ssl_alp;
+
+		return $ssl_alp->coauthors->get_user_post_count( $user );
+	}
+endif;
+
+if ( ! function_exists( 'labbook_get_author_post_count' ) ) :
+	/**
+	 * Get author post count.
+	 *
+	 * @param WP_User $user User object.
+	 */
+	function labbook_get_author_post_count( $user ) {
+		return count_user_posts( $user->ID );
 	}
 endif;
 
@@ -1315,13 +1453,6 @@ if ( ! function_exists( 'labbook_the_advanced_search_category_filter_table' ) ) 
 		echo '<table class="advanced-search-criteria">';
 
 		$categories = get_categories();
-
-		// Category list items.
-		$category_list = array();
-
-		foreach ( (array) $categories as $id => $category ) {
-			$category_list[ $category->term_id ] = $category->name;
-		}
 
 		// Get term querystrings.
 		$selected_category_and    = get_query_var( 'category__and', array() );
@@ -1337,13 +1468,31 @@ if ( ! function_exists( 'labbook_the_advanced_search_category_filter_table' ) ) 
 
 		echo '<tr>';
 		echo '<td>';
-		labbook_the_advanced_search_select( 'category__and[]', $category_list, $selected_category_and, false, true, 10 );
+		labbook_the_advanced_search_term_multiselect(
+			'category__and[]',
+			$categories,
+			array(
+				'selected' => $selected_category_and,
+			)
+		);
 		echo '</td>';
 		echo '<td>';
-		labbook_the_advanced_search_select( 'category__in[]', $category_list, $selected_category_in, false, true, 10 );
+		labbook_the_advanced_search_term_multiselect(
+			'category__in[]',
+			$categories,
+			array(
+				'selected' => $selected_category_in,
+			)
+		);
 		echo '</td>';
 		echo '<td>';
-		labbook_the_advanced_search_select( 'category__not_in[]', $category_list, $selected_category_not_in, false, true, 10 );
+		labbook_the_advanced_search_term_multiselect(
+			'category__not_in[]',
+			$categories,
+			array(
+				'selected' => $selected_category_not_in,
+			)
+		);
 		echo '</td>';
 		echo '</tr>';
 
@@ -1360,13 +1509,6 @@ if ( ! function_exists( 'labbook_the_advanced_search_tag_filter_table' ) ) :
 
 		$tags = get_tags();
 
-		// Tag list items.
-		$tag_list = array();
-
-		foreach ( (array) $tags as $id => $tag ) {
-			$tag_list[ $tag->term_id ] = $tag->name;
-		}
-
 		// Get term querystrings.
 		$selected_tag_and    = get_query_var( 'tag__and', array() );
 		$selected_tag_in     = get_query_var( 'tag__in', array() );
@@ -1381,13 +1523,31 @@ if ( ! function_exists( 'labbook_the_advanced_search_tag_filter_table' ) ) :
 
 		echo '<tr>';
 		echo '<td>';
-		labbook_the_advanced_search_select( 'tag__and[]', $tag_list, $selected_tag_and, false, true, 10 );
+		labbook_the_advanced_search_term_multiselect(
+			'tag__and[]',
+			$tags,
+			array(
+				'selected' => $selected_tag_and,
+			)
+		);
 		echo '</td>';
 		echo '<td>';
-		labbook_the_advanced_search_select( 'tag__in[]', $tag_list, $selected_tag_in, false, true, 10 );
+		labbook_the_advanced_search_term_multiselect(
+			'tag__in[]',
+			$tags,
+			array(
+				'selected' => $selected_tag_in,
+			)
+		);
 		echo '</td>';
 		echo '<td>';
-		labbook_the_advanced_search_select( 'tag__not_in[]', $tag_list, $selected_tag_not_in, false, true, 10 );
+		labbook_the_advanced_search_term_multiselect(
+			'tag__not_in[]',
+			$tags,
+			array(
+				'selected' => $selected_tag_not_in,
+			)
+		);
 		echo '</td>';
 		echo '</tr>';
 
