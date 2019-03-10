@@ -4,7 +4,7 @@ Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
 Requires at least: 5.1.0
 Tested up to: 5.1.0
 Requires PHP: 7.0.0
-Stable tag: 0.13.0
+Stable tag: 0.13.1
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -72,6 +72,11 @@ with maximum control. Please see [this guide](https://alp.attackllama.com/docume
 on the ALP website.
 
 == Changelog ==
+
+= 0.13.1 =
+ - Added support for advanced searches, letting users search posts by multiple coauthors, categories
+   and tags, and dates.
+ - Added setting to control display of advanced search tools to non-logged-in users.
 
 = 0.13.0 =
  - Added support for read flags, letting users keep track of posts they've read or not read and
