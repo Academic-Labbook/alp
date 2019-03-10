@@ -43,7 +43,8 @@ Nicolas Gallagher and Jonathan Neal https://necolas.github.io/normalize.css/
     ## References
     ## Revisions
     ## Comments
-# Archives
+# Advanced search
+# Search
 # Media
     ## Captions
     ## Galleries
@@ -1126,13 +1127,12 @@ a:hover, a:active {
 	content: '\f0e5'; /* question */
 }
 
-/* search widget */
-.search-form .search-field {
+/* Shared search field properties (widget and advanced) */
+.search-form .search-field, .advanced-search-form .search-field {
 	border:1px #CCCCCC solid;
 	font-weight: normal;
 	font-family: inherit;
 	box-sizing: border-box;
-	max-width: 350px;
 }
 
 /* Flexbox used to make search box fill available width. */
@@ -1148,31 +1148,6 @@ a:hover, a:active {
 .search-form .search-flex .search-advanced-link {
     align-self: center; /* vertically center the contents */
     margin-left: 0.5em;
-}
-
-/* advanced search form */
-.advanced-search-form {
-    padding-left: 0.5em;
-    padding-bottom: 2em;
-}
-
-.advanced-search td, .advanced-search th {
-    border-color: #a7a7a7;
-}
-
-.advanced-search-date-range {
-    border: none;
-    padding-left: 0;
-}
-
-/* advanced search criteria */
-table.advanced-search-criteria {
-    table-layout: fixed;
-    font-size: 95%;
-}
-
-table.advanced-search-criteria select {
-    width: 100%;
 }
 
 /*--------------------------------------------------------------
@@ -1524,6 +1499,42 @@ table.advanced-search-criteria select {
 
 .archive-description p {
     margin: 0;
+}
+
+/*--------------------------------------------------------------
+# Advanced search
+--------------------------------------------------------------*/
+/* Stop h3 margin taking up too much space */
+.advanced-search h3:first-child {
+    margin-top: 0;
+}
+
+/* advanced search form */
+.advanced-search-form {
+    padding-bottom: 2em;
+}
+
+.advanced-search .search-field {
+    min-width: 33%;
+}
+
+.advanced-search-date-range {
+    border: none;
+    padding-left: 0;
+}
+
+/* advanced search criteria */
+table.advanced-search-criteria {
+    table-layout: fixed;
+    font-size: 95%;
+}
+
+.advanced-search-criteria td, .advanced-search-criteria th {
+    border: none;
+}
+
+table.advanced-search-criteria select {
+    width: 100%;
 }
 
 /*--------------------------------------------------------------

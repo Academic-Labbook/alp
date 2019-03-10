@@ -1028,11 +1028,11 @@ if ( ! function_exists( 'labbook_the_advanced_search_form' ) ) :
 		}
 
 		printf(
-			'<form role="search" method="get" id="advanced-search-form" class="search-form advanced-search-form" action="%1$s">',
+			'<form role="search" method="get" id="advanced-search-form" class="advanced-search-form" action="%1$s">',
 			esc_url( home_url( '/' ) )
 		);
 
-		echo '<div class="advanced-search">';
+		echo '<div class="advanced-search hentry">';
 
 		printf(
 			'<h3>%1$s</h3>',
