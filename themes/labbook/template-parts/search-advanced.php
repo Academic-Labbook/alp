@@ -38,13 +38,23 @@ $selected_before_year  = get_query_var( 'ssl_alp_before_year' );
 $selected_before_month = get_query_var( 'ssl_alp_before_month' );
 $selected_before_day   = get_query_var( 'ssl_alp_before_day' );
 
+// Get users with coauthored posts.
 $authors = get_users(
-	array(
-		'orderby'             => 'display_name',
-		'order'   		      => 'ASC',
-		'has_published_posts' => true,
-	)
+    array(
+        'order'   => 'ASC',
+        'orderby' => 'display_name',
+    )
 );
+
+// Get users with non-zero post counts. This matches the behaviour of wp_list_authors.
+foreach ( (array) $authors as $id => $author ) {
+    $post_count = $ssl_alp->coauthors->get_user_post_count( $author );
+
+    if ( is_null( $post_count ) || 0 === intval( $post_count ) ) {
+        // Remove user from list.
+        unset( $authors[ $id ] );
+    }
+}
 
 $categories = get_categories();
 $tags = get_tags();
@@ -72,7 +82,7 @@ $selected_tag_not_in      = get_query_var( 'tag__not_in', array() );
             <input type="submit" class="search-submit screen-reader-text" id="searchsubmit" value="<?php echo esc_attr_x( 'Search', 'submit button', 'labbook' ); ?>" />
         </div>
 
-        <h3><?php esc_html_e( 'Date', 'labbook' ); ?></h3>
+        <h3><?php esc_html_e( 'Publication date', 'labbook' ); ?></h3>
         <fieldset class="advanced-search-date-range">
             <?php esc_html_e( 'From', 'labbook' ); ?>
             <select name="ssl_alp_after_year">

@@ -1195,6 +1195,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			// There is only one AND term specified, so merge it into IN.
 			$coauthor_in[] = absint( reset( $coauthor_and ) );
 			$coauthor_and = array();
+
+			// Update querystring. This matches core behaviour for categories
+			// (but bizarrely not for tags: https://core.trac.wordpress.org/ticket/46459).
+			$query->set( 'ssl_alp_coauthor__and', $coauthor_and );
+			$query->set( 'ssl_alp_coauthor__in', $coauthor_in );
 		}
 
         if ( ! empty( $coauthor_and ) ) {

@@ -24,7 +24,10 @@ class SSL_ALP_Search extends SSL_ALP_Module {
         $loader->add_filter( 'query_vars', $this, 'whitelist_advanced_search_query_vars' );
 
         // Support date querystrings in WP_Query.
-		$loader->add_action( 'pre_get_posts', $this, 'parse_date_query_vars' );
+        $loader->add_action( 'pre_get_posts', $this, 'parse_date_query_vars' );
+
+        // Fix inconsistent behaviour applied to tag and category AND queries.
+        $loader->add_action( 'parse_tax_query', $this, 'fix_category_tag_and_query_var_inconsistency' );
     }
 
     /**
@@ -120,5 +123,34 @@ class SSL_ALP_Search extends SSL_ALP_Module {
         }
 
         $query->set( 'date_query', $date_query );
+    }
+
+    /**
+     * Fix inconsistency in WordPress when handling tag__and queries.
+     *
+     * If a category__and query contains only a single item, it is merged into category__in. This is
+     * not applied to singular tag__and queries. This may lead to user confusion with the search
+     * page, since items in category__and can jump to category__in, but not items in tag__and and
+     * tag__in.
+     *
+     * See https://core.trac.wordpress.org/ticket/46459.
+     *
+     * @param WP_Query $query The query.
+     */
+    public function fix_category_tag_and_query_var_inconsistency( $query ) {
+        $tag_and = $query->get( 'tag__and', array() );
+
+        if ( ! empty( $tag_and ) && 1 === count( $tag_and ) ) {
+            // There is only one tag AND term specified, so merge it into IN, consistent with core
+            // behaviour for categories.
+            $tag_in   = $query->get( 'tag__in', array() );
+            $tag_in[] = absint( reset( $tag_and ) );
+
+            // Reset AND.
+            $tag_and = array();
+
+			$query->set( 'tag__and', $tag_and );
+			$query->set( 'tag__in', $tag_in );
+		}
     }
 }

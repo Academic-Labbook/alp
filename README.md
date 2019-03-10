@@ -143,7 +143,8 @@ been pushed back to these plugins and WordPress itself:
 [15](https://github.com/WordPress/wordpress-importer/issues/40),
 [16](https://github.com/WordPress/gutenberg/issues/10834),
 [17](https://github.com/adamsilverstein/mathml-block/issues/12),
-[18](https://github.com/WordPress/gutenberg/issues/13749)
+[18](https://github.com/WordPress/gutenberg/issues/13749),
+[19](https://core.trac.wordpress.org/ticket/46459)
 
 ### Co-Authors Plus
 Authors: Mohammad Jangda, Daniel Bachhuber, Automattic, Shepherd Interactive, Mark Jaquith

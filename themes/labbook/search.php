@@ -38,7 +38,9 @@ get_header();
 					</h1>
 				</header><!-- .page-header -->
 
-				<p><a href="#search-again"><?php esc_html_e( 'Skip to search form', 'labbook' ); ?></a></p>
+				<div class="page-content">
+					<p><a href="#search-again"><?php esc_html_e( 'Skip to search form', 'labbook' ); ?></a></p>
+				</div>
 
 			<?php
 			/* Start the Loop */
