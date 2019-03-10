@@ -1,0 +1,124 @@
+<?php
+/**
+ * Search tools.
+ *
+ * @package ssl-alp
+ */
+
+if ( ! defined( 'WPINC' ) ) {
+	// Prevent direct access.
+	exit;
+}
+
+/**
+ * Advanced search functionality.
+ */
+class SSL_ALP_Search extends SSL_ALP_Module {
+	/**
+	 * Register hooks.
+	 */
+	public function register_hooks() {
+		$loader = $this->get_loader();
+
+        // Allow extra public query vars.
+        $loader->add_filter( 'query_vars', $this, 'whitelist_advanced_search_query_vars' );
+
+        // Support date querystrings in WP_Query.
+		$loader->add_action( 'pre_get_posts', $this, 'parse_date_query_vars' );
+    }
+
+    /**
+     * Whitelist advanced search query vars.
+     *
+     * This allows posts to be filtered by lists of authors, categories and tags. Note that
+     * coauthor post filtering is provided by the coauthor module.
+     *
+     * @param string[] $public_query_vars Array of public query vars.
+     */
+    public function whitelist_advanced_search_query_vars( $public_query_vars ) {
+        // Private query vars to make public. These are sanitised by WordPress core.
+        $extra_query_vars = array(
+            'author__in',
+            'author__not_in',
+            'category__and',
+            'category__in',
+            'category__not_in',
+            'tag__and',
+            'tag__in',
+            'tag__not_in',
+        );
+
+        // Merge new query vars into existing ones.
+        $public_query_vars = wp_parse_args( $extra_query_vars, $public_query_vars );
+
+        // Custom query vars to make public. These are sanitised and handled by
+        // `parse_date_query_vars`.
+        $custom_query_vars = array(
+			'ssl_alp_after_year',
+			'ssl_alp_after_month',
+            'ssl_alp_after_day',
+            'ssl_alp_before_year',
+            'ssl_alp_before_month',
+            'ssl_alp_before_day',
+        );
+
+		// Merge new query vars into existing ones.
+        $public_query_vars = wp_parse_args( $custom_query_vars, $public_query_vars );
+
+        return $public_query_vars;
+    }
+
+    /**
+     * Sanitise date querystrings and inject them as filters into WP_Query.
+     *
+     * This detects values submitted through the custom search function and turns them into the
+     * filters expected by WP_Query.
+     *
+     * @param WP_Query $query The query (passed by reference).
+     */
+    public function parse_date_query_vars( $query ) {
+        if ( ! $query->is_search() ) {
+            return;
+        }
+
+        // Get querystrings.
+        $after_year   = $query->get( 'ssl_alp_after_year' );
+        $after_month  = $query->get( 'ssl_alp_after_month' );
+        $after_day    = $query->get( 'ssl_alp_after_day' );
+        $before_year  = $query->get( 'ssl_alp_before_year' );
+        $before_month = $query->get( 'ssl_alp_before_month' );
+        $before_day   = $query->get( 'ssl_alp_before_day' );
+
+        $date_query = array(
+            'after'     => array(),
+            'before'    => array(),
+            'inclusive' => true,
+        );
+
+        if ( ! empty( $after_year ) ) {
+            $date_query['after']['year'] = $after_year;
+        }
+
+        if ( ! empty( $after_month ) ) {
+            $date_query['after']['month'] = $after_month;
+        }
+
+        if ( ! empty( $after_day ) ) {
+            $date_query['after']['day'] = $after_day;
+        }
+
+        if ( ! empty( $before_year ) ) {
+            $date_query['before']['year'] = $before_year;
+        }
+
+        if ( ! empty( $before_month ) ) {
+            $date_query['before']['month'] = $before_month;
+        }
+
+        if ( ! empty( $before_day ) ) {
+            $date_query['before']['day'] = $before_day;
+        }
+
+        $query->set( 'date_query', $date_query );
+    }
+}

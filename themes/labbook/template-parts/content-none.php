@@ -35,15 +35,20 @@
 			?>
 
 			<p><?php esc_html_e( 'Sorry, but nothing matched your search terms. Please try again with some different keywords.', 'labbook' ); ?></p>
+
+			<h2 id="search-again"><?php esc_html_e( 'Search again', 'labbook' ); ?></h2>
+
 			<?php
-			get_search_form();
+			/* Show advanced search form. */
+			get_template_part( 'template-parts/search-advanced' );
 
 		else :
 			?>
 
 			<p><?php esc_html_e( 'It seems we can&rsquo;t find what you&rsquo;re looking for. Perhaps searching can help.', 'labbook' ); ?></p>
 			<?php
-			get_search_form();
+			/* Show advanced search form. */
+			get_template_part( 'template-parts/search-advanced' );
 
 		endif;
 		?>

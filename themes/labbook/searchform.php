@@ -12,5 +12,5 @@
 		<input type="text" value="<?php the_search_query(); ?>" name="s" id="s" placeholder="<?php echo esc_attr( labbook_get_option( 'search_placeholder' ) ); ?>" class="search-field" />
 		<input type="submit" class="search-submit screen-reader-text" id="searchsubmit" value="<?php echo esc_attr_x( 'Search', 'submit button', 'labbook' ); ?>" />
 	</div>
-	<a href=""><?php esc_html_e( 'Advanced search', 'labbook' ); ?></a>
+	<a href="<?php echo esc_url( home_url( '/?labbook_advanced_search=1' ) ); ?>"><?php esc_html_e( 'Advanced Search', 'labbook' ); ?></a>
 </form><!-- .search-form -->
