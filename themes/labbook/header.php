@@ -29,10 +29,12 @@
 		<nav id="network-navigation" class="main-navigation">
 			<button class="menu-toggle" aria-controls="network-menu" aria-expanded="false"><?php esc_html_e( 'Network Menu', 'labbook' ); ?></button>
 			<?php
-			wp_nav_menu( array(
-				'theme_location' => 'network-menu',
-				'menu_id'        => 'network-menu',
-			) );
+			wp_nav_menu(
+				array(
+					'theme_location' => 'network-menu',
+					'menu_id'        => 'network-menu',
+				)
+			);
 			?>
 		</nav><!-- #network-navigation -->
 		<?php endif; ?>
@@ -58,10 +60,12 @@
 		<nav id="site-navigation" class="main-navigation">
 			<button class="menu-toggle" aria-controls="primary-menu" aria-expanded="false"><?php esc_html_e( 'Primary Menu', 'labbook' ); ?></button>
 			<?php
-			wp_nav_menu( array(
-				'theme_location' => 'site-menu',
-				'menu_id'        => 'primary-menu',
-			) );
+			wp_nav_menu(
+				array(
+					'theme_location' => 'site-menu',
+					'menu_id'        => 'primary-menu',
+				)
+			);
 			?>
 		</nav><!-- #site-navigation -->
 	</header><!-- #masthead -->

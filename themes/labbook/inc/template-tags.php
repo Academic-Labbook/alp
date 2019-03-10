@@ -236,15 +236,15 @@ if ( ! function_exists( 'labbook_the_post_meta' ) ) :
 
 		// Allowed tags in date HTML.
 		$allowed_date_html = array(
-			'time'	=> array(
-				'class'		=> array(),
-				'datetime'	=> array(),
-				'title'		=> array(),
+			'time' => array(
+				'class'    => array(),
+				'datetime' => array(),
+				'title'    => array(),
 			),
-			'i'		=> array(
-				'class'			=> array(),
-				'title'			=> array(),
-				'aria-hidden'	=> array(),
+			'i'    => array(
+				'class'       => array(),
+				'title'       => array(),
+				'aria-hidden' => array(),
 			),
 		);
 
@@ -416,11 +416,11 @@ if ( ! function_exists( 'labbook_the_authors' ) ) :
 		echo wp_kses(
 			$author_list_html,
 			array(
-				'span'	=> array(
-					'class'	=> array(),
+				'span' => array(
+					'class' => array(),
 				),
-				'a'		=> array(
-					'href'	=> array(),
+				'a'    => array(
+					'href' => array(),
 				),
 			)
 		);
@@ -474,9 +474,9 @@ if ( ! function_exists( 'labbook_the_footer' ) ) :
 
 		// Allowed category and tag HTML.
 		$cat_tag_tags = array(
-			'a'	=> array(
-				'href'	=> array(),
-				'rel'	=> array(),
+			'a' => array(
+				'href' => array(),
+				'rel'  => array(),
 			),
 		);
 
@@ -586,12 +586,14 @@ if ( ! function_exists( 'labbook_the_revisions' ) ) :
 		<?php
 
 		if ( $pages > 1 ) {
-			echo paginate_links( array(
-				'base'			=> '%_%#post-revisions',
-				'format'		=> '?revision_page=%#%',
-				'current'  		=> $current_page,
-				'total'    		=> $pages,
-			) );
+			echo paginate_links(
+				array(
+					'base'    => '%_%#post-revisions',
+					'format'  => '?revision_page=%#%',
+					'current' => $current_page,
+					'total'   => $pages,
+				)
+			);
 		}
 
 		echo '</div>';
@@ -627,9 +629,9 @@ if ( ! function_exists( 'labbook_the_revision_description_row' ) ) :
 
 		// Allowed revision abbreviation tags.
 		$allowed_abbr_tags = array(
-			'a'	=> array(
-				'href'	=> array(),
-				'title'	=> array(),
+			'a' => array(
+				'href'  => array(),
+				'title' => array(),
 			),
 		);
 
@@ -1046,7 +1048,7 @@ if ( ! function_exists( 'labbook_the_advanced_search_form' ) ) :
 			esc_html_x( 'Search for:', 'label', 'labbook' )
 		);
 
-        printf(
+		printf(
 			'<input type="text" value="%1$s" name="s" id="s" placeholder="%2$s" class="search-field" />',
 			get_search_query(),
 			esc_attr( __( 'Search...', 'labbook' ) )
@@ -1107,7 +1109,7 @@ if ( ! function_exists( 'labbook_the_advanced_search_form' ) ) :
 
 		printf(
 			'<input type="submit" value="%1$s"/>',
-			esc_html__( 'Search', 'labbook')
+			esc_html__( 'Search', 'labbook' )
 		);
 
 		echo '</div>';
@@ -1135,7 +1137,7 @@ if ( ! function_exists( 'labbook_the_advanced_search_dropdown' ) ) :
 		);
 
 		if ( $blank ) {
-        	echo '<option value=""></option>';
+			echo '<option value=""></option>';
 		}
 
 		foreach ( $items as $value => $item ) {
@@ -1151,7 +1153,7 @@ if ( ! function_exists( 'labbook_the_advanced_search_dropdown' ) ) :
 				}
 			}
 
-            printf(
+			printf(
 				'<option value="%1$s"%2$s>%3$s</option>',
 				esc_attr( $value ),
 				$item_selected ? ' selected="true"' : '',
@@ -1187,7 +1189,7 @@ if ( ! function_exists( 'labbook_the_advanced_search_term_multiselect' ) ) :
 
 		$args = wp_parse_args( $args, $defaults );
 
-		$walker = new Labbook_Search_Term_Walker;
+		$walker = new Labbook_Search_Term_Walker();
 
 		printf(
 			'<select name="%1$s"%2$s%3$s>',
@@ -1268,7 +1270,7 @@ if ( ! function_exists( 'labbook_the_advanced_search_date_fieldset' ) ) :
 		labbook_the_advanced_search_dropdown( 'ssl_alp_before_month', $months, $selected_before_month );
 		labbook_the_advanced_search_dropdown( 'ssl_alp_before_day', $days, $selected_before_day );
 
-        echo '</fieldset>';
+		echo '</fieldset>';
 	}
 endif;
 
@@ -1497,7 +1499,7 @@ if ( ! function_exists( 'labbook_the_advanced_search_category_filter_table' ) ) 
 		echo '</tr>';
 
 		echo '</table>';
-}
+	}
 endif;
 
 if ( ! function_exists( 'labbook_the_advanced_search_tag_filter_table' ) ) :
@@ -1552,5 +1554,5 @@ if ( ! function_exists( 'labbook_the_advanced_search_tag_filter_table' ) ) :
 		echo '</tr>';
 
 		echo '</table>';
-}
+	}
 endif;

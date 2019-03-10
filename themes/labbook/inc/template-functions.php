@@ -48,18 +48,18 @@ if ( ! function_exists( 'labbook_get_theme_option_defaults' ) ) :
 	 */
 	function labbook_get_theme_option_defaults() {
 		return array(
-			'content_layout'               		=> 'excerpt',
-			'search_placeholder'           		=> esc_html__( 'Quick search...', 'labbook' ),
-			'excerpt_length'               		=> 55, // WordPress default.
-			'copyright_text'               		=> '',
-			'show_page_breadcrumbs'				=> true,
-			'show_page_table_of_contents'		=> true,
-			'table_of_contents_max_depth'		=> 4,
-			'show_crossreferences'				=> true,
-			'show_edit_summaries'				=> true,
-			'edit_summaries_per_page'			=> 5,
-			'show_unread_flags'                 => true,
-			'show_privacy_policy'				=> true,
+			'content_layout'              => 'excerpt',
+			'search_placeholder'          => esc_html__( 'Quick search...', 'labbook' ),
+			'excerpt_length'              => 55, // WordPress default.
+			'copyright_text'              => '',
+			'show_page_breadcrumbs'       => true,
+			'show_page_table_of_contents' => true,
+			'table_of_contents_max_depth' => 4,
+			'show_crossreferences'        => true,
+			'show_edit_summaries'         => true,
+			'edit_summaries_per_page'     => 5,
+			'show_unread_flags'           => true,
+			'show_privacy_policy'         => true,
 		);
 	}
 endif;
@@ -147,23 +147,23 @@ if ( ! function_exists( 'labbook_get_page_breadcrumbs' ) ) :
 		// URL list with home.
 		$breadcrumbs = array(
 			array(
-				'title'	=> __( 'Home', 'labbook' ),
-				'url'	=> get_home_url(),
+				'title' => __( 'Home', 'labbook' ),
+				'url'   => get_home_url(),
 			),
 		);
 
 		// Add ancestor titles and URLs.
 		foreach ( $ancestors as $ancestor ) {
 			$breadcrumbs[] = array(
-				'title'	=> get_the_title( $ancestor ),
-				'url'	=> get_permalink( $ancestor ),
+				'title' => get_the_title( $ancestor ),
+				'url'   => get_permalink( $ancestor ),
 			);
 		}
 
 		// Add current page to end.
 		$breadcrumbs[] = array(
-			'title'	=> get_the_title( $page ),
-			'url'	=> '',
+			'title' => get_the_title( $page ),
+			'url'   => '',
 		);
 
 		return $breadcrumbs;
@@ -188,8 +188,8 @@ if ( ! function_exists( 'labbook_get_revisions' ) ) :
 	 * Get list of revisions for the current or specified post.
 	 *
 	 * @param int|WP_Post|null $post Post ID or post object. Defaults to global $post.
-	 * @param int			   $page Revision page.
-	 * @param int 			   $per_page Revisions to show per page.
+	 * @param int              $page Revision page.
+	 * @param int              $per_page Revisions to show per page.
 	 */
 	function labbook_get_revisions( $post = null, $page = 1, $per_page = -1 ) {
 		global $ssl_alp;
@@ -210,8 +210,8 @@ if ( ! function_exists( 'labbook_get_revisions' ) ) :
 		$revisions = $ssl_alp->revisions->get_revisions(
 			$post,
 			array(
-				'paged'				=> $page,
-				'posts_per_page'	=> $per_page,
+				'paged'          => $page,
+				'posts_per_page' => $per_page,
 			)
 		);
 
