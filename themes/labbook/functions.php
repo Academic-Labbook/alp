@@ -263,7 +263,7 @@ if ( ! function_exists( 'labbook_show_advanced_search_form' ) ) :
 	 * @param string $original_template Original template.
 	 */
 	function labbook_show_advanced_search_form( $original_template ) {
-		if ( get_query_var( 'labbook_advanced_search' ) ) {
+		if ( get_query_var( 'labbook_advanced_search' ) && labbook_ssl_alp_advanced_search_enabled() ) {
 			// Show advanced search form instead of search results.
 			define( 'LABBOOK_PAGE_SHOW_ADVANCED_SEARCH_FORM', true );
 
@@ -315,6 +315,20 @@ if ( ! function_exists( 'labbook_get_content_with_toc' ) ) :
 	}
 endif;
 add_filter( 'the_content', 'labbook_get_content_with_toc' );
+
+/**
+ * Check if advanced search capabilities provided by the ALP plugin are available and enabled.
+ */
+function labbook_ssl_alp_advanced_search_enabled() {
+	global $ssl_alp;
+
+	if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
+		// Plugin is disabled.
+		return false;
+	}
+
+	return $ssl_alp->search->current_user_can_advanced_search();
+}
 
 /**
  * Check if coauthors provided by the ALP plugin are available and enabled.

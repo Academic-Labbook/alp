@@ -30,6 +30,53 @@ class SSL_ALP_Search extends SSL_ALP_Module {
         $loader->add_action( 'parse_tax_query', $this, 'fix_category_tag_and_query_var_inconsistency' );
     }
 
+	/**
+	 * Register settings.
+	 */
+	public function register_settings() {
+		register_setting(
+			SSL_ALP_SITE_SETTINGS_PAGE,
+			'ssl_alp_disallow_public_advanced_search',
+			array(
+				'type' => 'boolean',
+			)
+		);
+	}
+
+	/**
+	 * Register settings fields.
+	 */
+	public function register_settings_fields() {
+		/**
+		 * Post multiple author settings field.
+		 */
+		add_settings_field(
+			'ssl_alp_search_settings',
+			__( 'Search', 'ssl-alp' ),
+			array( $this, 'search_settings_callback' ),
+			SSL_ALP_SITE_SETTINGS_PAGE,
+			'ssl_alp_site_settings_section'
+		);
+	}
+
+	/**
+	 * Search settings partial.
+	 */
+	public function search_settings_callback() {
+		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/site/search-settings-display.php';
+    }
+
+    /**
+     * Check if the current user can make advanced searches.
+     */
+    public function current_user_can_advanced_search() {
+        if ( get_option( 'ssl_alp_disallow_public_advanced_search' ) ) {
+            return is_user_logged_in();
+        }
+
+        return true;
+    }
+
     /**
      * Whitelist advanced search query vars.
      *
@@ -39,9 +86,14 @@ class SSL_ALP_Search extends SSL_ALP_Module {
      * @param string[] $public_query_vars Array of public query vars.
      */
     public function whitelist_advanced_search_query_vars( $public_query_vars ) {
+        if ( ! $this->current_user_can_advanced_search() ) {
+			// Advanced search disabled.
+			return $public_query_vars;
+        }
+
         // Private query vars to make public. These are sanitised by WordPress core.
         $extra_query_vars = array(
-            'author__in',
+            'author__in',     // Author query vars only used when coauthor support is disabled.
             'author__not_in',
             'category__and',
             'category__in',
@@ -82,6 +134,11 @@ class SSL_ALP_Search extends SSL_ALP_Module {
     public function parse_date_query_vars( $query ) {
         if ( ! $query->is_search() ) {
             return;
+        }
+
+        if ( ! $this->current_user_can_advanced_search() ) {
+			// Advanced search disabled.
+			return;
         }
 
         // Get querystrings.

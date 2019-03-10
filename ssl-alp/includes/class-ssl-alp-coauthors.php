@@ -1147,10 +1147,17 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
      * @param string[] $public_query_vars Array of public query vars.
      */
     public function whitelist_coauthor_search_query_vars( $public_query_vars ) {
+		global $ssl_alp;
+
 		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
 			// Coauthors disabled.
-			return;
+			return $public_query_vars;
 		}
+
+        if ( ! $ssl_alp->search->current_user_can_advanced_search() ) {
+			// Advanced search disabled.
+			return $public_query_vars;
+        }
 
         // Custom query vars to make public. These are sanitised and handled by
         // `parse_coauthor_query_vars`.
@@ -1173,10 +1180,17 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
      * @param WP_Query $query The query.
      */
     public function parse_coauthor_query_vars( $query ) {
+		global $ssl_alp;
+
 		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
 			// Coauthors disabled.
 			return;
 		}
+
+        if ( ! $ssl_alp->search->current_user_can_advanced_search() ) {
+			// Advanced search disabled.
+			return;
+        }
 
         // Taxonomy query.
         $tax_query = array();

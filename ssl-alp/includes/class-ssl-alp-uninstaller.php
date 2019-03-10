@@ -121,6 +121,7 @@ class SSL_ALP_Uninstaller {
 	private static function delete_options() {
 		// Delete site options.
 		delete_option( 'ssl_alp_require_login' );
+		delete_option( 'ssl_alp_disallow_public_advanced_search' );
 		delete_option( 'ssl_alp_allow_multiple_authors' );
 		delete_option( 'ssl_alp_disable_post_trackbacks' );
 		delete_option( 'ssl_alp_enable_crossreferences' );
