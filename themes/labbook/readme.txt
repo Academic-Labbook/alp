@@ -46,6 +46,7 @@ of features provided in this theme.
   option providing the functionality relied upon by the theme is not enabled.
 * Fixed bug with timezones when displaying revision dates.
 * Enforced minimum PHP version (7.0.0) on activation.
+* Requires WordPress 5.1 or higher.
 
 = 1.0.7 - 2019-01-29 =
 * Made visited post titles show a different colour to non-visited ones.
