@@ -120,6 +120,14 @@ class SSL_ALP {
 		$this->auth = new SSL_ALP_Authenticate( $this );
 
 		/**
+		 * Search.
+		 */
+
+		require_once SSL_ALP_BASE_DIR . 'includes/class-ssl-alp-search.php';
+
+		$this->search = new SSL_ALP_Search( $this );
+
+		/**
 		 * Page functionality.
 		 */
 
@@ -185,6 +193,7 @@ class SSL_ALP {
 		$this->core->register();
 		$this->tools->register();
 		$this->auth->register();
+		$this->search->register();
 		$this->pages->register();
 		$this->coauthors->register();
 		$this->revisions->register();

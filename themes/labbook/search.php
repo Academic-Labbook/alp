@@ -13,16 +13,34 @@ get_header();
 	<section id="primary" class="content-area">
 		<main id="main" class="site-main">
 
-		<?php if ( have_posts() ) : ?>
+		<?php
+		if ( defined( 'LABBOOK_PAGE_SHOW_ADVANCED_SEARCH_FORM' ) && LABBOOK_PAGE_SHOW_ADVANCED_SEARCH_FORM ) :
+			/* Show the advanced search form instead of search results. */
+		?>
 
 			<header class="page-header">
-				<h1 class="page-title">
-					<?php
-					/* translators: %s: search query. */
-					printf( esc_html__( 'Search Results for: %s', 'labbook' ), '<span>' . get_search_query() . '</span>' );
-					?>
-				</h1>
+				<h1 class="page-title"><?php esc_html_e( 'Advanced Search', 'labbook' ); ?></h1>
 			</header><!-- .page-header -->
+
+		<?php
+			labbook_the_advanced_search_form();
+
+		else :
+
+			if ( have_posts() ) : ?>
+
+				<header class="page-header">
+					<h1 class="page-title">
+						<?php
+						/* translators: %s: search query. */
+						printf( esc_html__( 'Search Results for "%s"', 'labbook' ), '<span>' . get_search_query() . '</span>' );
+						?>
+					</h1>
+				</header><!-- .page-header -->
+
+				<div class="page-content">
+					<p><a href="#search-again"><?php esc_html_e( 'Skip to search form', 'labbook' ); ?></a></p>
+				</div>
 
 			<?php
 			/* Start the Loop */
@@ -38,11 +56,22 @@ get_header();
 
 			endwhile;
 
-			the_posts_navigation();
+				the_posts_navigation();
 
-		else :
+				?>
 
-			get_template_part( 'template-parts/content', 'none' );
+				<h2 id="search-again"><?php esc_html_e( 'Search again', 'labbook' ); ?></h2>
+
+				<?php
+
+				/* Show advanced search form. */
+				labbook_the_advanced_search_form();
+
+			else :
+
+				get_template_part( 'template-parts/content', 'none' );
+
+			endif;
 
 		endif;
 		?>

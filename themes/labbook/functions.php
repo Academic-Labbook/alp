@@ -238,6 +238,43 @@ function labbook_scripts() {
 }
 add_action( 'wp_enqueue_scripts', 'labbook_scripts' );
 
+if ( ! function_exists( 'labbook_add_advanced_search_query_var' ) ) :
+	/**
+	 * Add support for the advanced search query var.
+	 *
+	 * @param string[] $query_vars Array of current query variables.
+	 */
+	function labbook_add_advanced_search_query_var( $query_vars ) {
+		$query_vars[] = 'labbook_advanced_search';
+
+		return $query_vars;
+	}
+endif;
+add_filter( 'query_vars', 'labbook_add_advanced_search_query_var' );
+
+if ( ! function_exists( 'labbook_show_advanced_search_form' ) ) :
+	/**
+	 * Show the advanced search form on the search page.
+	 *
+	 * This shows the advanced search form instead of search results. In any case, search results
+	 * are followed by the advanced search form; this function exists to show the advanced search
+	 * page without showing an empty search result alongside it.
+	 *
+	 * @param string $original_template Original template.
+	 */
+	function labbook_show_advanced_search_form( $original_template ) {
+		if ( get_query_var( 'labbook_advanced_search' ) && labbook_ssl_alp_advanced_search_enabled() ) {
+			// Show advanced search form instead of search results.
+			define( 'LABBOOK_PAGE_SHOW_ADVANCED_SEARCH_FORM', true );
+
+			return get_search_template();
+		} else {
+			return $original_template;
+		}
+	}
+endif;
+add_action( 'template_include', 'labbook_show_advanced_search_form' );
+
 if ( ! function_exists( 'labbook_get_content_with_toc' ) ) :
 	/**
 	 * Insert table of contents into post.
@@ -278,6 +315,20 @@ if ( ! function_exists( 'labbook_get_content_with_toc' ) ) :
 	}
 endif;
 add_filter( 'the_content', 'labbook_get_content_with_toc' );
+
+/**
+ * Check if advanced search capabilities provided by the ALP plugin are available and enabled.
+ */
+function labbook_ssl_alp_advanced_search_enabled() {
+	global $ssl_alp;
+
+	if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
+		// Plugin is disabled.
+		return false;
+	}
+
+	return $ssl_alp->search->current_user_can_advanced_search();
+}
 
 /**
  * Check if coauthors provided by the ALP plugin are available and enabled.
@@ -343,6 +394,11 @@ function labbook_ssl_alp_unread_flags_enabled() {
  * Page table of contents generator.
  */
 require get_template_directory() . '/inc/class-labbook-toc-menu-level.php';
+
+/**
+ * Hierarchical taxonomy term select list builder.
+ */
+require get_template_directory() . '/inc/class-labbook-search-term-walker.php';
 
 /**
  * Functions which enhance the theme by hooking into WordPress.
