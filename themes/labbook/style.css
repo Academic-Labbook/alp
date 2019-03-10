@@ -1135,9 +1135,19 @@ a:hover, a:active {
 	max-width: 350px;
 }
 
-.search-form .search-field {
-    width: 100%;
-    margin-bottom: 0.5em;
+/* Flexbox used to make search box fill available width. */
+.search-form .search-flex {
+    display: flex;
+    align-items: stretch;
+}
+
+.search-form .search-flex .search-field {
+    flex: 1; /* stretch to fit available space */
+}
+
+.search-form .search-flex .search-advanced-link {
+    align-self: center; /* vertically center the contents */
+    margin-left: 0.5em;
 }
 
 /* advanced search form */
