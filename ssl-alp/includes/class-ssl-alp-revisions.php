@@ -1028,10 +1028,34 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	public function rest_get_post_read_status( WP_REST_Request $data ) {
 		if ( is_null( $data['post_id'] ) ) {
 			// Invalid data.
-			return $this->unread_flag_invalid_data_error();
+			return rest_ensure_response( $this->unread_flag_invalid_data_error() );
 		}
 
-		$response = $this->get_post_read_status( $data['post_id'], $data['user_id'] );
+		$post = get_post( $data['post_id'] );
+
+		if ( is_null( $post ) ) {
+			return rest_ensure_response( $this->unread_flag_post_not_found_error() );
+		}
+
+		if ( is_numeric( $data['user_id'] ) ) {
+			// Get user by their ID.
+			$user = get_user_by( 'id', $data['user_id'] );
+		} else {
+			// Try to get logged in user.
+			$user = wp_get_current_user();
+		}
+
+		if ( ! $user ) {
+			// Invalid user.
+			return rest_ensure_response( $this->unread_flag_user_not_found_error() );
+		}
+
+		if ( ! $this->check_unread_flag_permission( $user ) ) {
+			// No permission.
+			return rest_ensure_response( $this->unread_flag_no_permission_error() );
+		}
+
+		$response = $this->get_post_read_status( $post, $user );
 
 		if ( ! is_wp_error( $response ) ) {
 			// Make response an array with new flag.
@@ -1052,10 +1076,34 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	public function rest_set_post_read_status( WP_REST_Request $data ) {
 		if ( is_null( $data['post_id'] ) || is_null( $data['read'] ) ) {
 			// Invalid data.
-			return $this->unread_flag_invalid_data_error();
+			return rest_ensure_response( $this->unread_flag_invalid_data_error() );
 		}
 
-		$response = $this->set_post_read_status( $data['read'], $data['post_id'], $data['user_id'] );
+		$post = get_post( $data['post_id'] );
+
+		if ( is_null( $post ) ) {
+			return rest_ensure_response( $this->unread_flag_post_not_found_error() );
+		}
+
+		if ( is_numeric( $data['user_id'] ) ) {
+			// Get user by their ID.
+			$user = get_user_by( 'id', $data['user_id'] );
+		} else {
+			// Try to get logged in user.
+			$user = wp_get_current_user();
+		}
+
+		if ( ! $user ) {
+			// Invalid user.
+			return rest_ensure_response( $this->unread_flag_user_not_found_error() );
+		}
+
+		if ( ! $this->check_unread_flag_permission( $user ) ) {
+			// No permission.
+			return rest_ensure_response( $this->unread_flag_no_permission_error() );
+		}
+
+		$response = $this->set_post_read_status( $data['read'], $post, $user );
 
 		if ( ! is_wp_error( $response ) ) {
 			// Make response an array with new flag.
@@ -1278,11 +1326,6 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			return $this->unread_flag_user_not_found_error();
 		}
 
-		if ( ! $this->check_unread_flag_permission( $user ) ) {
-			// No permission.
-			return $this->unread_flag_no_permission_error();
-		}
-
 		$user_unread_flag_term = $this->get_user_unread_flag_term( $user );
 
 		if ( ! $user_unread_flag_term ) {
@@ -1302,7 +1345,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * @param int|WP_User|null $user User ID or user object. Defaults to currently logged in user.
 	 * @return bool|WP_Error New read status, or error.
 	 */
-	private function set_post_read_status( $read, $post = null, $user = null ) {
+	public function set_post_read_status( $read, $post = null, $user = null ) {
 		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
 			// Unread flags disabled.
 			return $this->unread_flag_no_permission_error();
