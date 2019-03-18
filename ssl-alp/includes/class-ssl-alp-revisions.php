@@ -134,8 +134,8 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		// Add link to unread posts on toolbar.
 		$loader->add_action( 'wp_before_admin_bar_render', $this, 'add_unread_posts_admin_bar_link' );
 
-		// Set default unread posts page to current user.
-		$loader->add_action( 'pre_get_posts', $this, 'set_default_unread_posts_user' );
+		// Set unread posts page user depending on query, and check permissions.
+		$loader->add_action( 'pre_get_posts', $this, 'set_unread_posts_archive_page_user' );
 
 		// Register REST API endpoints for unread flags.
 		$loader->add_action( 'rest_api_init', $this, 'rest_register_unread_flag_routes' );
@@ -148,6 +148,9 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		// Add "Unread" filter to admin post list.
 		$loader->add_filter( 'views_edit-post', $this, 'filter_edit_post_views', 10, 1 );
+
+		// Set the unread posts archive page name to the user's display name.
+		$loader->add_filter( 'single_term_title', $this, 'set_unread_post_archive_title' );
 
 		// Add bulk actions to mark posts as read/unread.
 		$loader->add_filter( 'bulk_actions-edit-post', $this, 'register_read_unread_bulk_actions' );
@@ -776,6 +779,24 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	}
 
 	/**
+	 * Get user from unread flag term.
+	 *
+	 * @param WP_Term $term Unread flag term.
+	 * @return WP_User|false
+	 */
+	private function get_user_from_unread_flag_term( $term ) {
+		if ( substr( $term->slug, 0, strlen( self::$unread_flag_term_slug_prefix ) ) !== self::$unread_flag_term_slug_prefix ) {
+			// The slug doesn't contain the prefix.
+			return false;
+		}
+
+		// Remove prefix.
+		$user_nicename = substr( $term->slug, strlen( self::$unread_flag_term_slug_prefix ) );
+
+		return get_user_by( 'slug', $user_nicename );
+	}
+
+	/**
 	 * Get unread flag term for specified user.
 	 *
 	 * @param int|WP_User|null $user User ID or user object. Defaults to currently logged in user.
@@ -901,9 +922,16 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Set the default unread posts page user if it is not set.
+	 * Set unread posts page user depending on query, and check permissions.
 	 */
-	public function set_default_unread_posts_user() {
+	public function set_unread_posts_archive_page_user() {
+		global $wp_query;
+
+		if ( ! is_tax() ) {
+			// Not a taxonomy page.
+			return;
+		}
+
 		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
 			// Unread flags disabled.
 			return;
@@ -911,14 +939,26 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		if ( ! is_user_logged_in() ) {
 			// Cannot show useful unread posts page.
-			set_query_var( 'unread', '' );
+			$wp_query->set_404();
+		} else {
+			if ( self::$unread_flag_term_slug_prefix === get_query_var( 'unread' ) ) {
+				// No unread term is set (it defaults to the slug prefix) - use current user's slug.
+				set_query_var( 'unread', $this->get_unread_flag_term_slug() );
+			} else {
+				// An unread archive slug is set, but does the user have permission to view it?
+				$term = get_term_by( 'slug', get_query_var( 'unread' ), 'ssl_alp_unread_flag' );
 
-			return;
-		}
+				if ( $term ) {
+					$user = $this->get_user_from_unread_flag_term( $term );
 
-		if ( self::$unread_flag_term_slug_prefix === get_query_var( 'unread' ) ) {
-			// No unread term is set - use current user's.
-			set_query_var( 'unread', $this->get_unread_flag_term_slug() );
+					if ( ! $this->check_unread_flag_permission( $user ) ) {
+						// User cannot view this page.
+						$wp_query->set_404();
+					}
+				} else {
+					$wp_query->set_404();
+				}
+			}
 		}
 	}
 
@@ -1467,6 +1507,40 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		array_splice( $views, 1, 0, array( $unread ) );
 
 		return $views;
+	}
+
+	/**
+	 * Filter the unread post archive page title to show the user's display name
+	 * instead of the user nicename (the term name).
+	 *
+	 * @param string $title The archive page title.
+	 */
+	public function set_unread_post_archive_title( $title ) {
+		if ( ! is_tax() ) {
+			// Not a taxonomy page.
+			return $title;
+		}
+
+		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
+			// Unread flags disabled.
+			return $title;
+		}
+
+		$term = get_queried_object();
+		$tax  = get_taxonomy( $term->taxonomy );
+
+		if ( 'ssl_alp_unread_flag' !== $tax->name ) {
+			return $title;
+		}
+
+		$user = $this->get_user_from_unread_flag_term( $term );
+
+		if ( $user ) {
+			// Use the user's display name.
+			$title = $user->display_name;
+		}
+
+		return $title;
 	}
 
 	/**
