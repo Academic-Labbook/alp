@@ -4,7 +4,7 @@ Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
 Requires at least: 5.1.0
 Tested up to: 5.1.0
 Requires PHP: 7.0.0
-Stable tag: 0.13.1
+Stable tag: 0.13.2
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -72,6 +72,11 @@ with maximum control. Please see [this guide](https://alp.attackllama.com/docume
 on the ALP website.
 
 == Changelog ==
+
+= 0.13.2 =
+ - Fix bug with read flags not being settable on single pages.
+ - Fix bug with display names on unread post pages.
+ - Remove invalid coauthors attached to posts on save.
 
 = 0.13.1 =
  - Added support for advanced searches, letting users search posts by multiple coauthors, categories
