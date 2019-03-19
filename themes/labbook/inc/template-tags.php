@@ -25,16 +25,6 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 
 		echo '<h2 class="entry-title">';
 
-		// Post read/unread status.
-		$post_is_read = labbook_post_is_read( $post );
-
-		// Default post read class.
-		$post_read_classes = array( 'entry-title-link-' . $post->ID );
-
-		if ( $post_is_read ) {
-			$post_read_classes[] = 'entry-read';
-		}
-
 		if ( $icon ) {
 			if ( ! is_user_logged_in() || ! labbook_get_option( 'show_unread_flags' ) || ! labbook_ssl_alp_unread_flags_enabled() ) {
 				// No support for unread flags.
@@ -48,7 +38,20 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 
 				$read_class = '';
 				$unread_class = '';
+				$read_status = '';
 			} else {
+				// Post read/unread status.
+				$post_is_read = labbook_post_is_read( $post );
+
+				// Default post read class.
+				$post_read_classes = array( 'entry-title-link-' . $post->ID );
+
+				if ( $post_is_read ) {
+					$post_read_classes[] = 'entry-read';
+				}
+
+				$read_status = $post_is_read ? "true" : "false";
+
 				if ( 'status' === get_post_format( $post ) ) {
 					$icon_class = 'fa fa-info-circle labbook-read-button';
 					$icon_description = __( 'Status update (click to toggle read status)', 'labbook' );
@@ -71,10 +74,11 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 
 			if ( ! empty( $icon_class ) ) {
 				printf(
-					'<i class="%1$s" title="%2$s" data-post-id="%3$s" data-read-class="%4$s" data-unread-class="%5$s"></i>',
+					'<i class="%1$s" title="%2$s" data-post-id="%3$s" data-read-status="%4$s" data-read-class="%5$s" data-unread-class="%6$s"></i>',
 					esc_attr( $icon_class ),
 					esc_attr( $icon_description ),
 					esc_attr( $post->ID ),
+					esc_attr( $read_status ),
 					esc_attr( $read_class ),
 					esc_attr( $unread_class )
 				);
