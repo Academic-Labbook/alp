@@ -56,6 +56,9 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// Set the current user as the default coauthor on new drafts.
 		$loader->add_action( 'save_post', $this, 'add_user_to_draft', 10, 2 );
 
+		// Delete any invalid coauthors when post terms are set.
+		$loader->add_action( 'added_term_relationship', $this, 'reject_invalid_coauthor_terms', 10, 3 );
+
 		// Check and if necessary update the primary author when post coauthor terms are set.
 		$loader->add_action( 'set_object_terms', $this, 'check_post_author', 10, 4 );
 
@@ -979,6 +982,42 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$coauthors = array( wp_get_current_user() );
 
 		$this->set_coauthors( $post, $coauthors );
+	}
+
+	/**
+	 * Delete invalid coauthors when a post is saved.
+	 *
+	 * Unfortunately there is no way to filter terms before they are set on a post, so this function
+	 * deletes them afterwards instead.
+	 *
+	 * @param int    $object_id Object ID.
+	 * @param int    $tt_id     Term taxonomy ID.
+	 * @param string $taxonomy  Taxonomy slug.
+	 */
+	public function reject_invalid_coauthor_terms( $object_id, $tt_id, $taxonomy ) {
+		if ( 'ssl_alp_coauthor' !== $taxonomy ) {
+			return;
+		}
+
+		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
+			// Coauthors disabled.
+			return;
+		}
+
+		$term = get_term_by( 'term_taxonomy_id', $tt_id, 'ssl_alp_coauthor' );
+
+		if ( ! $term ) {
+			// Nothing to do here.
+			return;
+		}
+
+		// Check term is valid.
+		$author_term = $this->get_user_from_coauthor_term( $term );
+
+		if ( ! $author_term ) {
+			// This is not a valid coauthor term - delete it.
+			wp_delete_term( $term->term_id, 'ssl_alp_coauthor' );
+		}
 	}
 
 	/**
