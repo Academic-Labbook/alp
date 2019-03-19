@@ -3,7 +3,7 @@ Contributors: seanleavey
 Tags: custom-background, custom-logo, custom-menu, editor-style, education, theme-options, threaded-comments, translation-ready, two-columns
 Requires at least: 5.0.0
 Tested up to: 5.0.3
-Stable tag: 1.1.1
+Stable tag: 1.1.2
 Requires PHP: 7.0.0
 License: GNU General Public License v3 or later
 License URI: LICENCE
@@ -35,6 +35,9 @@ Labbook supports Academic Labbook Plugin - indeed, use of it is highly encourage
 of features provided in this theme.
 
 == Changelog ==
+
+= 1.1.2 - 2019-03-19 =
+* Fixed bug with read flags on single pages.
 
 = 1.1.1 - 2019-03-10 =
 * Added support for advanced searches.
