@@ -87,6 +87,8 @@ of features provided in this theme.
 
 == Credits ==
 
+* [Sean Leavey](https://attackllama.com/)
 * Based on Underscores https://underscores.me/, (C) 2012-2017 Automattic, Inc., [GPLv2 or later](https://www.gnu.org/licenses/gpl-2.0.html)
 * [normalize.css](https://necolas.github.io/normalize.css/), (C) 2012-2016 Nicolas Gallagher and Jonathan Neal, [MIT](https://opensource.org/licenses/MIT)
 * Look and feel based on [Simple Life](https://wordpress.org/themes/simple-life/), by Nilambar Sharma, [GPLv3 or later](http://www.gnu.org/licenses/gpl-3.0.html)
+* Fonts from [FontAwesome](https://fontawesome.com/)
