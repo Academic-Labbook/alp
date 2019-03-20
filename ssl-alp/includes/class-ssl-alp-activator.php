@@ -118,6 +118,7 @@ class SSL_ALP_Activator {
 		// Add options with default values (if they already exist, nothing happens).
 		add_option( 'ssl_alp_require_login', true );
 		add_option( 'ssl_alp_disallow_public_advanced_search', true );
+		add_option( 'ssl_alp_enable_abbreviations', true );
 		add_option( 'ssl_alp_allow_multiple_authors', true );
 		add_option( 'ssl_alp_disable_post_trackbacks', true );
 		add_option( 'ssl_alp_enable_crossreferences', true );

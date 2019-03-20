@@ -128,6 +128,14 @@ class SSL_ALP {
 		$this->search = new SSL_ALP_Search( $this );
 
 		/**
+		 * Abbreviations.
+		 */
+
+		require_once SSL_ALP_BASE_DIR . 'includes/class-ssl-alp-abbreviations.php';
+
+		$this->abbreviations = new SSL_ALP_Abbreviations( $this );
+
+		/**
 		 * Page functionality.
 		 */
 
@@ -194,6 +202,7 @@ class SSL_ALP {
 		$this->tools->register();
 		$this->auth->register();
 		$this->search->register();
+		$this->abbreviations->register();
 		$this->pages->register();
 		$this->coauthors->register();
 		$this->revisions->register();
