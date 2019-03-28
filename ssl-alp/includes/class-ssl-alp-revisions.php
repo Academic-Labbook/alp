@@ -927,8 +927,8 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	public function set_unread_posts_archive_page_user() {
 		global $wp_query;
 
-		if ( ! is_tax() ) {
-			// Not a taxonomy page.
+		if ( ! is_tax() || empty( get_query_var( 'unread' ) ) ) {
+			// Not the unread posts page.
 			return;
 		}
 
@@ -1516,8 +1516,8 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * @param string $title The archive page title.
 	 */
 	public function set_unread_post_archive_title( $title ) {
-		if ( ! is_tax() ) {
-			// Not a taxonomy page.
+		if ( ! is_tax( 'ssl_alp_unread_flag' ) ) {
+			// Not this taxonomy's page.
 			return $title;
 		}
 
