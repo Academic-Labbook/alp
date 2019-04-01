@@ -570,6 +570,13 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		$revisions = wp_get_post_revisions( $post, $args );
 
+		// Remove autosaves.
+		foreach ( $revisions as $key => $revision ) {
+			if ( wp_is_post_autosave( $revision ) ) {
+				unset( $revisions[ $key ] );
+			}
+		}
+
 		return $revisions;
 	}
 
