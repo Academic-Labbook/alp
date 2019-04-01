@@ -534,7 +534,7 @@ if ( ! function_exists( 'labbook_the_revisions' ) ) :
 			return;
 		}
 
-		$current_page = ( get_query_var( 'revision_page' ) ) ? get_query_var( 'revision_page' ) : 1;
+		$current_page = get_query_var( 'revision_page', 1 );
 
 		// Total revisions.
 		$count = labbook_get_post_revision_count( $post );
@@ -592,7 +592,7 @@ if ( ! function_exists( 'labbook_the_revisions' ) ) :
 		if ( $pages > 1 ) {
 			echo paginate_links(
 				array(
-					'base'    => '%_%#post-revisions',
+					'base'    => get_permalink( $post ) . '%_%#post-revisions',
 					'format'  => '?revision_page=%#%',
 					'current' => $current_page,
 					'total'   => $pages,
