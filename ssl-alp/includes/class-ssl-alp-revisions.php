@@ -705,7 +705,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			 * Get last $number revisions (don't need parents) grouped by author and parent id, ordered
 			 * by date descending, where number is > 1 if the revision was made by the original author
 			 * (this prevents the original published post showing up as a revision), or > 0 if the
-			 * revision was made by someone else.
+			 * revision was made by someone else. Ignore autosaves.
 			 *
 			 * Note: `post_date` is the most recent revision found in each group.
 			 */
@@ -718,6 +718,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 					INNER JOIN {$wpdb->posts} AS parent_posts ON posts.post_parent = parent_posts.ID
 					WHERE
 						posts.post_type = 'revision'
+						AND LOCATE(CONCAT(posts.post_parent, '-autosave'), posts.post_name) = 0
 						AND posts.post_status = 'inherit'
 						AND parent_posts.post_type IN ({$supported_types_clause})
 						AND parent_posts.post_status = 'publish'
