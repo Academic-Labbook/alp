@@ -186,10 +186,10 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 	 */
 	public function get_columns() {
 		return array(
-			'post_title'  => esc_html__( 'Title', 'ssl-alp' ),
-			'changes'     => '<abbr title="' . esc_html__( 'Lines added to and removed from the post text', 'ssl-alp' ) . '">' . esc_html__( 'Line changes', 'ssl-alp' ) . '</abbr>',
-			'author'      => esc_html__( 'Author', 'ssl-alp' ),
-			'date'        => esc_html__( 'Date', 'ssl-alp' ),
+			'title'   => esc_html__( 'Title', 'ssl-alp' ),
+			'changes' => '<abbr title="' . esc_html__( 'Lines added to and removed from the post text', 'ssl-alp' ) . '">' . esc_html__( 'Line changes', 'ssl-alp' ) . '</abbr>',
+			'author'  => esc_html__( 'Author', 'ssl-alp' ),
+			'date'    => esc_html__( 'Date', 'ssl-alp' ),
 		);
 	}
 
@@ -198,9 +198,47 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 	 */
 	protected function get_sortable_columns() {
 		return array(
-			'post_title' => 'post_title',
-			'date'       => array( 'post_date', true ),
+			'title' => 'post_title',
+			'date'  => array( 'post_date', true ),
 		);
+	}
+
+	public function column_title( $revision ) {
+		global $ssl_alp;
+
+		$latest_revision = $ssl_alp->revisions->get_latest_revision( $revision );
+
+		echo '<strong>';
+
+		/**
+		 * Note: interns are not shown the edit link below (it is empty) because they fail
+		 * the edit_post permission check against the *revision* here. This is a subtle bug
+		 * that would take a lot of effort to fix.
+		 *
+		 * Instead, interns simply aren't shown the revision link.
+		 */
+		$edit_link = get_edit_post_link( $revision->ID );
+
+		if ( ! empty( $edit_link ) && $ssl_alp->revisions->current_user_can_view_revision( $revision ) ) {
+			printf(
+				'<a class="row-title" href="%s" aria-label="%s">%s</a>',
+				$edit_link,
+				/* translators: %s: post title */
+				esc_attr( sprintf( __( '&#8220;%s&#8221; (Difference)', 'ssl-alp' ), $revision->post_title ) ),
+				$revision->post_title
+			);
+		} else {
+			printf(
+				'<span>%s</span>',
+				$revision->post_title
+			);
+		}
+
+		if ( ! is_null( $latest_revision ) && $revision->ID === $latest_revision->ID ) {
+			echo ' &mdash; ' . '<span class="post-state">' . __( 'Latest', 'ssl-alp' ) . '</span>';
+		}
+
+		echo '</strong>';
 	}
 
 	/**
@@ -416,15 +454,30 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 			$actions['view_diff'] = sprintf(
 				'<a href="%1$s" aria-label="%2$s">%3$s</a>',
 				esc_url( $edit_link ),
-				esc_attr(
-					sprintf(
-						/* translators: %s: revision parent post title */
-						__( 'View changes to &#8220;%s&#8221;', 'ssl-alp' ),
-						$revision->post_title
-					)
-				),
-				__( 'View Changes', 'ssl-alp' )
+				esc_attr( __( 'View changes made in this revision', 'ssl-alp' ) ),
+				esc_html__( 'View Difference to Previous', 'ssl-alp' )
 			);
+
+			$latest_revision = $ssl_alp->revisions->get_latest_revision( $revision );
+
+			if ( ! is_null( $latest_revision ) && $revision->ID !== $latest_revision->ID ) {
+				$cur_link = admin_url(
+					add_query_arg(
+						array(
+							'from' => $revision->ID,
+							'to'   => $latest_revision->ID,
+						),
+						'revision.php'
+					)
+				);
+
+				$actions['view_cur'] = sprintf(
+					'<a href="%1$s" aria-label="%2$s">%3$s</a>',
+					esc_url( $cur_link ),
+					esc_attr( __( 'View difference between this revision and current published version', 'ssl-alp' ) ),
+					esc_html__( 'View Difference to Latest', 'ssl-alp' )
+				);
+			}
 		}
 
 		return $this->row_actions( $actions );

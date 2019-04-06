@@ -301,6 +301,10 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * @return WP_Post|null The latest revision or null if no revision found.
 	 */
 	public function get_latest_revision( $post ) {
+		if ( wp_is_post_revision( $post ) ) {
+			$post = $post->post_parent;
+		}
+
 		$post = get_post( $post );
 
 		if ( is_null( $post ) ) {
