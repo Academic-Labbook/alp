@@ -52,3 +52,11 @@ div.ssl-alp-tools-card {
 .components-base-control .components-base-control__help {
     margin-top: 0 !important;
 }
+
+.ssl-alp-text-added {
+    color: #006505;
+}
+
+.ssl-alp-text-removed {
+    color: #a00;
+}

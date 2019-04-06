@@ -545,10 +545,11 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * @param int|WP_Post|null $post                 Post ID or post object. Defaults to global
 	 *                                               $post.
 	 * @param array|null       $args                 Arguments for retrieving post revisions.
+	 * @param bool             $include_autosaves    Include autosave revisions.
 	 * @param bool             $only_since_published Only retrieve revisions since publication
 	 *                                               (inclusive).
 	 */
-	public function get_revisions( $post = null, $args = null, $only_since_published = true ) {
+	public function get_revisions( $post = null, $args = null, $include_autosaves = false, $only_since_published = true ) {
 		$post = get_post( $post );
 
 		if ( is_null( $post ) ) {
@@ -578,10 +579,12 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		$revisions = wp_get_post_revisions( $post, $args );
 
-		// Remove autosaves.
-		foreach ( $revisions as $key => $revision ) {
-			if ( wp_is_post_autosave( $revision ) ) {
-				unset( $revisions[ $key ] );
+		if ( ! $include_autosaves ) {
+			// Remove autosaves.
+			foreach ( $revisions as $key => $revision ) {
+				if ( wp_is_post_autosave( $revision ) ) {
+					unset( $revisions[ $key ] );
+				}
 			}
 		}
 
@@ -676,24 +679,45 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Add revisions page to admin menu.
+	 * Add revisions pages to admin menu.
 	 */
 	public function add_revisions_page() {
-		$hook_suffix = add_posts_page(
+		$post_hook_suffix = add_posts_page(
 			__( 'Revisions', 'ssl-alp' ),
 			__( 'Revisions', 'ssl-alp' ),
 			'read',
-			SSL_ALP_REVISIONS_MENU_SLUG,
+			SSL_ALP_POST_REVISIONS_MENU_SLUG,
 			array( $this, 'output_admin_revisions_page' )
 		);
 
-		if ( $hook_suffix ) {
+		$page_hook_suffix = add_pages_page(
+			__( 'Revisions', 'ssl-alp' ),
+			__( 'Revisions', 'ssl-alp' ),
+			'read',
+			SSL_ALP_PAGE_REVISIONS_MENU_SLUG,
+			array( $this, 'output_admin_revisions_page' )
+		);
+
+		if ( $post_hook_suffix ) {
 			// Add callback for loading the page.
-			add_action( "load-{$hook_suffix}", array( $this, 'load_revisions_page_screen_options' ) );
+			add_action( "load-{$post_hook_suffix}", array( $this, 'load_post_revisions_page_screen_options' ) );
+		}
+
+		if ( $page_hook_suffix ) {
+			// Add callback for loading the page.
+			add_action( "load-{$page_hook_suffix}", array( $this, 'load_page_revisions_page_screen_options' ) );
 		}
 	}
 
-	public function load_revisions_page_screen_options() {
+	public function load_post_revisions_page_screen_options() {
+		return $this->load_revisions_page_screen_options( 'post' );
+	}
+
+	public function load_page_revisions_page_screen_options() {
+		return $this->load_revisions_page_screen_options( 'page' );
+	}
+
+	private function load_revisions_page_screen_options( $post_type ) {
 		$arguments = array(
 			'label'   => __( 'Revisions Per Page', 'ssl-alp' ),
 			'default' => 20,
@@ -706,7 +730,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		 * Instantiate the revisions list table. Creating the instance here allow the core
 		 * WP_List_Table class to automatically load the table columns in the screen options panel.
 		 */
-		$this->revisions_list_table = new SSL_ALP_Revisions_List_Table();
+		$this->revisions_list_table = new SSL_ALP_Revisions_List_Table( $post_type );
 	}
 
 	/**
@@ -1395,17 +1419,11 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 				require( ABSPATH . WPINC . '/wp-diff.php' );
 			}
 
-			$old_string  = normalize_whitespace( $post_before->post_content );
-			$new_string = normalize_whitespace( $post_after->post_content );
-
-			$old_lines  = explode( "\n", $old_string );
-			$new_lines = explode( "\n", $new_string );
-
 			// Compute text difference between old and new posts.
-			$diff = new Text_Diff( $old_lines, $new_lines );
+			$diff = $this->get_post_text_differences( $post_after, $post_before );
 
 			// Post content is deemed changed if there are new or deleted lines.
-			$changed = $diff->countAddedLines() > 1 || $diff->countDeletedLines() > 1;
+			$changed = $diff['added'] > 1 || $diff['removed'] > 1;
 
 			if ( ! $changed ) {
 				return;
@@ -1414,6 +1432,60 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		// Set post as unread for all users except current user.
 		$this->set_users_post_read_status( false, $post_after, wp_get_current_user() );
+	}
+
+	/**
+	 * Get the number of added and deleted lines between two revisions of a post.
+	 *
+	 * @param WP_Post      $new_revision New revision.
+	 * @param WP_Post|null $old_revision Previous revision. If not specified, the revision
+	 *                                   immediately prior to $post_after is used.
+	 * @return array|null Array containing lines added and removed, or null if difference can't be
+	 *                    determined.
+	 */
+	public function get_post_text_differences( $new_revision, $old_revision = null ) {
+		if ( ! class_exists( 'Text_Diff', false ) ) {
+			require( ABSPATH . WPINC . '/wp-diff.php' );
+		}
+
+		if ( is_null( $old_revision ) ) {
+			// Get previous revision.
+			$revisions = $this->get_revisions(
+				$new_revision->post_parent,
+				array(
+					'order'         => 'DESC',
+					'orderby'       => 'date ID',
+					'numberposts'   => 1,
+					'date_query' => array(
+						'before'    => $new_revision->post_date,
+						'inclusive' => false,
+					),
+				),
+				true,
+				false
+			);
+
+			if ( empty( $revisions ) ) {
+				// Can't get previous revision.
+				return;
+			}
+
+			$old_revision = reset( $revisions );
+		}
+
+		$old_string  = normalize_whitespace( $old_revision->post_content );
+		$new_string = normalize_whitespace( $new_revision->post_content );
+
+		$old_lines  = explode( "\n", $old_string );
+		$new_lines = explode( "\n", $new_string );
+
+		// Compute text difference between old and new posts.
+		$diff = new Text_Diff( $old_lines, $new_lines );
+
+		return array(
+			'added'   => $diff->countAddedLines(),
+			'removed' => $diff->countDeletedLines(),
+		);
 	}
 
 	/**
