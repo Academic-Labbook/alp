@@ -1375,4 +1375,61 @@ class CoauthorsTest extends WP_UnitTestCase {
         // Remove notify authors hook.
         remove_filter( 'comment_notification_notify_author', '__return_true' );
     }
+
+    /**
+     * Test that invalid coauthors specified for posts are removed.
+     */
+    function test_invalid_coauthor_terms_are_removed() {
+        global $ssl_alp;
+
+        $post = $this->factory->post->create_and_get(
+            array(
+                'post_status'     => 'publish',
+                'post_type'       => 'post',
+            )
+        );
+
+        // Valid terms to set.
+        $required_term_ids = array(
+            $ssl_alp->coauthors->get_coauthor_term( get_user_by( 'id', self::$author_ids[0] ) )->term_id,
+            $ssl_alp->coauthors->get_coauthor_term( get_user_by( 'id', self::$author_ids[1] ) )->term_id,
+            $ssl_alp->coauthors->get_coauthor_term( get_user_by( 'id', self::$editor_ids[0] ) )->term_id,
+            $ssl_alp->coauthors->get_coauthor_term( get_user_by( 'id', self::$editor_ids[1] ) )->term_id,
+        );
+
+        // Create junk terms.
+        $junk1 = wp_insert_term(
+            'junk_term',
+            'ssl_alp_coauthor',
+            array(
+                'slug' => 'junk-term',
+            )
+        );
+        $junk2 = wp_insert_term(
+            'ssl_alp_coauthor_nonexistent_user',
+            'ssl_alp_coauthor',
+            array(
+                'slug' => 'ssl-alp-coauthor-nonexistent-user',
+            )
+        );
+
+        // Add junk terms to the submission.
+        $set_terms   = $required_term_ids;
+        $set_terms[] = $junk1['term_id'];
+        $set_terms[] = $junk2['term_id'];
+
+        // Set terms.
+        wp_set_post_terms( $post->ID, $set_terms, 'ssl_alp_coauthor' );
+
+        // Get post terms.
+		$new_terms = wp_get_object_terms(
+			$post->ID,
+			'ssl_alp_coauthor'
+        );
+
+        $new_term_ids = wp_list_pluck( $new_terms, 'term_id' );
+
+        // Verify junk terms were removed.
+        $this->assertEquals( $new_term_ids, $required_term_ids );
+    }
 }

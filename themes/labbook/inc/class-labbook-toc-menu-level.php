@@ -5,9 +5,9 @@
  * @package Labbook
  */
 
- /**
-  * Table of contents menu level.
-  */
+/**
+ * Table of contents menu level.
+ */
 class Labbook_TOC_Menu_Level {
 	/**
 	 * Parent menu.
@@ -66,7 +66,7 @@ class Labbook_TOC_Menu_Level {
 	 * @param array $child Child.
 	 */
 	public function add_child_menu( $child ) {
-		$child->parent_menu = &$this;
+		$child->parent_menu  = &$this;
 		$this->child_menus[] = $child;
 
 		// Update last child reference.
@@ -153,7 +153,7 @@ if ( ! function_exists( 'labbook_generate_post_contents' ) ) :
 		libxml_use_internal_errors( $prev_libxml_error_setting );
 
 		// Create root list container.
-		$toc = new Labbook_TOC_Menu_Level();
+		$toc          = new Labbook_TOC_Menu_Level();
 		$toc->is_root = true;
 
 		// Set parent container to root.
@@ -175,17 +175,17 @@ if ( ! function_exists( 'labbook_generate_post_contents' ) ) :
 		 * a root array is created to hold the whole tree, and this is defined as the
 		 * first "parent". Then the document's header elements are iterated over:
 		 *
-		 *     First of all, the current header level (e.g. <h3> is level 3) is checked
-		 * 	   against the previous level. If it's higher (for example, when an <h3>
-		 *     follows an <h2>), a new array is created as a child of the current parent,
-		 *     and this becomes the new parent (this array does not initially contain a
-		 *     value, as there may not be a header for this level). If the current level
-		 *     is lower than the previous, the parent is set to the current parent's
-		 *     parent.
+		 * First of all, the current header level (e.g. <h3> is level 3) is checked
+		 * against the previous level. If it's higher (for example, when an <h3>
+		 * follows an <h2>), a new array is created as a child of the current parent,
+		 * and this becomes the new parent (this array does not initially contain a
+		 * value, as there may not be a header for this level). If the current level
+		 * is lower than the previous, the parent is set to the current parent's
+		 * parent.
 		 *
-		 *     After determining the current level, a new child is added to the current
-		 *     parent, and is given a value corresponding to the current header's id. The
-		 *     previous level is set to the current level, and the loop continues.
+		 * After determining the current level, a new child is added to the current
+		 * parent, and is given a value corresponding to the current header's id. The
+		 * previous level is set to the current level, and the loop continues.
 		 *
 		 * After the loop, the result is an tree structure containing each header from
 		 * each level, ordered in a hierarchy where higher headers are children of its
@@ -226,8 +226,8 @@ if ( ! function_exists( 'labbook_generate_post_contents' ) ) :
 			$child = new Labbook_TOC_Menu_Level();
 			$child->set_menu_data(
 				array(
-					'id'	=> $header_id,
-					'title'	=> $header->textContent,
+					'id'    => $header_id,
+					'title' => $header->textContent,
 				)
 			);
 

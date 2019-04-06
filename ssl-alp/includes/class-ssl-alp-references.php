@@ -253,9 +253,16 @@ class SSL_ALP_References extends SSL_ALP_Module {
 
 			$referenced_post = get_post( $referenced_post_id );
 
-			if ( ! is_null( $referenced_post ) ) {
-				$posts[] = $referenced_post;
+			if ( is_null( $referenced_post ) ) {
+				continue;
 			}
+
+			if ( 'publish' !== $referenced_post->post_status ) {
+				// Ignore unpublished posts.
+				continue;
+			}
+
+			$posts[] = $referenced_post;
 		}
 
 		return $posts;
@@ -314,9 +321,16 @@ class SSL_ALP_References extends SSL_ALP_Module {
 			foreach ( $object_ids as $post_id ) {
 				$referenced_post = get_post( $post_id );
 
-				if ( ! is_null( $referenced_post ) ) {
-					$posts[] = $referenced_post;
+				if ( is_null( $referenced_post ) ) {
+					continue;
 				}
+
+				if ( 'publish' !== $referenced_post->post_status ) {
+					// Ignore unpublished posts.
+					continue;
+				}
+
+				$posts[] = $referenced_post;
 			}
 
 			wp_cache_set( $cache_key, $posts );

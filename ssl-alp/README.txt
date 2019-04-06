@@ -4,7 +4,7 @@ Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
 Requires at least: 5.1.0
 Tested up to: 5.1.0
 Requires PHP: 7.0.0
-Stable tag: 0.13.0
+Stable tag: 0.13.3
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -72,6 +72,21 @@ with maximum control. Please see [this guide](https://alp.attackllama.com/docume
 on the ALP website.
 
 == Changelog ==
+
+= 0.13.3 =
+ - Fixed bug with advanced search not returning results.
+ - Stopped unpublished posts being crossreferenced.
+ - Prevented autosaves showing up as post revisions publicly.
+
+= 0.13.2 =
+ - Fixed bug with read flags not being settable on single pages.
+ - Fixed bug with display names on unread post pages.
+ - Removed invalid coauthors attached to posts on save.
+
+= 0.13.1 =
+ - Added support for advanced searches, letting users search posts by multiple coauthors, categories
+   and tags, and dates.
+ - Added setting to control display of advanced search tools to non-logged-in users.
 
 = 0.13.0 =
  - Added support for read flags, letting users keep track of posts they've read or not read and

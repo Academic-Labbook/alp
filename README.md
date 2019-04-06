@@ -16,8 +16,11 @@ section below. It explains how new features in WordPress will be tracked by ALP.
  - Shows list of cross-references made between posts and pages
  - Provides TeX block for rendering mathematical markup
  - Tracks whether posts have been read or not by logged-in users, and allows users to view a list
-   of unread posts and change the read/unread status of posts.
+   of unread posts and change the read/unread status of posts
+ - Adds advanced search capabilities, letting users search for posts by coauthors, categories, tags
+   and dates
  - Option to force users to be logged in to view
+   - Option to disallow non-logged-in users from making computationally expensive searches
    - Feeds still accessible using HTTP authentication
    - Images still accessible with direct link (not possible to block without server configuration)
    - XML-RPC interface disabled
@@ -143,7 +146,8 @@ been pushed back to these plugins and WordPress itself:
 [15](https://github.com/WordPress/wordpress-importer/issues/40),
 [16](https://github.com/WordPress/gutenberg/issues/10834),
 [17](https://github.com/adamsilverstein/mathml-block/issues/12),
-[18](https://github.com/WordPress/gutenberg/issues/13749)
+[18](https://github.com/WordPress/gutenberg/issues/13749),
+[19](https://core.trac.wordpress.org/ticket/46459)
 
 ### Co-Authors Plus
 Authors: Mohammad Jangda, Daniel Bachhuber, Automattic, Shepherd Interactive, Mark Jaquith

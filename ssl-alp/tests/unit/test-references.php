@@ -307,4 +307,43 @@ class CrossReferencesTest extends WP_UnitTestCase {
 			array( $this->post_1 )
 		);
 	}
+
+	function test_draft_reference() {
+		global $ssl_alp;
+
+		$editor = $this->factory->user->create( array( 'role' => 'editor' ) );
+
+		// needed to allow editing
+		wp_set_current_user( $editor );
+
+		// Create published post.
+		$published = $this->factory->post->create_and_get(
+			array(
+				'post_content' => 'Empty.',
+			)
+		);
+
+		// Create draft that links to published post.
+		$draft = $this->factory->post->create_and_get(
+			array(
+				'post_content' => sprintf(
+					'This is a <a href="%1$s">link</a> to published post.',
+					get_permalink( $published )
+				),
+				'post_status'  => 'draft',
+			)
+		);
+
+		// Draft post should show link to published post.
+		$this->assertEquals(
+			$ssl_alp->references->get_reference_to_posts( $draft ),
+			array( $published )
+		);
+
+		// Published post should not show link from draft.
+		$this->assertEquals(
+			$ssl_alp->references->get_reference_from_posts( $published ),
+			array()
+		);
+	}
 }

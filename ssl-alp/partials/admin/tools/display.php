@@ -31,6 +31,7 @@
 <?php endif; ?>
 <div class="wrap">
 	<h2><?php _e('Academic Labbook Tools', 'ssl-alp'); ?></h2>
+	<p class="description"><?php esc_html_e( sprintf( 'You are running Academic Labbook Plugin %s.', SSL_ALP_VERSION ), 'ssl-alp' ); ?></p>
 	<div class="ssl-alp-tools-cards">
 		<div class="ssl-alp-tools-card">
 			<h2 class="title"><?php _e( 'Activate theme', 'ssl-alp' ); ?></h2>

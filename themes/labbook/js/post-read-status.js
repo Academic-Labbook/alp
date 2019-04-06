@@ -7,18 +7,18 @@
  */
 
 ( function( $ ) {
-	$( '.logbook-read-button' ).click( function() {
+	$( '.labbook-read-button' ).click( function() {
 		// Icon element.
 		var $button = $( this );
 
 		// Post ID.
 		var post_id = $button.data( 'post-id' );
 
-		// Entry title link element.
+		// Entry title link element, if present.
 		var $entry_link = $( '.entry-title-link-' + post_id );
 
 		// Add loading class.
-		$button.addClass( 'logbook-read-button-loading' );
+		$button.addClass( 'labbook-read-button-loading' );
 
 		// Endpoint from wpApiSetting variable passed from wp-api.
 		var endpoint = wpApiSettings.root + 'ssl-alp/v1/post-read-status/';
@@ -28,7 +28,12 @@
 		var unread_class = $button.data( 'unread-class' );
 
 		// Current read flag.
-		var current_read_status = $entry_link.hasClass( 'entry-read' );
+		var current_read_status = $button.data( 'read-status' );
+
+		if ( null === current_read_status ) {
+			// Can't get element's read status.
+			return;
+		}
 
 		$.ajax( {
 			url: endpoint,
@@ -43,23 +48,29 @@
 				read: ! current_read_status,
 			}
 		} ).done( function( data ) {
-			// Update icon class.
-			if ( current_read_status ) {
-				// Read -> unread.
-				$button.removeClass( read_class );
-				$button.addClass( unread_class );
+			$button.data( 'read-status', data.read );
 
-				$entry_link.removeClass( 'entry-read' );
-			} else {
-				// Unread -> read.
+			// Update icon class.
+			if ( data.read ) {
+				// Post now read.
 				$button.removeClass( unread_class );
 				$button.addClass( read_class );
 
-				$entry_link.addClass( 'entry-read' );
+				if ( $entry_link.length ) {
+					$entry_link.addClass( 'entry-read' );
+				}
+			} else {
+				// Post now unread.
+				$button.removeClass( read_class );
+				$button.addClass( unread_class );
+
+				if ( $entry_link.length ) {
+					$entry_link.removeClass( 'entry-read' );
+				}
 			}
 		} ).always( function() {
 			// Remove loading class.
-			$button.removeClass( 'logbook-read-button-loading' );
+			$button.removeClass( 'labbook-read-button-loading' );
 		} );
 	} );
 } )( jQuery );

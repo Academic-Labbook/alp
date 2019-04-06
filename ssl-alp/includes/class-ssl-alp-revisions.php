@@ -142,8 +142,8 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		// Add link to unread posts on toolbar.
 		$loader->add_action( 'wp_before_admin_bar_render', $this, 'add_unread_posts_admin_bar_link' );
 
-		// Set default unread posts page to current user.
-		$loader->add_action( 'pre_get_posts', $this, 'set_default_unread_posts_user' );
+		// Set unread posts page user depending on query, and check permissions.
+		$loader->add_action( 'pre_get_posts', $this, 'set_unread_posts_archive_page_user' );
 
 		// Register REST API endpoints for unread flags.
 		$loader->add_action( 'rest_api_init', $this, 'rest_register_unread_flag_routes' );
@@ -156,6 +156,9 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		// Add "Unread" filter to admin post list.
 		$loader->add_filter( 'views_edit-post', $this, 'filter_edit_post_views', 10, 1 );
+
+		// Set the unread posts archive page name to the user's display name.
+		$loader->add_filter( 'single_term_title', $this, 'set_unread_post_archive_title' );
 
 		// Add bulk actions to mark posts as read/unread.
 		$loader->add_filter( 'bulk_actions-edit-post', $this, 'register_read_unread_bulk_actions' );
@@ -575,6 +578,13 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		$revisions = wp_get_post_revisions( $post, $args );
 
+		// Remove autosaves.
+		foreach ( $revisions as $key => $revision ) {
+			if ( wp_is_post_autosave( $revision ) ) {
+				unset( $revisions[ $key ] );
+			}
+		}
+
 		return $revisions;
 	}
 
@@ -771,7 +781,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			 * Get last $number revisions (don't need parents) grouped by author and parent id, ordered
 			 * by date descending, where number is > 1 if the revision was made by the original author
 			 * (this prevents the original published post showing up as a revision), or > 0 if the
-			 * revision was made by someone else.
+			 * revision was made by someone else. Ignore autosaves.
 			 *
 			 * Note: `post_date` is the most recent revision found in each group.
 			 */
@@ -784,6 +794,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 					INNER JOIN {$wpdb->posts} AS parent_posts ON posts.post_parent = parent_posts.ID
 					WHERE
 						posts.post_type = 'revision'
+						AND LOCATE(CONCAT(posts.post_parent, '-autosave'), posts.post_name) = 0
 						AND posts.post_status = 'inherit'
 						AND parent_posts.post_type IN ({$supported_types_clause})
 						AND parent_posts.post_status = 'publish'
@@ -849,6 +860,24 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		}
 
 		return self::$unread_flag_term_slug_prefix . $user->user_nicename;
+	}
+
+	/**
+	 * Get user from unread flag term.
+	 *
+	 * @param WP_Term $term Unread flag term.
+	 * @return WP_User|false
+	 */
+	private function get_user_from_unread_flag_term( $term ) {
+		if ( substr( $term->slug, 0, strlen( self::$unread_flag_term_slug_prefix ) ) !== self::$unread_flag_term_slug_prefix ) {
+			// The slug doesn't contain the prefix.
+			return false;
+		}
+
+		// Remove prefix.
+		$user_nicename = substr( $term->slug, strlen( self::$unread_flag_term_slug_prefix ) );
+
+		return get_user_by( 'slug', $user_nicename );
 	}
 
 	/**
@@ -977,9 +1006,16 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Set the default unread posts page user if it is not set.
+	 * Set unread posts page user depending on query, and check permissions.
 	 */
-	public function set_default_unread_posts_user() {
+	public function set_unread_posts_archive_page_user() {
+		global $wp_query;
+
+		if ( ! is_tax() || empty( get_query_var( 'unread' ) ) ) {
+			// Not the unread posts page.
+			return;
+		}
+
 		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
 			// Unread flags disabled.
 			return;
@@ -987,14 +1023,26 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		if ( ! is_user_logged_in() ) {
 			// Cannot show useful unread posts page.
-			set_query_var( 'unread', '' );
+			$wp_query->set_404();
+		} else {
+			if ( self::$unread_flag_term_slug_prefix === get_query_var( 'unread' ) ) {
+				// No unread term is set (it defaults to the slug prefix) - use current user's slug.
+				set_query_var( 'unread', $this->get_unread_flag_term_slug() );
+			} else {
+				// An unread archive slug is set, but does the user have permission to view it?
+				$term = get_term_by( 'slug', get_query_var( 'unread' ), 'ssl_alp_unread_flag' );
 
-			return;
-		}
+				if ( $term ) {
+					$user = $this->get_user_from_unread_flag_term( $term );
 
-		if ( self::$unread_flag_term_slug_prefix === get_query_var( 'unread' ) ) {
-			// No unread term is set - use current user's.
-			set_query_var( 'unread', $this->get_unread_flag_term_slug() );
+					if ( ! $this->check_unread_flag_permission( $user ) ) {
+						// User cannot view this page.
+						$wp_query->set_404();
+					}
+				} else {
+					$wp_query->set_404();
+				}
+			}
 		}
 	}
 
@@ -1074,7 +1122,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	private function check_unread_flag_permission( $user = null ) {
 		if ( $user instanceof WP_User ) {
 			// Do nothing.
-		} elseif ( is_int( $user ) ) {
+		} elseif ( is_numeric( $user ) ) {
 			// Get user by their ID.
 			$user = get_user_by( 'id', $user );
 		} else {
@@ -1087,7 +1135,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			return false;
 		}
 
-		if ( $user !== wp_get_current_user() && ! current_user_can( 'edit_users' ) ) {
+		if ( $user->ID !== wp_get_current_user()->ID && ! current_user_can( 'edit_users' ) ) {
 			// No permission to edit another user's flag.
 			return false;
 		}
@@ -1104,10 +1152,43 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	public function rest_get_post_read_status( WP_REST_Request $data ) {
 		if ( is_null( $data['post_id'] ) ) {
 			// Invalid data.
-			return $this->unread_flag_invalid_data_error();
+			return rest_ensure_response( $this->unread_flag_invalid_data_error() );
 		}
 
-		return rest_ensure_response( $this->get_post_read_status( $data['post_id'], $data['user_id'] ) );
+		$post = get_post( $data['post_id'] );
+
+		if ( is_null( $post ) ) {
+			return rest_ensure_response( $this->unread_flag_post_not_found_error() );
+		}
+
+		if ( is_numeric( $data['user_id'] ) ) {
+			// Get user by their ID.
+			$user = get_user_by( 'id', $data['user_id'] );
+		} else {
+			// Try to get logged in user.
+			$user = wp_get_current_user();
+		}
+
+		if ( ! $user ) {
+			// Invalid user.
+			return rest_ensure_response( $this->unread_flag_user_not_found_error() );
+		}
+
+		if ( ! $this->check_unread_flag_permission( $user ) ) {
+			// No permission.
+			return rest_ensure_response( $this->unread_flag_no_permission_error() );
+		}
+
+		$response = $this->get_post_read_status( $post, $user );
+
+		if ( ! is_wp_error( $response ) ) {
+			// Make response an array with new flag.
+			$response = array(
+				'read'    => $response,
+			);
+		}
+
+		return rest_ensure_response( $response );
 	}
 
 	/**
@@ -1119,10 +1200,43 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	public function rest_set_post_read_status( WP_REST_Request $data ) {
 		if ( is_null( $data['post_id'] ) || is_null( $data['read'] ) ) {
 			// Invalid data.
-			return $this->unread_flag_invalid_data_error();
+			return rest_ensure_response( $this->unread_flag_invalid_data_error() );
 		}
 
-		return rest_ensure_response( $this->set_post_read_status( $data['read'], $data['post_id'], $data['user_id'] ) );
+		$post = get_post( $data['post_id'] );
+
+		if ( is_null( $post ) ) {
+			return rest_ensure_response( $this->unread_flag_post_not_found_error() );
+		}
+
+		if ( is_numeric( $data['user_id'] ) ) {
+			// Get user by their ID.
+			$user = get_user_by( 'id', $data['user_id'] );
+		} else {
+			// Try to get logged in user.
+			$user = wp_get_current_user();
+		}
+
+		if ( ! $user ) {
+			// Invalid user.
+			return rest_ensure_response( $this->unread_flag_user_not_found_error() );
+		}
+
+		if ( ! $this->check_unread_flag_permission( $user ) ) {
+			// No permission.
+			return rest_ensure_response( $this->unread_flag_no_permission_error() );
+		}
+
+		$response = $this->set_post_read_status( $data['read'], $post, $user );
+
+		if ( ! is_wp_error( $response ) ) {
+			// Make response an array with new flag.
+			$response = array(
+				'read' => $response,
+			);
+		}
+
+		return rest_ensure_response( $response );
 	}
 
 	/**
@@ -1226,7 +1340,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		// Get all users.
 		$users = get_users();
 
-		if ( is_int( $ignore_user ) ) {
+		if ( is_numeric( $ignore_user ) ) {
 			// Get user by their ID.
 			$ignore_user = get_user_by( 'id', $ignore_user );
 		}
@@ -1240,7 +1354,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 				continue;
 			}
 
-			$this->set_post_read_status( $read, $post, $user );
+			$this->set_post_read_status( (bool) $read, $post, $user );
 		}
 	}
 
@@ -1259,7 +1373,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			return;
 		}
 
-		if ( 'publish' !== $post_after->post_status ) {
+		if ( 'publish' !== get_post_status( $post_after ) ) {
 			// Don't change anything on unpublished posts.
 			return;
 		}
@@ -1273,7 +1387,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			'future',
 		);
 
-		if ( ! in_array( $post_before->post_status, $no_check_statuses, true ) ) {
+		if ( ! in_array( get_post_status( $post_before ), $no_check_statuses, true ) ) {
 			// The post has been updated from a previous version - check if it
 			// has changed sufficiently to mark as unread.
 
@@ -1323,7 +1437,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		if ( $user instanceof WP_User ) {
 			// Do nothing.
-		} elseif ( is_int( $user ) ) {
+		} elseif ( is_numeric( $user ) ) {
 			// Get user by their ID.
 			$user = get_user_by( 'id', $user );
 		} else {
@@ -1334,11 +1448,6 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		if ( ! $user ) {
 			// Invalid user.
 			return $this->unread_flag_user_not_found_error();
-		}
-
-		if ( ! $this->check_unread_flag_permission( $user ) ) {
-			// No permission.
-			return $this->unread_flag_no_permission_error();
 		}
 
 		$user_unread_flag_term = $this->get_user_unread_flag_term( $user );
@@ -1360,7 +1469,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * @param int|WP_User|null $user User ID or user object. Defaults to currently logged in user.
 	 * @return bool|WP_Error New read status, or error.
 	 */
-	private function set_post_read_status( $read, $post = null, $user = null ) {
+	public function set_post_read_status( $read, $post = null, $user = null ) {
 		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
 			// Unread flags disabled.
 			return $this->unread_flag_no_permission_error();
@@ -1374,7 +1483,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		if ( $user instanceof WP_User ) {
 			// Do nothing.
-		} elseif ( is_int( $user ) ) {
+		} elseif ( is_numeric( $user ) ) {
 			// Get user by their ID.
 			$user = get_user_by( 'id', $user );
 		} else {
@@ -1385,11 +1494,6 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		if ( ! $user ) {
 			// Invalid user.
 			return $this->unread_flag_user_not_found_error();
-		}
-
-		if ( ! $this->check_unread_flag_permission( $user ) ) {
-			// No permission.
-			return $this->unread_flag_no_permission_error();
 		}
 
 		$user_unread_flag_term = $this->get_user_unread_flag_term( $user );
@@ -1487,6 +1591,40 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		array_splice( $views, 1, 0, array( $unread ) );
 
 		return $views;
+	}
+
+	/**
+	 * Filter the unread post archive page title to show the user's display name
+	 * instead of the user nicename (the term name).
+	 *
+	 * @param string $title The archive page title.
+	 */
+	public function set_unread_post_archive_title( $title ) {
+		if ( ! is_tax( 'ssl_alp_unread_flag' ) ) {
+			// Not this taxonomy's page.
+			return $title;
+		}
+
+		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
+			// Unread flags disabled.
+			return $title;
+		}
+
+		$term = get_queried_object();
+		$tax  = get_taxonomy( $term->taxonomy );
+
+		if ( 'ssl_alp_unread_flag' !== $tax->name ) {
+			return $title;
+		}
+
+		$user = $this->get_user_from_unread_flag_term( $term );
+
+		if ( $user ) {
+			// Use the user's display name.
+			$title = $user->display_name;
+		}
+
+		return $title;
 	}
 
 	/**
