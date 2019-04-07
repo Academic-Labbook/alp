@@ -37,6 +37,11 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 */
 	protected static $unread_flag_term_slug_prefix = 'ssl-alp-unread-flag-';
 
+	/**
+	 * Revisions list table.
+	 *
+	 * @var SSL_ALP_Revisions_List_Table
+	 */
 	protected $revisions_list_table;
 
 	/**
@@ -713,19 +718,30 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		}
 	}
 
+	/**
+	 * Load post revisions page screen options.
+	 */
 	public function load_post_revisions_page_screen_options() {
 		return $this->load_revisions_page_screen_options( 'post' );
 	}
 
+	/**
+	 * Load page revisions page screen options.
+	 */
 	public function load_page_revisions_page_screen_options() {
 		return $this->load_revisions_page_screen_options( 'page' );
 	}
 
+	/**
+	 * Load revisions page screen options.
+	 *
+	 * @param string $post_type Post type. Either 'post' or 'page'.
+	 */
 	private function load_revisions_page_screen_options( $post_type ) {
 		$arguments = array(
 			'label'   => __( 'Revisions Per Page', 'ssl-alp' ),
 			'default' => 20,
-			'option'  => 'ssl_alp_revisions_per_page'
+			'option'  => 'ssl_alp_revisions_per_page',
 		);
 
 		add_screen_option( 'per_page', $arguments );
@@ -759,12 +775,12 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	/**
 	 * Save revisions per page screen option when saved by the user.
 	 *
-	 * @param bool    $keep   Whether to save or skip saving the screen option value. Default false.
-	 * @param string  $option The option name.
-	 * @param int     $value  The number of rows to use.
+	 * @param bool   $keep   Whether to save or skip saving the screen option value. Default false.
+	 * @param string $option The option name.
+	 * @param int    $value  The number of rows to use.
 	 */
 	public function save_revisions_per_page_option( $keep, $option, $value ) {
-		if ( 'ssl_alp_revisions_per_page' == $option ) {
+		if ( 'ssl_alp_revisions_per_page' === $option ) {
 			return $value;
 		}
 
@@ -872,9 +888,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * @return string|null
 	 */
 	private function get_unread_flag_term_slug( $user = null ) {
-		if ( $user instanceof WP_User ) {
-			// Do nothing.
-		} elseif ( is_numeric( $user ) ) {
+		if ( is_numeric( $user ) ) {
 			// Get user by their ID.
 			$user = get_user_by( 'id', $user );
 		} else {
@@ -915,9 +929,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * @return WP_Term|false
 	 */
 	private function get_user_unread_flag_term( $user = null ) {
-		if ( $user instanceof WP_User ) {
-			// Do nothing.
-		} elseif ( is_numeric( $user ) ) {
+		if ( is_numeric( $user ) ) {
 			// Get user by their ID.
 			$user = get_user_by( 'id', $user );
 		} else {
@@ -931,7 +943,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		}
 
 		$term_name = $this->get_unread_flag_term_name( $user );
-		$term = get_term_by( 'name', $term_name, 'ssl_alp_unread_flag' );
+		$term      = get_term_by( 'name', $term_name, 'ssl_alp_unread_flag' );
 
 		if ( ! $term ) {
 			// Term doesn't yet exist.
@@ -963,15 +975,15 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		// Register new taxonomy so that we can store all of the relationships.
 		$args = array(
-			'label'                 => __( 'Unread', 'ssl-alp' ),
-			'query_var'             => false,
-			'rewrite'               => false,    // Rewrites are handled elsewhere.
-			'public'                => true,     // Allow public display.
-			'show_ui'               => false,    // Disallow editing of tags.
-			'show_in_menu'          => false,    // Hide tag editor from admin post menu.
-			'show_in_nav_menus'     => false,
-			'show_in_rest'          => false,    // Flags set via custom endpoint instead.
-			'query_var'             => 'unread', // Allow ?unread=... query.
+			'label'             => __( 'Unread', 'ssl-alp' ),
+			'query_var'         => false,
+			'rewrite'           => false,    // Rewrites are handled elsewhere.
+			'public'            => true,     // Allow public display.
+			'show_ui'           => false,    // Disallow editing of tags.
+			'show_in_menu'      => false,    // Hide tag editor from admin post menu.
+			'show_in_nav_menus' => false,
+			'show_in_rest'      => false,    // Flags set via custom endpoint instead.
+			'query_var'         => 'unread', // Allow ?unread=... query.
 		);
 
 		// Create read flag taxonomy for posts.
@@ -1022,12 +1034,12 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		$wp_admin_bar->add_menu(
 			array(
-				'parent' => 'top-secondary', // On the right side
+				'parent' => 'top-secondary', // On the right side.
 				'title'  => __( 'Unread Posts', 'ssl-alp' ),
 				'id'     => 'ssl-alp-unread-posts-link',
 				'href'   => $url,
 				'meta'   => array(
-					'title'  => esc_html__( 'View unread posts', 'ssl-alp' ),
+					'title' => esc_html__( 'View unread posts', 'ssl-alp' ),
 				),
 			)
 		);
@@ -1053,7 +1065,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			// Cannot show useful unread posts page.
 			$wp_query->set_404();
 		} else {
-			if ( self::$unread_flag_term_slug_prefix === get_query_var( 'unread' ) ) {
+			if ( get_query_var( 'unread' ) === self::$unread_flag_term_slug_prefix ) {
 				// No unread term is set (it defaults to the slug prefix) - use current user's slug.
 				set_query_var( 'unread', $this->get_unread_flag_term_slug() );
 			} else {
@@ -1093,17 +1105,17 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			'/post-read-status',
 			array(
 				array(
-					'methods'				=> 'GET',
-					'callback'				=> array( $this, 'rest_get_post_read_status' ),
-					'args'					=> array(
-						'post_id'    => array(
+					'methods'  => 'GET',
+					'callback' => array( $this, 'rest_get_post_read_status' ),
+					'args'     => array(
+						'post_id' => array(
 							'required'          => true,
 							'validate_callback' => function( $param, $request, $key ) {
 								return is_numeric( $param );
 							},
 							'sanitize_callback' => 'absint',
 						),
-						'user_id'    => array(
+						'user_id' => array(
 							'required'          => false,
 							'validate_callback' => function( $param, $request, $key ) {
 								return is_numeric( $param );
@@ -1113,21 +1125,21 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 					),
 				),
 				array(
-					'methods'				=> 'POST',
-					'callback'				=> array( $this, 'rest_set_post_read_status' ),
-					'args'					=> array(
-						'read' => array(
+					'methods'  => 'POST',
+					'callback' => array( $this, 'rest_set_post_read_status' ),
+					'args'     => array(
+						'read'    => array(
 							'required'          => true,
 							'sanitize_callback' => 'rest_sanitize_boolean',
 						),
-						'post_id'    => array(
+						'post_id' => array(
 							'required'          => true,
 							'validate_callback' => function( $param, $request, $key ) {
 								return is_numeric( $param );
 							},
 							'sanitize_callback' => 'absint',
 						),
-						'user_id'    => array(
+						'user_id' => array(
 							'required'          => false,
 							'validate_callback' => function( $param, $request, $key ) {
 								return is_numeric( $param );
@@ -1145,12 +1157,10 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 *
 	 * @param int|WP_User|null $user User ID or user object. Defaults to currently logged in user.
 	 * @return bool false if $target_user is not the current user and the
-	 * 				current user is not able to edit users, true otherwise.
+	 *              current user is not able to edit users, true otherwise.
 	 */
 	private function check_unread_flag_permission( $user = null ) {
-		if ( $user instanceof WP_User ) {
-			// Do nothing.
-		} elseif ( is_numeric( $user ) ) {
+		if ( is_numeric( $user ) ) {
 			// Get user by their ID.
 			$user = get_user_by( 'id', $user );
 		} else {
@@ -1163,7 +1173,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			return false;
 		}
 
-		if ( $user->ID !== wp_get_current_user()->ID && ! current_user_can( 'edit_users' ) ) {
+		if ( wp_get_current_user()->ID !== $user->ID && ! current_user_can( 'edit_users' ) ) {
 			// No permission to edit another user's flag.
 			return false;
 		}
@@ -1212,7 +1222,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		if ( ! is_wp_error( $response ) ) {
 			// Make response an array with new flag.
 			$response = array(
-				'read'    => $response,
+				'read' => $response,
 			);
 		}
 
@@ -1348,9 +1358,9 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	/**
 	 * Set post read status for users, optionally ignoring one.
 	 *
-	 * @param bool             $read Read status to set.
-	 * @param int|WP_Post|null $post Post ID or post object. Defaults to global $post.
-	 * @param int|WP_User|null $user User ID or user object to ignore. Defaults to none.
+	 * @param bool             $read        Read status to set.
+	 * @param int|WP_Post|null $post        Post ID or post object. Defaults to global $post.
+	 * @param int|WP_User|null $ignore_user User ID or user object to ignore. Defaults to none.
 	 */
 	private function set_users_post_read_status( $read, $post, $ignore_user = null ) {
 		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
@@ -1376,7 +1386,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		$should_ignore = $ignore_user instanceof WP_User;
 
 		// Set each user's read status.
-		foreach( $users as $user ) {
+		foreach ( $users as $user ) {
 			if ( $should_ignore && $user->ID === $ignore_user->ID ) {
 				// Ignore user.
 				continue;
@@ -1392,8 +1402,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 *
 	 * @param int     $post_id     Post ID.
 	 * @param WP_Post $post_after  New post.
-	 * @param WP_Post $post_before Previous post (the auto-draft in the case of
-	 *                             new posts)
+	 * @param WP_Post $post_before Previous post (the auto-draft in the case of new posts).
 	 */
 	public function mark_post_as_unread_for_users_after_update( $post_id, $post_after, $post_before ) {
 		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
@@ -1418,9 +1427,8 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		if ( ! in_array( get_post_status( $post_before ), $no_check_statuses, true ) ) {
 			// The post has been updated from a previous version - check if it
 			// has changed sufficiently to mark as unread.
-
 			if ( ! class_exists( 'Text_Diff', false ) ) {
-				require( ABSPATH . WPINC . '/wp-diff.php' );
+				require ABSPATH . WPINC . '/wp-diff.php';
 			}
 
 			// Compute text difference between old and new posts.
@@ -1449,7 +1457,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 */
 	public function get_post_text_differences( $new_revision, $old_revision = null ) {
 		if ( ! class_exists( 'Text_Diff', false ) ) {
-			require( ABSPATH . WPINC . '/wp-diff.php' );
+			require ABSPATH . WPINC . '/wp-diff.php';
 		}
 
 		if ( is_null( $old_revision ) ) {
@@ -1457,10 +1465,10 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			$revisions = $this->get_revisions(
 				$new_revision->post_parent,
 				array(
-					'order'         => 'DESC',
-					'orderby'       => 'date ID',
-					'numberposts'   => 1,
-					'date_query' => array(
+					'order'       => 'DESC',
+					'orderby'     => 'date ID',
+					'numberposts' => 1,
+					'date_query'  => array(
 						'before'    => $new_revision->post_date,
 						'inclusive' => false,
 					),
@@ -1477,10 +1485,10 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			$old_revision = reset( $revisions );
 		}
 
-		$old_string  = normalize_whitespace( $old_revision->post_content );
+		$old_string = normalize_whitespace( $old_revision->post_content );
 		$new_string = normalize_whitespace( $new_revision->post_content );
 
-		$old_lines  = explode( "\n", $old_string );
+		$old_lines = explode( "\n", $old_string );
 		$new_lines = explode( "\n", $new_string );
 
 		// Compute text difference between old and new posts.
@@ -1511,9 +1519,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			return $this->unread_flag_post_not_found_error();
 		}
 
-		if ( $user instanceof WP_User ) {
-			// Do nothing.
-		} elseif ( is_numeric( $user ) ) {
+		if ( is_numeric( $user ) ) {
 			// Get user by their ID.
 			$user = get_user_by( 'id', $user );
 		} else {
@@ -1557,9 +1563,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			return $this->unread_flag_post_not_found_error();
 		}
 
-		if ( $user instanceof WP_User ) {
-			// Do nothing.
-		} elseif ( is_numeric( $user ) ) {
+		if ( is_numeric( $user ) ) {
 			// Get user by their ID.
 			$user = get_user_by( 'id', $user );
 		} else {
@@ -1647,8 +1651,11 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			'term'     => $unread_flag_slug,
 		);
 
+		$request_tax  = get_query_var( 'taxonomy' );
+		$request_term = get_query_var( 'term' );
+
 		// Check if the current page is the "Mine" view.
-		if ( ! empty( $_REQUEST['taxonomy'] ) && 'ssl_alp_unread_flag' === $_REQUEST['taxonomy'] && ! empty( $_REQUEST['term'] ) && $_REQUEST['term'] === $unread_flag_slug ) {
+		if ( 'ssl_alp_unread_flag' === $request_tax && $unread_flag_slug === $request_term ) {
 			$class = 'current';
 		} else {
 			$class = '';
@@ -1715,7 +1722,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			return $actions;
 		}
 
-		$actions['mark_as_read'] = __( 'Mark as Read', 'ssl_alp' );
+		$actions['mark_as_read']   = __( 'Mark as Read', 'ssl_alp' );
 		$actions['mark_as_unread'] = __( 'Mark as Unread', 'ssl_alp' );
 
 		return $actions;
@@ -1723,6 +1730,11 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 	/**
 	 * Handle read/unread bulk action.
+	 *
+	 * @param array  $redirect_to Redirect query args.
+	 * @param string $doaction    Action.
+	 * @param array  $post_ids    Array of post IDs.
+	 * @return array Updated redirect query args.
 	 */
 	public function handle_read_unread_bulk_actions( $redirect_to, $doaction, $post_ids ) {
 		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
@@ -1764,34 +1776,40 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		}
 
 		if ( ! empty( $_REQUEST['posts_marked_read'] ) ) {
-			$count = intval( $_REQUEST['posts_marked_read'] );
+			$count = absint( $_REQUEST['posts_marked_read'] );
 
 			echo '<div id="message" class="updated"><p>';
 
 			printf(
-				_n(
-					'Set %s post as read.',
-					'Set %s posts as read.',
-					$count,
-					'ssl_alp'
+				esc_html(
+					/* translators: number of posts flagged as read */
+					_n(
+						'Set %s post as read.',
+						'Set %s posts as read.',
+						$count,
+						'ssl_alp'
+					)
 				),
 				$count
 			);
 
 			echo '</p></div>';
 		} elseif ( ! empty( $_REQUEST['posts_marked_unread'] ) ) {
-			$count = intval( $_REQUEST['posts_marked_unread'] );
+			$count = absint( $_REQUEST['posts_marked_unread'] );
 
 			echo '<div id="message" class="updated"><p>';
 
 			printf(
-				_n(
-					'Set %s post as unread.',
-					'Set %s posts as unread.',
-					$count,
-					'ssl_alp'
+				esc_html(
+					/* translators: number of posts flagged as unread */
+					_n(
+						'Set %s post as unread.',
+						'Set %s posts as unread.',
+						$count,
+						'ssl_alp'
+					)
 				),
-				$count
+				number_format_i18n( $count )
 			);
 
 			echo '</p></div>';

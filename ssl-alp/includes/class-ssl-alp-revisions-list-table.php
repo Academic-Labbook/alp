@@ -10,8 +10,8 @@ if ( ! defined( 'WPINC' ) ) {
 	exit;
 }
 
-if ( ! class_exists('WP_List_Table') ) {
-	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
+if ( ! class_exists( 'WP_List_Table' ) ) {
+	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
 
 /**
@@ -27,6 +27,8 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 
 	/**
 	 * Constructor.
+	 *
+	 * @param string $post_type Post type to show revisions for.
 	 */
 	public function __construct( $post_type = 'post' ) {
 		parent::__construct(
@@ -57,13 +59,14 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 		$revisions_count = $this->count_revisions();
 		$mine_count      = $this->count_revisions( $current_user_id );
 
-		$all_class    = '';
+		$all_class = '';
 
-		if ( empty( $all_class ) && ( $this->is_base_request() || isset( $_REQUEST['all_revisions'] ) ) ) {
+		if ( empty( $all_class ) && ( $this->is_base_request() ) ) {
 			$all_class = 'current';
 		}
 
 		$all_inner_html = sprintf(
+			/* translators: total revision count */
 			_nx(
 				'All <span class="count">(%s)</span>',
 				'All <span class="count">(%s)</span>',
@@ -80,9 +83,9 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 			$all_class
 		);
 
-		$mine_class      = '';
+		$mine_class = '';
 
-		if ( isset( $_GET['author'] ) && ( $_GET['author'] == $current_user_id ) ) {
+		if ( isset( $_GET['author'] ) && ( absint( $_GET['author'] ) === $current_user_id ) ) {
 			$mine_class = 'current';
 		}
 
@@ -94,6 +97,7 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 		);
 
 		$mine_inner_html = sprintf(
+			/* translators: total user revision count */
 			_nx(
 				'Mine <span class="count">(%s)</span>',
 				'Mine <span class="count">(%s)</span>',
@@ -117,13 +121,16 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 		return $status_links;
 	}
 
+	/**
+	 * Get URL query arguments depending on post type.
+	 */
 	private function get_page_args() {
 		$args = array();
 
 		if ( 'post' === $this->post_type ) {
 			$args['page'] = SSL_ALP_POST_REVISIONS_MENU_SLUG;
 		} elseif ( 'page' === $this->post_type ) {
-			$args['page'] = SSL_ALP_PAGE_REVISIONS_MENU_SLUG;
+			$args['page']      = SSL_ALP_PAGE_REVISIONS_MENU_SLUG;
 			$args['post_type'] = 'page';
 		}
 
@@ -159,8 +166,9 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 	 * @return string The formatted link string.
 	 */
 	protected function get_edit_link( $args, $label, $class = '' ) {
-		$url = add_query_arg( $args, 'edit.php' );
-		$class_html = $aria_current = '';
+		$url          = add_query_arg( $args, 'edit.php' );
+		$class_html   = '';
+		$aria_current = '';
 
 		if ( ! empty( $class ) ) {
 			$class_html = sprintf(
@@ -203,6 +211,11 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 		);
 	}
 
+	/**
+	 * Handle column title output.
+	 *
+	 * @param WP_Post $revision The current revision object.
+	 */
 	public function column_title( $revision ) {
 		global $ssl_alp;
 
@@ -222,27 +235,27 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 		if ( ! empty( $edit_link ) && $ssl_alp->revisions->current_user_can_view_revision( $revision ) ) {
 			printf(
 				'<a class="row-title" href="%s" aria-label="%s">%s</a>',
-				$edit_link,
+				esc_url( $edit_link ),
 				/* translators: %s: post title */
 				esc_attr( sprintf( __( '&#8220;%s&#8221; (Difference)', 'ssl-alp' ), $revision->post_title ) ),
-				$revision->post_title
+				esc_html( $revision->post_title )
 			);
 		} else {
 			printf(
 				'<span>%s</span>',
-				$revision->post_title
+				esc_html( $revision->post_title )
 			);
 		}
 
 		if ( ! is_null( $latest_revision ) && $revision->ID === $latest_revision->ID ) {
-			echo ' &mdash; ' . '<span class="post-state">' . __( 'Latest', 'ssl-alp' ) . '</span>';
+			echo ' &mdash; <span class="post-state">' . esc_html__( 'Latest', 'ssl-alp' ) . '</span>';
 		}
 
 		echo '</strong>';
 	}
 
 	/**
-	 * Handles the changes column output.
+	 * Handle changes column output.
 	 *
 	 * @param WP_Post $revision The current revision object.
 	 */
@@ -262,18 +275,18 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 		$pieces = array();
 
 		if ( $diff['added'] > 0 ) {
-			$pieces[] = '<span class="ssl-alp-text-added">' . '+' . $diff['added'] . '</span>';
+			$pieces[] = '<span class="ssl-alp-text-added">+' . $diff['added'] . '</span>';
 		}
 
 		if ( $diff['removed'] > 0 ) {
-			$pieces[] = '<span class="ssl-alp-text-removed">' . '-' . $diff['removed'] . '</span>';
+			$pieces[] = '<span class="ssl-alp-text-removed">-' . $diff['removed'] . '</span>';
 		}
 
 		echo implode( ', ', $pieces );
 	}
 
 	/**
-	 * Handles the post author column output.
+	 * Handle post author column output.
 	 *
 	 * @param WP_Post $revision The current revision object.
 	 */
@@ -298,26 +311,33 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Handles the post date column output.
+	 * Handle post date column output.
 	 *
 	 * @param WP_Post $revision The current revision object.
 	 */
 	public function column_date( $revision ) {
-		$t_time = get_the_time( __( 'Y/m/d g:i:s a' ), $revision );
-		$m_time = $revision->post_date;
-		$time   = get_post_time( 'G', true, $revision );
+		$t_time    = get_the_time( __( 'Y/m/d g:i:s a' ), $revision );
+		$m_time    = $revision->post_date;
+		$time      = get_post_time( 'G', true, $revision );
 		$time_diff = time() - $time;
 
 		if ( $time_diff > 0 && $time_diff < DAY_IN_SECONDS ) {
+			/* translators: time since revision */
 			$h_time = sprintf( __( '%s ago', 'ssl-alp' ), human_time_diff( $time ) );
 		} else {
 			$h_time = mysql2date( __( 'Y/m/d' ), $m_time );
 		}
 
 		echo esc_html( 'Last Modified', 'ssl-alp' ) . '<br/>';
-		echo '<abbr title="' . $t_time . '">' . $h_time . '</abbr>';
+		echo '<abbr title="' . esc_attr( $t_time ) . '">' . esc_html( $h_time ) . '</abbr>';
 	}
 
+	/**
+	 * Handle column output not provided by any other function.
+	 *
+	 * @param string $item        Row item.
+	 * @param string $column_name Column name.
+	 */
 	public function column_default( $item, $column_name ) {
 		switch ( $column_name ) {
 			default:
@@ -325,20 +345,23 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 		}
 	}
 
+	/**
+	 * Get items for display.
+	 */
 	public function prepare_items() {
 		global $wpdb;
 
 		$revisions_per_page = $this->get_items_per_page( 'ssl_alp_revisions_per_page' );
-		$orderby            = ( isset( $_GET['orderby'] ) ) ? esc_sql( $_GET['orderby'] ) : 'post_date';
-		$order              = ( isset( $_GET['order'] ) ) ? esc_sql( $_GET['order'] ) : 'DESC';
+		$orderby            = ( isset( $_GET['orderby'] ) ) ? esc_sql( wp_unslash( $_GET['orderby'] ) ) : 'post_date';
+		$order              = ( isset( $_GET['order'] ) ) ? esc_sql( wp_unslash( $_GET['order'] ) ) : 'DESC';
 
 		$author_sql = '';
 
 		if ( isset( $_GET['author'] ) ) {
-			$author_id = absint( $_GET['author'] );
+			$author_id = absint( wp_unslash( $_GET['author'] ) );
 
 			if ( $author_id > 0 ) {
-				$author_sql = esc_sql( "AND posts.post_author = " . $author_id );
+				$author_sql = esc_sql( 'AND posts.post_author = ' . $author_id );
 			}
 		}
 
@@ -362,8 +385,8 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 			AND posts.post_date <> parent_posts.post_date
 			AND parent_posts.post_status = 'publish'
 			{$author_sql}
-			ORDER BY posts." . $orderby . ' ' . $order . ", posts.ID DESC
-			LIMIT %d, %d",
+			ORDER BY posts." . $orderby . ' ' . $order . ', posts.ID DESC
+			LIMIT %d, %d',
 			$this->post_type,
 			absint( ( $this->get_pagenum() - 1 ) * $revisions_per_page ),
 			$revisions_per_page
@@ -372,7 +395,7 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 		$revisions = $wpdb->get_results( $revisions_query );
 
 		// Get found rows.
-		$total_revisions = $wpdb->get_var( "SELECT FOUND_ROWS()" );
+		$total_revisions = $wpdb->get_var( 'SELECT FOUND_ROWS()' );
 
 		if ( $revisions_per_page > 0 ) {
 			$max_pages = ceil( $total_revisions / $revisions_per_page );
@@ -384,22 +407,28 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 		$this->items = $revisions;
 
 		// Pagination.
-  		$this->set_pagination_args(
-			array (
-	  			'total_items' => $total_revisions,
-	  			'per_page'    => $revisions_per_page,
-	  			'total_pages' => $max_pages,
-		    )
+		$this->set_pagination_args(
+			array(
+				'total_items' => $total_revisions,
+				'per_page'    => $revisions_per_page,
+				'total_pages' => $max_pages,
+			)
 		);
 	}
 
+	/**
+	 * Count total revisions.
+	 *
+	 * @param int|null $user_id User ID to count revisions for. If null, all revisions are counted.
+	 * @return int Number of revisions.
+	 */
 	private function count_revisions( $user_id = null ) {
 		global $wpdb;
 
 		$user_sql = '';
 
 		if ( ! is_null( $user_id ) ) {
-			$user_id = absint( $user_id );
+			$user_id  = absint( $user_id );
 			$user_sql = esc_sql( 'AND posts.post_author = ' . $user_id );
 		}
 
@@ -420,6 +449,9 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 		return $wpdb->get_var( $count_query );
 	}
 
+	/**
+	 * Message for when there are no revisions found.
+	 */
 	public function no_items() {
 		esc_html_e( 'No revisions.', 'ssl-alp' );
 	}
