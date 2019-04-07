@@ -678,8 +678,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			'term'     => $coauthor_slug,
 		);
 
+		$request_tax  = get_query_var( 'taxonomy' );
+		$request_term = get_query_var( 'term' );
+
 		// Check if the current page is the "Mine" view.
-		if ( 'ssl_alp_coauthor' === get_query_var( 'taxonomy' ) && $coauthor_slug === get_query_var( 'term' ) ) {
+		if ( 'ssl_alp_coauthor' === $request_tax && $coauthor_slug === $request_term ) {
 			$class = 'current';
 		} else {
 			$class = '';
@@ -752,7 +755,8 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$query .= " LEFT JOIN {$wpdb->term_relationships} ON ({$wpdb->posts}.ID = {$wpdb->term_relationships}.object_id)";
 		$query .= " LEFT JOIN {$wpdb->term_taxonomy} ON ( {$wpdb->term_relationships}.term_taxonomy_id = {$wpdb->term_taxonomy}.term_taxonomy_id )";
 
-		$having_terms_and_authors = $having_terms = $wpdb->prepare( "{$wpdb->term_taxonomy}.term_id = %d", $term->term_id );
+		$having_terms             = $wpdb->prepare( "{$wpdb->term_taxonomy}.term_id = %d", $term->term_id );
+		$having_terms_and_authors = $having_terms;
 
 		$having_terms_and_authors .= $wpdb->prepare( " OR {$wpdb->posts}.post_author = %d", $coauthor->ID );
 
@@ -764,7 +768,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$query .= $wpdb->prepare(
 			"
 			GROUP BY {$wpdb->posts}.ID
-			HAVING MAX( IF ( {$wpdb->term_taxonomy}.taxonomy = '%s', IF ( {$having_terms},2,1 ),0 ) ) <> 1
+			HAVING MAX( IF ( {$wpdb->term_taxonomy}.taxonomy = %s, IF ( {$having_terms}, 2, 1 ), 0 ) ) <> 1
 			",
 			'ssl_alp_coauthor'
 		);
@@ -792,7 +796,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$real_count = $this->get_user_post_count( $user_id );
 
 		if ( is_null( $real_count ) ) {
-			// Use default.
+			// Use the default.
 			$real_count = $count;
 		}
 
@@ -885,9 +889,10 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			$coauthor = get_user_by( 'login', $author_data->user_login );
 		}
 
-		$terms = array();
+		$terms       = array();
+		$author_term = $this->get_coauthor_term( $coauthor );
 
-		if ( $author_term = $this->get_coauthor_term( $coauthor ) ) {
+		if ( $author_term ) {
 			$terms[] = $author_term;
 		}
 
@@ -896,8 +901,8 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			$this->having_terms = '';
 
 			foreach ( $terms as $term ) {
-				$terms_implode      .= '(' . $wpdb->term_taxonomy . '.taxonomy = \'' . 'ssl_alp_coauthor' . '\' AND ' . $wpdb->term_taxonomy . '.term_id = \'' . $term->term_id . '\') OR ';
-				$this->having_terms .= ' ' . $wpdb->term_taxonomy . '.term_id = \'' . $term->term_id . '\' OR ';
+				$terms_implode      .= "({$wpdb->term_taxonomy}.taxonomy = 'ssl_alp_coauthor' AND {$wpdb->term_taxonomy}.term_id = '{$term->term_id}') OR ";
+				$this->having_terms .= " {$wpdb->term_taxonomy}.term_id = '{$term->term_id}' OR ";
 			}
 
 			$terms_implode      = rtrim( $terms_implode, ' OR' );
@@ -942,8 +947,8 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		if ( $this->having_terms ) {
-			$having  = 'MAX( IF ( ' . $wpdb->term_taxonomy . '.taxonomy = \'' . 'ssl_alp_coauthor' . '\', IF ( ' . $this->having_terms . ',2,1 ),0 ) ) <> 1 ';
-			$groupby = $wpdb->posts . '.ID HAVING ' . $having;
+			$having  = "MAX( IF ( {$wpdb->term_taxonomy}.taxonomy = 'ssl_alp_coauthor', IF ( {$this->having_terms}, 2, 1 ), 0 ) ) <> 1 ";
+			$groupby = "{$wpdb->posts}.ID HAVING {$having}";
 		}
 
 		return $groupby;
@@ -1081,13 +1086,10 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		// Update primary author.
-		$wpdb->update(
-			$wpdb->posts,
+		wp_update_post(
 			array(
+				'ID'          => $post->ID,
 				'post_author' => $new_primary_author_id,
-			),
-			array(
-				'ID' => $post->ID,
 			)
 		);
 
@@ -1258,10 +1260,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		if ( ! empty( $coauthor_and ) ) {
 			// Coauthor AND search criterion specified.
 			$tax_query[] = array(
-				'relation' => 'AND', // Note, this is different from how parse_tax_query handles
-									 // e.g. tag__and because we have to inject the tax query after
-									 // WP_Tax_Query has already been instantiated, which normally
-									 // applies the relation as part of its instantiation.
+				// Note, this is different from how parse_tax_query handles
+				// e.g. tag__and because we have to inject the tax query after
+				// WP_Tax_Query has already been instantiated, which normally
+				// applies the relation as part of its instantiation.
+				'relation' => 'AND',
 				array(
 					'taxonomy'         => 'ssl_alp_coauthor',
 					'terms'            => $coauthor_and,
@@ -1456,11 +1459,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		// Annoyingly, $reassign_id is not passed to this call, so detect it from the post data.
-		if ( ! empty( $_POST['delete'] ) && 'reassign' === $_POST['delete'][ $blog_id ][ $remove_id ] &&
-			 ! empty( $_POST['blog'] ) && is_array( $_POST['blog'] ) ) {
+		if ( ! empty( $_POST['delete'] ) && 'reassign' === $_POST['delete'][ $blog_id ][ $remove_id ]
+				&& ! empty( $_POST['blog'] ) && is_array( $_POST['blog'] ) ) {
 			// Post data from `dodelete` case in `wp-admin/network/users.php` is present, and
 			// admin wishes to reassign user content array of blog ids to respective reassign users.
-			$reassign_users = $_POST['blog'][ $remove_id ];
+			$reassign_users = wp_unslash( $_POST['blog'][ $remove_id ] );
 
 			// Get reassign user for this blog.
 			$reassign_id = $reassign_users[ $blog_id ];
@@ -1617,15 +1620,13 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Filter array of comment notification email addresses to add coauthors of
-	 * post where comment was made.
+	 * Add coauthor emails to comment email recipients.
 	 *
 	 * @param array $recipients Recipient email addresses.
 	 * @param int   $comment_id Comment ID.
-	 *
-	 * @return array
+	 * @return array Recipients including coauthors.
 	 */
-	private function filter_comment_email_recipients( $recipients, $comment_id ) {
+	private function add_coauthors_to_comment_email_recipients( $recipients, $comment_id ) {
 		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
 			// Coauthors disabled.
 			return $recipients;
@@ -1658,9 +1659,17 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		return $recipients;
 	}
 
+	/**
+	 * Filter comment notification email recipients to add coauthors, but avoid notifying the
+	 * commenter if they are also a coauthor.
+	 *
+	 * @param array $recipients Recipient email addresses.
+	 * @param int   $comment_id Comment ID.
+	 * @return array Recipients including coauthors.
+	 */
 	public function filter_comment_notification_email_recipients( $recipients, $comment_id ) {
 		// Pass through to shared recipient function.
-		$recipients = $this->filter_comment_email_recipients( $recipients, $comment_id );
+		$recipients = $this->add_coauthors_to_comment_email_recipients( $recipients, $comment_id );
 
 		$comment = get_comment( $comment_id );
 
@@ -1693,7 +1702,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 */
 	public function filter_comment_moderation_email_recipients( $recipients, $comment_id ) {
 		// Pass through to shared recipient function.
-		return $this->filter_comment_email_recipients( $recipients, $comment_id );
+		return $this->add_coauthors_to_comment_email_recipients( $recipients, $comment_id );
 	}
 
 	/**
@@ -1760,7 +1769,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		foreach ( $coauthors as $coauthor ) {
-			if ( $user == $coauthor->user_login ) {
+			if ( $user === $coauthor->user_login ) {
 				return true;
 			}
 		}
