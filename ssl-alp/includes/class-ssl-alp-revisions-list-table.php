@@ -219,6 +219,7 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 	public function column_title( $revision ) {
 		global $ssl_alp;
 
+		$parent          = get_post( $revision->post_parent );
 		$latest_revision = $ssl_alp->revisions->get_latest_revision( $revision );
 
 		echo '<strong>';
@@ -232,18 +233,31 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 		 */
 		$edit_link = get_edit_post_link( $revision->ID );
 
+		$revision_title = $revision->post_title;
+		$latest_title   = $parent->post_title;
+
 		if ( ! empty( $edit_link ) && $ssl_alp->revisions->current_user_can_view_revision( $revision ) ) {
 			printf(
 				'<a class="row-title" href="%s" aria-label="%s">%s</a>',
 				esc_url( $edit_link ),
 				/* translators: %s: post title */
-				esc_attr( sprintf( __( '&#8220;%s&#8221; (Difference)', 'ssl-alp' ), $revision->post_title ) ),
-				esc_html( $revision->post_title )
+				esc_attr( sprintf( __( '&#8220;%s&#8221; (Difference)', 'ssl-alp' ), $revision_title ) ),
+				esc_html( $revision_title )
 			);
 		} else {
 			printf(
 				'<span>%s</span>',
-				esc_html( $revision->post_title )
+				esc_html( $revision_title )
+			);
+		}
+
+		if ( $revision_title !== $latest_title ) {
+			// The title has changed since this revision.
+			echo '&nbsp;';
+			printf(
+				/* translators: current post title */
+				esc_html__( '(now %s)', 'ssl-alp' ),
+				'<em>' . esc_html( $latest_title ) . '</em>'
 			);
 		}
 
@@ -487,7 +501,7 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 				'<a href="%1$s" aria-label="%2$s">%3$s</a>',
 				esc_url( $edit_link ),
 				esc_attr( __( 'View changes made in this revision', 'ssl-alp' ) ),
-				esc_html__( 'View Difference to Previous', 'ssl-alp' )
+				esc_html__( 'View Changes', 'ssl-alp' )
 			);
 
 			$latest_revision = $ssl_alp->revisions->get_latest_revision( $revision );
