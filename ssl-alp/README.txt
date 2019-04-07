@@ -4,7 +4,7 @@ Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
 Requires at least: 5.1.0
 Tested up to: 5.1.0
 Requires PHP: 7.0.0
-Stable tag: 0.13.3
+Stable tag: 0.14.0
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -72,6 +72,12 @@ with maximum control. Please see [this guide](https://alp.attackllama.com/docume
 on the ALP website.
 
 == Changelog ==
+
+= 0.14.0 =
+ - Added revisions lists for posts and pages to admin area.
+ - Prevented non-posts being marked as read/unread via the theme.
+ - Fixed date issue in recent revisions widget.
+ - Added plugin version on tools page.
 
 = 0.13.3 =
  - Fixed bug with advanced search not returning results.
