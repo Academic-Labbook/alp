@@ -38,6 +38,15 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	protected static $unread_flag_term_slug_prefix = 'ssl-alp-unread-flag-';
 
 	/**
+	 * Supported post types for unread flags.
+	 *
+	 * @var array
+	 */
+	protected static $supported_unread_flag_post_types = array(
+		'post',
+	);
+
+	/**
 	 * Revisions list table.
 	 *
 	 * @var SSL_ALP_Revisions_List_Table
@@ -1584,7 +1593,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			return $this->unread_flag_post_not_found_error();
 		}
 
-		if ( 'post' !== $post->post_type ) {
+		if ( ! $this->unread_flags_supported( $post ) ) {
 			// Not a post.
 			return $this->unread_flag_unsupported_post_type_error();
 		}
@@ -1627,6 +1636,22 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		}
 
 		return $read;
+	}
+
+	/**
+	 * Check if a post has unread flag support.
+	 *
+	 * @param int|WP_Post|null $post Post ID or post object. Defaults to global $post.
+	 * @return bool|null Whether unread flags are supported. Null if post is invalid.
+	 */
+	public function unread_flags_supported( $post ) {
+		$post = get_post( $post );
+
+		if ( is_null( $post ) ) {
+			return;
+		}
+
+		return in_array( $post->post_type, self::$supported_unread_flag_post_types, true );
 	}
 
 	/**
