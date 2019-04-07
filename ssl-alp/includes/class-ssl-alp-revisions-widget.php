@@ -120,7 +120,7 @@ class SSL_ALP_Revisions_Widget extends WP_Widget {
 				$post_date = sprintf(
 					/* translators: 1: time ago */
 					__( '%s ago', 'ssl-alp' ),
-					human_time_diff( strtotime( $revision->post_date ) )
+					human_time_diff( strtotime( $revision->post_date ), current_time( 'timestamp' ) )
 				);
 
 				echo '<li class="recent-revision">';
