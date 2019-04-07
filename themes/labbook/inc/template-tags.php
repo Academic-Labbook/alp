@@ -21,12 +21,19 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 	 * @param bool             $icon   Add post icon, if present.
 	 */
 	function labbook_the_post_title( $post = null, $url = true, $icon = true ) {
+		global $ssl_alp;
+
 		$post = get_post( $post );
 
 		echo '<h2 class="entry-title">';
 
+		$post_read_classes = array();
+
 		if ( $icon ) {
-			if ( ! is_user_logged_in() || ! labbook_get_option( 'show_unread_flags' ) || ! labbook_ssl_alp_unread_flags_enabled() ) {
+			if ( ! is_user_logged_in() || ! labbook_get_option( 'show_unread_flags' )
+				|| ! labbook_ssl_alp_unread_flags_enabled()
+				|| ! $ssl_alp->revisions->unread_flags_supported( $post )
+			) {
 				// No support for unread flags.
 				if ( 'status' === get_post_format( $post ) ) {
 					$icon_class = 'fa fa-info-circle';
@@ -44,7 +51,7 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 				$post_is_read = labbook_post_is_read( $post );
 
 				// Default post read class.
-				$post_read_classes = array( 'entry-title-link-' . $post->ID );
+				$post_read_classes[] = 'entry-title-link-' . $post->ID;
 
 				if ( $post_is_read ) {
 					$post_read_classes[] = 'entry-read';
