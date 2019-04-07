@@ -888,12 +888,14 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * @return string|null
 	 */
 	private function get_unread_flag_term_slug( $user = null ) {
-		if ( is_numeric( $user ) ) {
-			// Get user by their ID.
-			$user = get_user_by( 'id', $user );
-		} else {
-			// Try to get logged in user.
-			$user = wp_get_current_user();
+		if ( ! $user instanceof WP_User ) {
+			if ( is_numeric( $user ) ) {
+				// Get user by their ID.
+				$user = get_user_by( 'id', $user );
+			} else {
+				// Try to get logged in user.
+				$user = wp_get_current_user();
+			}
 		}
 
 		if ( ! is_object( $user ) ) {
@@ -929,12 +931,14 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * @return WP_Term|false
 	 */
 	private function get_user_unread_flag_term( $user = null ) {
-		if ( is_numeric( $user ) ) {
-			// Get user by their ID.
-			$user = get_user_by( 'id', $user );
-		} else {
-			// Try to get logged in user.
-			$user = wp_get_current_user();
+		if ( ! $user instanceof WP_User ) {
+			if ( is_numeric( $user ) ) {
+				// Get user by their ID.
+				$user = get_user_by( 'id', $user );
+			} else {
+				// Try to get logged in user.
+				$user = wp_get_current_user();
+			}
 		}
 
 		if ( ! is_object( $user ) ) {
@@ -1160,12 +1164,14 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 *              current user is not able to edit users, true otherwise.
 	 */
 	private function check_unread_flag_permission( $user = null ) {
-		if ( is_numeric( $user ) ) {
-			// Get user by their ID.
-			$user = get_user_by( 'id', $user );
-		} else {
-			// Try to get logged in user.
-			$user = wp_get_current_user();
+		if ( ! $user instanceof WP_User ) {
+			if ( is_numeric( $user ) ) {
+				// Get user by their ID.
+				$user = get_user_by( 'id', $user );
+			} else {
+				// Try to get logged in user.
+				$user = wp_get_current_user();
+			}
 		}
 
 		if ( ! is_object( $user ) ) {
@@ -1519,12 +1525,14 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			return $this->unread_flag_post_not_found_error();
 		}
 
-		if ( is_numeric( $user ) ) {
-			// Get user by their ID.
-			$user = get_user_by( 'id', $user );
-		} else {
-			// Try to get logged in user.
-			$user = wp_get_current_user();
+		if ( ! $user instanceof WP_User ) {
+			if ( is_numeric( $user ) ) {
+				// Get user by their ID.
+				$user = get_user_by( 'id', $user );
+			} else {
+				// Try to get logged in user.
+				$user = wp_get_current_user();
+			}
 		}
 
 		if ( ! $user ) {
@@ -1563,12 +1571,14 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			return $this->unread_flag_post_not_found_error();
 		}
 
-		if ( is_numeric( $user ) ) {
-			// Get user by their ID.
-			$user = get_user_by( 'id', $user );
-		} else {
-			// Try to get logged in user.
-			$user = wp_get_current_user();
+		if ( ! $user instanceof WP_User ) {
+			if ( is_numeric( $user ) ) {
+				// Get user by their ID.
+				$user = get_user_by( 'id', $user );
+			} else {
+				// Try to get logged in user.
+				$user = wp_get_current_user();
+			}
 		}
 
 		if ( ! $user ) {
