@@ -1323,6 +1323,19 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	}
 
 	/**
+	 * Post is not of the correct type (e.g. page).
+	 */
+	private function unread_flag_unsupported_post_type_error() {
+		return new WP_Error(
+			'post_unread_flag_post_type_unsupported',
+			__( 'Post type not supported.', 'ssl-alp' ),
+			array(
+				'status' => 400,
+			)
+		);
+	}
+
+	/**
 	 * User not found REST error.
 	 */
 	private function unread_flag_user_not_found_error() {
@@ -1569,6 +1582,11 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		if ( is_null( $post ) ) {
 			return $this->unread_flag_post_not_found_error();
+		}
+
+		if ( 'post' !== $post->post_type ) {
+			// Not a post.
+			return $this->unread_flag_unsupported_post_type_error();
 		}
 
 		if ( ! $user instanceof WP_User ) {
