@@ -679,7 +679,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		);
 
 		// Check if the current page is the "Mine" view.
-		if ( ! empty( $_REQUEST['taxonomy'] ) && 'ssl_alp_coauthor' === $_REQUEST['taxonomy'] && ! empty( $_REQUEST['term'] ) && $_REQUEST['term'] === $coauthor_slug ) {
+		if ( 'ssl_alp_coauthor' === get_query_var( 'taxonomy' ) && $coauthor_slug === get_query_var( 'term' ) ) {
 			$class = 'current';
 		} else {
 			$class = '';
@@ -1178,14 +1178,14 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		wp_set_post_terms( $post->ID, $coauthor_term_ids, 'ssl_alp_coauthor', false );
 	}
 
-    /**
-     * Whitelist coauthor query vars.
+	/**
+	 * Whitelist coauthor query vars.
 	 *
 	 * This allows coauthored posts to be queried publicly.
-     *
-     * @param string[] $public_query_vars Array of public query vars.
-     */
-    public function whitelist_coauthor_search_query_vars( $public_query_vars ) {
+	 *
+	 * @param string[] $public_query_vars Array of public query vars.
+	 */
+	public function whitelist_coauthor_search_query_vars( $public_query_vars ) {
 		global $ssl_alp;
 
 		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
@@ -1193,32 +1193,32 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return $public_query_vars;
 		}
 
-        if ( ! $ssl_alp->search->current_user_can_advanced_search() ) {
+		if ( ! $ssl_alp->search->current_user_can_advanced_search() ) {
 			// Advanced search disabled.
 			return $public_query_vars;
-        }
+		}
 
-        // Custom query vars to make public. These are sanitised and handled by
-        // `parse_coauthor_query_vars`.
-        $custom_query_vars = array(
+		// Custom query vars to make public. These are sanitised and handled by
+		// `parse_coauthor_query_vars`.
+		$custom_query_vars = array(
 			'ssl_alp_coauthor__and',
 			'ssl_alp_coauthor__in',
-            'ssl_alp_coauthor__not_in',
-        );
+			'ssl_alp_coauthor__not_in',
+		);
 
 		// Merge new query vars into existing ones.
-        return wp_parse_args( $custom_query_vars, $public_query_vars );
-    }
+		return wp_parse_args( $custom_query_vars, $public_query_vars );
+	}
 
-    /**
-     * Sanitise coauthor querystrings and inject them as taxonomy filters into WP_Query.
-     *
-     * This detects values submitted through the custom search function and turns them into the
-     * filters expected by WP_Query.
-     *
-     * @param WP_Query $query The query.
-     */
-    public function parse_coauthor_query_vars( $query ) {
+	/**
+	 * Sanitise coauthor querystrings and inject them as taxonomy filters into WP_Query.
+	 *
+	 * This detects values submitted through the custom search function and turns them into the
+	 * filters expected by WP_Query.
+	 *
+	 * @param WP_Query $query The query.
+	 */
+	public function parse_coauthor_query_vars( $query ) {
 		global $ssl_alp;
 
 		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
@@ -1226,13 +1226,13 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return;
 		}
 
-        if ( ! $ssl_alp->search->current_user_can_advanced_search() ) {
+		if ( ! $ssl_alp->search->current_user_can_advanced_search() ) {
 			// Advanced search disabled.
 			return;
-        }
+		}
 
-        // Taxonomy query.
-        $tax_query = array();
+		// Taxonomy query.
+		$tax_query = array();
 
 		// Sanitize submitted values.
 		$this->sanitize_coauthor_querystring( $query, 'ssl_alp_coauthor__and' );
@@ -1240,14 +1240,14 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$this->sanitize_coauthor_querystring( $query, 'ssl_alp_coauthor__not_in' );
 
 		// Get coauthor query vars.
-		$coauthor_and = $query->get( 'ssl_alp_coauthor__and' );
-		$coauthor_in = $query->get( 'ssl_alp_coauthor__in' );
-        $coauthor_not_in = $query->get( 'ssl_alp_coauthor__not_in' );
+		$coauthor_and    = $query->get( 'ssl_alp_coauthor__and' );
+		$coauthor_in     = $query->get( 'ssl_alp_coauthor__in' );
+		$coauthor_not_in = $query->get( 'ssl_alp_coauthor__not_in' );
 
 		if ( ! empty( $coauthor_and ) && 1 === count( $coauthor_and ) ) {
 			// There is only one AND term specified, so merge it into IN.
 			$coauthor_in[] = absint( reset( $coauthor_and ) );
-			$coauthor_and = array();
+			$coauthor_and  = array();
 
 			// Update querystring. This matches core behaviour for categories
 			// (but bizarrely not for tags: https://core.trac.wordpress.org/ticket/46459).
@@ -1255,9 +1255,9 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			$query->set( 'ssl_alp_coauthor__in', $coauthor_in );
 		}
 
-        if ( ! empty( $coauthor_and ) ) {
-            // Coauthor AND search criterion specified.
-            $tax_query[] = array(
+		if ( ! empty( $coauthor_and ) ) {
+			// Coauthor AND search criterion specified.
+			$tax_query[] = array(
 				'relation' => 'AND', // Note, this is different from how parse_tax_query handles
 									 // e.g. tag__and because we have to inject the tax query after
 									 // WP_Tax_Query has already been instantiated, which normally
@@ -1266,55 +1266,55 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 					'taxonomy'         => 'ssl_alp_coauthor',
 					'terms'            => $coauthor_and,
 					'field'            => 'term_id',
-					'operator'		   => 'AND',
+					'operator'         => 'AND',
 					'include_children' => false,
 				),
-            );
-        }
-
-        if ( ! empty( $coauthor_in ) ) {
-            // Coauthor IN search criterion specified.
-            $tax_query[] = array(
-                'taxonomy'         => 'ssl_alp_coauthor',
-                'terms'            => $coauthor_in,
-                'field'            => 'term_id',
-                'include_children' => false,
-            );
+			);
 		}
 
-        if ( ! empty( $coauthor_not_in ) ) {
-            // Coauthor NOT IN search criterion specified.
-            $tax_query[] = array(
-                'taxonomy'         => 'ssl_alp_coauthor',
-                'terms'            => $coauthor_not_in,
-                'field'            => 'term_id',
-                'operator'         => 'NOT IN',
-                'include_children' => false,
-            );
-        }
+		if ( ! empty( $coauthor_in ) ) {
+			// Coauthor IN search criterion specified.
+			$tax_query[] = array(
+				'taxonomy'         => 'ssl_alp_coauthor',
+				'terms'            => $coauthor_in,
+				'field'            => 'term_id',
+				'include_children' => false,
+			);
+		}
 
-        // Sanitize new taxonomy filters.
-        $tax_query = $query->tax_query->sanitize_query( $tax_query );
+		if ( ! empty( $coauthor_not_in ) ) {
+			// Coauthor NOT IN search criterion specified.
+			$tax_query[] = array(
+				'taxonomy'         => 'ssl_alp_coauthor',
+				'terms'            => $coauthor_not_in,
+				'field'            => 'term_id',
+				'operator'         => 'NOT IN',
+				'include_children' => false,
+			);
+		}
 
-        // Merge new taxonomy filters into existing ones.
-        $query->tax_query->queries = wp_parse_args( $tax_query, $query->tax_query->queries );
-    }
+		// Sanitize new taxonomy filters.
+		$tax_query = $query->tax_query->sanitize_query( $tax_query );
 
-    /**
-     * Sanitize coauthor querystring, returning an array of integers.
-     *
-     * Used for coauthor__in and coauthor__not_in.
-     *
+		// Merge new taxonomy filters into existing ones.
+		$query->tax_query->queries = wp_parse_args( $tax_query, $query->tax_query->queries );
+	}
+
+	/**
+	 * Sanitize coauthor querystring, returning an array of integers.
+	 *
+	 * Used for coauthor__in and coauthor__not_in.
+	 *
 	 * @param WP_Query $query     Query object.
-     * @param string   $query_var Query var whose contents to sanitize.
-     */
-    private function sanitize_coauthor_querystring( $query, $query_var ) {
+	 * @param string   $query_var Query var whose contents to sanitize.
+	 */
+	private function sanitize_coauthor_querystring( $query, $query_var ) {
 		$querystring = $query->get( $query_var, array() );
 		$querystring = array_map( 'absint', array_unique( (array) $querystring ) );
 
 		// Update querystring.
 		$query->set( $query_var, $querystring );
-    }
+	}
 
 	/**
 	 * Action taken when user is deleted. This function does the deleting/reassigning of
