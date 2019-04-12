@@ -27,7 +27,7 @@ class SSL_ALP_Authenticate_Applications_List_Table extends WP_List_Table {
 		return array(
 			'cb'        => '<input type="checkbox"/>',
 			'name'      => esc_html__( 'Name', 'ssl-alp' ),
-			'password'  => esc_html__( 'Password', 'ssl-alp' ),
+			'password'  => '<abbr title="' . esc_attr__( 'Application password (spaces do not matter)', 'ssl-alp' ) . '">' . esc_html__( 'Password', 'ssl-alp' ) . '</abbr>',
 			'created'   => esc_html__( 'Created', 'ssl-alp' ),
 			'last_used' => esc_html__( 'Last Used', 'ssl-alp' ),
 			'last_ip'   => esc_html__( 'Last IP', 'ssl-alp' ),
