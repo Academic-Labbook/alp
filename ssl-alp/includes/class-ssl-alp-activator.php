@@ -117,6 +117,7 @@ class SSL_ALP_Activator {
 	private static function add_options() {
 		// Add options with default values (if they already exist, nothing happens).
 		add_option( 'ssl_alp_require_login', true );
+		add_option( 'ssl_alp_enable_applications', false );
 		add_option( 'ssl_alp_disallow_public_advanced_search', true );
 		add_option( 'ssl_alp_allow_multiple_authors', true );
 		add_option( 'ssl_alp_disable_post_trackbacks', true );
