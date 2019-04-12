@@ -60,3 +60,16 @@ div.ssl-alp-tools-card {
 .ssl-alp-text-removed {
     color: #a00;
 }
+
+.ssl-alp-application-revoke {
+    color: #a00;
+}
+
+.ssl-alp-application-revoke:hover {
+    color: #dc3232;
+}
+
+pre.ssl-alp-application-password {
+    margin: 0;
+    white-space: pre-wrap;
+}

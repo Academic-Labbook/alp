@@ -48,6 +48,7 @@ define( 'SSL_ALP_NETWORK_SETTINGS_MENU_SLUG', 'ssl-alp-network-options' );
 define( 'SSL_ALP_SITE_TOOLS_MENU_SLUG', 'ssl-alp-admin-tools' );
 define( 'SSL_ALP_POST_REVISIONS_MENU_SLUG', 'ssl-alp-admin-post-revisions' );
 define( 'SSL_ALP_PAGE_REVISIONS_MENU_SLUG', 'ssl-alp-admin-page-revisions' );
+define( 'SSL_ALP_APPLICATIONS_MENU_SLUG', 'ssl-alp-admin-applications' );
 
 /**
  * REST namespace
