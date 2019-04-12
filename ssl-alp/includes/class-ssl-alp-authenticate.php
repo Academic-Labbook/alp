@@ -374,8 +374,8 @@ class SSL_ALP_Authenticate extends SSL_ALP_Module {
 	 * @return bool True if the password was set, false if not.
 	 */
 	public function create_new_application( $application, $user_id = null ) {
-		if ( 3 > strlen( $application ) ) {
-			// Application name too short.
+		if ( 3 > strlen( $application ) || 30 < strlen( $application ) ) {
+			// Application name too short or too long.
 			return false;
 		}
 
