@@ -804,16 +804,17 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Get recent revisions, grouped by author and post.
+	 * Get revisions on published posts, grouped by author and post.
 	 *
-	 * Repeated edits made to posts by the same author are returned only once.
+	 * Repeated edits made to posts by the same author are returned only once. The revisions
+	 * auto-generated on publication are also ignored.
 	 *
 	 * @param int    $number Maximum number of revisions to get.
 	 * @param string $order  Sort order.
 	 * @return array
 	 * @global $wpdb
 	 */
-	public function get_recent_revisions( $number, $order = 'DESC' ) {
+	public function get_author_grouped_published_revisions( $number, $order = 'DESC' ) {
 		global $wpdb;
 
 		$number = absint( $number );
@@ -840,8 +841,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			 */
 			$object_ids = $wpdb->get_results(
 				$wpdb->prepare(
-					"
-					SELECT posts.post_author, posts.post_parent, MAX(posts.post_date) AS post_date,
+					"SELECT posts.post_author, posts.post_parent, MAX(posts.post_date) AS post_date,
 						COUNT(1) AS number, parent_posts.post_author AS parent_author
 					FROM {$wpdb->posts} AS posts
 					INNER JOIN {$wpdb->posts} AS parent_posts ON posts.post_parent = parent_posts.ID
@@ -849,13 +849,13 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 						posts.post_type = 'revision'
 						AND LOCATE(CONCAT(posts.post_parent, '-autosave'), posts.post_name) = 0
 						AND posts.post_status = 'inherit'
-						AND parent_posts.post_type IN ({$supported_types_clause})
+						AND posts.post_date > parent_posts.post_date
 						AND parent_posts.post_status = 'publish'
+						AND parent_posts.post_type IN ({$supported_types_clause})
 					GROUP BY posts.post_author, posts.post_parent
 					HAVING (number > 1) OR (posts.post_author <> parent_posts.post_author)
 					ORDER BY post_date {$order}
-					LIMIT %d
-					",
+					LIMIT %d",
 					$number
 				)
 			);

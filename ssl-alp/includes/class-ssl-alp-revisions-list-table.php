@@ -404,7 +404,7 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 			AND LOCATE(CONCAT(posts.post_parent, '-autosave'), posts.post_name) = 0
 			AND parent_posts.post_type = %s
 			AND posts.post_status = 'inherit'
-			AND posts.post_date <> parent_posts.post_date
+			AND posts.post_date > parent_posts.post_date
 			AND parent_posts.post_status = 'publish'
 			{$author_sql}
 			ORDER BY posts." . $orderby . ' ' . $order . ', posts.ID DESC
@@ -463,7 +463,7 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 			{$user_sql}
 			AND parent_posts.post_type = %s
 			AND posts.post_status = 'inherit'
-			AND posts.post_date <> parent_posts.post_date
+			AND posts.post_date > parent_posts.post_date
 			AND parent_posts.post_status = 'publish'",
 			$this->post_type
 		);
