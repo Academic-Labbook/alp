@@ -228,6 +228,11 @@ class RevisionsRestTest extends WP_UnitTestCase {
             $this->editor,
         );
 
+        if ( is_multisite() ) {
+            // Site admins on networks can't see unread flags.
+            $cant_get[] = $this->admin;
+        }
+
         foreach ( $cant_get as $user ) {
             // This role shouldn't be able to get the read status for someone else's post.
             wp_set_current_user( $user->ID );
@@ -237,8 +242,12 @@ class RevisionsRestTest extends WP_UnitTestCase {
 
         $can_get = array(
             $post_author,
-            $this->admin,
         );
+
+        if ( ! is_multisite() ) {
+            // Admins on single sites can see unread flags.
+            $can_get[] = $this->admin;
+        }
 
         foreach ( $can_get as $user ) {
             // This role should be able to get the read status.
