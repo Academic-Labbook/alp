@@ -194,10 +194,11 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 	 */
 	public function get_columns() {
 		return array(
-			'title'   => esc_html__( 'Title', 'ssl-alp' ),
-			'changes' => '<abbr title="' . esc_html__( 'Lines added to and removed from the post text', 'ssl-alp' ) . '">' . esc_html__( 'Line changes', 'ssl-alp' ) . '</abbr>',
-			'author'  => esc_html__( 'Author', 'ssl-alp' ),
-			'date'    => esc_html__( 'Date', 'ssl-alp' ),
+			'title'        => esc_html__( 'Title', 'ssl-alp' ),
+			'changes'      => '<abbr title="' . esc_html__( 'Lines added to and removed from the post text', 'ssl-alp' ) . '">' . esc_html__( 'Line changes', 'ssl-alp' ) . '</abbr>',
+			'edit_summary' => esc_html__( 'Edit Summary', 'ssl-alp' ),
+			'author'       => esc_html__( 'Author', 'ssl-alp' ),
+			'date'         => esc_html__( 'Date', 'ssl-alp' ),
 		);
 	}
 
@@ -303,6 +304,99 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 		$title .= implode( ', ', $pieces );
 
 		return $title;
+	}
+
+	/**
+	 * Handle edit summary column output.
+	 *
+	 * @param WP_Post $revision The current revision object.
+	 */
+	public function column_edit_summary( $revision ) {
+		global $ssl_alp;
+
+		// Get edit summary data.
+		$edit_data = $ssl_alp->revisions->get_revision_edit_summary( $revision );
+
+		if ( is_null( $edit_data ) ) {
+			// No edit summary data.
+			return;
+		}
+
+		$text = '';
+
+		if ( ! empty( $edit_data['summary'] ) ) {
+			// Print the edit summary.
+			$text .= '<em>';
+			$text .= esc_html( $edit_data['summary'] );
+			$text .= '</em>';
+			$text .= '&nbsp';
+		}
+
+		if ( ! empty( $edit_data['revert_id'] ) ) {
+			// Revision was a revert.
+			$abbr = $edit_data['revert_id'];
+
+			// Allowed revision abbreviation tags.
+			$allowed_abbr_tags = array(
+				'a' => array(
+					'href'  => array(),
+					'title' => array(),
+				),
+			);
+
+			/**
+			 * Note: interns are not shown the edit link below (it is empty) because they fail
+			 * the edit_post permission check against the *revision* here. This is a subtle bug
+			 * that would take a lot of effort to fix.
+			 *
+			 * Instead, interns simply aren't shown the revision link (but they still see the edit
+			 * link).
+			 */
+			$edit_link = get_edit_post_link( $revision->ID );
+
+			if ( ! empty( $edit_link ) && $ssl_alp->revisions->current_user_can_view_revision( $revision ) ) {
+				$abbr = sprintf(
+					'<a href="%1$s" title="%2$s">%3$s</a>',
+					esc_url( $edit_link ),
+					esc_attr(
+						sprintf(
+							/* translators: 1: revision ID */
+							__( 'View changes in revision %1$s', 'ssl-alp' ),
+							$revision->ID
+						)
+					),
+					$abbr
+				);
+			}
+
+			if ( is_null( $abbr ) ) {
+				// Source revision is invalid.
+				/* translators: reverted to unknown revision */
+				$text .= esc_html__( 'reverted', 'ssl-alp' );
+			} else {
+				$text .= sprintf(
+					/* translators: 1: reverted revision ID */
+					esc_html__( 'reverted to %1$s', 'ssl-alp' ),
+					wp_kses( $abbr, $allowed_abbr_tags )
+				);
+			}
+
+			$text .= '&nbsp;';
+
+			if ( ! empty( $edit_data['source_summary'] ) ) {
+				// Add original edit summary.
+				$text .= '<em>';
+				$text .= sprintf(
+					/* translators: 1: edit summary of post reverted to */
+					esc_html__( '("%1$s")', 'ssl-alp' ),
+					esc_html( $edit_data['source_summary'] )
+				);
+				$text .= '</em>';
+				$text .= '&nbsp;';
+			}
+		}
+
+		return $text;
 	}
 
 	/**
