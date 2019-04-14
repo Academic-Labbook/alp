@@ -353,18 +353,18 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 				'methods'  => 'POST',
 				'callback' => array( $this, 'rest_update_revision_meta' ),
 				'args'     => array(
-					'id'    => array(
+					'post_id' => array(
 						'required'          => true,
 						'validate_callback' => function( $param, $request, $key ) {
 							return is_numeric( $param );
 						},
 						'sanitize_callback' => 'absint',
 					),
-					'key'   => array(
+					'key'     => array(
 						'required'          => true,
 						'validate_callback' => array( $this, 'validate_revision_meta_key' ),
 					),
-					'value' => array(
+					'value'   => array(
 						'required'          => true,
 						'sanitize_callback' => array( $this, 'sanitize_edit_summary' ),
 					),
@@ -381,7 +381,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 *                       permission to edit it.
 	 */
 	public function rest_update_revision_meta( WP_REST_Request $data ) {
-		if ( is_null( $data['id'] ) || is_null( $data['key'] ) || is_null( $data['value'] ) ) {
+		if ( is_null( $data['post_id'] ) || is_null( $data['key'] ) || is_null( $data['value'] ) ) {
 			// Invalid data.
 			return;
 		}
@@ -391,7 +391,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			return;
 		}
 
-		$revision_id = $data['id'];
+		$revision_id = $data['post_id'];
 
 		// Get revision.
 		$post = get_post( $revision_id );
@@ -897,17 +897,17 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * @return string|null
 	 */
 	private function get_unread_flag_term_slug( $user = null ) {
-		if ( ! $user instanceof WP_User ) {
+		if ( ! is_a( $user, 'WP_User' ) ) {
 			if ( is_numeric( $user ) ) {
 				// Get user by their ID.
 				$user = get_user_by( 'id', $user );
-			} else {
+			} elseif ( is_user_logged_in() ) {
 				// Try to get logged in user.
 				$user = wp_get_current_user();
 			}
 		}
 
-		if ( ! is_object( $user ) ) {
+		if ( ! is_a( $user, 'WP_User' ) ) {
 			// Invalid user.
 			return;
 		}
@@ -940,17 +940,17 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * @return WP_Term|false
 	 */
 	private function get_user_unread_flag_term( $user = null ) {
-		if ( ! $user instanceof WP_User ) {
+		if ( ! is_a( $user, 'WP_User' ) ) {
 			if ( is_numeric( $user ) ) {
 				// Get user by their ID.
 				$user = get_user_by( 'id', $user );
-			} else {
+			} elseif ( is_user_logged_in() ) {
 				// Try to get logged in user.
 				$user = wp_get_current_user();
 			}
 		}
 
-		if ( ! is_object( $user ) ) {
+		if ( ! is_a( $user, 'WP_User' ) ) {
 			// Invalid user.
 			return false;
 		}
@@ -1173,17 +1173,17 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 *              current user is not able to edit users, true otherwise.
 	 */
 	private function check_unread_flag_permission( $user = null ) {
-		if ( ! $user instanceof WP_User ) {
+		if ( ! is_a( $user, 'WP_User' ) ) {
 			if ( is_numeric( $user ) ) {
 				// Get user by their ID.
 				$user = get_user_by( 'id', $user );
-			} else {
+			} elseif ( is_user_logged_in() ) {
 				// Try to get logged in user.
 				$user = wp_get_current_user();
 			}
 		}
 
-		if ( ! is_object( $user ) ) {
+		if ( ! is_a( $user, 'WP_User' ) ) {
 			// Invalid user.
 			return false;
 		}
@@ -1218,6 +1218,10 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			// Get user by their ID.
 			$user = get_user_by( 'id', $data['user_id'] );
 		} else {
+			if ( ! is_user_logged_in() ) {
+				return rest_ensure_response( $this->unread_flag_no_permission_error() );
+			}
+
 			// Try to get logged in user.
 			$user = wp_get_current_user();
 		}
@@ -1266,6 +1270,10 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			// Get user by their ID.
 			$user = get_user_by( 'id', $data['user_id'] );
 		} else {
+			if ( ! is_user_logged_in() ) {
+				return rest_ensure_response( $this->unread_flag_no_permission_error() );
+			}
+
 			// Try to get logged in user.
 			$user = wp_get_current_user();
 		}
@@ -1411,7 +1419,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			$ignore_user = get_user_by( 'id', $ignore_user );
 		}
 
-		$should_ignore = $ignore_user instanceof WP_User;
+		$should_ignore = is_a( $ignore_user, 'WP_User' );
 
 		// Set each user's read status.
 		foreach ( $users as $user ) {
@@ -1547,11 +1555,15 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			return $this->unread_flag_post_not_found_error();
 		}
 
-		if ( ! $user instanceof WP_User ) {
+		if ( ! is_a( $user, 'WP_User' ) ) {
 			if ( is_numeric( $user ) ) {
 				// Get user by their ID.
 				$user = get_user_by( 'id', $user );
 			} else {
+				if ( ! is_user_logged_in() ) {
+					return $this->unread_flag_no_permission_error();
+				}
+
 				// Try to get logged in user.
 				$user = wp_get_current_user();
 			}
@@ -1598,11 +1610,15 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			return $this->unread_flag_unsupported_post_type_error();
 		}
 
-		if ( ! $user instanceof WP_User ) {
+		if ( ! is_a( $user, 'WP_User' ) ) {
 			if ( is_numeric( $user ) ) {
 				// Get user by their ID.
 				$user = get_user_by( 'id', $user );
 			} else {
+				if ( ! is_user_logged_in() ) {
+					return $this->unread_flag_no_permission_error();
+				}
+
 				// Try to get logged in user.
 				$user = wp_get_current_user();
 			}

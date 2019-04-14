@@ -130,12 +130,13 @@ class EditSummaryPlugin extends Component {
      */
     setRevisionEditSummary( revisionId, editSummary ) {
         let payload = {
+            post_id: revisionId,
             key: 'ssl_alp_edit_summary',
             value: editSummary
         };
 
         wp.apiRequest( {
-            path: `/ssl-alp/v1/update-revision-meta?id=${revisionId}`,
+            path: '/ssl-alp/v1/update-revision-meta',
             method: 'POST',
             data: payload
         } ).then(
