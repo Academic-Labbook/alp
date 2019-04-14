@@ -632,8 +632,7 @@ if ( ! function_exists( 'labbook_the_revision_description_row' ) ) :
 		}
 
 		// Get revision's edit summary.
-		$revision_edit_summary = get_post_meta( $revision->ID, 'ssl_alp_edit_summary', true );
-		$revision_edit_summary_revert_id = get_post_meta( $revision->ID, 'ssl_alp_edit_summary_revert_id', true );
+		$edit_data = $ssl_alp->revisions->get_revision_edit_summary( $revision );
 
 		// Revision abbreviation, e.g. r101, with link to diff.
 		$abbr = labbook_get_revision_abbreviation( $revision );
@@ -698,12 +697,43 @@ if ( ! function_exists( 'labbook_the_revision_description_row' ) ) :
 		echo '</td>';
 		echo '<td>'; // Information.
 
-		if ( ! empty( $revision_edit_summary ) ) {
+		if ( ! empty( $edit_data['summary'] ) ) {
 			// Print the edit summary.
 			echo '<em>';
-			echo esc_html( $revision_edit_summary );
+			echo esc_html( $edit_data['summary'] );
 			echo '</em>';
 			echo '&nbsp';
+		}
+
+		if ( ! empty( $edit_data['revert_id'] ) ) {
+			// Revision was a revert.
+			$source_abbr = labbook_get_revision_abbreviation( $edit_data['revert_id'] );
+
+			if ( is_null( $source_abbr ) ) {
+				// Source revision is invalid.
+				/* translators: reverted to unknown revision */
+				esc_html_e( 'reverted', 'labbook' );
+			} else {
+				printf(
+					/* translators: 1: reverted revision ID */
+					esc_html__( 'reverted to %1$s', 'labbook' ),
+					wp_kses( $source_abbr, $allowed_abbr_tags )
+				);
+			}
+
+			echo '&nbsp;';
+
+			if ( ! empty( $edit_data['source_summary'] ) ) {
+				// Add original edit summary.
+				echo '<em>';
+				printf(
+					/* translators: 1: edit summary of post reverted to */
+					esc_html__( '("%1$s")', 'labbook' ),
+					esc_html( $edit_data['source_summary'] )
+				);
+				echo '</em>';
+				echo '&nbsp;';
+			}
 		}
 
 		if ( $is_current ) {
@@ -721,38 +751,7 @@ if ( ! function_exists( 'labbook_the_revision_description_row' ) ) :
 			/* translators: original published post */
 			esc_html_e( '(original)', 'labbook' );
 			echo '</strong>';
-		} elseif ( ! empty( $revision_edit_summary_revert_id ) ) {
-			// Revision was a revert.
-			$source_abbr = labbook_get_revision_abbreviation( $revision_edit_summary_revert_id );
-
-			if ( is_null( $source_abbr ) ) {
-				// Source revision is invalid.
-				/* translators: reverted to unknown revision */
-				esc_html_e( 'reverted', 'labbook' );
-			} else {
-				printf(
-					/* translators: 1: reverted revision ID */
-					esc_html__( 'reverted to %1$s', 'labbook' ),
-					wp_kses( $source_abbr, $allowed_abbr_tags )
-				);
-			}
-
-			// Get original source revision.
-			$source_revision = $ssl_alp->revisions->get_source_revision( $revision );
-			$source_edit_summary = get_post_meta( $source_revision->ID, 'ssl_alp_edit_summary', true );
-
-			if ( ! empty( $source_edit_summary ) ) {
-				// Add original edit summary.
-				echo '&nbsp;';
-				echo '<em>';
-				printf(
-					/* translators: 1: edit summary of post reverted to */
-					esc_html__( '("%1$s")', 'labbook' ),
-					esc_html( $source_edit_summary )
-				);
-				echo '</em>';
-			}
-		} // End if().
+		}
 
 		echo '</td>';
 		echo '</tr>';
@@ -761,7 +760,7 @@ endif;
 
 if ( ! function_exists( 'labbook_get_revision_abbreviation' ) ) :
 	/**
-	 * Gets abbreviated revision ID, with optional URL.
+	 * Get abbreviated revision ID, with optional URL.
 	 *
 	 * If the specified revision doesn't exist, it may have been deleted but is still referenced by
 	 * another revision edit summary. In this case, this function will will still show the
@@ -769,6 +768,8 @@ if ( ! function_exists( 'labbook_get_revision_abbreviation' ) ) :
 	 *
 	 * @param int  $revision Revision ID.
 	 * @param bool $url      Print revision URL.
+	 * @return string|null The revision abbreviation, or null if specified revision is invalid or
+	 *                     not a valid revision.
 	 */
 	function labbook_get_revision_abbreviation( $revision, $url = true ) {
 		global $ssl_alp;

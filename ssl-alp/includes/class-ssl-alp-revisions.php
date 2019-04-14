@@ -215,6 +215,44 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	}
 
 	/**
+	 * Get revision edit summary.
+	 *
+	 * @param int|WP_Post $revision The revision.
+	 * @return array|null Array containing edit summary (or null if specified revision is invalid),
+	 *                    the revert source post ID, and the revert source comment.
+	 */
+	public function get_revision_edit_summary( $revision ) {
+		// Get revision object if id is specified.
+		$revision = wp_get_post_revision( $revision );
+
+		if ( is_null( $revision ) ) {
+			return;
+		}
+
+		if ( 'revision' !== $revision->post_type ) {
+			return;
+		}
+
+		// Get revision's edit summary.
+		$edit_summary = get_post_meta( $revision->ID, 'ssl_alp_edit_summary', true );
+		$edit_summary_revert_id = get_post_meta( $revision->ID, 'ssl_alp_edit_summary_revert_id', true );
+
+		$source_edit_summary = null;
+
+		if ( ! empty( $edit_summary_revert_id ) ) {
+			// Get original source revision.
+			$source_revision = $this->get_source_revision( $revision );
+			$source_edit_summary = get_post_meta( $source_revision->ID, 'ssl_alp_edit_summary', true );
+		}
+
+		return array(
+			'summary'        => $edit_summary,
+			'revert_id'      => $edit_summary_revert_id,
+			'source_summary' => $source_edit_summary,
+		);
+	}
+
+	/**
 	 * Register post meta field for edit summaries
 	 */
 	public function register_edit_summary_post_meta() {
