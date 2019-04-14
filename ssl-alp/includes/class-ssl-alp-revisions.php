@@ -399,21 +399,9 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		if ( is_null( $post ) ) {
 			return;
 		} elseif ( wp_is_post_autosave( $post ) ) {
-			return new WP_Error(
-				'post_is_autosave',
-				__( 'The specified post is an autosave, and therefore cannot have its edit summary set.', 'ssl-alp' ),
-				array(
-					'status' => 400, // Bad request.
-				)
-			);
+			return $this->update_revision_meta_post_is_autosave_error();
 		} elseif ( ! $this->edit_summary_allowed( $post ) ) {
-			return new WP_Error(
-				'post_cannot_read',
-				__( 'Sorry, you are not allowed to edit this post.', 'ssl-alp' ),
-				array(
-					'status' => rest_authorization_required_code(),
-				)
-			);
+			return $this->update_revision_meta_no_permission_error();
 		}
 
 		$edit_summary = $data['value']; // Sanitized already by REST endpoint callback.
@@ -430,6 +418,32 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 */
 	public function validate_revision_meta_key( $key ) {
 		return 'ssl_alp_edit_summary' === $key;
+	}
+
+	/**
+	 * Post is autosave error.
+	 */
+	public function update_revision_meta_post_is_autosave_error() {
+		return new WP_Error(
+			'post_is_autosave',
+			__( 'The specified post is an autosave, and therefore cannot have its edit summary set.', 'ssl-alp' ),
+			array(
+				'status' => 400, // Bad request.
+			)
+		);
+	}
+
+	/**
+	 * No permission error.
+	 */
+	public function update_revision_meta_no_permission_error() {
+		return new WP_Error(
+			'post_cannot_read',
+			__( 'Sorry, you are not allowed to edit this post.', 'ssl-alp' ),
+			array(
+				'status' => rest_authorization_required_code(),
+			)
+		);
 	}
 
 	/**
