@@ -1458,6 +1458,10 @@ a:hover, a:active {
     margin: 1em 0;
 }
 
+.comment-list, .children {
+    list-style: none; /* remove numbering from comment lists */
+}
+
 .comments-area h3 {
     color: #353535;
     font-size: 1.385em;
