@@ -28,6 +28,9 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 		echo '<h2 class="entry-title">';
 
 		$post_read_classes = array();
+		$read_class = '';
+		$unread_class = '';
+		$read_status = '';
 
 		if ( $icon ) {
 			if ( ! is_user_logged_in() || ! labbook_get_option( 'show_unread_flags' )
@@ -42,10 +45,6 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 					// Don't show icon.
 					$icon_class = '';
 				}
-
-				$read_class = '';
-				$unread_class = '';
-				$read_status = '';
 			} else {
 				// Post read/unread status.
 				$post_is_read = labbook_post_is_read( $post );
