@@ -217,7 +217,7 @@ if ( ! function_exists( 'labbook_generate_post_contents' ) ) :
 			$last_level = $current_level;
 
 			// Unique id for this header.
-			$header_id = _unique_id( $header, $document );
+			$header_id = labbook_tag_unique_id( $header, $document );
 
 			// Set tag's ID.
 			$header->setAttribute( 'id', $header_id );
@@ -239,7 +239,7 @@ if ( ! function_exists( 'labbook_generate_post_contents' ) ) :
 	}
 endif;
 
-if ( ! function_exists( '_unique_id' ) ) :
+if ( ! function_exists( 'labbook_tag_unique_id' ) ) :
 	/**
 	 * Get a unique id for the given tag.
 	 *
@@ -247,7 +247,7 @@ if ( ! function_exists( '_unique_id' ) ) :
 	 * @param DOMDocument $dom HTML document.
 	 * @return int
 	 */
-	function _unique_id( $tag, $dom ) {
+	function labbook_tag_unique_id( $tag, $dom ) {
 		$id = $tag->getAttribute( 'id' );
 
 		if ( empty( $id ) ) {
@@ -255,7 +255,7 @@ if ( ! function_exists( '_unique_id' ) ) :
 			$id = _text_to_id( $tag->textContent );
 		}
 
-		if ( _id_exists( $id, $dom ) && $dom->getElementById( $id ) !== $tag ) {
+		if ( labbook_tag_id_exists( $id, $dom ) && $dom->getElementById( $id ) !== $tag ) {
 			/**
 			 * ID already used elsewhere - generate new one.
 			 */
@@ -267,7 +267,7 @@ if ( ! function_exists( '_unique_id' ) ) :
 			$num = 1;
 
 			// Add increasing natural number onto end of ID until unique is found.
-			while ( _id_exists( $id, $dom ) ) {
+			while ( labbook_tag_id_exists( $id, $dom ) ) {
 				// ID with appended number.
 				$id = $original_id . $num;
 
@@ -279,14 +279,14 @@ if ( ! function_exists( '_unique_id' ) ) :
 	}
 endif;
 
-if ( ! function_exists( '_id_exists' ) ) :
+if ( ! function_exists( 'labbook_tag_id_exists' ) ) :
 	/**
 	 * Check if specified DOM element ID already exists.
 	 *
 	 * @param int         $id  Element ID.
 	 * @param DOMDocument $dom HTML document.
 	 */
-	function _id_exists( $id, &$dom ) {
+	function labbook_tag_id_exists( $id, &$dom ) {
 		return ! is_null( $dom->getElementById( $id ) );
 	}
 endif;

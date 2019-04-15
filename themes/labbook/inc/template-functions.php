@@ -116,7 +116,7 @@ if ( ! function_exists( 'labbook_custom_excerpt_length' ) ) :
 	 * @return int Excerpt length.
 	 */
 	function labbook_custom_excerpt_length( $length ) {
-		$excerpt_length = labbook_get_option( 'excerpt_length' );
+		$excerpt_length = absint( labbook_get_option( 'excerpt_length' ) );
 
 		if ( empty( $excerpt_length ) ) {
 			$excerpt_length = $length;
@@ -148,7 +148,7 @@ if ( ! function_exists( 'labbook_get_page_breadcrumbs' ) ) :
 		$breadcrumbs = array(
 			array(
 				'title' => __( 'Home', 'labbook' ),
-				'url'   => get_home_url(),
+				'url'   => home_url(),
 			),
 		);
 

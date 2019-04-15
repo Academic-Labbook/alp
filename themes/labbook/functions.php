@@ -336,12 +336,19 @@ endif;
 add_filter( 'the_content', 'labbook_get_content_with_toc' );
 
 /**
+ * Check if Academic Labbook Plugin is available on this site.
+ */
+function labbook_ssl_alp_active() {
+	return class_exists( 'SSL_ALP' );
+}
+
+/**
  * Check if advanced search capabilities provided by the ALP plugin are available and enabled.
  */
 function labbook_ssl_alp_advanced_search_enabled() {
 	global $ssl_alp;
 
-	if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
+	if ( ! labbook_ssl_alp_active() ) {
 		// Plugin is disabled.
 		return false;
 	}
@@ -353,7 +360,7 @@ function labbook_ssl_alp_advanced_search_enabled() {
  * Check if coauthors provided by the ALP plugin are available and enabled.
  */
 function labbook_ssl_alp_coauthors_enabled() {
-	if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
+	if ( ! labbook_ssl_alp_active() ) {
 		// Plugin is disabled.
 		return false;
 	} elseif ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
@@ -368,7 +375,7 @@ function labbook_ssl_alp_coauthors_enabled() {
  * Check if crossreferences provided by the ALP plugin are available and enabled.
  */
 function labbook_ssl_alp_crossreferences_enabled() {
-	if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
+	if ( ! labbook_ssl_alp_active() ) {
 		// Plugin is disabled.
 		return false;
 	} elseif ( ! get_option( 'ssl_alp_enable_crossreferences' ) ) {
@@ -383,7 +390,7 @@ function labbook_ssl_alp_crossreferences_enabled() {
  * Check if edit summaries provided by the ALP plugin are available and enabled.
  */
 function labbook_ssl_alp_edit_summaries_enabled() {
-	if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
+	if ( ! labbook_ssl_alp_active() ) {
 		// Plugin is disabled.
 		return false;
 	} elseif ( ! get_option( 'ssl_alp_enable_edit_summaries' ) ) {
@@ -398,7 +405,7 @@ function labbook_ssl_alp_edit_summaries_enabled() {
  * Check if unread flags provided by the ALP plugin are available and enabled.
  */
 function labbook_ssl_alp_unread_flags_enabled() {
-	if ( ! is_plugin_active( 'ssl-alp/alp.php' ) ) {
+	if ( ! labbook_ssl_alp_active() ) {
 		// Plugin is disabled.
 		return false;
 	} elseif ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
@@ -433,8 +440,3 @@ require get_template_directory() . '/inc/template-tags.php';
  * Customizer additions.
  */
 require get_template_directory() . '/inc/customizer.php';
-
-/**
- * Admin functions (for is_plugin_active)
- */
-require_once ABSPATH . 'wp-admin/includes/plugin.php';
