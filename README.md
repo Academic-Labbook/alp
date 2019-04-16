@@ -24,6 +24,7 @@ section below. It explains how new features in WordPress will be tracked by ALP.
    - REST API and feeds accessible using HTTP authentication with application-specific passwords
    - Images still accessible with direct link (not possible to block without server configuration)
    - XML-RPC interface disabled
+ - Provides tools to allow tags and categories to be merged and restructured.
  - Disable trackbacks, which are usually only useful for commercial sites
  - Modifies pages to work more like a wiki:
    - Removes authors and dates
