@@ -111,7 +111,7 @@ class SSL_ALP_Authenticate extends SSL_ALP_Module {
 		$loader->add_action( 'admin_post_ssl-alp-revoke-application', $this, 'handle_revoke_application_form' );
 
 		// Handle admin notices.
-		$loader->add_action( 'admin_notices', $this, 'handle_admin_notices' );
+		$loader->add_action( 'admin_notices', $this, 'print_admin_notices' );
 	}
 
 	/**
@@ -262,7 +262,7 @@ class SSL_ALP_Authenticate extends SSL_ALP_Module {
 	/**
 	 * Handle admin notices.
 	 */
-	public function handle_admin_notices() {
+	public function print_admin_notices() {
 		if ( ! isset( $_GET['message'] ) ) {
 			return;
 		}
