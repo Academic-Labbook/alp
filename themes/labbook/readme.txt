@@ -3,7 +3,7 @@ Contributors: seanleavey
 Tags: custom-background, custom-logo, custom-menu, editor-style, education, theme-options, threaded-comments, translation-ready, two-columns
 Requires at least: 5.0.0
 Tested up to: 5.0.3
-Stable tag: 1.1.4
+Stable tag: 1.1.5
 Requires PHP: 7.0.0
 License: GNU General Public License v3 or later
 License URI: LICENCE
@@ -35,6 +35,12 @@ Labbook supports Academic Labbook Plugin - indeed, use of it is highly encourage
 of features provided in this theme.
 
 == Changelog ==
+
+= 1.1.5 - 2019-04-16 =
+* Fixed bug with sidebar positioning on smaller screens.
+* Fixed notice when ALP plugin is disabled.
+* Removed misleading comment numbering.
+* Move code from Labbook theme into ALP plugin (now requires 0.15.0).
 
 = 1.1.4 - 2019-04-07 =
 * Prevented unread flag buttons showing up on pages in search results.
