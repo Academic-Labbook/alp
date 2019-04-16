@@ -109,6 +109,9 @@ class SSL_ALP_Authenticate extends SSL_ALP_Module {
 		// Handle submitted application form data.
 		$loader->add_action( 'admin_post_ssl-alp-add-application', $this, 'handle_add_application_form' );
 		$loader->add_action( 'admin_post_ssl-alp-revoke-application', $this, 'handle_revoke_application_form' );
+
+		// Handle admin notices.
+		$loader->add_action( 'admin_notices', $this, 'print_admin_notices' );
 	}
 
 	/**
@@ -231,9 +234,9 @@ class SSL_ALP_Authenticate extends SSL_ALP_Module {
 			$application_name = sanitize_text_field( $_REQUEST['application_name'] );
 
 			if ( $this->create_new_application( $application_name ) ) {
-				$this->redirect( array( 'add_success' => true ) );
+				$this->redirect( array( 'message' => 'ssl_alp_add_success' ) );
 			} else {
-				$this->redirect( array( 'add_failure' => true ) );
+				$this->redirect( array( 'message' => 'ssl_alp_add_failure' ) );
 			}
 		}
 	}
@@ -252,7 +255,34 @@ class SSL_ALP_Authenticate extends SSL_ALP_Module {
 				$this->delete_user_application( $application );
 			}
 
-			$this->redirect( array( 'revoke_success' => true ) );
+			$this->redirect( array( 'message' => 'ssl_alp_revoke_success' ) );
+		}
+	}
+
+	/**
+	 * Handle admin notices.
+	 */
+	public function print_admin_notices() {
+		if ( ! isset( $_GET['message'] ) ) {
+			return;
+		}
+
+		switch ( $_GET['message'] ) {
+			case  'ssl_alp_add_success':
+				echo '<div class="notice notice-success is-dismissible">';
+				echo '<p>' . esc_html__( 'Application added.', 'ssl-alp' ) . '</p>';
+				echo '</div>';
+				break;
+			case 'ssl_alp_add_failure':
+				echo '<div class="notice notice-error is-dismissible">';
+				echo '<p>' . esc_html__( 'Application name invalid or already in use.', 'ssl-alp' ) . '</p>';
+				echo '</div>';
+				break;
+			case 'ssl_alp_revoke_success':
+				echo '<div class="notice notice-success is-dismissible">';
+				echo '<p>' . esc_html__( 'Application(s) revoked.', 'ssl-alp' ) . '</p>';
+				echo '</div>';
+				break;
 		}
 	}
 
