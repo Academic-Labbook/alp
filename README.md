@@ -170,6 +170,13 @@ The core authentication code of Authenticator has been the basis for ALP's priva
 Parts of Application Passwords have been adapted for REST authentication, but expanded to
 authenticate feeds and admin AJAX calls, and the admin interface has been completely replaced.
 
+### Term Management Tools
+Author: Cristi Burcă
+Link: [Term Management Tools](https://wordpress.org/plugins/term-management-tools/)
+
+Most of the code has been copied with a few minor changes, but the "change taxonomy" function has
+been removed and the "merge" function user interface has been tweaked.
+
 ### Simple Life
 Author: Nilambar Sharma
 Link: [Simple Life](https://wordpress.org/themes/simple-life/)

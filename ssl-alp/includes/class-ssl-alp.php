@@ -128,6 +128,14 @@ class SSL_ALP {
 		$this->search = new SSL_ALP_Search( $this );
 
 		/**
+		 * Term management.
+		 */
+
+		require_once SSL_ALP_BASE_DIR . 'includes/class-ssl-alp-terms.php';
+
+		$this->terms = new SSL_ALP_Terms( $this );
+
+		/**
 		 * Page functionality.
 		 */
 
@@ -195,6 +203,7 @@ class SSL_ALP {
 		$this->tools->register();
 		$this->auth->register();
 		$this->search->register();
+		$this->terms->register();
 		$this->pages->register();
 		$this->coauthors->register();
 		$this->revisions->register();
