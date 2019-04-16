@@ -199,7 +199,7 @@ if ( ! function_exists( 'labbook_get_human_date' ) ) :
 		return sprintf(
 			/* translators: 1: time ago */
 			__( '%s ago', 'labbook' ),
-			human_time_diff( $timestamp, current_time( 'timestamp' ) )
+			human_time_diff( $timestamp )
 		);
 	}
 endif;

@@ -437,7 +437,7 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 
 		if ( $time_diff > 0 && $time_diff < DAY_IN_SECONDS ) {
 			/* translators: time since revision */
-			$h_time = sprintf( __( '%s ago', 'ssl-alp' ), human_time_diff( $time, current_time( 'timestamp' ) ) );
+			$h_time = sprintf( __( '%s ago', 'ssl-alp' ), human_time_diff( $time ) );
 		} else {
 			$h_time = mysql2date( __( 'Y/m/d' ), $m_time );
 		}
