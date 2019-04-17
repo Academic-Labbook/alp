@@ -339,7 +339,7 @@ add_filter( 'the_content', 'labbook_get_content_with_toc' );
  * Check if Academic Labbook Plugin is available on this site.
  */
 function labbook_ssl_alp_active() {
-	return in_array( 'ssl-alp/alp.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) );
+	return in_array( 'ssl-alp/alp.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true );
 }
 
 /**

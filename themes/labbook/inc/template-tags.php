@@ -28,9 +28,9 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 		echo '<h2 class="entry-title">';
 
 		$post_read_classes = array();
-		$read_class = '';
-		$unread_class = '';
-		$read_status = '';
+		$read_class        = '';
+		$unread_class      = '';
+		$read_status       = '';
 
 		if ( $icon ) {
 			if ( ! is_user_logged_in() || ! labbook_get_option( 'show_unread_flags' )
@@ -39,7 +39,7 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 			) {
 				// No support for unread flags.
 				if ( 'status' === get_post_format( $post ) ) {
-					$icon_class = 'fa fa-info-circle';
+					$icon_class       = 'fa fa-info-circle';
 					$icon_description = __( 'Status update', 'labbook' );
 				} else {
 					// Don't show icon.
@@ -56,13 +56,13 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 					$post_read_classes[] = 'entry-read';
 				}
 
-				$read_status = $post_is_read ? "true" : "false";
+				$read_status = $post_is_read ? 'true' : 'false';
 
 				if ( 'status' === get_post_format( $post ) ) {
-					$icon_class = 'fa fa-info-circle labbook-read-button';
+					$icon_class       = 'fa fa-info-circle labbook-read-button';
 					$icon_description = __( 'Status update (click to toggle read status)', 'labbook' );
-					$read_class = 'fa-info-circle';
-					$unread_class = 'fa-info-circle';
+					$read_class       = 'fa-info-circle';
+					$unread_class     = 'fa-info-circle';
 				} else {
 					if ( $post_is_read ) {
 						// Read.
@@ -73,8 +73,8 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 					}
 
 					$icon_description = __( 'Post (click to toggle read status)', 'labbook' );
-					$read_class = 'fa-envelope-open';
-					$unread_class = 'fa-envelope';
+					$read_class       = 'fa-envelope-open';
+					$unread_class     = 'fa-envelope';
 				}
 			}
 
@@ -400,7 +400,7 @@ if ( ! function_exists( 'labbook_the_authors' ) ) :
 			$icon_class = 'fa fa-users';
 
 			// Get delimiters.
-			$delimiter_between = _x( ', ', 'delimiter between coauthors except last', 'labbook' );
+			$delimiter_between      = _x( ', ', 'delimiter between coauthors except last', 'labbook' );
 			$delimiter_between_last = _x( ' and ', 'delimiter between last two coauthors', 'labbook' );
 
 			// Pop last author off.
@@ -551,7 +551,7 @@ if ( ! function_exists( 'labbook_the_revisions' ) ) :
 		}
 
 		$per_page = labbook_get_option( 'edit_summaries_per_page' );
-		$pages = ceil( $count / $per_page );
+		$pages    = ceil( $count / $per_page );
 
 		// Get list of revisions to this post.
 		$revisions = labbook_get_revisions( $post, $current_page, $per_page );
@@ -840,7 +840,7 @@ if ( ! function_exists( 'labbook_the_references' ) ) :
 			return;
 		}
 
-		$ref_to_posts = $ssl_alp->references->get_reference_to_posts( $post );
+		$ref_to_posts   = $ssl_alp->references->get_reference_to_posts( $post );
 		$ref_from_posts = $ssl_alp->references->get_reference_from_posts( $post );
 
 		if ( ( ! is_array( $ref_to_posts ) || ! count( $ref_to_posts ) ) && ( ! is_array( $ref_from_posts ) || ! count( $ref_from_posts ) ) ) {
@@ -1252,9 +1252,9 @@ if ( ! function_exists( 'labbook_the_advanced_search_date_fieldset' ) ) :
 		$day_range   = range( 1, 31 );
 
 		// Make arrays with keys == values.
-		$years = array_combine( $year_range, $year_range );
+		$years  = array_combine( $year_range, $year_range );
 		$months = array_combine( $month_range, $month_range );
-		$days = array_combine( $day_range, $day_range );
+		$days   = array_combine( $day_range, $day_range );
 
 		// Selected dates.
 		$selected_after_year   = get_query_var( 'ssl_alp_after_year' );
@@ -1391,11 +1391,11 @@ if ( ! function_exists( 'labbook_the_advanced_search_author_filter_table' ) ) :
 				'author__in[]',
 				$authors,
 				array(
-					'name_field'     => 'display_name',
-					'value_field'    => 'ID',
-					'count_field'    => 'labbook_get_author_post_count',
-					'depth'          => -1, // Flat.
-					'selected'       => $selected_author_in,
+					'name_field'  => 'display_name',
+					'value_field' => 'ID',
+					'count_field' => 'labbook_get_author_post_count',
+					'depth'       => -1, // Flat.
+					'selected'    => $selected_author_in,
 				)
 			);
 			echo '</td>';
@@ -1404,11 +1404,11 @@ if ( ! function_exists( 'labbook_the_advanced_search_author_filter_table' ) ) :
 				'author__not_in[]',
 				$authors,
 				array(
-					'name_field'     => 'display_name',
-					'value_field'    => 'ID',
-					'count_field'    => 'labbook_get_author_post_count',
-					'depth'          => -1, // Flat.
-					'selected'       => $selected_author_not_in,
+					'name_field'  => 'display_name',
+					'value_field' => 'ID',
+					'count_field' => 'labbook_get_author_post_count',
+					'depth'       => -1, // Flat.
+					'selected'    => $selected_author_not_in,
 				)
 			);
 			echo '</td>';

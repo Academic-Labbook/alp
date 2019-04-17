@@ -488,7 +488,7 @@ if ( ! function_exists( 'labbook_sanitize_select' ) ) {
 	 * @return mixed Sanitized value.
 	 */
 	function labbook_sanitize_select( $input, $setting ) {
-		$input = sanitize_key( $input );
+		$input   = sanitize_key( $input );
 		$choices = $setting->manager->get_control( $setting->id )->choices;
 
 		return ( array_key_exists( $input, $choices ) ? $input : $setting->default );
