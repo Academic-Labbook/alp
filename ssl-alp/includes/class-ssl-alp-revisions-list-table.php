@@ -587,6 +587,8 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 			return '';
 		}
 
+		$parent = get_post( $revision->post_parent );
+
 		$actions = array();
 
 		/**
@@ -626,6 +628,16 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 					esc_html__( 'View Difference to Latest', 'ssl-alp' )
 				);
 			}
+		}
+
+		if ( 'publish' === $parent->post_status && current_user_can( 'read_post', $parent->ID ) ) {
+			$actions['view_latest'] = sprintf(
+				'<a href="%s" rel="bookmark" aria-label="%s">%s</a>',
+				get_permalink( $parent->ID ),
+				/* translators: %s: post title */
+				esc_attr( sprintf( __( 'View latest version of &#8220;%s&#8221;', 'ssl-alp' ), $revision->post_title ) ),
+				__( 'View Latest', 'ssl-alp' )
+			);
 		}
 
 		return $this->row_actions( $actions );
