@@ -493,6 +493,6 @@ if ( ! function_exists( 'labbook_sanitize_select' ) ) {
 		$input   = sanitize_key( $input );
 		$choices = $setting->manager->get_control( $setting->id )->choices;
 
-		return ( array_key_exists( $input, $choices ) ? $input : $setting->default );
+		return ( isset( $choices[ $input ] ) ? $input : $setting->default );
 	}
 }

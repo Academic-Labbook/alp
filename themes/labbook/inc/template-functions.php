@@ -25,14 +25,14 @@ if ( ! function_exists( 'labbook_get_option' ) ) :
 			return;
 		}
 
-		$default = ( array_key_exists( $key, $labbook_default_options ) ) ? $labbook_default_options[ $key ] : '';
+		$default = ( isset( $labbook_default_options[ $key ] ) ) ? $labbook_default_options[ $key ] : '';
 
 		$theme_options = get_theme_mod( 'labbook_options', $labbook_default_options );
 		$theme_options = array_merge( $labbook_default_options, $theme_options );
 
 		$value = '';
 
-		if ( array_key_exists( $key, $theme_options ) ) {
+		if ( isset( $theme_options[ $key ] ) ) {
 			$value = $theme_options[ $key ];
 		}
 
