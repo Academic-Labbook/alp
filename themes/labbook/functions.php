@@ -303,15 +303,11 @@ if ( ! function_exists( 'labbook_get_content_with_toc' ) ) :
 	function labbook_get_content_with_toc( $content ) {
 		$post = get_post();
 
-		if ( ! labbook_get_option( 'show_page_table_of_contents' ) ) {
+		if ( ! labbook_php_dom_extension_loaded() || ! labbook_get_option( 'show_page_table_of_contents' ) ) {
 			return $content;
 		}
 
-		if ( is_null( $post ) ) {
-			return $content;
-		}
-
-		if ( ! is_page( $post ) ) {
+		if ( is_null( $post ) || ! is_page( $post ) ) {
 			return $content;
 		}
 
@@ -352,6 +348,13 @@ function labbook_ssl_alp_active() {
 	}
 
 	return $blog_active || $network_active;
+}
+
+/**
+ * Check if DOM extension is available in order to show tables of contents.
+ */
+function labbook_php_dom_extension_loaded() {
+	return extension_loaded( 'dom' );
 }
 
 /**

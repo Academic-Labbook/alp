@@ -105,7 +105,7 @@ if ( ! function_exists( 'labbook_generate_post_contents' ) ) :
 	 * @param Labbook_TOC_Menu_Level $toc          Variable to store generated menus.
 	 */
 	function labbook_generate_post_contents( $post_content, &$toc ) {
-		if ( ! extension_loaded( 'dom' ) ) {
+		if ( ! labbook_php_dom_extension_loaded() ) {
 			// Cannot generate table of contents.
 			return $post_content;
 		}

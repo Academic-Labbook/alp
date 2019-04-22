@@ -241,53 +241,55 @@ function labbook_customize_register( $wp_customize ) {
 	);
 
 	// Table of contents display setting.
-	$wp_customize->add_setting(
-		'labbook_options[show_page_table_of_contents]',
-		array(
-			'default'           => $labbook_default_options['show_page_table_of_contents'],
-			'capability'        => 'edit_theme_options',
-			'sanitize_callback' => 'labbook_sanitize_checkbox',
-		)
-	);
+	if ( labbook_php_dom_extension_loaded() ) {
+		$wp_customize->add_setting(
+			'labbook_options[show_page_table_of_contents]',
+			array(
+				'default'           => $labbook_default_options['show_page_table_of_contents'],
+				'capability'        => 'edit_theme_options',
+				'sanitize_callback' => 'labbook_sanitize_checkbox',
+			)
+		);
 
-	$wp_customize->add_control(
-		'labbook_options[show_page_table_of_contents]',
-		array(
-			'label'       => __( 'Show table of contents', 'labbook' ),
-			'description' => __( 'Generate and display a table of contents panel shown at the top right of the page.', 'labbook' ),
-			'section'     => 'labbook_page_options',
-			'type'        => 'checkbox',
-			'priority'    => 110,
-		)
-	);
+		$wp_customize->add_control(
+			'labbook_options[show_page_table_of_contents]',
+			array(
+				'label'       => __( 'Show table of contents', 'labbook' ),
+				'description' => __( 'Generate and display a table of contents panel shown at the top right of the page.', 'labbook' ),
+				'section'     => 'labbook_page_options',
+				'type'        => 'checkbox',
+				'priority'    => 110,
+			)
+		);
 
-	// Table of contents maximum header depth setting.
-	$wp_customize->add_setting(
-		'labbook_options[table_of_contents_max_depth]',
-		array(
-			'default'           => $labbook_default_options['table_of_contents_max_depth'],
-			'capability'        => 'edit_theme_options',
-			'sanitize_callback' => 'labbook_sanitize_select',
-		)
-	);
+		// Table of contents maximum header depth setting.
+		$wp_customize->add_setting(
+			'labbook_options[table_of_contents_max_depth]',
+			array(
+				'default'           => $labbook_default_options['table_of_contents_max_depth'],
+				'capability'        => 'edit_theme_options',
+				'sanitize_callback' => 'labbook_sanitize_select',
+			)
+		);
 
-	$wp_customize->add_control(
-		'labbook_options[table_of_contents_max_depth]',
-		array(
-			'label'       => __( 'Table of contents maximum depth', 'labbook' ),
-			'description' => __( 'Maximum heading level displayed in the table of contents.', 'labbook' ),
-			'section'     => 'labbook_page_options',
-			'type'        => 'select',
-			'choices'     => array(
-				2 => __( 'h2', 'labbook' ),
-				3 => __( 'h3', 'labbook' ),
-				4 => __( 'h4', 'labbook' ),
-				5 => __( 'h5', 'labbook' ),
-				6 => __( 'h6', 'labbook' ),
-			),
-			'priority'    => 120,
-		)
-	);
+		$wp_customize->add_control(
+			'labbook_options[table_of_contents_max_depth]',
+			array(
+				'label'       => __( 'Table of contents maximum depth', 'labbook' ),
+				'description' => __( 'Maximum heading level displayed in the table of contents.', 'labbook' ),
+				'section'     => 'labbook_page_options',
+				'type'        => 'select',
+				'choices'     => array(
+					2 => __( 'h2', 'labbook' ),
+					3 => __( 'h3', 'labbook' ),
+					4 => __( 'h4', 'labbook' ),
+					5 => __( 'h5', 'labbook' ),
+					6 => __( 'h6', 'labbook' ),
+				),
+				'priority'    => 120,
+			)
+		);
+	}
 
 	/**
 	 * Sidebar section.
