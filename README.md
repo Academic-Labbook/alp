@@ -1,45 +1,108 @@
 # ALP - Academic Labbook Plugin
 [![Build Status](https://travis-ci.com/SeanDS/alp.svg?branch=master)](https://travis-ci.com/SeanDS/alp)
 
-ALP leverages the powerful WordPress platform to provide an academic
-labbook/logbook fit for purpose. It's free, open source, and attempts to be
-minimally invasive on the core WordPress functionality, which should allow you
-to install additional plugins as you like.
+ALP leverages the powerful WordPress platform to provide an electronic laboratory notebook fit
+for academic and scientific purposes. It's free, open source, regularly updated and attempts to be
+minimally invasive on the core WordPress functionality.
 
 Lots of documentation is provided on the [ALP website](https://alp.attackllama.com/).
 Before installing, please read and understand the `Development plans in the context of WordPress upgrades`
 section below. It explains how new features in WordPress will be tracked by ALP.
 
+ALP is under development, and not feature-complete. While it is being used daily and without much
+issue by a large organisation of around 100 scientists, there are surely still some bugs waiting
+to be discovered. If you choose to use ALP, [please report any unexpected behaviour](https://alp.attackllama.com/bugs/).
+The developer is also willing to help with any installation or setup queries you might have - please
+[get in touch](https://alp.attackllama.com/contact/).
+
 ## What does ALP do?
- - Allows multiple authors to be assigned to single posts
- - Provides change logs for posts and pages with user-defined comments
- - Shows list of cross-references made between posts and pages
- - Provides TeX block for rendering mathematical markup
- - Tracks whether posts have been read or not by logged-in users, and allows users to view a list
-   of unread posts and change the read/unread status of posts
- - Adds advanced search capabilities, letting users search for posts by coauthors, categories, tags
-   and dates
- - Option to force users to be logged in to view
-   - Option to disallow non-logged-in users from making computationally expensive searches
-   - REST API and feeds accessible using HTTP authentication with application-specific passwords
-   - Images still accessible with direct link (not possible to block without server configuration)
-   - XML-RPC interface disabled
- - Provides tools to allow tags and categories to be merged and restructured.
- - Disable trackbacks, which are usually only useful for commercial sites
- - Modifies pages to work more like a wiki:
-   - Removes authors and dates
-   - Displays a table of contents based on page headers (when used with Labbook theme)
-   - Shows breadcrumb trail back to home page (when used with Labbook theme)
- - Supports custom media (MIME) upload types (when used on a network)
- - Optionally changes user roles:
-   - *Administrator* is unchanged
-   - *Editor* is renamed *Researcher*
-   - *Author* is renamed *Intern*
-   - *Contributor* is removed
-   - *Subscriber* is unchanged
-   - *Excluded* is added (for keeping ex-users' posts, comments, etc. on record but not giving them
-     access)
- - Hides some WordPress branding and news
+ALP makes many extensive additions and modifications to WordPress. Most of the features below are
+modular, allowing them to be switched on and off via settings.
+
+### Multiple author support
+ALP allows multiple authors to be assigned to single posts. When writing a post, the user can
+specify their coauthors using the sidebar. These extra names are then shown in order on the post
+page, and the posts appear on each coauthor's archive page and are included in their post counts.
+
+### Edit summaries and revision lists
+When editing a published post or page, a user is able to specify an edit summary detailing the
+changes they have made. This edit summary appears under the post or page when using the *Labbook*
+theme, with a link to the WordPress admin screen showing the changeset (like the "diff" on
+Wikipedia).
+
+A new admin screen is also provided, allowing users to navigate the complete history of changes to
+posts and pages.
+
+### Cross-references
+When a post or page links to another post or page on the same site, the corresponding post or page
+is shown in a list under the other post or page. This creates a web of links between posts and
+pages. This is particularly useful for finding out whether newer posts on a particular topic have
+been made, as long as the author of the newer post remembered to link back to the older one. This
+feature acts like a bit like a "related posts" list on other websites.
+
+### Mathematical markup support
+ALP adds a TeX block to the Gutenberg editor in WordPress 5.0, allowing users to create equations.
+The equation is rendered within the editor so the user can check their markup, and the markup can be
+edited later alongside the rest of the post.
+
+### Unread flags
+ALP tracks whether logged-in users have read new posts. When a new post is made, everyone except
+the post's author sees the new post as unread, designated in the *Labbook* theme using a closed
+envelope icon next to the post title. When the user reads the post (by clicking the title to visit
+the post's single page), the post is marked as read (designated in *Labbook* with an open envelope).
+In *Labbook*, users can manually mark a post as read or unread by clicking the envelope. Users can
+also click a link in the top bar to view a list of all unread posts.
+
+When a post undergoes significant edits, a post is again marked as unread to all users except the
+author.
+
+### Advanced search
+When used with the *Labbook* theme, ALP adds advanced search capabilities allowing users to
+search by categories, tags, coauthors, dates, and keywords. Users can also disallow posts made by
+certain users or with certain categories or tags, and search for posts with only certain subsets
+of users, categories or tags.
+
+### Privacy options
+ALP lets you force users to be logged in to view the site content. Public feeds are only then
+available using HTTP authentication and application passwords (see below). The REST API provided
+by WordPress is still accessible to logged-in users but only if they configure an application
+password see below).
+
+Advanced search may be switched off for non-logged-in users to avoid computationally expensive
+searches.
+
+Note: images are still accessible when the direct link is known - this is a shortcoming in WordPress
+itself. This can in most cases be mitigated with appropriate HTTP server configuration.
+
+### Term management
+ALP adds the ability to merge tags and categories in bulk.
+
+### Page changes
+ALP modifies pages to work more like wiki pages. When using the *Labbook* theme, authors and dates
+are removed from the title area, a breadcrumb trail is shown back to the home page, and there is
+an option to generate and show tables of contents for each page.
+
+### WordPress core changes
+The XML-RPC is disabled by ALP, since this is an old scheme which is entirely superceded in
+functionality by the REST API.
+
+Post trackbacks are disabled, since these are usually only useful for commercial sites.
+
+When used on a network, extra media (MIME) types can be specified in addition to the core WordPress
+ones, to allow your users to upload special files without triggering securty errors.
+
+Some WordPress branding is removed from the admin dashboard pages.
+
+### Role changes
+A tool is provided to allow the administrators to change user roles en-masse, to make them more
+suitable for academic contexts:
+  - *Administrator* is unchanged
+  - *Editor* is renamed *Researcher*
+  - *Author* is renamed *Intern*
+  - *Contributor* is removed
+  - *Subscriber* is unchanged
+  - *Excluded* is added (for keeping ex-users' posts, comments, etc. on record but not giving them
+    access)
 
 ## Labbook theme
 ALP is intended to be used with the specially created "Labbook" theme, which supports display of
@@ -59,6 +122,14 @@ Features:
  - Provides two menu locations for providing links to site or external pages or URLs
  - Provides customisable copyright notice and ability to hide branding
  - Responsive to screen size: viewable on mobile, tablet and desktop browsers
+
+## Uninstallation
+ALP can be uninstalled via the normal procedure, using the plugin page in the admin area.
+Upon uninstallation, all of these changes made by ALP are reversed and all additions to the database
+are removed, with the only exception being the user groups. If you have converted user groups using
+the included tool, then these will remain as they are. You can manually change user groups using
+other plugins. One day ALP may provide a tool to reverse user group changes, but this is not a
+high priority.
 
 ## Requirements
 
