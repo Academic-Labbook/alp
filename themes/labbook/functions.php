@@ -339,7 +339,19 @@ add_filter( 'the_content', 'labbook_get_content_with_toc' );
  * Check if Academic Labbook Plugin is available on this site.
  */
 function labbook_ssl_alp_active() {
-	return in_array( 'ssl-alp/alp.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true );
+	$plugin = 'ssl-alp/alp.php';
+
+	$blog_plugins = (array) get_option( 'active_plugins', array() );
+	$blog_active  = in_array( $plugin, $blog_plugins, true );
+
+	if ( is_multisite() ) {
+		$network_plugins = (array) get_site_option( 'active_sitewide_plugins', array() );
+		$network_active  = isset( $network_plugins[ $plugin ] );
+	} else {
+		$network_active = false;
+	}
+
+	return $blog_active || $network_active;
 }
 
 /**
