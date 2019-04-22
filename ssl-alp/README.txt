@@ -2,9 +2,9 @@
 Contributors: seanleavey
 Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
 Requires at least: 5.1.0
-Tested up to: 5.1.0
+Tested up to: 5.2.0
 Requires PHP: 7.0.0
-Stable tag: 0.15.0
+Stable tag: 0.15.1
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -72,6 +72,10 @@ with maximum control. Please see [this guide](https://alp.attackllama.com/docume
 on the ALP website.
 
 == Changelog ==
+
+= 0.15.1 =
+ - Removed incorrectly appearing merge action from user application list table.
+ - Added link to published post under each revision in admin list table.
 
 = 0.15.0 =
  - Added application passwords feature, removed special feed key support
