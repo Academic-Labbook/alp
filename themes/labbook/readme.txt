@@ -3,7 +3,7 @@ Contributors: seanleavey
 Tags: custom-background, custom-logo, custom-menu, editor-style, education, theme-options, threaded-comments, translation-ready, two-columns
 Requires at least: 5.0.0
 Tested up to: 5.0.3
-Stable tag: 1.1.7
+Stable tag: 1.1.8
 Requires PHP: 7.0.0
 License: GNU General Public License v3 or later
 License URI: LICENCE
@@ -51,6 +51,9 @@ Labbook supports Academic Labbook Plugin - indeed, use of it is highly encourage
 of features provided in this theme.
 
 == Changelog ==
+
+= 1.1.8 - 2019-04-22 =
+* Hotfix: removed incorrectly displayed post ID.
 
 = 1.1.7 - 2019-04-22 =
 * Set relative body font size instead of absolute, so users with non-default font size settings see
