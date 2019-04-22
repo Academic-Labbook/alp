@@ -24,7 +24,8 @@ get_header();
 		<?php
 		else :
 
-			if ( have_posts() ) : ?>
+			if ( have_posts() ) :
+			?>
 
 				<header class="page-header">
 					<h1 class="page-title">

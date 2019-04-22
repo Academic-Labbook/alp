@@ -46,7 +46,14 @@ if ( post_password_required() ) {
 			?>
 		</h2><!-- .comments-title -->
 
-		<?php the_comments_navigation(); ?>
+		<?php
+		the_comments_navigation(
+			array(
+				'next_text' => __( 'Newer comments', 'labbook' ) . ' <i class="fa fa-chevron-right" aria-hidden="true"></i>',
+				'prev_text' => '<i class="fa fa-chevron-left" aria-hidden="true"></i> ' . __( 'Older comments', 'labbook' ),
+			)
+		);
+		?>
 
 		<ol class="comment-list">
 			<?php
@@ -60,7 +67,12 @@ if ( post_password_required() ) {
 		</ol><!-- .comment-list -->
 
 		<?php
-		the_comments_navigation();
+		the_comments_navigation(
+			array(
+				'next_text' => __( 'Newer comments', 'labbook' ) . ' <i class="fa fa-chevron-right" aria-hidden="true"></i>',
+				'prev_text' => '<i class="fa fa-chevron-left" aria-hidden="true"></i> ' . __( 'Older comments', 'labbook' ),
+			)
+		);
 
 		// If comments are closed and there are comments, let's leave a little note, shall we?
 		if ( ! comments_open() ) :

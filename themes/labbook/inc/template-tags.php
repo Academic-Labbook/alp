@@ -21,42 +21,48 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 	 * @param bool             $icon   Add post icon, if present.
 	 */
 	function labbook_the_post_title( $post = null, $url = true, $icon = true ) {
+		global $ssl_alp;
+
 		$post = get_post( $post );
 
 		echo '<h2 class="entry-title">';
 
+		$post_read_classes = array();
+		$read_class        = '';
+		$unread_class      = '';
+		$read_status       = '';
+
 		if ( $icon ) {
-			if ( ! is_user_logged_in() || ! labbook_get_option( 'show_unread_flags' ) || ! labbook_ssl_alp_unread_flags_enabled() ) {
+			if ( ! is_user_logged_in() || ! labbook_get_option( 'show_unread_flags' )
+				|| ! labbook_ssl_alp_unread_flags_enabled()
+				|| ! $ssl_alp->revisions->unread_flags_supported( $post )
+			) {
 				// No support for unread flags.
 				if ( 'status' === get_post_format( $post ) ) {
-					$icon_class = 'fa fa-info-circle';
+					$icon_class       = 'fa fa-info-circle';
 					$icon_description = __( 'Status update', 'labbook' );
 				} else {
 					// Don't show icon.
 					$icon_class = '';
 				}
-
-				$read_class = '';
-				$unread_class = '';
-				$read_status = '';
 			} else {
 				// Post read/unread status.
 				$post_is_read = labbook_post_is_read( $post );
 
 				// Default post read class.
-				$post_read_classes = array( 'entry-title-link-' . $post->ID );
+				$post_read_classes[] = 'entry-title-link-' . $post->ID;
 
 				if ( $post_is_read ) {
 					$post_read_classes[] = 'entry-read';
 				}
 
-				$read_status = $post_is_read ? "true" : "false";
+				$read_status = $post_is_read ? 'true' : 'false';
 
 				if ( 'status' === get_post_format( $post ) ) {
-					$icon_class = 'fa fa-info-circle labbook-read-button';
+					$icon_class       = 'fa fa-info-circle labbook-read-button';
 					$icon_description = __( 'Status update (click to toggle read status)', 'labbook' );
-					$read_class = 'fa-info-circle';
-					$unread_class = 'fa-info-circle';
+					$read_class       = 'fa-info-circle';
+					$unread_class     = 'fa-info-circle';
 				} else {
 					if ( $post_is_read ) {
 						// Read.
@@ -67,8 +73,8 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 					}
 
 					$icon_description = __( 'Post (click to toggle read status)', 'labbook' );
-					$read_class = 'fa-envelope-open';
-					$unread_class = 'fa-envelope';
+					$read_class       = 'fa-envelope-open';
+					$unread_class     = 'fa-envelope';
 				}
 			}
 
@@ -193,7 +199,7 @@ if ( ! function_exists( 'labbook_get_human_date' ) ) :
 		return sprintf(
 			/* translators: 1: time ago */
 			__( '%s ago', 'labbook' ),
-			human_time_diff( $timestamp, current_time( 'timestamp' ) )
+			human_time_diff( $timestamp )
 		);
 	}
 endif;
@@ -394,7 +400,7 @@ if ( ! function_exists( 'labbook_the_authors' ) ) :
 			$icon_class = 'fa fa-users';
 
 			// Get delimiters.
-			$delimiter_between = _x( ', ', 'delimiter between coauthors except last', 'labbook' );
+			$delimiter_between      = _x( ', ', 'delimiter between coauthors except last', 'labbook' );
 			$delimiter_between_last = _x( ' and ', 'delimiter between last two coauthors', 'labbook' );
 
 			// Pop last author off.
@@ -545,7 +551,7 @@ if ( ! function_exists( 'labbook_the_revisions' ) ) :
 		}
 
 		$per_page = labbook_get_option( 'edit_summaries_per_page' );
-		$pages = ceil( $count / $per_page );
+		$pages    = ceil( $count / $per_page );
 
 		// Get list of revisions to this post.
 		$revisions = labbook_get_revisions( $post, $current_page, $per_page );
@@ -625,8 +631,7 @@ if ( ! function_exists( 'labbook_the_revision_description_row' ) ) :
 		}
 
 		// Get revision's edit summary.
-		$revision_edit_summary = get_post_meta( $revision->ID, 'ssl_alp_edit_summary', true );
-		$revision_edit_summary_revert_id = get_post_meta( $revision->ID, 'ssl_alp_edit_summary_revert_id', true );
+		$edit_data = $ssl_alp->revisions->get_revision_edit_summary( $revision );
 
 		// Revision abbreviation, e.g. r101, with link to diff.
 		$abbr = labbook_get_revision_abbreviation( $revision );
@@ -691,12 +696,43 @@ if ( ! function_exists( 'labbook_the_revision_description_row' ) ) :
 		echo '</td>';
 		echo '<td>'; // Information.
 
-		if ( ! empty( $revision_edit_summary ) ) {
+		if ( ! empty( $edit_data['summary'] ) ) {
 			// Print the edit summary.
 			echo '<em>';
-			echo esc_html( $revision_edit_summary );
+			echo esc_html( $edit_data['summary'] );
 			echo '</em>';
 			echo '&nbsp';
+		}
+
+		if ( ! empty( $edit_data['revert_id'] ) ) {
+			// Revision was a revert.
+			$source_abbr = labbook_get_revision_abbreviation( $edit_data['revert_id'] );
+
+			if ( is_null( $source_abbr ) ) {
+				// Source revision is invalid.
+				/* translators: reverted to unknown revision */
+				esc_html_e( 'reverted', 'labbook' );
+			} else {
+				printf(
+					/* translators: 1: reverted revision ID */
+					esc_html__( 'reverted to %1$s', 'labbook' ),
+					wp_kses( $source_abbr, $allowed_abbr_tags )
+				);
+			}
+
+			echo '&nbsp;';
+
+			if ( ! empty( $edit_data['source_summary'] ) ) {
+				// Add original edit summary.
+				echo '<em>';
+				printf(
+					/* translators: 1: edit summary of post reverted to */
+					esc_html__( '("%1$s")', 'labbook' ),
+					esc_html( $edit_data['source_summary'] )
+				);
+				echo '</em>';
+				echo '&nbsp;';
+			}
 		}
 
 		if ( $is_current ) {
@@ -714,38 +750,7 @@ if ( ! function_exists( 'labbook_the_revision_description_row' ) ) :
 			/* translators: original published post */
 			esc_html_e( '(original)', 'labbook' );
 			echo '</strong>';
-		} elseif ( ! empty( $revision_edit_summary_revert_id ) ) {
-			// Revision was a revert.
-			$source_abbr = labbook_get_revision_abbreviation( $revision_edit_summary_revert_id );
-
-			if ( is_null( $source_abbr ) ) {
-				// Source revision is invalid.
-				/* translators: reverted to unknown revision */
-				esc_html_e( 'reverted', 'labbook' );
-			} else {
-				printf(
-					/* translators: 1: reverted revision ID */
-					esc_html__( 'reverted to %1$s', 'labbook' ),
-					wp_kses( $source_abbr, $allowed_abbr_tags )
-				);
-			}
-
-			// Get original source revision.
-			$source_revision = $ssl_alp->revisions->get_source_revision( $revision );
-			$source_edit_summary = get_post_meta( $source_revision->ID, 'ssl_alp_edit_summary', true );
-
-			if ( ! empty( $source_edit_summary ) ) {
-				// Add original edit summary.
-				echo '&nbsp;';
-				echo '<em>';
-				printf(
-					/* translators: 1: edit summary of post reverted to */
-					esc_html__( '("%1$s")', 'labbook' ),
-					esc_html( $source_edit_summary )
-				);
-				echo '</em>';
-			}
-		} // End if().
+		}
 
 		echo '</td>';
 		echo '</tr>';
@@ -754,7 +759,7 @@ endif;
 
 if ( ! function_exists( 'labbook_get_revision_abbreviation' ) ) :
 	/**
-	 * Gets abbreviated revision ID, with optional URL.
+	 * Get abbreviated revision ID, with optional URL.
 	 *
 	 * If the specified revision doesn't exist, it may have been deleted but is still referenced by
 	 * another revision edit summary. In this case, this function will will still show the
@@ -762,6 +767,8 @@ if ( ! function_exists( 'labbook_get_revision_abbreviation' ) ) :
 	 *
 	 * @param int  $revision Revision ID.
 	 * @param bool $url      Print revision URL.
+	 * @return string|null The revision abbreviation, or null if specified revision is invalid or
+	 *                     not a valid revision.
 	 */
 	function labbook_get_revision_abbreviation( $revision, $url = true ) {
 		global $ssl_alp;
@@ -833,7 +840,7 @@ if ( ! function_exists( 'labbook_the_references' ) ) :
 			return;
 		}
 
-		$ref_to_posts = $ssl_alp->references->get_reference_to_posts( $post );
+		$ref_to_posts   = $ssl_alp->references->get_reference_to_posts( $post );
 		$ref_from_posts = $ssl_alp->references->get_reference_from_posts( $post );
 
 		if ( ( ! is_array( $ref_to_posts ) || ! count( $ref_to_posts ) ) && ( ! is_array( $ref_from_posts ) || ! count( $ref_from_posts ) ) ) {
@@ -971,14 +978,14 @@ if ( ! function_exists( 'labbook_the_page_breadcrumbs' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'labbook_the_toc' ) ) :
+if ( ! function_exists( 'labbook_get_toc' ) ) :
 	/**
-	 * Print the table of contents.
+	 * Generate a page's table of contents.
 	 *
 	 * @param Labbook_TOC_Menu_Level $contents   The table of contents hierarchy.
 	 * @param int                    $max_levels Maximum heading level to display.
 	 */
-	function labbook_the_toc( $contents, $max_levels ) {
+	function labbook_get_toc( $contents, $max_levels ) {
 		if ( ! is_int( $max_levels ) || $max_levels < 0 ) {
 			// Invalid.
 			return;
@@ -989,10 +996,12 @@ if ( ! function_exists( 'labbook_the_toc' ) ) :
 			return;
 		}
 
+		$toc = '';
+
 		$menu_data = $contents->get_menu_data();
 
 		if ( is_array( $menu_data ) ) {
-			printf(
+			$toc .= sprintf(
 				'<a href="%1$s">%2$s</a>',
 				esc_attr( '#' . $menu_data['id'] ),
 				esc_html( $menu_data['title'] )
@@ -1004,18 +1013,20 @@ if ( ! function_exists( 'labbook_the_toc' ) ) :
 			$children = $contents->get_child_menus();
 
 			if ( count( $children ) ) {
-				echo '<ul>';
+				$toc .= '<ul>';
 
 				foreach ( $children as $child ) {
 					// Show sublevel.
-					echo '<li>';
-					labbook_the_toc( $child, $max_levels - 1 );
-					echo '</li>';
+					$toc .= '<li>';
+					$toc .= labbook_get_toc( $child, $max_levels - 1 );
+					$toc .= '</li>';
 				}
 
-				echo '</ul>';
+				$toc .= '</ul>';
 			}
 		}
+
+		return $toc;
 	}
 endif;
 
@@ -1245,9 +1256,9 @@ if ( ! function_exists( 'labbook_the_advanced_search_date_fieldset' ) ) :
 		$day_range   = range( 1, 31 );
 
 		// Make arrays with keys == values.
-		$years = array_combine( $year_range, $year_range );
+		$years  = array_combine( $year_range, $year_range );
 		$months = array_combine( $month_range, $month_range );
-		$days = array_combine( $day_range, $day_range );
+		$days   = array_combine( $day_range, $day_range );
 
 		// Selected dates.
 		$selected_after_year   = get_query_var( 'ssl_alp_after_year' );
@@ -1384,11 +1395,11 @@ if ( ! function_exists( 'labbook_the_advanced_search_author_filter_table' ) ) :
 				'author__in[]',
 				$authors,
 				array(
-					'name_field'     => 'display_name',
-					'value_field'    => 'ID',
-					'count_field'    => 'labbook_get_author_post_count',
-					'depth'          => -1, // Flat.
-					'selected'       => $selected_author_in,
+					'name_field'  => 'display_name',
+					'value_field' => 'ID',
+					'count_field' => 'labbook_get_author_post_count',
+					'depth'       => -1, // Flat.
+					'selected'    => $selected_author_in,
 				)
 			);
 			echo '</td>';
@@ -1397,11 +1408,11 @@ if ( ! function_exists( 'labbook_the_advanced_search_author_filter_table' ) ) :
 				'author__not_in[]',
 				$authors,
 				array(
-					'name_field'     => 'display_name',
-					'value_field'    => 'ID',
-					'count_field'    => 'labbook_get_author_post_count',
-					'depth'          => -1, // Flat.
-					'selected'       => $selected_author_not_in,
+					'name_field'  => 'display_name',
+					'value_field' => 'ID',
+					'count_field' => 'labbook_get_author_post_count',
+					'depth'       => -1, // Flat.
+					'selected'    => $selected_author_not_in,
 				)
 			);
 			echo '</td>';

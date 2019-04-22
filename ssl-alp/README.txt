@@ -2,9 +2,9 @@
 Contributors: seanleavey
 Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
 Requires at least: 5.1.0
-Tested up to: 5.1.0
+Tested up to: 5.2.0
 Requires PHP: 7.0.0
-Stable tag: 0.13.3
+Stable tag: 0.15.1
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -72,6 +72,25 @@ with maximum control. Please see [this guide](https://alp.attackllama.com/docume
 on the ALP website.
 
 == Changelog ==
+
+= 0.15.1 =
+ - Removed incorrectly appearing merge action from user application list table.
+ - Added link to published post under each revision in admin list table.
+
+= 0.15.0 =
+ - Added application passwords feature, removed special feed key support
+   (application passwords can be used for this).
+ - Added term management tools for merging and reordering the hierarchy of terms
+   such as tags and categories.
+ - Prevented revisions made to posts before publication from showing in sidebar
+   and admin list table.
+ - Moved edit summary helper functions out of Labbook theme and into this plugin.
+
+= 0.14.0 =
+ - Added revisions lists for posts and pages to admin area.
+ - Prevented non-posts being marked as read/unread via the theme.
+ - Fixed date issue in recent revisions widget.
+ - Added plugin version on tools page.
 
 = 0.13.3 =
  - Fixed bug with advanced search not returning results.

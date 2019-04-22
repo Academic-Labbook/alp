@@ -102,7 +102,7 @@ class SSL_ALP_Revisions_Widget extends WP_Widget {
 	 * @param int $number Number of revisions to show.
 	 */
 	private function the_revisions( $number ) {
-		$revisions = $this->get_revisions( $number );
+		$revisions = $this->get_author_grouped_published_revisions( $number );
 
 		if ( ! count( $revisions ) ) {
 			echo '<p>There are no revisions yet.</p>';
@@ -145,16 +145,16 @@ class SSL_ALP_Revisions_Widget extends WP_Widget {
 	}
 
 	/**
-	 * Get revisions.
+	 * Get revisions on published posts, grouped by author.
 	 *
 	 * @param int $number Number of revisions to show.
 	 *
 	 * @return array
 	 */
-	private function get_revisions( $number ) {
+	private function get_author_grouped_published_revisions( $number ) {
 		global $ssl_alp;
 
 		// Pass through to main revisions class.
-		return $ssl_alp->revisions->get_recent_revisions( $number );
+		return $ssl_alp->revisions->get_author_grouped_published_revisions( $number );
 	}
 }

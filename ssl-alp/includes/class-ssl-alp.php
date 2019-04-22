@@ -115,7 +115,7 @@ class SSL_ALP {
 		 */
 
 		require_once SSL_ALP_BASE_DIR . 'includes/class-ssl-alp-authenticate.php';
-		require_once SSL_ALP_BASE_DIR . 'includes/class-http-auth.php';
+		require_once SSL_ALP_BASE_DIR . 'includes/class-ssl-alp-authenticate-applications-list-table.php';
 
 		$this->auth = new SSL_ALP_Authenticate( $this );
 
@@ -126,6 +126,14 @@ class SSL_ALP {
 		require_once SSL_ALP_BASE_DIR . 'includes/class-ssl-alp-search.php';
 
 		$this->search = new SSL_ALP_Search( $this );
+
+		/**
+		 * Term management.
+		 */
+
+		require_once SSL_ALP_BASE_DIR . 'includes/class-ssl-alp-terms.php';
+
+		$this->terms = new SSL_ALP_Terms( $this );
 
 		/**
 		 * Page functionality.
@@ -150,6 +158,7 @@ class SSL_ALP {
 
 		require_once SSL_ALP_BASE_DIR . 'includes/class-ssl-alp-revisions.php';
 		require_once SSL_ALP_BASE_DIR . 'includes/class-ssl-alp-revisions-widget.php';
+		require_once SSL_ALP_BASE_DIR . 'includes/class-ssl-alp-revisions-list-table.php';
 
 		$this->revisions = new SSL_ALP_Revisions( $this );
 
@@ -194,6 +203,7 @@ class SSL_ALP {
 		$this->tools->register();
 		$this->auth->register();
 		$this->search->register();
+		$this->terms->register();
 		$this->pages->register();
 		$this->coauthors->register();
 		$this->revisions->register();

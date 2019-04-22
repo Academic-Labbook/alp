@@ -21,9 +21,10 @@ section below. It explains how new features in WordPress will be tracked by ALP.
    and dates
  - Option to force users to be logged in to view
    - Option to disallow non-logged-in users from making computationally expensive searches
-   - Feeds still accessible using HTTP authentication
+   - REST API and feeds accessible using HTTP authentication with application-specific passwords
    - Images still accessible with direct link (not possible to block without server configuration)
    - XML-RPC interface disabled
+ - Provides tools to allow tags and categories to be merged and restructured.
  - Disable trackbacks, which are usually only useful for commercial sites
  - Modifies pages to work more like a wiki:
    - Removes authors and dates
@@ -62,7 +63,7 @@ Features:
 ## Requirements
 
 ### WordPress
-WordPress 5.0.0 or newer is required. ALP adds a block to and extends the sidebar of the new editor
+WordPress 5.1.0 or newer is required. ALP adds a block to and extends the sidebar of the new editor
 provided in WordPress 5.
 
 It is desirable, but not required, to use WordPress in [multisite](https://codex.wordpress.org/Create_A_Network)
@@ -162,12 +163,20 @@ Links: [WP-Post-Meta-Revisions](https://github.com/adamsilverstein/wp-post-meta-
 
 These plugins inspired parts of the design of ALP's edit summaries feature.
 
-### Authenticator
-Authors: Inpsyde GmbH
-Link: [Authenticator](https://wordpress.org/plugins/authenticator/)
+### Authenticator and Application Passwords
+Authors: Inpsyde GmbH, George Stephanis
+Links: [Authenticator](https://wordpress.org/plugins/authenticator/) and [Application Passwords](https://wordpress.org/plugins/application-passwords/)
 
-The core authentication code, and the feed HTTP authenticator, have been adapted with only a few
-changes. The special settings page, private feed keys and cookie lifetime setting have been removed.
+The core authentication code of Authenticator has been the basis for ALP's private site feature.
+Parts of Application Passwords have been adapted for REST authentication, but expanded to
+authenticate feeds and admin AJAX calls, and the admin interface has been completely replaced.
+
+### Term Management Tools
+Author: Cristi Burcă
+Link: [Term Management Tools](https://wordpress.org/plugins/term-management-tools/)
+
+Most of the code has been copied with a few minor changes, but the "change taxonomy" function has
+been removed and the "merge" function user interface has been tweaked.
 
 ### Simple Life
 Author: Nilambar Sharma

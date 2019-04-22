@@ -25,14 +25,14 @@ if ( ! function_exists( 'labbook_get_option' ) ) :
 			return;
 		}
 
-		$default = ( array_key_exists( $key, $labbook_default_options ) ) ? $labbook_default_options[ $key ] : '';
+		$default = ( isset( $labbook_default_options[ $key ] ) ) ? $labbook_default_options[ $key ] : '';
 
 		$theme_options = get_theme_mod( 'labbook_options', $labbook_default_options );
 		$theme_options = array_merge( $labbook_default_options, $theme_options );
 
 		$value = '';
 
-		if ( array_key_exists( $key, $theme_options ) ) {
+		if ( isset( $theme_options[ $key ] ) ) {
 			$value = $theme_options[ $key ];
 		}
 
@@ -116,7 +116,7 @@ if ( ! function_exists( 'labbook_custom_excerpt_length' ) ) :
 	 * @return int Excerpt length.
 	 */
 	function labbook_custom_excerpt_length( $length ) {
-		$excerpt_length = labbook_get_option( 'excerpt_length' );
+		$excerpt_length = absint( labbook_get_option( 'excerpt_length' ) );
 
 		if ( empty( $excerpt_length ) ) {
 			$excerpt_length = $length;
@@ -148,7 +148,7 @@ if ( ! function_exists( 'labbook_get_page_breadcrumbs' ) ) :
 		$breadcrumbs = array(
 			array(
 				'title' => __( 'Home', 'labbook' ),
-				'url'   => get_home_url(),
+				'url'   => home_url(),
 			),
 		);
 

@@ -52,3 +52,30 @@ div.ssl-alp-tools-card {
 .components-base-control .components-base-control__help {
     margin-top: 0 !important;
 }
+
+.ssl-alp-text-added {
+    color: #006505;
+}
+
+.ssl-alp-text-removed {
+    color: #a00;
+}
+
+.ssl-alp-application-revoke {
+    color: #a00;
+}
+
+.ssl-alp-application-revoke:hover {
+    color: #dc3232;
+}
+
+pre.ssl-alp-application-password {
+    margin: 0;
+    white-space: pre-wrap;
+}
+
+#ssl-alp-term-management-action-merge select#ssl-alp-term-management-merge,
+#ssl-alp-term-management-action-set_parent select#ssl-alp-term-management-set-parent
+{
+    float: none; /* prevent label floating right of select */
+}

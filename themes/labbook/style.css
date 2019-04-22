@@ -1,10 +1,10 @@
 /*!
 Theme Name: Labbook
-Theme URI: https://alp.attackllama.com/themes/labbook/
+Theme URI: https://alp.attackllama.com/documentation/themes/labbook/
 Author: Sean Leavey
 Author URI: https://attackllama.com/
 Description: Laboratory notebook theme, intended to be used in combination with Academic Labbook Plugin.
-Version: 1.1.3
+Version: 1.1.8
 License: GNU General Public License v3 or later
 License URI: LICENSE
 Text Domain: labbook
@@ -405,7 +405,7 @@ optgroup,
 textarea {
     color: #404040;
     font-family: sans-serif;
-    font-size: 14px;
+    font-size: 85%;
     line-height: 1.5;
 }
 
@@ -977,11 +977,15 @@ a:hover, a:active {
     display: inline-block;
 }
 
-.site-main .comment-navigation, .site-main
-.posts-navigation, .site-main
-.post-navigation {
+.site-main .comment-navigation, .site-main .posts-navigation, .site-main .post-navigation {
     margin: 0 0 1.5em;
     overflow: hidden;
+}
+
+.site-main .posts-navigation, .site-main .post-navigation {
+    background-color: #ffffff;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06);
+    padding: 1.5em 1.5em;
 }
 
 .comment-navigation .nav-previous,
@@ -989,7 +993,6 @@ a:hover, a:active {
 .post-navigation .nav-previous {
     float: left;
     width: 50%;
-    padding-left: 1em;
 }
 
 .comment-navigation .nav-next,
@@ -998,7 +1001,6 @@ a:hover, a:active {
     float: right;
     text-align: right;
     width: 50%;
-    padding-right: 1em;
 }
 
 /*--------------------------------------------------------------
@@ -1108,6 +1110,7 @@ a:hover, a:active {
 /* Make sure select elements fit in widgets */
 .widget select {
     max-width: 100%;
+    font-size: 95%;
 }
 
 .widget .widget-title {
@@ -1158,6 +1161,7 @@ a:hover, a:active {
 
 .search-form .search-flex .search-field {
     flex: 1; /* stretch to fit available space */
+    min-width: 0; /* avoid default minimum width using content width */
 }
 
 .search-form .search-flex .search-advanced-link {
@@ -1454,6 +1458,10 @@ a:hover, a:active {
 
 .comment-list {
     margin: 1em 0;
+}
+
+.comment-list, .children {
+    list-style: none; /* remove numbering from comment lists */
 }
 
 .comments-area h3 {

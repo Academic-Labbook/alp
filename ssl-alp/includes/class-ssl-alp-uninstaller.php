@@ -121,6 +121,7 @@ class SSL_ALP_Uninstaller {
 	private static function delete_options() {
 		// Delete site options.
 		delete_option( 'ssl_alp_require_login' );
+		delete_option( 'ssl_alp_enable_applications' );
 		delete_option( 'ssl_alp_disallow_public_advanced_search' );
 		delete_option( 'ssl_alp_allow_multiple_authors' );
 		delete_option( 'ssl_alp_disable_post_trackbacks' );
@@ -259,6 +260,36 @@ class SSL_ALP_Uninstaller {
 	 * Delete user metas.
 	 */
 	private static function delete_user_metas() {
-		// No user meta defined by plugin.
+		// Revisions.
+		self::delete_user_meta( 'ssl_alp_revisions_per_page' );
+
+		// Application passwords.
+		self::delete_user_meta( 'ssl_alp_applications' );
+		self::delete_user_meta( 'ssl_alp_applications_per_page' );
+
+		// Screen column settings.
+		self::delete_user_meta( 'manageposts_page_ssl-alp-admin-revisionscolumnshidden' );
+		self::delete_user_meta( 'manageusers_page_ssl-alp-admin-applicationscolumnshidden' );
+	}
+
+	/**
+	 * Delete user meta.
+	 *
+	 * @param string $meta_key User meta key.
+	 *
+	 * @global $wpdb
+	 */
+	private static function delete_user_meta( $meta_key ) {
+		global $wpdb;
+
+		$wpdb->delete(
+			$wpdb->usermeta,
+			array(
+				'meta_key' => $meta_key,
+			),
+			array(
+				'%s',
+			)
+		);
 	}
 }
