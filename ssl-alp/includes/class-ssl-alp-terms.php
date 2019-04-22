@@ -17,10 +17,23 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class SSL_ALP_Terms extends SSL_ALP_Module {
     /**
+	 * Whether or not terms are being edited.
+     *
+     * This is set to true if the load-edit-tags.php action is fired.
+	 *
+	 * @var bool
+	 */
+    protected $editing_terms = false;
+
+    /**
      * Enqueue scripts.
      */
     public function enqueue_admin_scripts() {
         global $taxonomy;
+
+        if ( ! $this->editing_terms ) {
+            return;
+        }
 
         if ( ! $this->user_can_manage_terms() ) {
             return;
@@ -104,6 +117,9 @@ class SSL_ALP_Terms extends SSL_ALP_Module {
      * Add term management tools to term edit screen.
      */
     public function add_term_management_tools() {
+        // Terms are being edited.
+        $this->editing_terms = true;
+
         if ( ! $this->user_can_manage_terms() ) {
             return;
         }
@@ -271,6 +287,10 @@ class SSL_ALP_Terms extends SSL_ALP_Module {
      * Print admin notices.
      */
 	public function print_admin_notices() {
+        if ( ! $this->editing_terms ) {
+            return;
+        }
+
         if ( ! $this->user_can_manage_terms() ) {
             return;
         }
@@ -298,6 +318,10 @@ class SSL_ALP_Terms extends SSL_ALP_Module {
      */
 	public function print_inputs() {
         global $taxonomy;
+
+        if ( ! $this->editing_terms ) {
+            return;
+        }
 
         if ( ! $this->user_can_manage_terms() ) {
             return;
