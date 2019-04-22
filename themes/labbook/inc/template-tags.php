@@ -978,14 +978,14 @@ if ( ! function_exists( 'labbook_the_page_breadcrumbs' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'labbook_the_toc' ) ) :
+if ( ! function_exists( 'labbook_get_toc' ) ) :
 	/**
-	 * Print the table of contents.
+	 * Generate a page's table of contents.
 	 *
 	 * @param Labbook_TOC_Menu_Level $contents   The table of contents hierarchy.
 	 * @param int                    $max_levels Maximum heading level to display.
 	 */
-	function labbook_the_toc( $contents, $max_levels ) {
+	function labbook_get_toc( $contents, $max_levels ) {
 		if ( ! is_int( $max_levels ) || $max_levels < 0 ) {
 			// Invalid.
 			return;
@@ -996,10 +996,12 @@ if ( ! function_exists( 'labbook_the_toc' ) ) :
 			return;
 		}
 
+		$toc = '';
+
 		$menu_data = $contents->get_menu_data();
 
 		if ( is_array( $menu_data ) ) {
-			printf(
+			$toc .= sprintf(
 				'<a href="%1$s">%2$s</a>',
 				esc_attr( '#' . $menu_data['id'] ),
 				esc_html( $menu_data['title'] )
@@ -1011,18 +1013,20 @@ if ( ! function_exists( 'labbook_the_toc' ) ) :
 			$children = $contents->get_child_menus();
 
 			if ( count( $children ) ) {
-				echo '<ul>';
+				$toc .= '<ul>';
 
 				foreach ( $children as $child ) {
 					// Show sublevel.
-					echo '<li>';
-					labbook_the_toc( $child, $max_levels - 1 );
-					echo '</li>';
+					$toc .= '<li>';
+					$toc .= labbook_get_toc( $child, $max_levels - 1 );
+					$toc .= '</li>';
 				}
 
-				echo '</ul>';
+				$toc .= '</ul>';
 			}
 		}
+
+		return $toc;
 	}
 endif;
 

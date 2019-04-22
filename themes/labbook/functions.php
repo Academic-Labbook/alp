@@ -319,14 +319,12 @@ if ( ! function_exists( 'labbook_get_content_with_toc' ) ) :
 			return $content;
 		}
 
-		?>
-		<div class="entry-toc entry-toc-<?php the_ID(); ?>">
-			<h3 class="entry-toc-title"><?php esc_html_e( 'Contents', 'labbook' ); ?></h3>
-			<?php labbook_the_toc( $hierarchy, labbook_get_option( 'table_of_contents_max_depth' ) ); ?>
-		</div>
-		<?php
+		$toc = '<div class="entry-toc entry-toc-' . the_ID() . '">';
+		$toc .= '<h3 class="entry-toc-title">' . esc_html__( 'Contents', 'labbook' ) . '</h3>';
+		$toc .= labbook_get_toc( $hierarchy, labbook_get_option( 'table_of_contents_max_depth' ) );
+		$toc .= '</div>';
 
-		return $content;
+		return $toc . $content;
 	}
 endif;
 add_filter( 'the_content', 'labbook_get_content_with_toc' );
