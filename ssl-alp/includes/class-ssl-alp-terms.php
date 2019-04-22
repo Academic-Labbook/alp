@@ -100,16 +100,6 @@ class SSL_ALP_Terms extends SSL_ALP_Module {
 			'merge' => __( 'Merge', 'ssl-alp' ),
         );
 
-		if ( is_taxonomy_hierarchical( $taxonomy ) ) {
-            // Add set parent action.
-			$actions = array_merge(
-                array(
-				    'set_parent' => __( 'Set Parent', 'ssl-alp' ),
-                ),
-                $actions
-            );
-        }
-
         return $actions;
     }
 
@@ -248,42 +238,6 @@ class SSL_ALP_Terms extends SSL_ALP_Module {
     }
 
     /**
-     * Handle setting a parent for a hierarchical term.
-     *
-     * @param array  $term_ids Terms to set the parent of.
-     * @param string $taxonomy Taxonomy.
-     */
-	protected function handle_set_parent( $term_ids, $taxonomy ) {
-        if ( ! isset( $_REQUEST['parent'] ) ) {
-            return false;
-        }
-
-        $parent_id = $_REQUEST['parent'];
-
-		foreach ( $term_ids as $term_id ) {
-			if ( absint( $term_id ) === absint( $parent_id ) ) {
-                // This term is the parent.
-                continue;
-            }
-
-            // Set the term's parent.
-            $ret = wp_update_term(
-                $term_id,
-                $taxonomy,
-                array(
-                    'parent' => $parent_id
-                )
-            );
-
-			if ( is_wp_error( $ret ) ) {
-                return false;
-            }
-        }
-
-		return true;
-	}
-
-    /**
      * Print admin notices.
      */
 	public function print_admin_notices() {
@@ -359,28 +313,4 @@ class SSL_ALP_Terms extends SSL_ALP_Module {
             )
         );
     }
-
-    /**
-     * Output dropdown box with categories available as targets for setting parent.
-     *
-     * @param string $taxonomy Taxonomy.
-     */
-	public function input_set_parent( $taxonomy ) {
-        echo '<label for="ssl-alp-term-management-set-parent">';
-        esc_html_e( 'to: ', 'ssl-alp' );
-        echo '</label>';
-
-		wp_dropdown_categories(
-            array(
-                'hide_empty'       => 0,
-                'hide_if_empty'    => false,
-                'name'             => 'parent',
-                'id'               => 'ssl-alp-term-management-set-parent',
-                'orderby'          => 'name',
-                'taxonomy'         => $taxonomy,
-                'hierarchical'     => true,
-                'show_option_none' => __( 'None', 'ssl-alp' ),
-            )
-        );
-	}
 }
