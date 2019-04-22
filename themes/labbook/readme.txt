@@ -8,24 +8,40 @@ Requires PHP: 7.0.0
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
-Academic labbook theme, intended to be used in combination with Academic Labbook Plugin.
+A clean, simple theme which, when used in combination with [Academic Labbook Plugin](https://alp.attackllama.com/),
+adds many useful features to your site for logging laboratory work in multi-user scientific or
+academic contexts such as universities and organisations.
+
+This theme is intended to be used in combination with the electronic laboratory notebook plugin
+[Academic Labbook Plugin](https://alp.attackllama.com/), which provides a back-end for many of the
+features this theme displays. While it is possible to use this theme without the aforementioned
+plugin, only with it installed and active will you benefit fully from this theme's features, such as
+the display of post coauthors, unread posts for logged-in users, and edit histories and summaries
+for posts and pages.
+
+This theme is not intended for mainstream, commercial sites; as such, modern browsers that support
+the CSS features [Grid](https://caniuse.com/#feat=css-grid) and [Flexbox](https://caniuse.com/#feat=flexbox)
+are required. Older browsers, or those which do not yet implement these features, may encounter
+layout issues.
 
 == Description ==
 
-This is a basic theme supporting features useful for logging lab work in an academic context. If
-used in combination with Academic Labbook Plugin, extra features such as display of coauthors,
+This is a basic theme supporting features useful for logging laboratory work in an academic context.
+If used in combination with Academic Labbook Plugin, extra features such as display of coauthors,
 revisions and cross-references are enabled.
+
+Note that Academic Labbook Plugin is still in beta and not yet available on WordPress.org. If you
+wish to obtain it, you must download and install it manually (see [instructions](https://alp.attackllama.com/documentation/installation/)).
 
 == Installation ==
 
 Note: this plugin requires the PHP DOM extension in order to properly render page tables of
 contents. If this extension is not available, tables of contents will be unavailable.
 
-Optional: install Academic Labbook Plugin.
-
-1. In your admin panel, go to Appearance > Themes and click the Add New button.
-2. Click Upload Theme and Choose File, then select the theme's .zip file. Click Install Now.
-3. Click Activate to use your new theme right away.
+1. (Optional but highly recommended): install [Academic Labbook Plugin](https://alp.attackllama.com/).
+2. In your admin panel, go to Appearance > Themes and click the Add New button.
+3. Click Upload Theme and Choose File, then select the theme's .zip file. Click Install Now.
+4. Click Activate to use your new theme right away.
 
 == Frequently Asked Questions ==
 
