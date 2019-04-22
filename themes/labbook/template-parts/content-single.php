@@ -33,5 +33,3 @@
 		<?php labbook_the_footer(); ?>
 	</footer>
 </article><!-- #post-<?php the_ID(); ?> -->
-<?php labbook_the_references(); ?>
-<?php labbook_the_revisions(); ?>

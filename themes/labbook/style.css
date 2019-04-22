@@ -977,11 +977,15 @@ a:hover, a:active {
     display: inline-block;
 }
 
-.site-main .comment-navigation, .site-main
-.posts-navigation, .site-main
-.post-navigation {
+.site-main .comment-navigation, .site-main .posts-navigation, .site-main .post-navigation {
     margin: 0 0 1.5em;
     overflow: hidden;
+}
+
+.site-main .posts-navigation, .site-main .post-navigation {
+    background-color: #ffffff;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06);
+    padding: 1.5em 1.5em;
 }
 
 .comment-navigation .nav-previous,
@@ -989,7 +993,6 @@ a:hover, a:active {
 .post-navigation .nav-previous {
     float: left;
     width: 50%;
-    padding-left: 1em;
 }
 
 .comment-navigation .nav-next,
@@ -998,7 +1001,6 @@ a:hover, a:active {
     float: right;
     text-align: right;
     width: 50%;
-    padding-right: 1em;
 }
 
 /*--------------------------------------------------------------
