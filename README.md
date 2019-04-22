@@ -223,6 +223,7 @@ been pushed back to these plugins and WordPress itself:
 
 ### Co-Authors Plus
 Authors: Mohammad Jangda, Daniel Bachhuber, Automattic, Shepherd Interactive, Mark Jaquith
+
 Link: [Co-Authors Plus](https://wordpress.org/plugins/co-authors-plus/)
 
 Some of the code from this plugin has been adapted into ALP, but the main behaviour has been
@@ -230,12 +231,14 @@ heavily modified to function using the block editor in WordPress 5.
 
 ### WP-Post-Meta-Revisions and Revision Notes
 Authors: Adam Silverstein, Helen Hou-Sandí
+
 Links: [WP-Post-Meta-Revisions](https://github.com/adamsilverstein/wp-post-meta-revisions) and [Revision Notes](https://wordpress.org/plugins/revision-notes/)
 
 These plugins inspired parts of the design of ALP's edit summaries feature.
 
 ### Authenticator and Application Passwords
 Authors: Inpsyde GmbH, George Stephanis
+
 Links: [Authenticator](https://wordpress.org/plugins/authenticator/) and [Application Passwords](https://wordpress.org/plugins/application-passwords/)
 
 The core authentication code of Authenticator has been the basis for ALP's private site feature.
@@ -244,6 +247,7 @@ authenticate feeds and admin AJAX calls, and the admin interface has been comple
 
 ### Term Management Tools
 Author: Cristi Burcă
+
 Link: [Term Management Tools](https://wordpress.org/plugins/term-management-tools/)
 
 Most of the code has been copied with a few minor changes, but the "change taxonomy" function has
@@ -251,6 +255,7 @@ been removed and the "merge" function user interface has been tweaked.
 
 ### Simple Life
 Author: Nilambar Sharma
+
 Link: [Simple Life](https://wordpress.org/themes/simple-life/)
 
 The look and feel of the Labbook theme recommended for use with ALP has been inspired by Simple Life,
