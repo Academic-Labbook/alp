@@ -15,7 +15,7 @@
 		<form method="post" action="edit.php?action=<?php echo SSL_ALP_NETWORK_SETTINGS_PAGE; ?>">
 			<?php settings_fields( 'ssl-alp-network-admin' ); ?>
 			<?php do_settings_sections( SSL_ALP_NETWORK_SETTINGS_PAGE ); ?>
-		    <?php submit_button( __( 'Save Changes' ) ); ?>
+		    <?php submit_button( __( 'Save Changes', 'ssl-alp' ) ); ?>
 		</form>
 	</div>
 </div>
