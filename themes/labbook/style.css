@@ -454,6 +454,13 @@ code, tt, var {
     font-style: normal;
 }
 
+code {
+    display: inline-block; /* display multi-line code nicely */
+    padding: 2px 4px;
+    background-color: #eee;
+    border-radius: 2px;
+}
+
 kbd {
     background-color: #eee;
     border-radius: 3px;
