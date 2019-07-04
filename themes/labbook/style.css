@@ -1262,6 +1262,7 @@ a:hover, a:active {
     margin-bottom: 1em;
     padding-top: 1em;
     padding-bottom: 1em;
+    word-wrap: break-word;
 }
 
 .entry-content h1,
