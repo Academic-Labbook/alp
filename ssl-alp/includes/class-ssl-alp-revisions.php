@@ -153,6 +153,9 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		// Add rewrite rule to page with unread posts.
 		$loader->add_action( 'init', $this, 'register_unread_post_rewrite_rules' );
 
+		// Remove adjacent links in HTML head section, which can set prefetched posts as unread.
+		$loader->add_action( 'init', $this, 'remove_adjacent_links_action' );
+
 		// Add link to unread posts on toolbar.
 		$loader->add_action( 'wp_before_admin_bar_render', $this, 'add_unread_posts_admin_bar_link' );
 
@@ -1065,6 +1068,31 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		}
 
 		$this->add_unread_post_rewrite_rules();
+	}
+
+	/**
+	 * Remove adjacent links from HTTP head section.
+	 *
+	 * These sometimes cause `the_post` action to be fired twice across two
+	 * requests when viewing a single post: first for the post in question, and
+	 * second for the "prefetched" next post that WordPress adds a link to in
+	 * the HTTP head section. This results in the next adjacent being set as
+	 * read even when the user may not have read it.
+	 *
+	 * An alternative approach to avoiding this unwanted behaviour would be to
+	 * detect the prefetch request, e.g. using a header parameter (see e.g.
+	 * [1]), but this is fragile and depends on the non-standardised header
+	 * parameter being set by browsers.
+	 *
+	 * [1] https://developer.mozilla.org/en-US/docs/Web/HTTP/Link_prefetching_FAQ#As_a_server_admin.2C_can_I_distinguish_prefetch_requests_from_normal_requests.3F
+	 */
+	public function remove_adjacent_links_action() {
+		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
+			// Unread flags disabled.
+			return;
+		}
+
+		remove_action( 'wp_head', 'adjacent_posts_rel_link_wp_head' );
 	}
 
 	/**
