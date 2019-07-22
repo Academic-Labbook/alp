@@ -8,7 +8,7 @@
  */
 
 // Theme version.
-define( 'LABBOOK_VERSION', '1.1.8' );
+define( 'LABBOOK_VERSION', '1.1.9' );
 
 // Required PHP version.
 define( 'LABBOOK_MINIMUM_PHP_VERSION', '7.0.0' );
