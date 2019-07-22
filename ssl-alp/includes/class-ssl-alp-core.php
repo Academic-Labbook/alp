@@ -15,12 +15,12 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class SSL_ALP_Core extends SSL_ALP_Module {
 	/**
-	 * Match media type in string
-	 * https://regexr.com/3mqrh
+	 * Match media type in string.
+	 * https://regexr.com/4d6nq
 	 *
 	 * @var string
 	 */
-	protected $media_type_regex = '/^([a-z|]+)(\s+[\w]+\/[\w\-\.\+]+)(\h+\/\/\h*.*)?$/';
+	protected $media_type_regex = '/^([a-z|]+)(\s+[\w]+\/[\w\-\.\+]+)\h*(\h+\/\/\h*.*)?$/';
 
 	/**
 	 * Register the stylesheets for the public-facing side of the site.
@@ -180,7 +180,7 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 			return $media_types;
 		} elseif ( empty( $media_types ) ) {
 			// Nothing to sanitize.
-			return;
+			return $media_types;
 		}
 
 		// Break supplied types into lines.
@@ -261,19 +261,37 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 	}
 
 	/**
+	 * Helper function to provide sanitised user-defined media types.
+	 *
+	 * The media types are stored in the database with untrimmed whitespace to allow the user
+	 * to align their media types in the settings page textarea nicely. This function provides
+	 * a stripped, deduplicated array of media types used by the media type checker.
+	 */
+	public function get_allowed_media_types() {
+		// Get extra media types defined in the plugin settings.
+		$extra_media_types = get_site_option( 'ssl_alp_additional_media_types' );
+
+		if ( ! $extra_media_types || ! is_array( $extra_media_types ) ) {
+			return array();
+		}
+
+		foreach ( $extra_media_types as $key => $extra_media_type ) {
+			// Trim whitespace.
+			$extra_media_type = array_map( 'trim', $extra_media_type );
+			$extra_media_types[ $key ] = $extra_media_type;
+		}
+
+		return $extra_media_types;
+	}
+
+	/**
 	 * Filter media types.
 	 *
 	 * @param array $media_types Media types to filter.
 	 * @return array Filtered media types.
 	 */
 	public function filter_media_types( $media_types ) {
-		// Get extra media types defined in the plugin settings.
-		$extra_media_types = get_site_option( 'ssl_alp_additional_media_types' );
-
-		if ( ! $extra_media_types || ! is_array( $extra_media_types ) ) {
-			// Nothing to add.
-			return $media_types;
-		}
+		$extra_media_types = $this->get_allowed_media_types();
 
 		// Loop over user-defined media types.
 		foreach ( $extra_media_types as $extra_media_type ) {
@@ -282,11 +300,8 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 				continue;
 			}
 
-			// Strip any whitespace that the user might have added to the media type.
-			$media_type = trim( $extra_media_type['media_type'] );
-
 			// Add as valid media type.
-			$media_types[ $extra_media_type['extension'] ] = $media_type;
+			$media_types[ $extra_media_type['extension'] ] = $extra_media_type['media_type'];
 		}
 
 		return $media_types;

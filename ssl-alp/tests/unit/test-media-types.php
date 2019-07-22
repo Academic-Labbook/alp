@@ -1,15 +1,11 @@
 <?php
 
 /**
- * Media tests
- * 
+ * Network media tests.
+ *
  * @group ms-required
  */
 class MediaTest extends WP_UnitTestCase {
-    public function setUp() {		
-        parent::setUp();
-    }
-
     private function get_test_file( $extension, $data_len = 50 ) {
         $count = 0;
 
@@ -30,6 +26,23 @@ class MediaTest extends WP_UnitTestCase {
         return $file;
     }
 
+    /**
+     * Check media type setting.
+     */
+    private function assert_media_type_set( $set_value, $get_value ) {
+        global $ssl_alp;
+
+        // Reset option first.
+        delete_site_option( 'ssl_alp_additional_media_types' );
+        // Update option.
+        update_site_option( 'ssl_alp_additional_media_types', $set_value );
+        $this->assertEquals( $ssl_alp->core->get_allowed_media_types(), $get_value );
+    }
+
+    /**
+     * Auto-format internal representation of media types the way they are entered into the settings
+     * box.
+     */
     private function format_media_types( $media_types ) {
         $str = "";
 
@@ -53,10 +66,79 @@ class MediaTest extends WP_UnitTestCase {
         return $str;
     }
 
-    public function test_media_types() {
-        // media types to test
-        // these get converted to "[ext] [type] // [comment]" and entered into
-        // the `ssl_alp_additional_media_types` network setting
+    /**
+     * Test media type sanitisation.
+     */
+	public function test_media_types() {
+        /**
+         * Text type to check.
+         */
+        $txt_type = array(
+            array(
+                'extension'  => 'txt',
+                'media_type' => 'text/plain',
+            )
+        );
+
+        // Valid, no comments.
+        $this->assert_media_type_set( 'txt text/plain', $txt_type );
+        $this->assert_media_type_set( 'txt text/plain ', $txt_type );
+        $this->assert_media_type_set( 'txt   text/plain  ', $txt_type );
+        // Invalid.
+        $this->assert_media_type_set( '  txt text/plain', array() ); // Preceding spaces.
+        $this->assert_media_type_set( '  txt text/plain//comment', array() ); // Preceding spaces.
+        $this->assert_media_type_set( 'txt text/plain//comment', array() ); // No space between media type and comment.
+
+        // Valid, with comments.
+        $txt_type[0]['comment'] = '// comment';
+        $this->assert_media_type_set( 'txt text/plain // comment', $txt_type );
+        $this->assert_media_type_set( 'txt text/plain // comment ', $txt_type ); // Strip trailing space.
+        $txt_type[0]['comment'] = '//comment';
+        $this->assert_media_type_set( 'txt   text/plain //comment', $txt_type );
+        $this->assert_media_type_set( 'txt   text/plain   //comment', $txt_type );
+        $this->assert_media_type_set( 'txt   text/plain   //comment ', $txt_type ); // Strip trailing space.
+
+        /**
+         * Multiple types to check.
+         */
+        $multi_types = array(
+            array(
+                'extension'  => 'txt',
+                'media_type' => 'text/plain',
+            ),
+            array(
+                'extension'  => 'm|py|c',
+                'media_type' => 'text/plain',
+            ),
+            array(
+                'extension'  => 'rbd',
+                'media_type' => 'application/octet-stream',
+            ),
+        );
+
+        // Valid, no comments.
+        $this->assert_media_type_set(
+'txt text/plain
+m|py|c text/plain
+rbd application/octet-stream',
+            $multi_types
+        );
+        // Valid, with comments.
+        $multi_types[0]['comment'] = '// text';
+        $multi_types[1]['comment'] = '// matlab';
+        $multi_types[2]['comment'] = '// made-up';
+        $this->assert_media_type_set(
+'txt text/plain // text
+m|py|c text/plain // matlab
+rbd application/octet-stream // made-up',
+            $multi_types
+        );
+	}
+
+    public function test_custom_media_type_uploads() {
+        // Media types to test.
+        // These get converted to "[ext] [type] // [comment]" and entered into the
+        // `ssl_alp_additional_media_types` network setting.
         $media_types = array(
             array(
                 'ext'       =>  'py',
@@ -70,54 +152,54 @@ class MediaTest extends WP_UnitTestCase {
             )
         );
 
-        // by default, it shouldn't be possible to upload the above files
+        // By default, it shouldn't be possible to upload the above files.
         foreach ( $media_types as $type ) {
             $exts = explode( '|', $type[ 'ext' ] );
 
-            // attempt each extension
+            // Attempt each extension.
             foreach ( $exts as $ext ) {
-                // create test file
+                // Create test file.
                 $filename = $this->get_test_file( $ext );
 
-                // get test file data
+                // Get test file data.
                 $contents = file_get_contents( $filename );
 
-                // do the upload
+                // Do the upload.
                 $upload = wp_upload_bits( basename( $filename ), null, $contents );
 
-                // there should be an error
+                // There should be an error.
                 $this->assertNotFalse( $upload['error'] );
             }
         }
 
-        // get media type string
+        // Get media type string.
         $media_type_str = $this->format_media_types( $media_types );
 
-        // run through sanitization filters
+        // Run through sanitization filters.
         $sanitized_media_types = sanitize_option( 'ssl_alp_additional_media_types', $media_type_str );
 
-        // set option
+        // Set option.
         update_site_option( 'ssl_alp_additional_media_types', $sanitized_media_types );
 
-        // it should now be possible to upload the above files
+        // It should now be possible to upload the above files.
         foreach ( $media_types as $type ) {
             $exts = explode( '|', $type[ 'ext' ] );
 
-            // attempt each extension
+            // Attempt each extension.
             foreach ( $exts as $ext ) {
-                // create test file
+                // Create test file.
                 $filename = $this->get_test_file( $ext );
 
-                // get test file data
+                // Get test file data.
                 $contents = file_get_contents( $filename );
 
-                // do the upload
+                // Do the upload.
                 $upload = wp_upload_bits( basename( $filename ), null, $contents );
 
-                // there should not be an error
+                // There should not be an error.
                 $this->assertFalse( $upload['error'] );
 
-                // remove the temporary file
+                // Remove the temporary file.
                 unlink( $filename );
             }
         }

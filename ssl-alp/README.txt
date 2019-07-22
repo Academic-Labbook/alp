@@ -4,7 +4,7 @@ Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
 Requires at least: 5.1.0
 Tested up to: 5.2.0
 Requires PHP: 7.0.0
-Stable tag: 0.15.1
+Stable tag: 0.15.2
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -72,6 +72,12 @@ with maximum control. Please see [this guide](https://alp.attackllama.com/docume
 on the ALP website.
 
 == Changelog ==
+
+= 0.15.2 =
+ - Fixed bug with media type definitions where trailing spaces caused types not
+   to be saved.
+ - Disabled header prefetch links to avoid posts being fetched preemptively by
+   browsers and therefore being set as read before being viewed.
 
 = 0.15.1 =
  - Removed incorrectly appearing merge action from user application list table.

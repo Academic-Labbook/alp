@@ -14,6 +14,15 @@
 		// Post ID.
 		var post_id = $button.data( 'post-id' );
 
+		// Current read flag.
+		var current_read_status = $button.data( 'read-status' );
+
+		// Fuzzy comparison required to catch undefined data.
+		if ( null == post_id || null == current_read_status ) {
+			// Can't continue without required data.
+			return;
+		}
+
 		// Entry title link element, if present.
 		var $entry_link = $( '.entry-title-link-' + post_id );
 
@@ -26,14 +35,6 @@
 		// Read and unread icon classes.
 		var read_class = $button.data( 'read-class' );
 		var unread_class = $button.data( 'unread-class' );
-
-		// Current read flag.
-		var current_read_status = $button.data( 'read-status' );
-
-		if ( null === current_read_status ) {
-			// Can't get element's read status.
-			return;
-		}
 
 		$.ajax( {
 			url: endpoint,

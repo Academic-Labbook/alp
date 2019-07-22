@@ -4,7 +4,7 @@ Theme URI: https://alp.attackllama.com/documentation/themes/labbook/
 Author: Sean Leavey
 Author URI: https://attackllama.com/
 Description: Laboratory notebook theme, intended to be used in combination with Academic Labbook Plugin.
-Version: 1.1.8
+Version: 1.1.9
 License: GNU General Public License v3 or later
 License URI: LICENSE
 Text Domain: labbook
@@ -452,6 +452,13 @@ code, tt, var {
     font-family: Monaco, Consolas, "Andale Mono", "DejaVu Sans Mono", monospace;
     font-size: 95%;
     font-style: normal;
+}
+
+code {
+    display: inline-block; /* display multi-line code nicely */
+    padding: 2px 4px;
+    background-color: #eee;
+    border-radius: 2px;
 }
 
 kbd {
@@ -1255,6 +1262,7 @@ a:hover, a:active {
     margin-bottom: 1em;
     padding-top: 1em;
     padding-bottom: 1em;
+    word-wrap: break-word;
 }
 
 .entry-content h1,
