@@ -113,6 +113,7 @@ class SSL_ALP_Uninstaller {
 		self::delete_taxonomies();
 		self::delete_post_metas();
 		self::delete_user_metas();
+		self::delete_custom_post_types();
 	}
 
 	/**
@@ -123,6 +124,7 @@ class SSL_ALP_Uninstaller {
 		delete_option( 'ssl_alp_require_login' );
 		delete_option( 'ssl_alp_enable_applications' );
 		delete_option( 'ssl_alp_disallow_public_advanced_search' );
+		delete_option( 'ssl_alp_enable_inventory' );
 		delete_option( 'ssl_alp_allow_multiple_authors' );
 		delete_option( 'ssl_alp_disable_post_trackbacks' );
 		delete_option( 'ssl_alp_enable_crossreferences' );
@@ -146,6 +148,7 @@ class SSL_ALP_Uninstaller {
 		self::delete_taxonomy( 'ssl_alp_coauthor' );
 		self::delete_taxonomy( 'ssl_alp_crossreference' );
 		self::delete_taxonomy( 'ssl_alp_read_flag' );
+		self::delete_taxonomy( 'ssl_alp_inventory_item' );
 	}
 
 	/**
@@ -286,6 +289,32 @@ class SSL_ALP_Uninstaller {
 			$wpdb->usermeta,
 			array(
 				'meta_key' => $meta_key,
+			),
+			array(
+				'%s',
+			)
+		);
+	}
+
+	/**
+	 * Delete custom post types.
+	 */
+	private static function delete_custom_post_types() {
+		// Inventory.
+		self::delete_custom_post_type_posts( 'ssl_alp_inventory' );
+	}
+
+	/**
+	 * Delete custom post type posts.
+	 *
+	 * @global $wpdb
+	 */
+	private static function delete_custom_post_type_posts( $post_type ) {
+		// Note: this doesn't delete the post type's revision posts.
+		$wpdb->delete(
+			$wpdb->posts,
+			array(
+				'post_type' => $post_type,
 			),
 			array(
 				'%s',
