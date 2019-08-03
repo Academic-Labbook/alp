@@ -47,7 +47,21 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 
         // Create/delete corresponding inventory item terms whenever posts are created/deleted.
         $loader->add_action( 'save_post', $this, 'associate_inventory_post_with_term', 10, 2 );
-		$loader->add_action( 'before_delete_post', $this, 'delete_associated_inventory_post_term' );
+		$loader->add_action( 'deleted_post', $this, 'delete_associated_inventory_post_term' );
+
+        /**
+         * Inventory taxonomy.
+         */
+
+		// Register inventory item taxonomy.
+		$loader->add_action( 'init', $this, 'register_taxonomy' );
+
+		// Disallow creation of new terms directly (this is temporarily disabled
+		// by `associate_inventory_post_with_term`).
+		// NOTE: if this line is changed, the enable_disallow_insert_term_filter
+		// and disable_disallow_insert_term_filter functions must also be
+		// updated.
+		$loader->add_filter( 'pre_insert_term', $this, 'disallow_insert_term', 10, 2 );
 
 		// Delete any invalid inventory items when post terms are set.
 		$loader->add_action( 'added_term_relationship', $this, 'reject_invalid_inventory_terms', 10, 3 );
@@ -57,12 +71,6 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 
 		// Stop super admins deleting inventory terms.
 		$loader->add_filter( 'map_meta_cap', $this, 'filter_capabilities', 10, 4 );
-
-        /**
-         * Inventory taxonomy.
-         */
-
-        $loader->add_action( 'init', $this, 'register_taxonomy' );
 	}
 
 	/**
@@ -99,6 +107,14 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 	 */
 	public function inventory_settings_callback() {
 		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/site/inventory-settings-display.php';
+	}
+
+	private function enable_disallow_insert_term_filter() {
+		add_filter( 'pre_insert_term', array( $this, 'disallow_insert_term', 10, 2 ) );
+	}
+
+	private function disable_disallow_insert_term_filter() {
+		remove_filter( 'pre_insert_term', array( $this, 'disallow_insert_term', 10, 2 ) );
 	}
 
     /**
@@ -228,6 +244,10 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 		// Get inventory item term, if present.
 		$term = $this->get_inventory_term( $post );
 
+		// Temporarily disable the filter that blocks creation of terms in the
+		// ssl_alp_inventory_item taxonomy.
+		$this->disable_disallow_insert_term_filter();
+
 		if ( ! $term ) {
 			// Term doesn't yet exist.
 			$args = array(
@@ -244,9 +264,12 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 
             wp_update_term( $term->term_id, 'ssl_alp_inventory_item', $args );
 		}
+
+		// Re-enable the filter.
+		$this->enable_disallow_insert_term_filter();
 	}
 
-	private function get_inventory_term( $post ) {
+	public function get_inventory_term( $post ) {
 		$post = get_post( $post );
 
         if ( is_null( $post ) ) {
@@ -327,33 +350,91 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 		if ( ! get_option( 'ssl_alp_enable_inventory' ) ) {
 			// Inventory disabled.
 			return;
-        }
+		}
 
         $post = get_post( $post_id );
 
         if ( is_null( $post ) ) {
 			// Invalid post.
 			return;
-        }
+		}
 
         if ( 'ssl_alp_inventory' !== $post->post_type ) {
             return;
-        }
-
-        if ( 'trash' !== $post->post_status ) {
-            // Don't create a term unless the post is being published.
-            return;
-        }
+		}
 
         $term = $this->get_inventory_term( $post );
 
         if ( ! $term ) {
             // No term to delete.
             return;
-        }
+		}
 
-        wp_delete_term( $term->term_id, 'ssl_alp_inventory_item' );
+		wp_delete_term( $term->term_id, 'ssl_alp_inventory_item' );
+		clean_term_cache( array( $term->term_id ), 'ssl_alp_inventory_item' );
     }
+
+	/**
+	 * Register the inventory taxonomy and add post type support.
+	 */
+	public function register_taxonomy() {
+		if ( ! get_option( 'ssl_alp_enable_inventory' ) ) {
+			// Inventory disabled.
+			return;
+		}
+
+		// Register new taxonomy so that we can store inventory item and post relationships.
+		$args = array(
+			'hierarchical'          => false,
+			'labels'                => array(
+                'name'                       => __( 'Inventory', 'ssl-alp' ),
+                'singular_name'              => __( 'Item', 'ssl-alp' ),
+                'search_items'               => __( 'Search Items', 'ssl-alp' ),
+                'popular_items'              => __( 'Popular Items', 'ssl-alp' ),
+                'all_items'                  => __( 'All Items', 'ssl-alp' ),
+                'edit_item'                  => __( 'Edit Item', 'ssl-alp' ),
+                'update_item'                => __( 'Update Item', 'ssl-alp' ),
+                'add_new_item'               => __( 'Add New Item', 'ssl-alp' ),
+                'new_item_name'              => __( 'New Item Name', 'ssl-alp' ),
+                'separate_items_with_commas' => __( 'Separate items with commas', 'ssl-alp' ),
+                'add_or_remove_items'        => __( 'Add or remove items', 'ssl-alp' ),
+                'choose_from_most_used'      => __( 'Choose from the most used items', 'ssl-alp' ),
+                'not_found'                  => __( 'No items found.', 'ssl-alp' ),
+                'no_terms'                   => __( 'No items', 'ssl-alp' ),
+            ),
+			'public'                => true,
+            'show_in_menu'          => false, // Disable term edit page.
+			'show_in_rest'          => true,  // Needed for block editor support.
+            'show_admin_column'     => true,  // Show associated terms in admin edit screen.
+		);
+
+		// Create inventory taxonomy.
+		register_taxonomy( 'ssl_alp_inventory_item', $this->supported_post_types, $args );
+	}
+
+	/**
+	 * Disallow the creation of new terms under normal circumstances.
+	 *
+	 * This is to avoid users being able to create terms in the inventory
+	 * taxonomy directly; terms should only be created when a new inventory post
+	 * is created.
+	 *
+	 * @param string $term     The term.
+	 * @param string $taxonomy The taxonomy.
+	 *
+	 * @return string|WP_Error $term The term, or error.
+	 */
+	public function disallow_insert_term( $term, $taxonomy ) {
+		if ( 'ssl_alp_inventory_item' !== $taxonomy ) {
+			return;
+		}
+
+		// Return an error in all circumstances.
+		return new WP_Error(
+			'disallow_insert_term',
+			__( 'Your role does not have permission to add terms to this taxonomy', 'ssl-alp' )
+		);
+	}
 
 	/**
 	 * Delete invalid inventory when a post is saved.
@@ -456,42 +537,4 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 
 		return $caps;
 	}
-
-	/**
-	 * Register the inventory taxonomy and add post type support.
-	 */
-	public function register_taxonomy() {
-		if ( ! get_option( 'ssl_alp_enable_inventory' ) ) {
-			// Inventory disabled.
-			return;
-		}
-
-		// Register new taxonomy so that we can store inventory item and post relationships.
-		$args = array(
-			'hierarchical'          => false,
-			'labels'                => array(
-                'name'                       => __( 'Inventory', 'ssl-alp' ),
-                'singular_name'              => __( 'Item', 'ssl-alp' ),
-                'search_items'               => __( 'Search Items', 'ssl-alp' ),
-                'popular_items'              => __( 'Popular Items', 'ssl-alp' ),
-                'all_items'                  => __( 'All Items', 'ssl-alp' ),
-                'edit_item'                  => __( 'Edit Item', 'ssl-alp' ),
-                'update_item'                => __( 'Update Item', 'ssl-alp' ),
-                'add_new_item'               => __( 'Add New Item', 'ssl-alp' ),
-                'new_item_name'              => __( 'New Item Name', 'ssl-alp' ),
-                'separate_items_with_commas' => __( 'Separate items with commas', 'ssl-alp' ),
-                'add_or_remove_items'        => __( 'Add or remove items', 'ssl-alp' ),
-                'choose_from_most_used'      => __( 'Choose from the most used items', 'ssl-alp' ),
-                'not_found'                  => __( 'No items found.', 'ssl-alp' ),
-                'no_terms'                   => __( 'No items', 'ssl-alp' ),
-            ),
-			'public'                => true,
-            'show_in_menu'          => false, // Disable term edit page.
-			'show_in_rest'          => true,  // Needed for block editor support.
-            'show_admin_column'     => true,  // Show associated terms in admin edit screen.
-		);
-
-		// Create inventory taxonomy.
-		register_taxonomy( 'ssl_alp_inventory_item', $this->supported_post_types, $args );
-    }
 }
