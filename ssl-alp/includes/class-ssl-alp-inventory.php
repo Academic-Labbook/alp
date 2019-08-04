@@ -56,11 +56,10 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 		// Register inventory item taxonomy.
 		$loader->add_action( 'init', $this, 'register_taxonomy' );
 
-		// Disallow creation of new terms directly (this is temporarily disabled
-		// by `associate_inventory_post_with_term`).
-		// NOTE: if this line is changed, the enable_disallow_insert_term_filter
-		// and disable_disallow_insert_term_filter functions must also be
-		// updated.
+		// Disallow creation of new terms directly (this is temporarily disabled by
+		// `associate_inventory_post_with_term`).
+		// NOTE: if this line is changed, the enable_disallow_insert_term_filter and
+		// disable_disallow_insert_term_filter functions must also be updated.
 		$loader->add_filter( 'pre_insert_term', $this, 'disallow_insert_term', 10, 2 );
 
 		// Delete any invalid inventory items when post terms are set.
@@ -109,12 +108,12 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/site/inventory-settings-display.php';
 	}
 
-	private function enable_disallow_insert_term_filter() {
-		add_filter( 'pre_insert_term', array( $this, 'disallow_insert_term', 10, 2 ) );
+	public function enable_disallow_insert_term_filter() {
+		add_filter( 'pre_insert_term', array( $this, 'disallow_insert_term' ), 10, 2 );
 	}
 
-	private function disable_disallow_insert_term_filter() {
-		remove_filter( 'pre_insert_term', array( $this, 'disallow_insert_term', 10, 2 ) );
+	public function disable_disallow_insert_term_filter() {
+		remove_filter( 'pre_insert_term', array( $this, 'disallow_insert_term' ), 10, 2 );
 	}
 
     /**
@@ -429,9 +428,12 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 	/**
 	 * Disallow the creation of new terms under normal circumstances.
 	 *
-	 * This is to avoid users being able to create terms in the inventory
-	 * taxonomy directly; terms should only be created when a new inventory post
-	 * is created.
+	 * This is to avoid users being able to create terms in the inventory taxonomy directly; terms
+	 * should only be created when a new inventory post is created.
+	 *
+	 * This filter is disabled temporarily by `enable_disallow_insert_term_filter` to allow creation
+	 * of new terms in acceptable circumstances, then reenabled by
+	 * `enable_disallow_insert_term_filter`.
 	 *
 	 * @param string $term     The term.
 	 * @param string $taxonomy The taxonomy.
