@@ -137,6 +137,22 @@ class SSL_ALP_Revisions_Widget extends WP_Widget {
 					)
 				);
 
+				// Post type (only for non-posts).
+				if ( 'post' !== $parent->post_type ) {
+					$post_type = get_post_type_object( $parent->post_type );
+					$post_type_label = sprintf(
+						/* translators: 1: referenced post type label */
+						__( '(%1$s)', 'ssl-alp' ),
+						$post_type->labels->singular_name
+					);
+
+					echo '&nbsp;';
+					printf(
+						'<span>%1$s</span>',
+						esc_html( $post_type_label )
+					);
+				}
+
 				echo '</li>';
 			}
 
