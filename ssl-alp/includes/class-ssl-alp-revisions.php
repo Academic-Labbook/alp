@@ -44,7 +44,6 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 */
 	protected static $supported_unread_flag_post_types = array(
 		'post',
-		'ssl_alp_inventory',
 	);
 
 	/**
