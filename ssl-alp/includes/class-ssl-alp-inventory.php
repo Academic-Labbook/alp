@@ -440,7 +440,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 	 */
 	public function disallow_insert_term( $term, $taxonomy ) {
 		if ( 'ssl_alp_inventory_item' !== $taxonomy ) {
-			return;
+			return $term;
 		}
 
 		// Return an error in all circumstances.
