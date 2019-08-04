@@ -44,6 +44,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 */
 	protected static $supported_unread_flag_post_types = array(
 		'post',
+		'ssl_alp_inventory',
 	);
 
 	/**
@@ -209,7 +210,8 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		}
 
 		// Check if user has permission to edit the post, if we are to check this.
-		if ( $check_edit_permission && ! current_user_can( "edit_{$post->post_type}", $post->ID ) ) {
+		$post_type = get_post_type_object( $post->post_type );
+		if ( $check_edit_permission && ! current_user_can( "edit_{$post_type->capability_type}", $post->ID ) ) {
 			// No permission.
 			return false;
 		}
