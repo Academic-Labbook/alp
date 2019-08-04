@@ -885,7 +885,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		// Reference posts cache key.
 		$cache_key = 'ssl-alp-revisions-' . $number . '-' . $order;
 
-		$object_ids = wp_cache_get( $cache_key );
+		$object_ids = get_transient( $cache_key );
 
 		if ( false === $object_ids ) {
 			/**
@@ -917,7 +917,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 				)
 			);
 
-			wp_cache_set( $cache_key, $object_ids );
+			set_transient( $cache_key, $object_ids, SSL_ALP_RECENT_REVISIONS_CACHE_TIMEOUT );
 		}
 
 		return $object_ids;
@@ -1569,7 +1569,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 *
 	 * @param WP_Post      $new_revision New revision.
 	 * @param WP_Post|null $old_revision Previous revision. If not specified, the revision
-	 *                                   immediately prior to $post_after is used.
+	 *                                   immediately prior to $new_revision is used.
 	 * @return array|null Array containing lines added and removed, or null if difference can't be
 	 *                    determined.
 	 */
