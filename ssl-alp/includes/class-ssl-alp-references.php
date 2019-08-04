@@ -21,8 +21,9 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	 * @var array
 	 */
 	protected $supported_reference_post_types = array(
-		'post' => true,
-		'page' => false,
+		'post' 				=> true,
+		'page' 				=> false,
+		'ssl_alp_inventory' => false,
 	);
 
 	/**
