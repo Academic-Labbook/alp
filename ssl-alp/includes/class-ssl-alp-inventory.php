@@ -174,7 +174,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 					)
 				),
 			),
-			'menu_icon'       => 'dashicons-tag',
+			'menu_icon'       => 'dashicons-book-alt',
             'supports'        => array(
                 'title',
                 'editor',
