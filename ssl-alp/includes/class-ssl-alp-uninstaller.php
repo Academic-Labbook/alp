@@ -300,25 +300,73 @@ class SSL_ALP_Uninstaller {
 	 * Delete custom post types.
 	 */
 	private static function delete_custom_post_types() {
-		// Inventory.
-		self::delete_custom_post_type_posts( 'ssl_alp_inventory' );
+		// Change inventory posts to pages.
+		self::delete_custom_post_type_posts( 'ssl_alp_inventory', 'page' );
 	}
 
 	/**
-	 * Delete custom post type posts.
+	 * Delete or reassign custom post type posts and their revisions.
+	 *
+	 * @param string $post_type     The post type to remove.
+	 * @param string $new_post_type The replacement post type. If specified, the post type is
+	 *                              changed to this, and revisions are left untouched. If null, the
+	 *                              posts are deleted.
 	 *
 	 * @global $wpdb
 	 */
-	private static function delete_custom_post_type_posts( $post_type ) {
-		// Note: this doesn't delete the post type's revision posts.
-		$wpdb->delete(
-			$wpdb->posts,
-			array(
-				'post_type' => $post_type,
-			),
-			array(
-				'%s',
-			)
-		);
+	private static function delete_custom_post_type_posts( $post_type, $new_post_type = null ) {
+		if ( is_null( $new_post_type ) ) {
+			$post_ids = $wpdb->get_col(
+				$wpdb->prepare(
+					"
+					SELECT post_id
+					FROM $wpdb->posts
+					WHERE post_type = %s
+					"
+				),
+				$post_type
+			);
+
+			foreach ( $post_ids as $post_id ) {
+				// Delete children.
+				$wpdb->delete(
+					$wpdb->posts,
+					array(
+						'post_parent' => $post_id
+					),
+					array(
+						'%d'
+					)
+				);
+
+				// Delete post.
+				$wpdb->delete(
+					$wpdb->posts,
+					array(
+						'ID' => $post_id
+					),
+					array(
+						'%d'
+					)
+				);
+			}
+		} else {
+			// Reassign to new post type.
+			$wpdb->update(
+				$wpdb->posts,
+				array(
+					'post_type' => $new_post_type,
+				),
+				array(
+					'post_type' => $post_type,
+				),
+				array(
+					'%s',
+				),
+				array(
+					'%s',
+				)
+			);
+		}
 	}
 }
