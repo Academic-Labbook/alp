@@ -885,9 +885,9 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		// Reference posts cache key.
 		$cache_key = 'ssl-alp-revisions-' . $number . '-' . $order;
 
-		$object_ids = get_transient( $cache_key );
+		$posts = get_transient( $cache_key );
 
-		if ( false === $object_ids ) {
+		if ( false === $posts ) {
 			/**
 			 * Get last $number revisions (don't need parents) grouped by author and parent id, ordered
 			 * by date descending, where number is > 1 if the revision was made by the original author
@@ -896,7 +896,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			 *
 			 * Note: `post_date` is the most recent revision found in each group.
 			 */
-			$object_ids = $wpdb->get_results(
+			$posts = $wpdb->get_results(
 				$wpdb->prepare(
 					"SELECT posts.post_author, posts.post_parent, MAX(posts.post_date) AS post_date,
 						COUNT(1) AS number, parent_posts.post_author AS parent_author
@@ -917,10 +917,10 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 				)
 			);
 
-			set_transient( $cache_key, $object_ids, SSL_ALP_RECENT_REVISIONS_CACHE_TIMEOUT );
+			set_transient( $cache_key, $posts, SSL_ALP_RECENT_REVISIONS_CACHE_TIMEOUT );
 		}
 
-		return $object_ids;
+		return $posts;
 	}
 
 	/**
@@ -1549,13 +1549,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 				require ABSPATH . WPINC . '/wp-diff.php';
 			}
 
-			// Compute text difference between old and new posts.
-			$diff = $this->get_post_text_differences( $post_after, $post_before );
-
-			// Post content is deemed changed if there are new or deleted lines.
-			$changed = $diff['added'] > 1 || $diff['removed'] > 1;
-
-			if ( ! $changed ) {
+			if ( ! $this->have_post_content_lines_changed( $post_after, $post_before ) ) {
 				return;
 			}
 		}
@@ -1616,6 +1610,22 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			'added'   => $diff->countAddedLines(),
 			'removed' => $diff->countDeletedLines(),
 		);
+	}
+
+	/**
+	 * Check if post content lines changed between two revisions of a post.
+	 *
+	 * @param WP_Post      $new_revision New revision.
+	 * @param WP_Post|null $old_revision Previous revision. If not specified, the revision
+	 *                                   immediately prior to $new_revision is used.
+	 * @return bool Whether post content lines changed.
+	 */
+	public function have_post_content_lines_changed( $new_revision, $old_revision = null ) {
+		// Compute text difference between old and new posts.
+		$diff = $this->get_post_text_differences( $new_revision, $old_revision );
+
+		// Post content is deemed changed if there are new or deleted lines.
+		return $diff['added'] > 1 || $diff['removed'] > 1;
 	}
 
 	/**
