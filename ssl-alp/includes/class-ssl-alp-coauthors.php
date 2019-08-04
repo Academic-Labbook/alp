@@ -56,6 +56,12 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// Set the current user as the default coauthor on new drafts.
 		$loader->add_action( 'save_post', $this, 'add_user_to_draft', 10, 2 );
 
+		// Disallow creation of new terms directly (this is temporarily disabled by
+		// `associate_inventory_post_with_term`).
+		// NOTE: if this line is changed, the enable_disallow_insert_term_filter and
+		// disable_disallow_insert_term_filter functions must also be updated.
+		$loader->add_filter( 'pre_insert_term', $this, 'disallow_insert_term', 10, 2 );
+
 		// Delete any invalid coauthors when post terms are set.
 		$loader->add_action( 'added_term_relationship', $this, 'reject_invalid_coauthor_terms', 10, 3 );
 
@@ -172,6 +178,14 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 */
 	public function author_settings_callback() {
 		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/author-settings-display.php';
+	}
+
+	public function enable_disallow_insert_term_filter() {
+		add_filter( 'pre_insert_term', array( $this, 'disallow_insert_term' ), 10, 2 );
+	}
+
+	public function disable_disallow_insert_term_filter() {
+		remove_filter( 'pre_insert_term', array( $this, 'disallow_insert_term' ), 10, 2 );
 	}
 
 	/**
@@ -313,7 +327,14 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 				'slug' => $this->get_coauthor_term_slug( $coauthor ),
 			);
 
+			// Temporarily disable the filter that blocks creation of terms in the ssl_alp_coauthor
+			// taxonomy.
+			$this->disable_disallow_insert_term_filter();
+
 			wp_insert_term( $coauthor->display_name, 'ssl_alp_coauthor', $args );
+
+			// Re-enable the filter.
+			$this->enable_disallow_insert_term_filter();
 		} else {
 			// Update term.
 			$this->update_coauthor_term( $coauthor->ID, $coauthor );
@@ -342,8 +363,15 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			'slug' => $this->get_coauthor_term_slug( $user ),
 		);
 
+		// Temporarily disable the filter that blocks creation of terms in the ssl_alp_coauthor
+		// taxonomy.
+		$this->disable_disallow_insert_term_filter();
+
 		// Set term name.
 		wp_update_term( $term->term_id, 'ssl_alp_coauthor', $args );
+
+		// Re-enable the filter.
+		$this->enable_disallow_insert_term_filter();
 	}
 
 	/**
@@ -987,6 +1015,33 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$coauthors = array( wp_get_current_user() );
 
 		$this->set_coauthors( $post, $coauthors );
+	}
+
+	/**
+	 * Disallow the creation of new terms under normal circumstances.
+	 *
+	 * This is to avoid users being able to create terms in the coauthor taxonomy directly; terms
+	 * should only be created when a new user is created.
+	 *
+	 * This filter is disabled temporarily by `enable_disallow_insert_term_filter` to allow creation
+	 * of new terms in acceptable circumstances, then reenabled by
+	 * `enable_disallow_insert_term_filter`.
+	 *
+	 * @param string $term     The term.
+	 * @param string $taxonomy The taxonomy.
+	 *
+	 * @return string|WP_Error $term The term, or error.
+	 */
+	public function disallow_insert_term( $term, $taxonomy ) {
+		if ( 'ssl_alp_coauthor' !== $taxonomy ) {
+			return $term;
+		}
+
+		// Return an error in all circumstances.
+		return new WP_Error(
+			'disallow_insert_term',
+			__( 'Your role does not have permission to add terms to this taxonomy', 'ssl-alp' )
+		);
 	}
 
 	/**
