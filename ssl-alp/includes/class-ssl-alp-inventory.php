@@ -40,10 +40,10 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
         $loader->add_action( 'months_dropdown_results', $this, 'disable_months_dropdown_results', 10, 2 );
 
         // Remove date column from admin post list.
-        $loader->add_filter( 'manage_edit-ssl_alp_inventory_columns', $this, 'manage_edit_columns' );
+        $loader->add_filter( 'manage_edit-ssl_alp_inventory_columns', $this, 'remove_date_edit_column' );
 
         // Sort inventory posts alphabetically by default.
-        $loader->add_filter( 'manage_edit-ssl_alp_inventory_sortable_columns', $this, 'manage_edit_sortable_columns' );
+        $loader->add_filter( 'manage_edit-ssl_alp_inventory_sortable_columns', $this, 'remove_date_sort_edit_control' );
 
         // Create/delete corresponding inventory item terms whenever posts are created/deleted.
         $loader->add_action( 'save_post', $this, 'associate_inventory_post_with_term', 10, 2 );
@@ -56,6 +56,19 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 		// Register inventory item taxonomy.
 		$loader->add_action( 'init', $this, 'register_taxonomy' );
 
+		// Add posts column to admin post list and make it sortable.
+		$loader->add_filter( 'manage_edit-ssl_alp_inventory_columns', $this, 'add_posts_column_to_edit_table' );
+		$loader->add_filter( 'manage_edit-ssl_alp_inventory_sortable_columns', $this, 'add_posts_column_to_edit_table' );
+
+		// Add posts to rows of the admin post list.
+		$loader->add_action( 'manage_ssl_alp_inventory_posts_custom_column', $this, 'add_posts_row_data', 10, 2 );
+
+		// Override default term links to point towards the term custom post instead of term
+		// archive.
+		// NOTE: if this line is changed, the `enable_override_term_link` and
+		// `disable_override_term_link` functions must also be updated.
+		$loader->add_filter( 'term_link', $this, 'override_term_link', 10, 3 );
+
 		// Disallow creation of new terms directly (this is temporarily disabled by
 		// `associate_inventory_post_with_term`).
 		// NOTE: if this line is changed, the enable_disallow_insert_term_filter and
@@ -64,6 +77,12 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 
 		// Delete any invalid inventory items when post terms are set.
 		$loader->add_action( 'added_term_relationship', $this, 'reject_invalid_inventory_terms', 10, 3 );
+
+		// Allow public inventory item query vars.
+		$loader->add_filter( 'query_vars', $this, 'whitelist_search_query_vars' );
+
+		// Support inventory item querystrings in WP_Query.
+		$loader->add_action( 'parse_tax_query', $this, 'parse_query_vars' );
 
 		// Filter to stop users from editing or deleting inventory terms directly.
 		$loader->add_filter( 'user_has_cap', $this, 'filter_user_has_cap', 10, 4 );
@@ -106,6 +125,14 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 	 */
 	public function inventory_settings_callback() {
 		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/site/inventory-settings-display.php';
+	}
+
+	public function enable_override_term_link() {
+		add_filter( 'term_link', array( $this, 'override_term_link' ), 10, 3 );
+	}
+
+	public function disable_override_term_link() {
+		remove_filter( 'term_link', array( $this, 'override_term_link' ), 10, 3 );
 	}
 
 	public function enable_disallow_insert_term_filter() {
@@ -212,7 +239,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 	 * @param array $columns Columns to show by default.
 	 * @return array Columns with date column removed.
 	 */
-	public function manage_edit_columns( $columns ) {
+	public function remove_date_edit_column( $columns ) {
 		if ( array_key_exists( 'date', $columns ) ) {
 			// Remove date column.
 			unset( $columns['date'] );
@@ -228,7 +255,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 	 * @param array $columns Sortable columns.
 	 * @return array Columns with title column set as default sort.
 	 */
-	public function manage_edit_sortable_columns( $columns ) {
+	public function remove_date_sort_edit_control( $columns ) {
 		if ( array_key_exists( 'date', $columns ) ) {
 			// Remove date column.
 			unset( $columns['date'] );
@@ -385,7 +412,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 
 		wp_delete_term( $term->term_id, 'ssl_alp_inventory_item' );
 		clean_term_cache( array( $term->term_id ), 'ssl_alp_inventory_item' );
-    }
+	}
 
 	/**
 	 * Register the inventory taxonomy and add post type support.
@@ -418,11 +445,122 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 			'public'                => true,
             'show_in_menu'          => false, // Disable term edit page.
 			'show_in_rest'          => true,  // Needed for block editor support.
-            'show_admin_column'     => true,  // Show associated terms in admin edit screen.
+			'show_admin_column'     => true,  // Show associated terms in admin edit screen.
+			'rewrite'         => array(
+                'slug' => 'inventory-posts',
+            ),
 		);
 
 		// Create inventory taxonomy.
 		register_taxonomy( 'ssl_alp_inventory_item', $this->supported_post_types, $args );
+	}
+
+	/**
+	 * Add posts column to inventory post type post edit table.
+	 *
+	 * This is called twice: once for getting the columns, and once for getting the sortable
+	 * columns.
+	 *
+	 * @param array $columns Columns to show by default.
+	 * @return array Columns with new column.
+	 */
+	public function add_posts_column_to_edit_table( $columns ) {
+		if ( ! get_option( 'ssl_alp_enable_inventory' ) ) {
+			// Inventory disabled.
+			return $columns;
+		}
+
+		$columns['posts'] = __( 'Posts', 'ssl-alp' );
+		return $columns;
+	}
+
+	/**
+	 * Add post counts to inventory admin table rows.
+	 *
+	 * @param string $colname The column name.
+	 * @param int    $post_id The inventory post type post ID.
+	 */
+	public function add_posts_row_data( $colname, $post_id ) {
+		if ( ! get_option( 'ssl_alp_enable_inventory' ) ) {
+			// Inventory disabled.
+			return;
+		}
+
+		if ( 'posts' !== $colname ) {
+			return;
+		}
+
+		$term = $this->get_inventory_term( $post_id );
+
+		if ( is_null( $term ) ) {
+			return;
+		}
+
+		if ( $term->count > 0 ) {
+			printf(
+				'<a href="%1$s" title="%2$s" class="edit">%3$d</a>',
+				esc_url( 'edit.php?taxonomy=ssl_alp_inventory_item&amp;term=' . $this->get_inventory_term_slug( $post_id ) ),
+				esc_attr__( 'View posts for this inventory item', 'ssl-alp' ),
+				esc_html( number_format_i18n( $term->count ) )
+			);
+		} else {
+			echo number_format_i18n( 0 );
+		}
+	}
+
+	/**
+	 * Override term links to point towards the inventory post page instead of the term archive.
+	 *
+     * @param string $termlink Term link URL.
+     * @param object $term     Term object.
+     * @param string $taxonomy Taxonomy slug.
+	 *
+	 * @return string The overridden term link.
+	 */
+	public function override_term_link( $link, $term, $taxonomy ) {
+		if ( 'ssl_alp_inventory_item' !== $taxonomy ) {
+			return $link;
+		}
+
+		if ( ! get_option( 'ssl_alp_enable_inventory' ) ) {
+			// Inventory disabled.
+			return $link;
+		}
+
+		$inventory_post = $this->get_post_from_inventory_term( $term );
+
+		if ( is_null( $inventory_post ) ) {
+			return $link;
+		}
+
+		return get_permalink( $inventory_post );
+	}
+
+	/**
+	 * Get the term archive link without overriding it to the corresponding custom post type post.
+	 *
+	 * @param WP_Term $term The term.
+	 *
+	 * @return string|null The term archive URL, or null if term not found or invalid.
+	 */
+	public function get_inventory_term_archive_url( $term ) {
+		if ( is_null( $term ) ) {
+			return;
+		}
+
+		if ( 'ssl_alp_inventory_item' !== $term->taxonomy ) {
+			return;
+		}
+
+		// Temporarily disable filter that overrides term link.
+		$this->disable_override_term_link();
+
+		$url = get_term_link( $term, 'ssl_alp_inventory_item' );
+
+		// Re-enable filter.
+		$this->enable_override_term_link();
+
+		return $url;
 	}
 
 	/**
@@ -486,6 +624,129 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 			// This is not a valid inventory term - delete it.
 			wp_delete_term( $term->term_id, 'ssl_alp_inventory_item' );
 		}
+	}
+
+	/**
+	 * Whitelist inventory item query vars.
+	 *
+	 * This allows inventory items to be queried publicly.
+	 *
+	 * @param string[] $public_query_vars Array of public query vars.
+	 */
+	public function whitelist_search_query_vars( $public_query_vars ) {
+		global $ssl_alp;
+
+		if ( ! get_option( 'ssl_alp_enable_inventory' ) ) {
+			// Inventory disabled.
+			return $public_query_vars;
+		}
+
+		if ( ! $ssl_alp->search->current_user_can_advanced_search() ) {
+			// Advanced search disabled.
+			return $public_query_vars;
+		}
+
+		// Custom query vars to make public. These are sanitised and handled by
+		// `parse_query_vars`.
+		$custom_query_vars = array(
+			'ssl_alp_inventory_item__and',
+			'ssl_alp_inventory_item__in',
+			'ssl_alp_inventory_item__not_in',
+		);
+
+		// Merge new query vars into existing ones.
+		return wp_parse_args( $custom_query_vars, $public_query_vars );
+	}
+
+	/**
+	 * Sanitise inventory item querystrings and inject them as taxonomy filters into WP_Query.
+	 *
+	 * This detects values submitted through the custom search function and turns them into the
+	 * filters expected by WP_Query.
+	 *
+	 * @param WP_Query $query The query.
+	 */
+	public function parse_query_vars( $query ) {
+		global $ssl_alp;
+
+		if ( ! get_option( 'ssl_alp_enable_inventory' ) ) {
+			// Inventory disabled.
+			return;
+		}
+
+		if ( ! $ssl_alp->search->current_user_can_advanced_search() ) {
+			// Advanced search disabled.
+			return;
+		}
+
+		// Taxonomy query.
+		$tax_query = array();
+
+		// Sanitize submitted values.
+		$ssl_alp->core->sanitize_querystring( $query, 'ssl_alp_inventory_item__and' );
+		$ssl_alp->core->sanitize_querystring( $query, 'ssl_alp_inventory_item__in' );
+		$ssl_alp->core->sanitize_querystring( $query, 'ssl_alp_inventory_item__not_in' );
+
+		// Get inventory item query vars.
+		$inventory_item_and = $query->get( 'ssl_alp_inventory_item__and' );
+		$inventory_item_in  = $query->get( 'ssl_alp_inventory_item__in' );
+		$inventory_not_in   = $query->get( 'ssl_alp_inventory_item__not_in' );
+
+		if ( ! empty( $inventory_item_and ) && 1 === count( $inventory_item_and ) ) {
+			// There is only one AND term specified, so merge it into IN.
+			$inventory_item_in[] = absint( reset( $inventory_item_and ) );
+			$inventory_item_and  = array();
+
+			// Update querystring. This matches core behaviour for categories
+			// (but bizarrely not for tags: https://core.trac.wordpress.org/ticket/46459).
+			$query->set( 'ssl_alp_inventory_item__and', $inventory_item_and );
+			$query->set( 'ssl_alp_inventory_item__in', $inventory_item_in );
+		}
+
+		if ( ! empty( $inventory_item_and ) ) {
+			// Inventory item AND search criterion specified.
+			$tax_query[] = array(
+				// Note, this is different from how parse_tax_query handles
+				// e.g. tag__and because we have to inject the tax query after
+				// WP_Tax_Query has already been instantiated, which normally
+				// applies the relation as part of its instantiation.
+				'relation' => 'AND',
+				array(
+					'taxonomy'         => 'ssl_alp_inventory_item',
+					'terms'            => $inventory_item_and,
+					'field'            => 'term_id',
+					'operator'         => 'AND',
+					'include_children' => false,
+				),
+			);
+		}
+
+		if ( ! empty( $inventory_item_in ) ) {
+			// Coauthor IN search criterion specified.
+			$tax_query[] = array(
+				'taxonomy'         => 'ssl_alp_inventory_item',
+				'terms'            => $inventory_item_in,
+				'field'            => 'term_id',
+				'include_children' => false,
+			);
+		}
+
+		if ( ! empty( $inventory_not_in ) ) {
+			// Coauthor NOT IN search criterion specified.
+			$tax_query[] = array(
+				'taxonomy'         => 'ssl_alp_inventory_item',
+				'terms'            => $inventory_not_in,
+				'field'            => 'term_id',
+				'operator'         => 'NOT IN',
+				'include_children' => false,
+			);
+		}
+
+		// Sanitize new taxonomy filters.
+		$tax_query = $query->tax_query->sanitize_query( $tax_query );
+
+		// Merge new taxonomy filters into existing ones.
+		$query->tax_query->queries = wp_parse_args( $tax_query, $query->tax_query->queries );
 	}
 
 	/**
