@@ -1398,6 +1398,7 @@ class CoauthorsTest extends WP_UnitTestCase {
         );
 
         // Create junk terms.
+        $ssl_alp->coauthors->disable_disallow_insert_term_filter();
         $junk1 = wp_insert_term(
             'junk_term',
             'ssl_alp_coauthor',
@@ -1412,6 +1413,7 @@ class CoauthorsTest extends WP_UnitTestCase {
                 'slug' => 'ssl-alp-coauthor-nonexistent-user',
             )
         );
+        $ssl_alp->coauthors->enable_disallow_insert_term_filter();
 
         // Add junk terms to the submission.
         $set_terms   = $required_term_ids;
