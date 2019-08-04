@@ -1017,9 +1017,9 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		// Check term is valid.
-		$author_term = $this->get_user_from_coauthor_term( $term );
+		$coauthor = $this->get_user_from_coauthor_term( $term );
 
-		if ( ! $author_term ) {
+		if ( ! $coauthor ) {
 			// This is not a valid coauthor term - delete it.
 			wp_delete_term( $term->term_id, 'ssl_alp_coauthor' );
 		}
