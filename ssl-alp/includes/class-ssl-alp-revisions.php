@@ -787,22 +787,23 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * Load post revisions page screen options.
 	 */
 	public function load_post_revisions_page_screen_options() {
-		return $this->load_revisions_page_screen_options( 'post' );
+		return $this->load_revisions_page_screen_options( 'post', SSL_ALP_POST_REVISIONS_MENU_SLUG );
 	}
 
 	/**
 	 * Load page revisions page screen options.
 	 */
 	public function load_page_revisions_page_screen_options() {
-		return $this->load_revisions_page_screen_options( 'page' );
+		return $this->load_revisions_page_screen_options( 'page', SSL_ALP_PAGE_REVISIONS_MENU_SLUG );
 	}
 
 	/**
 	 * Load revisions page screen options.
 	 *
 	 * @param string $post_type Post type. Either 'post' or 'page'.
+	 * @param string $menu_slug Menu slug.
 	 */
-	private function load_revisions_page_screen_options( $post_type ) {
+	public function load_revisions_page_screen_options( $post_type, $menu_slug ) {
 		$arguments = array(
 			'label'   => __( 'Revisions Per Page', 'ssl-alp' ),
 			'default' => 20,
@@ -815,7 +816,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		 * Instantiate the revisions list table. Creating the instance here allow the core
 		 * WP_List_Table class to automatically load the table columns in the screen options panel.
 		 */
-		$this->revisions_list_table = new SSL_ALP_Revisions_List_Table( $post_type );
+		$this->revisions_list_table = new SSL_ALP_Revisions_List_Table( $post_type, $menu_slug );
 	}
 
 	/**

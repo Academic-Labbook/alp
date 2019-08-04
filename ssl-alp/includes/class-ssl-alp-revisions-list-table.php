@@ -19,18 +19,25 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
  */
 class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 	/**
-	 * Revisions post type. Sets whether posts or pages are displayed.
+	 * Revisions post type. Determines the post type revisions shown.
 	 *
 	 * @var string
 	 */
 	protected $post_type;
 
 	/**
+	 * Menu slug. Used for links.
+	 *
+	 * @var string
+	 */
+	protected $menu_slug;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param string $post_type Post type to show revisions for.
 	 */
-	public function __construct( $post_type = 'post' ) {
+	public function __construct( $post_type, $menu_slug ) {
 		parent::__construct(
 			array(
 				'singular' => __( 'Revision', 'ssl-alp' ),
@@ -39,11 +46,13 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 			)
 		);
 
-		if ( ! in_array( $post_type, array( 'post', 'page' ), true ) ) {
-			$post_type = 'post';
+		if ( ! post_type_supports( $post_type, 'revisions' ) ) {
+			// Post type not supported.
+			return;
 		}
 
 		$this->post_type = $post_type;
+		$this->menu_slug = $menu_slug;
 	}
 
 	/**
@@ -125,13 +134,12 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 	 * Get URL query arguments depending on post type.
 	 */
 	private function get_page_args() {
-		$args = array();
+		$args = array(
+			'page' => $this->menu_slug,
+		);
 
-		if ( 'post' === $this->post_type ) {
-			$args['page'] = SSL_ALP_POST_REVISIONS_MENU_SLUG;
-		} elseif ( 'page' === $this->post_type ) {
-			$args['page']      = SSL_ALP_PAGE_REVISIONS_MENU_SLUG;
-			$args['post_type'] = 'page';
+		if ( 'post' !== $this->post_type ) {
+			$args['post_type'] = $this->post_type;
 		}
 
 		return $args;

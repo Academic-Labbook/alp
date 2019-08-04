@@ -273,6 +273,7 @@ class SSL_ALP_Uninstaller {
 		// Screen column settings.
 		self::delete_user_meta( 'manageposts_page_ssl-alp-admin-revisionscolumnshidden' );
 		self::delete_user_meta( 'manageusers_page_ssl-alp-admin-applicationscolumnshidden' );
+		self::delete_user_meta( 'managessl_alp_inventory_page_ssl-alp-admin-inventory-revisionscolumnshidden' );
 	}
 
 	/**

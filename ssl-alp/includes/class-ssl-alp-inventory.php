@@ -49,6 +49,9 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
         $loader->add_action( 'save_post', $this, 'associate_inventory_post_with_term', 10, 2 );
 		$loader->add_action( 'deleted_post', $this, 'delete_associated_inventory_post_term' );
 
+		// Add admin revisions tables.
+		$loader->add_action( 'admin_menu', $this, 'add_revisions_page' );
+
         /**
          * Inventory taxonomy.
          */
@@ -412,6 +415,40 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 
 		wp_delete_term( $term->term_id, 'ssl_alp_inventory_item' );
 		clean_term_cache( array( $term->term_id ), 'ssl_alp_inventory_item' );
+	}
+
+	/**
+	 * Add revisions pages to admin menu.
+	 *
+	 * @global $ssl_alp
+	 */
+	public function add_revisions_page() {
+		global $ssl_alp;
+
+		$hook_suffix = add_submenu_page(
+			'edit.php?post_type=ssl_alp_inventory',
+			__( 'Revisions', 'ssl-alp' ),
+			__( 'Revisions', 'ssl-alp' ),
+			'read',
+			SSL_ALP_INVENTORY_REVISIONS_MENU_SLUG,
+			array( $ssl_alp->revisions, 'output_admin_revisions_page' )
+		);
+
+		if ( $hook_suffix ) {
+			// Add callback for loading the page.
+			add_action( "load-{$hook_suffix}", array( $this, 'load_revisions_page_screen_options' ) );
+		}
+	}
+
+	/**
+	 * Load revisions page screen options.
+	 *
+	 * @global $ssl_alp
+	 */
+	public function load_revisions_page_screen_options() {
+		global $ssl_alp;
+
+		return $ssl_alp->revisions->load_revisions_page_screen_options( 'ssl_alp_inventory', SSL_ALP_INVENTORY_REVISIONS_MENU_SLUG );
 	}
 
 	/**
