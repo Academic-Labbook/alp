@@ -156,20 +156,34 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 
         // Register new post type to represent inventory items.
         $args = array(
-            'labels'       => $labels,
-            'description'  => __( 'Inventory items.', 'ssl-alp' ),
-            'public'       => true,
-            'hierarchical' => false,
-			'show_in_rest' => true,
-			'menu_icon'    => 'dashicons-tag',
-            'supports'     => array(
+            'labels'          => $labels,
+            'description'     => __( 'Inventory items.', 'ssl-alp' ),
+            'public'          => true,
+            'hierarchical'    => false,
+			'show_in_rest'    => true,
+			'template'        => array(
+				array(
+					'core/heading',
+					array(
+						'content'     => 'Location',
+					)
+				),
+				array(
+					'core/paragraph',
+					array(
+						'placeholder' => 'Location...',
+					)
+				),
+			),
+			'menu_icon'       => 'dashicons-tag',
+            'supports'        => array(
                 'title',
                 'editor',
                 'revisions',
                 'page-attributes',
                 'thumbnail',
             ),
-            'rewrite'      => array(
+            'rewrite'         => array(
                 'slug' => 'inventory',
             ),
         );
