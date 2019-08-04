@@ -262,6 +262,16 @@ class SSL_ALP_References extends SSL_ALP_Module {
 				continue;
 			}
 
+			if ( ! post_type_exists( $referenced_post->post_type ) ) {
+				// The referenced post is some type that doesn't exist any more.
+				continue;
+			}
+
+			// Check user permission to view.
+			if ( ! current_user_can( 'read', $referenced_post ) ) {
+				continue;
+			}
+
 			$posts[] = $referenced_post;
 		}
 
@@ -327,6 +337,16 @@ class SSL_ALP_References extends SSL_ALP_Module {
 
 				if ( 'publish' !== $referenced_post->post_status ) {
 					// Ignore unpublished posts.
+					continue;
+				}
+
+				if ( ! post_type_exists( $referenced_post->post_type ) ) {
+					// The referenced post is some type that doesn't exist any more.
+					continue;
+				}
+
+				// Check user permission to view.
+				if ( ! current_user_can( 'read', $referenced_post ) ) {
 					continue;
 				}
 
