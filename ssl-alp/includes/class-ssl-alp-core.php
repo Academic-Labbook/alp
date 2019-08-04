@@ -169,6 +169,22 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 	}
 
 	/**
+	 * Sanitize term querystring, returning an array of integers.
+	 *
+	 * Used for e.g. coauthor__in, coauthor__not_in, ssl_alp_inventory_item__and, etc.
+	 *
+	 * @param WP_Query $query     Query object.
+	 * @param string   $query_var Query var whose contents to sanitize.
+	 */
+	public function sanitize_querystring( $query, $query_var ) {
+		$querystring = $query->get( $query_var, array() );
+		$querystring = array_map( 'absint', array_unique( (array) $querystring ) );
+
+		// Update querystring.
+		$query->set( $query_var, $querystring );
+	}
+
+	/**
 	 * Filters supplied media type string into an array.
 	 *
 	 * @param string|array $media_types Media types to filter.
