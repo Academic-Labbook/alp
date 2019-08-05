@@ -93,6 +93,9 @@ class SSL_ALP_Revisions_Widget extends WP_Widget {
 		$instance['title']  = ! empty( $new_instance['title'] ) ? wp_strip_all_tags( $new_instance['title'] ) : '';
 		$instance['number'] = absint( $new_instance['number'] );
 
+		// Invalidate cached recent revisions.
+		delete_transient( 'ssl-alp-recent-revisions' );
+
 		return $instance;
 	}
 
