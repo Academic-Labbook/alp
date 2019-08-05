@@ -239,6 +239,29 @@ class CrossReferencesTest extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_references_from_invalid_post_types() {
+		global $ssl_alp;
+
+		$invalid_post = $this->factory->post->create_and_get(
+			array(
+				'post_content'	=>	sprintf(
+					'Cross reference to <a href="%s">post 1</a>.',
+					get_permalink( $this->post_1 )
+				),
+				'post_type'     => 'invalid',
+			)
+		);
+
+		// Rebuild references.
+		$ssl_alp->references->rebuild_references();
+
+		// Post 1 references don't include the new post.
+		$this->assertEquals(
+			$ssl_alp->references->get_reference_from_posts( $this->post_1 ),
+			array( $this->post_2, $this->post_3, $this->page_2 )
+		);
+	}
+
 	function test_multi_reference() {
 		global $ssl_alp;
 
