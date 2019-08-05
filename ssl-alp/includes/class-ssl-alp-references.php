@@ -226,8 +226,12 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	 *
 	 * @param int|WP_Post|null $post Post ID or post object. Defaults to global $post.
 	 * @return array|null Referenced posts, or null if invalid post specified.
+	 *
+	 * @global $ssl_alp
 	 */
 	public function get_reference_to_posts( $post = null ) {
+		global $ssl_alp;
+
 		$post = get_post( $post );
 
 		if ( is_null( $post ) ) {
@@ -269,7 +273,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 			}
 
 			// Check user permission to view.
-			if ( ! current_user_can( 'read', $referenced_post ) ) {
+			if ( ! $ssl_alp->core->current_user_can_read_post( $referenced_post ) ) {
 				continue;
 			}
 
@@ -285,9 +289,10 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	 * @param int|WP_Post|null $post Post ID or post object. Defaults to global $post.
 	 * @return array|null Referencing posts, or null if invalid post specified.
 	 * @global $wpdb
+	 * @global $ssl_alp;
 	 */
 	public function get_reference_from_posts( $post = null ) {
-		global $wpdb;
+		global $wpdb, $ssl_alp;
 
 		$post = get_post( $post );
 
@@ -347,7 +352,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 				}
 
 				// Check user permission to view.
-				if ( ! current_user_can( 'read', $referenced_post ) ) {
+				if ( ! $ssl_alp->core->current_user_can_read_post( $referenced_post ) ) {
 					continue;
 				}
 
