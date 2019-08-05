@@ -42,7 +42,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
         // Remove date column from admin post list.
 		$loader->add_filter( 'manage_edit-ssl_alp_inventory_columns', $this, 'remove_date_edit_column' );
 
-		// Set default inventory post list sort order to alphabetical by title.
+		// Make the post title the default sort order.
 		$loader->add_action( 'pre_get_posts', $this, 'sort_posts_by_title' );
 
         // Create/delete corresponding inventory item terms whenever posts are created/deleted.
@@ -251,7 +251,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Set default inventory post list sort order to alphabetical by title.
+	 * Sort inventory post list in admin panel by title by default.
 	 *
 	 * @param WP_Query $query The query.
 	 */
@@ -261,7 +261,13 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 			return;
 		}
 
-		if ( ! isset( $_GET['orderby'] ) ) {
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		$screen = get_current_screen();
+
+		if ( 'edit' === $screen->base && 'ssl_alp_inventory' === $screen->post_type && ! isset( $_GET['orderby'] ) ) {
 			$query->set( 'orderby', 'title' );
 			$query->set( 'order', 'ASC' );
 		}
