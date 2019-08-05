@@ -76,9 +76,9 @@ class CoauthorsSearchTest extends WP_UnitTestCase {
 
     protected function get_search_results( $search_string, $extra_args ) {
         $query_data = array(
-            's'              => $search_string,
-            'post_type'      => 'post',
-            'posts_per_page' => -1, // Required to get all results.
+            's'         => $search_string,
+            'post_type' => 'post',
+            'nopaging'  => true, // Required to get all results.
         );
 
         $query_data = wp_parse_args( $extra_args, $query_data );

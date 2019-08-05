@@ -209,9 +209,9 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		foreach ( array_keys( $this->supported_reference_post_types ) as $post_type ) {
 			$posts = get_posts(
 				array(
-					'post_type'      => $post_type,
-					'post_status'    => 'published',
-					'posts_per_page' => -1, // Needed to get all.
+					'post_type'   => $post_type,
+					'post_status' => 'published',
+					'nopaging'    => true,
 				)
 			);
 
