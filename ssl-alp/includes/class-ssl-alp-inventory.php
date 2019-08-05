@@ -40,10 +40,10 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
         $loader->add_action( 'months_dropdown_results', $this, 'disable_months_dropdown_results', 10, 2 );
 
         // Remove date column from admin post list.
-        $loader->add_filter( 'manage_edit-ssl_alp_inventory_columns', $this, 'remove_date_edit_column' );
+		$loader->add_filter( 'manage_edit-ssl_alp_inventory_columns', $this, 'remove_date_edit_column' );
 
-        // Sort inventory posts alphabetically by default.
-        $loader->add_filter( 'manage_edit-ssl_alp_inventory_sortable_columns', $this, 'remove_date_sort_edit_control' );
+		// Set default inventory post list sort order to alphabetical by title.
+		$loader->add_action( 'pre_get_posts', $this, 'sort_posts_by_title' );
 
         // Create/delete corresponding inventory item terms whenever posts are created/deleted.
         $loader->add_action( 'save_post', $this, 'associate_inventory_post_with_term', 10, 2 );
@@ -61,7 +61,6 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 
 		// Add posts column to admin post list and make it sortable.
 		$loader->add_filter( 'manage_edit-ssl_alp_inventory_columns', $this, 'add_posts_column_to_edit_table' );
-		$loader->add_filter( 'manage_edit-ssl_alp_inventory_sortable_columns', $this, 'add_posts_column_to_edit_table' );
 
 		// Add posts to rows of the admin post list.
 		$loader->add_action( 'manage_ssl_alp_inventory_posts_custom_column', $this, 'add_posts_row_data', 10, 2 );
@@ -252,23 +251,21 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Remove date column and sort columns alphabetically by name on list of
-     * inventory posts in admin panel.
+	 * Set default inventory post list sort order to alphabetical by title.
 	 *
-	 * @param array $columns Sortable columns.
-	 * @return array Columns with title column set as default sort.
+	 * @param WP_Query $query The query.
 	 */
-	public function remove_date_sort_edit_control( $columns ) {
-		if ( array_key_exists( 'date', $columns ) ) {
-			// Remove date column.
-			unset( $columns['date'] );
+	public function sort_posts_by_title( $query ) {
+		if ( ! get_option( 'ssl_alp_enable_inventory' ) ) {
+			// Inventory disabled.
+			return;
 		}
 
-		// Make title the default sort.
-		$columns['title'] = array( $columns['title'], true );
-
-		return $columns;
-    }
+		if ( ! isset( $_GET['orderby'] ) ) {
+			$query->set( 'orderby', 'title' );
+			$query->set( 'order', 'ASC' );
+		}
+	}
 
 	/**
 	 * Add or update inventory item taxonomy term using the specified inventory
