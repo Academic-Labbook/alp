@@ -28,9 +28,6 @@ class SSL_ALP_Pages extends SSL_ALP_Module {
 
 		// Remove date column from admin page list.
 		$loader->add_filter( 'manage_edit-page_columns', $this, 'manage_edit_columns' );
-
-		// Sort pages alphabetically by default.
-		$loader->add_filter( 'manage_edit-page_sortable_columns', $this, 'manage_edit_sortable_columns' );
 	}
 
 	/**
@@ -69,24 +66,6 @@ class SSL_ALP_Pages extends SSL_ALP_Module {
 			// Remove date column.
 			unset( $columns['date'] );
 		}
-
-		return $columns;
-	}
-
-	/**
-	 * Remove date column and sort columns alphabetically by name on list of pages in admin panel.
-	 *
-	 * @param array $columns Sortable columns.
-	 * @return array Columns with title column set as default sort.
-	 */
-	public function manage_edit_sortable_columns( $columns ) {
-		if ( array_key_exists( 'date', $columns ) ) {
-			// Remove date column.
-			unset( $columns['date'] );
-		}
-
-		// Make title the default sort.
-		$columns['title'] = array( $columns['title'], true );
 
 		return $columns;
 	}
