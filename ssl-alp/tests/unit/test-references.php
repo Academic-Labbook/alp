@@ -4,8 +4,54 @@
  * Cross-references tests
  */
 class CrossReferencesTest extends WP_UnitTestCase {
+    protected $admin;
+    protected $editor;
+    protected $author;
+    protected $contributor;
+	protected $subscriber;
+
+	protected $user_ids;
+
 	public function setUp() {
 		parent::setUp();
+
+        $this->admin = $this->factory->user->create_and_get(
+            array(
+                'role'  =>  'administrator'
+            )
+        );
+
+        $this->editor = $this->factory->user->create_and_get(
+            array(
+                'role'  =>  'editor'
+            )
+        );
+
+        $this->author = $this->factory->user->create_and_get(
+            array(
+                'role'  =>  'author'
+            )
+        );
+
+        $this->contributor = $this->factory->user->create_and_get(
+            array(
+                'role'  =>  'contributor'
+            )
+        );
+
+        $this->subscriber = $this->factory->user->create_and_get(
+            array(
+                'role'  =>  'subscriber'
+            )
+		);
+
+		$this->users = array(
+			$this->admin,
+			$this->editor,
+			$this->author,
+			$this->contributor,
+			$this->subscriber,
+		);
 
 		$this->post_1 = $this->factory->post->create_and_get(
 			array(
@@ -97,72 +143,84 @@ class CrossReferencesTest extends WP_UnitTestCase {
 		// rebuild references
 		$ssl_alp->references->rebuild_references();
 
-		// post 1 references nothing
-		$this->assertEquals(
-			$ssl_alp->references->get_reference_to_posts( $this->post_1 ),
-			array()
-		);
+		foreach ( $this->users as $user ) {
+			wp_set_current_user( $user->ID );
 
-		// post 2 references post 1
-		$this->assertEquals(
-			$ssl_alp->references->get_reference_to_posts( $this->post_2 ),
-			array( $this->post_1 )
-		);
+			// post 1 references nothing
+			$this->assertEquals(
+				$ssl_alp->references->get_reference_to_posts( $this->post_1 ),
+				array()
+			);
 
-		// post 3 references posts 1 and 2
-		$this->assertEqualSets(
-			$ssl_alp->references->get_reference_to_posts( $this->post_3 ),
-			array( $this->post_1, $this->post_2 )
-		);
+			// post 2 references post 1
+			$this->assertEquals(
+				$ssl_alp->references->get_reference_to_posts( $this->post_2 ),
+				array( $this->post_1 )
+			);
 
-		// page 1 references nothing
-		$this->assertEquals(
-			$ssl_alp->references->get_reference_to_posts( $this->page_1 ),
-			array()
-		);
+			// post 3 references posts 1 and 2
+			$this->assertEqualSets(
+				$ssl_alp->references->get_reference_to_posts( $this->post_3 ),
+				array( $this->post_1, $this->post_2 )
+			);
 
-		// page 2 references post 1
-		$this->assertEquals(
-			$ssl_alp->references->get_reference_to_posts( $this->page_2 ),
-			array( $this->post_1 )
-		);
+			// page 1 references nothing
+			$this->assertEquals(
+				$ssl_alp->references->get_reference_to_posts( $this->page_1 ),
+				array()
+			);
+
+			// page 2 references post 1
+			$this->assertEquals(
+				$ssl_alp->references->get_reference_to_posts( $this->page_2 ),
+				array( $this->post_1 )
+			);
+		}
+
+		wp_set_current_user( 0 );
 	}
 
 	function test_references_from() {
 		global $ssl_alp;
 
-		// rebuild references
+		// Rebuild references.
 		$ssl_alp->references->rebuild_references();
 
-		// post 1 referenced by posts 2 and 3 and page 2
-		$this->assertEqualSets(
-			$ssl_alp->references->get_reference_from_posts( $this->post_1 ),
-			array( $this->post_2, $this->post_3, $this->page_2 )
-		);
+		foreach ( $this->users as $user ) {
+			wp_set_current_user( $user->ID );
 
-		// post 2 referenced by post 3
-		$this->assertEquals(
-			$ssl_alp->references->get_reference_from_posts( $this->post_2 ),
-			array( $this->post_3 )
-		);
+			// post 1 referenced by posts 2 and 3 and page 2
+			$this->assertEqualSets(
+				$ssl_alp->references->get_reference_from_posts( $this->post_1 ),
+				array( $this->post_2, $this->post_3, $this->page_2 )
+			);
 
-		// post 3 referenced by nothing
-		$this->assertEquals(
-			$ssl_alp->references->get_reference_from_posts( $this->post_3 ),
-			array()
-		);
+			// post 2 referenced by post 3
+			$this->assertEquals(
+				$ssl_alp->references->get_reference_from_posts( $this->post_2 ),
+				array( $this->post_3 )
+			);
 
-		// page 1 referenced by nothing
-		$this->assertEquals(
-			$ssl_alp->references->get_reference_from_posts( $this->page_1 ),
-			array()
-		);
+			// post 3 referenced by nothing
+			$this->assertEquals(
+				$ssl_alp->references->get_reference_from_posts( $this->post_3 ),
+				array()
+			);
 
-		// page 2 referenced by nothing
-		$this->assertEquals(
-			$ssl_alp->references->get_reference_from_posts( $this->page_2 ),
-			array()
-		);
+			// page 1 referenced by nothing
+			$this->assertEquals(
+				$ssl_alp->references->get_reference_from_posts( $this->page_1 ),
+				array()
+			);
+
+			// page 2 referenced by nothing
+			$this->assertEquals(
+				$ssl_alp->references->get_reference_from_posts( $this->page_2 ),
+				array()
+			);
+		}
+
+		wp_set_current_user( 0 );
 	}
 
 	function test_invalid_references() {
@@ -272,6 +330,8 @@ class CrossReferencesTest extends WP_UnitTestCase {
 			$ssl_alp->references->get_reference_to_posts( $post ),
 			array( $this->post_1 )
 		);
+
+		wp_set_current_user( 0 );
 	}
 
 	function test_self_reference() {
@@ -306,6 +366,8 @@ class CrossReferencesTest extends WP_UnitTestCase {
 			$ssl_alp->references->get_reference_to_posts( $post ),
 			array( $this->post_1 )
 		);
+
+		wp_set_current_user( 0 );
 	}
 
 	function test_draft_reference() {
@@ -345,5 +407,7 @@ class CrossReferencesTest extends WP_UnitTestCase {
 			$ssl_alp->references->get_reference_from_posts( $published ),
 			array()
 		);
+
+		wp_set_current_user( 0 );
 	}
 }
