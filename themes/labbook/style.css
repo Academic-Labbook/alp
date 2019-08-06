@@ -1311,8 +1311,10 @@ a:hover, a:active {
     clear: left; /* disable clear: right to allow table of contents to float to right */
 }
 
-/* category and tag links */
-.entry-footer .cat-links a, .entry-footer .tag-links a {
+/* post term links */
+.entry-footer .cat-links a,
+.entry-footer .tag-links a,
+.entry-footer .inventory-item-links a {
 	background-color: #F5DF44;
     border-radius: 4px;
     padding: 2px;
