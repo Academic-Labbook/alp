@@ -572,6 +572,8 @@ table {
     margin: 0 0 1.5em;
     border-collapse: collapse;
     width: 100%;
+    display: block;
+    overflow: auto;
 }
 
 td,
