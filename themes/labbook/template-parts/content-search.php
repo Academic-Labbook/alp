@@ -10,12 +10,14 @@
 ?>
 
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
-	<header class="entry-header">
-		<?php labbook_the_post_title(); ?>
-		<div class="entry-meta">
-			<?php labbook_the_post_meta(); ?>
-		</div><!-- .entry-meta -->
-	</header><!-- .entry-header -->
+	<div class="entry-header-container">
+		<header class="entry-header">
+			<?php labbook_the_post_title(); ?>
+			<div class="entry-meta">
+				<?php labbook_the_post_meta(); ?>
+			</div><!-- .entry-meta -->
+		</header><!-- .entry-header -->
+	</div>
 
 	<?php if ( 'status' !== get_post_format() ) : // Status update theme type; don't show content. ?>
 	<div class="entry-summary">
