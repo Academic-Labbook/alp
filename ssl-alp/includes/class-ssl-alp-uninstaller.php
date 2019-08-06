@@ -113,6 +113,7 @@ class SSL_ALP_Uninstaller {
 		self::delete_taxonomies();
 		self::delete_post_metas();
 		self::delete_user_metas();
+		self::delete_custom_post_types();
 	}
 
 	/**
@@ -123,6 +124,7 @@ class SSL_ALP_Uninstaller {
 		delete_option( 'ssl_alp_require_login' );
 		delete_option( 'ssl_alp_enable_applications' );
 		delete_option( 'ssl_alp_disallow_public_advanced_search' );
+		delete_option( 'ssl_alp_enable_inventory' );
 		delete_option( 'ssl_alp_allow_multiple_authors' );
 		delete_option( 'ssl_alp_disable_post_trackbacks' );
 		delete_option( 'ssl_alp_enable_crossreferences' );
@@ -146,6 +148,7 @@ class SSL_ALP_Uninstaller {
 		self::delete_taxonomy( 'ssl_alp_coauthor' );
 		self::delete_taxonomy( 'ssl_alp_crossreference' );
 		self::delete_taxonomy( 'ssl_alp_read_flag' );
+		self::delete_taxonomy( 'ssl_alp_inventory_item' );
 	}
 
 	/**
@@ -270,6 +273,7 @@ class SSL_ALP_Uninstaller {
 		// Screen column settings.
 		self::delete_user_meta( 'manageposts_page_ssl-alp-admin-revisionscolumnshidden' );
 		self::delete_user_meta( 'manageusers_page_ssl-alp-admin-applicationscolumnshidden' );
+		self::delete_user_meta( 'managessl_alp_inventory_page_ssl-alp-admin-inventory-revisionscolumnshidden' );
 	}
 
 	/**
@@ -291,5 +295,79 @@ class SSL_ALP_Uninstaller {
 				'%s',
 			)
 		);
+	}
+
+	/**
+	 * Delete custom post types.
+	 */
+	private static function delete_custom_post_types() {
+		// Change inventory posts to pages.
+		self::delete_custom_post_type_posts( 'ssl_alp_inventory', 'page' );
+	}
+
+	/**
+	 * Delete or reassign custom post type posts and their revisions.
+	 *
+	 * @param string $post_type     The post type to remove.
+	 * @param string $new_post_type The replacement post type. If specified, the post type is
+	 *                              changed to this, and revisions are left untouched. If null, the
+	 *                              posts are deleted.
+	 *
+	 * @global $wpdb
+	 */
+	private static function delete_custom_post_type_posts( $post_type, $new_post_type = null ) {
+		if ( is_null( $new_post_type ) ) {
+			$post_ids = $wpdb->get_col(
+				$wpdb->prepare(
+					"
+					SELECT post_id
+					FROM $wpdb->posts
+					WHERE post_type = %s
+					"
+				),
+				$post_type
+			);
+
+			foreach ( $post_ids as $post_id ) {
+				// Delete children.
+				$wpdb->delete(
+					$wpdb->posts,
+					array(
+						'post_parent' => $post_id
+					),
+					array(
+						'%d'
+					)
+				);
+
+				// Delete post.
+				$wpdb->delete(
+					$wpdb->posts,
+					array(
+						'ID' => $post_id
+					),
+					array(
+						'%d'
+					)
+				);
+			}
+		} else {
+			// Reassign to new post type.
+			$wpdb->update(
+				$wpdb->posts,
+				array(
+					'post_type' => $new_post_type,
+				),
+				array(
+					'post_type' => $post_type,
+				),
+				array(
+					'%s',
+				),
+				array(
+					'%s',
+				)
+			);
+		}
 	}
 }

@@ -209,7 +209,8 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		}
 
 		// Check if user has permission to edit the post, if we are to check this.
-		if ( $check_edit_permission && ! current_user_can( "edit_{$post->post_type}", $post->ID ) ) {
+		$post_type = get_post_type_object( $post->post_type );
+		if ( $check_edit_permission && ! current_user_can( "edit_{$post_type->capability_type}", $post->ID ) ) {
 			// No permission.
 			return false;
 		}
@@ -786,22 +787,23 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * Load post revisions page screen options.
 	 */
 	public function load_post_revisions_page_screen_options() {
-		return $this->load_revisions_page_screen_options( 'post' );
+		return $this->load_revisions_page_screen_options( 'post', SSL_ALP_POST_REVISIONS_MENU_SLUG );
 	}
 
 	/**
 	 * Load page revisions page screen options.
 	 */
 	public function load_page_revisions_page_screen_options() {
-		return $this->load_revisions_page_screen_options( 'page' );
+		return $this->load_revisions_page_screen_options( 'page', SSL_ALP_PAGE_REVISIONS_MENU_SLUG );
 	}
 
 	/**
 	 * Load revisions page screen options.
 	 *
 	 * @param string $post_type Post type. Either 'post' or 'page'.
+	 * @param string $menu_slug Menu slug.
 	 */
-	private function load_revisions_page_screen_options( $post_type ) {
+	public function load_revisions_page_screen_options( $post_type, $menu_slug ) {
 		$arguments = array(
 			'label'   => __( 'Revisions Per Page', 'ssl-alp' ),
 			'default' => 20,
@@ -814,7 +816,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		 * Instantiate the revisions list table. Creating the instance here allow the core
 		 * WP_List_Table class to automatically load the table columns in the screen options panel.
 		 */
-		$this->revisions_list_table = new SSL_ALP_Revisions_List_Table( $post_type );
+		$this->revisions_list_table = new SSL_ALP_Revisions_List_Table( $post_type, $menu_slug );
 	}
 
 	/**
@@ -873,52 +875,114 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		global $wpdb;
 
 		$number = absint( $number );
-		$order  = esc_sql( ( 'ASC' === strtoupper( $order ) ) ? 'ASC' : 'DESC' );
-
-		// Get post types that support edit summaries, and filter for SQL.
-		$supported_post_types   = get_post_types_by_support( 'revisions' );
-		$supported_post_types   = array_map( 'esc_sql', $supported_post_types );
-		$supported_types_clause = "'" . implode( "', '", $supported_post_types ) . "'";
 
 		// Reference posts cache key.
-		$cache_key = 'ssl-alp-revisions-' . $number . '-' . $order;
+		$posts = get_transient( 'ssl-alp-recent-revisions' );
 
-		$object_ids = wp_cache_get( $cache_key );
-
-		if ( false === $object_ids ) {
+		if ( false === $posts ) {
 			/**
-			 * Get last $number revisions (don't need parents) grouped by author and parent id, ordered
-			 * by date descending, where number is > 1 if the revision was made by the original author
-			 * (this prevents the original published post showing up as a revision), or > 0 if the
-			 * revision was made by someone else. Ignore autosaves.
-			 *
-			 * Note: `post_date` is the most recent revision found in each group.
+			 * Generate post list.
 			 */
-			$object_ids = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT posts.post_author, posts.post_parent, MAX(posts.post_date) AS post_date,
-						COUNT(1) AS number, parent_posts.post_author AS parent_author
-					FROM {$wpdb->posts} AS posts
-					INNER JOIN {$wpdb->posts} AS parent_posts ON posts.post_parent = parent_posts.ID
-					WHERE
-						posts.post_type = 'revision'
-						AND LOCATE(CONCAT(posts.post_parent, '-autosave'), posts.post_name) = 0
-						AND posts.post_status = 'inherit'
-						AND posts.post_date > parent_posts.post_date
-						AND parent_posts.post_status = 'publish'
-						AND parent_posts.post_type IN ({$supported_types_clause})
-					GROUP BY posts.post_author, posts.post_parent
-					HAVING (number > 1) OR (posts.post_author <> parent_posts.post_author)
-					ORDER BY post_date {$order}
-					LIMIT %d",
-					$number
-				)
-			);
 
-			wp_cache_set( $cache_key, $object_ids );
+			$supported_post_types = get_post_types_by_support( 'revisions' );
+
+			$maxiter = 10 * $number;
+			$iter = 0;
+			$offset = 0;
+			$posts = array();
+			$last_post = null;
+			// Array of user IDs and the post IDs they've edited contained in the $posts array.
+			$user_post_revisions = array();
+
+			while ( count( $posts ) < $number ) {
+				if ( ++$iter > $maxiter ) {
+					// Maximum iterations reached without finding $number posts. Proceed with what
+					// we have.
+					break;
+				}
+
+				$post = get_posts(
+					array(
+						'post_type'      => 'revision',
+						'post_status'    => 'inherit',
+						'orderby'        => 'date',
+						'order'          => $order,
+						'posts_per_page' => 1,
+						'offset'         => $offset,
+					)
+				);
+
+				if ( empty( $post ) ) {
+					// Stop searching.
+					break;
+				}
+
+				$offset++;
+				$post = $post[0];
+				$parent = get_post( $post->post_parent );
+
+				if ( is_null( $parent ) ) {
+					// Invalid parent.
+					continue;
+				}
+
+				if ( ! in_array( $parent->post_type, $supported_post_types, true ) ) {
+					// Unsupported post type.
+					continue;
+				}
+
+				if ( $post->post_date <= $parent->post_date ) {
+					// Draft.
+					continue;
+				}
+
+				if ( wp_is_post_autosave( $post ) ) {
+					// Autosave.
+					continue;
+				}
+
+				if ( 'publish' !== $parent->post_status ) {
+					// Unpublished.
+					continue;
+				}
+
+				if ( $this->revision_was_autogenerated_on_publication( $post ) ) {
+					// Autogenerated.
+					continue;
+				}
+
+				if ( ! is_null( $last_post ) ) {
+					if ( $post->post_parent === $last_post->post_parent && $post->post_author === $last_post->post_author ) {
+						// This is a further edit to the same post by the same author.
+						continue;
+					}
+				}
+
+				if ( ! $this->have_post_content_lines_changed( $post ) ) {
+					// Insufficient changes.
+					continue;
+				}
+
+				if ( array_key_exists( $post->post_author, $user_post_revisions ) ) {
+					if ( in_array( $parent->ID, $user_post_revisions[ $post->post_author ] ) ) {
+						// User has already edited this post more recently.
+						continue;
+					}
+				}
+
+				$posts[] = $post;
+				$last_post = $post;
+
+				if ( ! array_key_exists( $post->post_author, $user_post_revisions ) ) {
+					$user_post_revisions[ $post->post_author ] = array();
+				}
+				$user_post_revisions[ $post->post_author ][] = $parent->ID;
+			}
+
+			set_transient( 'ssl-alp-recent-revisions', $posts, SSL_ALP_RECENT_REVISIONS_CACHE_TIMEOUT );
 		}
 
-		return $object_ids;
+		return $posts;
 	}
 
 	/**
@@ -1547,19 +1611,16 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 				require ABSPATH . WPINC . '/wp-diff.php';
 			}
 
-			// Compute text difference between old and new posts.
-			$diff = $this->get_post_text_differences( $post_after, $post_before );
-
-			// Post content is deemed changed if there are new or deleted lines.
-			$changed = $diff['added'] > 1 || $diff['removed'] > 1;
-
-			if ( ! $changed ) {
+			if ( ! $this->have_post_content_lines_changed( $post_after, $post_before ) ) {
 				return;
 			}
 		}
 
 		// Set post as unread for all users except current user.
 		$this->set_users_post_read_status( false, $post_after, wp_get_current_user() );
+
+		// Invalidate cached recent revisions.
+		delete_transient( 'ssl-alp-recent-revisions' );
 	}
 
 	/**
@@ -1567,7 +1628,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 *
 	 * @param WP_Post      $new_revision New revision.
 	 * @param WP_Post|null $old_revision Previous revision. If not specified, the revision
-	 *                                   immediately prior to $post_after is used.
+	 *                                   immediately prior to $new_revision is used.
 	 * @return array|null Array containing lines added and removed, or null if difference can't be
 	 *                    determined.
 	 */
@@ -1614,6 +1675,22 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			'added'   => $diff->countAddedLines(),
 			'removed' => $diff->countDeletedLines(),
 		);
+	}
+
+	/**
+	 * Check if post content lines changed between two revisions of a post.
+	 *
+	 * @param WP_Post      $new_revision New revision.
+	 * @param WP_Post|null $old_revision Previous revision. If not specified, the revision
+	 *                                   immediately prior to $new_revision is used.
+	 * @return bool Whether post content lines changed.
+	 */
+	public function have_post_content_lines_changed( $new_revision, $old_revision = null ) {
+		// Compute text difference between old and new posts.
+		$diff = $this->get_post_text_differences( $new_revision, $old_revision );
+
+		// Post content is deemed changed if there are new or deleted lines.
+		return $diff['added'] > 1 || $diff['removed'] > 1;
 	}
 
 	/**

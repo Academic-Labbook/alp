@@ -230,16 +230,14 @@ if ( ! function_exists( 'labbook_the_post_meta' ) ) :
 			echo '&nbsp;&nbsp;';
 		}
 
-		if ( 'page' === $post->post_type ) {
-			$permission = 'edit_page';
-		} else {
-			$permission = 'edit_post';
-		}
+		$post_type_obj = get_post_type_object( $post->post_type );
 
-		if ( current_user_can( $permission, $post ) ) {
-			// Print edit post link.
-			labbook_the_post_edit_link( $post );
-			echo '&nbsp;&nbsp;';
+		if ( ! is_null( $post_type_obj ) ) {
+			if ( current_user_can( $post_type_obj->cap->edit_post, $post ) ) {
+				// Print edit post link.
+				labbook_the_post_edit_link( $post );
+				echo '&nbsp;&nbsp;';
+			}
 		}
 
 		echo '</div>';
@@ -320,7 +318,7 @@ if ( ! function_exists( 'labbook_the_revisions_link' ) ) :
 	function labbook_the_revisions_link( $post = null ) {
 		global $ssl_alp;
 
-		if ( ! labbook_ssl_alp_edit_summaries_enabled() ) {
+		if ( ! labbook_get_option( 'show_edit_summaries' ) || ! labbook_ssl_alp_edit_summaries_enabled() ) {
 			return;
 		}
 
@@ -479,11 +477,13 @@ if ( ! function_exists( 'labbook_the_footer' ) ) :
 	 * handle it. It always uses the current post.
 	 */
 	function labbook_the_footer() {
+		$post = get_post();
+
 		/* translators: used between list items, there is a space after the comma. */
 		$categories_list = get_the_category_list( __( ', ', 'labbook' ) );
 
-		// Allowed category and tag HTML.
-		$cat_tag_tags = array(
+		// Allowed term HTML.
+		$term_tags = array(
 			'a' => array(
 				'href' => array(),
 				'rel'  => array(),
@@ -492,8 +492,9 @@ if ( ! function_exists( 'labbook_the_footer' ) ) :
 
 		if ( $categories_list ) {
 			printf(
-				'<span class="cat-links"><i class="fa fa-folder-open" aria-hidden="true"></i>%1$s</span>',
-				wp_kses( $categories_list, $cat_tag_tags )
+				'<span class="cat-links"><i class="fa fa-folder-open" aria-hidden="true" title="%1$s"></i>%2$s</span>',
+				esc_attr__( 'Categories', 'labbook' ),
+				wp_kses( $categories_list, $term_tags )
 			);
 			echo '&nbsp;&nbsp;';
 		}
@@ -503,14 +504,29 @@ if ( ! function_exists( 'labbook_the_footer' ) ) :
 
 		if ( $tags_list ) {
 			printf(
-				'<span class="tag-links"><i class="fa fa-tags" aria-hidden="true"></i>%1$s</span>',
-				wp_kses( $tags_list, $cat_tag_tags )
+				'<span class="tag-links"><i class="fa fa-tags" aria-hidden="true" title="%1$s"></i>%2$s</span>',
+				esc_attr__( 'Tags', 'labbook' ),
+				wp_kses( $tags_list, $term_tags )
 			);
 			echo '&nbsp;&nbsp;';
 		}
 
+		if ( labbook_ssl_alp_inventory_enabled() ) {
+			/* translators: used between list items, there is a space after the comma. */
+			$inventory_list = get_the_term_list( $post->ID, 'ssl_alp_inventory_item', '', __( ', ', 'labbook' ) );
+
+			if ( $inventory_list ) {
+				printf(
+					'<span class="inventory-item-links"><i class="fa fa-book" aria-hidden="true" title="%1$s"></i>%2$s</span>',
+					esc_attr__( 'Inventory items', 'labbook' ),
+					wp_kses( $inventory_list, $term_tags )
+				);
+				echo '&nbsp;&nbsp;';
+			}
+		}
+
 		if ( ! is_single() && ! post_password_required() && ( comments_open() || get_comments_number() ) ) {
-			// Show comments link.
+			// Show commentss link.
 			printf(
 				'<span class="comments-link"><i class="fa fa-comment" aria-hidden="true"></i><a href="%1$s">%2$s</a></span>',
 				esc_url( get_comments_link() ),
@@ -526,17 +542,21 @@ if ( ! function_exists( 'labbook_the_revisions' ) ) :
 	 * Print revisions for the specified post.
 	 *
 	 * @param int|WP_Post|null $post Post ID or post object. Defaults to global $post.
+	 *
+	 * @global $ssl_alp
 	 */
 	function labbook_the_revisions( $post = null ) {
-		if ( ! labbook_get_option( 'show_edit_summaries' ) ) {
+		global $ssl_alp;
+
+		if ( ! labbook_get_option( 'show_edit_summaries' ) || ! labbook_ssl_alp_edit_summaries_enabled() ) {
 			// Display is unavailable.
 			return;
 		}
 
 		$post = get_post( $post );
 
-		if ( ! post_type_supports( $post->post_type, 'revisions' ) ) {
-			// Post type not supported.
+		// Check if edit summaries are available for this post.
+		if ( ! $ssl_alp->revisions->edit_summary_allowed( $post, false ) ) {
 			return;
 		}
 
@@ -824,6 +844,8 @@ if ( ! function_exists( 'labbook_the_references' ) ) :
 	 * Print post references.
 	 *
 	 * @param int|WP_Post|null $post Post ID or post object. Defaults to global $post.
+	 *
+	 * @global $ssl_alp
 	 */
 	function labbook_the_references( $post = null ) {
 		global $ssl_alp;
@@ -929,6 +951,22 @@ if ( ! function_exists( 'labbook_referenced_post_list_item' ) ) {
 			);
 		}
 
+		// Post type (only for non-posts).
+		if ( 'post' !== $referenced_post->post_type ) {
+			$post_type = get_post_type_object( $referenced_post->post_type );
+			$post_type_label = sprintf(
+				/* translators: 1: referenced post type label */
+				__( '(%1$s)', 'labbook' ),
+				$post_type->labels->singular_name
+			);
+
+			echo '&nbsp;';
+			printf(
+				'<span>%1$s</span>',
+				esc_html( $post_type_label )
+			);
+		}
+
 		echo '</li>';
 	}
 } // End if().
@@ -940,6 +978,8 @@ if ( ! function_exists( 'labbook_the_page_breadcrumbs' ) ) :
 	 * @param int|WP_Post|null $page Post ID or post object. Defaults to global $post.
 	 */
 	function labbook_the_page_breadcrumbs( $page = null ) {
+		$page = get_post( $page );
+
 		if ( ! is_page( $page ) ) {
 			// Not a page.
 			return;
@@ -956,6 +996,53 @@ if ( ! function_exists( 'labbook_the_page_breadcrumbs' ) ) :
 			return;
 		}
 
+		labbook_the_breadcrumb_trail( $breadcrumbs );
+	}
+endif;
+
+if ( ! function_exists( 'labbook_the_inventory_breadcrumbs' ) ) :
+	/**
+	 * Print inventory breadcrumbs.
+	 *
+	 * @param int|WP_Post|null $post Post ID or post object. Defaults to global $post.
+	 */
+	function labbook_the_inventory_breadcrumbs( $post = null ) {
+		$post = get_post( $post );
+
+		if ( is_null( $post ) ) {
+			return;
+		}
+
+		if ( 'ssl_alp_inventory' !== $post->post_type ) {
+			return;
+		}
+
+		if ( ! labbook_get_option( 'show_page_breadcrumbs' ) ) {
+			// Display is unavailable.
+			return;
+		}
+
+		$breadcrumbs = array(
+			array(
+				'title' => __( 'Home', 'labbook' ),
+				'url'   => home_url(),
+			),
+			array(
+				'title' => __( 'Inventory', 'labbook' ),
+			)
+		);
+
+		labbook_the_breadcrumb_trail( $breadcrumbs );
+	}
+endif;
+
+if ( ! function_exists( 'labbook_the_breadcrumb_trail' ) ) :
+	/**
+	 * Print breadcrumb trail.
+	 *
+	 * @param array $breadcrumbs The breadcrumb trail.
+	 */
+	function labbook_the_breadcrumb_trail( $breadcrumbs ) {
 		echo '<ul>';
 
 		foreach ( $breadcrumbs as $breadcrumb ) {
@@ -975,6 +1062,60 @@ if ( ! function_exists( 'labbook_the_page_breadcrumbs' ) ) :
 		}
 
 		echo '</ul>';
+	}
+endif;
+
+if ( ! function_exists( 'labbook_the_inventory_item_posts_link' ) ) :
+	/**
+	 * Generate a link to the inventory item posts archive.
+	 *
+	 * @global $ssl_alp
+	 */
+	function labbook_the_inventory_item_posts_link() {
+		global $ssl_alp;
+
+		if ( ! labbook_ssl_alp_inventory_enabled() ) {
+			return;
+		}
+
+		$post = get_post();
+
+		if ( 'ssl_alp_inventory' !== $post->post_type ) {
+			return;
+		}
+
+		$term = $ssl_alp->inventory->get_inventory_term( $post );
+
+		if ( is_null( $term ) ) {
+			return;
+		}
+
+		echo '<div class="ssl-alp-inventory-post-count">';
+		echo '<em>';
+
+		if ( $term->count ) {
+			/* translators: number of inventory item posts */
+			$link_str = sprintf(
+				_n(
+					'View %s post associated with this item',
+					'View %s posts associated with this item',
+					$term->count,
+					'labbook'
+				),
+				$term->count
+			);
+
+			printf(
+				'<a href="%1$s">%2$s</a>',
+				esc_url( $ssl_alp->inventory->get_inventory_term_archive_url( $term ) ),
+				esc_html( $link_str )
+			);
+		} else {
+			esc_html_e( 'No posts associated with this item', 'labbook' );
+		}
+
+		echo '</em>';
+		echo '</div>';
 	}
 endif;
 
@@ -1112,6 +1253,15 @@ if ( ! function_exists( 'labbook_the_advanced_search_form' ) ) :
 		);
 
 		labbook_the_advanced_search_tag_filter_table();
+
+		if ( labbook_ssl_alp_inventory_enabled() ) {
+			printf(
+				'<h3>%1$s</h3>',
+				esc_html__( 'Inventory', 'labbook' )
+			);
+
+			labbook_the_advanced_search_inventory_filter_table();
+		}
 
 		echo '<p class="advanced-search-hint">';
 		echo wp_kses(
@@ -1563,6 +1713,67 @@ if ( ! function_exists( 'labbook_the_advanced_search_tag_filter_table' ) ) :
 			$tags,
 			array(
 				'selected' => $selected_tag_not_in,
+			)
+		);
+		echo '</td>';
+		echo '</tr>';
+
+		echo '</table>';
+	}
+endif;
+
+if ( ! function_exists( 'labbook_the_advanced_search_inventory_filter_table' ) ) :
+	/**
+	 * Print advanced search inventory item filter table.
+	 */
+	function labbook_the_advanced_search_inventory_filter_table() {
+		echo '<table class="advanced-search-criteria">';
+
+		$inventory_items = get_terms(
+			array(
+				'taxonomy' => 'ssl_alp_inventory_item',
+				'orderby'  => 'name',
+				'order'    => 'ASC',
+			)
+		);
+
+		// Get term querystrings.
+		$selected_inventory_item_and    = get_query_var( 'ssl_alp_inventory_item__and', array() );
+		$selected_inventory_item_in     = get_query_var( 'ssl_alp_inventory_item__in', array() );
+		$selected_inventory_item_not_in = get_query_var( 'ssl_alp_inventory_item__not_in', array() );
+
+		printf(
+			'<tr><th>%1$s</th><th>%2$s</th><th>%3$s</th></tr>',
+			esc_attr( 'Posts with all of these tags', 'labbook' ),
+			esc_attr( 'Posts with any of these tags', 'labbook' ),
+			esc_attr( 'Posts with none of these tags', 'labbook' )
+		);
+
+		echo '<tr>';
+		echo '<td>';
+		labbook_the_advanced_search_term_multiselect(
+			'ssl_alp_inventory_item__and[]',
+			$inventory_items,
+			array(
+				'selected' => $selected_inventory_item_and,
+			)
+		);
+		echo '</td>';
+		echo '<td>';
+		labbook_the_advanced_search_term_multiselect(
+			'ssl_alp_inventory_item__in[]',
+			$inventory_items,
+			array(
+				'selected' => $selected_inventory_item_in,
+			)
+		);
+		echo '</td>';
+		echo '<td>';
+		labbook_the_advanced_search_term_multiselect(
+			'ssl_alp_inventory_item__not_in[]',
+			$inventory_items,
+			array(
+				'selected' => $selected_inventory_item_not_in,
 			)
 		);
 		echo '</td>';

@@ -74,10 +74,10 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$loader->add_filter( 'posts_groupby', $this, 'posts_groupby_filter', 10, 2 );
 
 		// Allow public coauthor query vars.
-		$loader->add_filter( 'query_vars', $this, 'whitelist_coauthor_search_query_vars' );
+		$loader->add_filter( 'query_vars', $this, 'whitelist_search_query_vars' );
 
 		// Support coauthor querystrings in WP_Query.
-		$loader->add_action( 'parse_tax_query', $this, 'parse_coauthor_query_vars' );
+		$loader->add_action( 'parse_tax_query', $this, 'parse_query_vars' );
 
 		// Filter to send comment notification/moderation emails to multiple authors.
 		$loader->add_filter( 'comment_notification_recipients', $this, 'filter_comment_notification_email_recipients', 10, 2 );
@@ -1242,7 +1242,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 *
 	 * @param string[] $public_query_vars Array of public query vars.
 	 */
-	public function whitelist_coauthor_search_query_vars( $public_query_vars ) {
+	public function whitelist_search_query_vars( $public_query_vars ) {
 		global $ssl_alp;
 
 		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
@@ -1256,7 +1256,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		// Custom query vars to make public. These are sanitised and handled by
-		// `parse_coauthor_query_vars`.
+		// `parse_query_vars`.
 		$custom_query_vars = array(
 			'ssl_alp_coauthor__and',
 			'ssl_alp_coauthor__in',
@@ -1275,7 +1275,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 *
 	 * @param WP_Query $query The query.
 	 */
-	public function parse_coauthor_query_vars( $query ) {
+	public function parse_query_vars( $query ) {
 		global $ssl_alp;
 
 		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
@@ -1292,9 +1292,9 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$tax_query = array();
 
 		// Sanitize submitted values.
-		$this->sanitize_coauthor_querystring( $query, 'ssl_alp_coauthor__and' );
-		$this->sanitize_coauthor_querystring( $query, 'ssl_alp_coauthor__in' );
-		$this->sanitize_coauthor_querystring( $query, 'ssl_alp_coauthor__not_in' );
+		$ssl_alp->core->sanitize_querystring( $query, 'ssl_alp_coauthor__and' );
+		$ssl_alp->core->sanitize_querystring( $query, 'ssl_alp_coauthor__in' );
+		$ssl_alp->core->sanitize_querystring( $query, 'ssl_alp_coauthor__not_in' );
 
 		// Get coauthor query vars.
 		$coauthor_and    = $query->get( 'ssl_alp_coauthor__and' );
@@ -1356,22 +1356,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 		// Merge new taxonomy filters into existing ones.
 		$query->tax_query->queries = wp_parse_args( $tax_query, $query->tax_query->queries );
-	}
-
-	/**
-	 * Sanitize coauthor querystring, returning an array of integers.
-	 *
-	 * Used for coauthor__in and coauthor__not_in.
-	 *
-	 * @param WP_Query $query     Query object.
-	 * @param string   $query_var Query var whose contents to sanitize.
-	 */
-	private function sanitize_coauthor_querystring( $query, $query_var ) {
-		$querystring = $query->get( $query_var, array() );
-		$querystring = array_map( 'absint', array_unique( (array) $querystring ) );
-
-		// Update querystring.
-		$query->set( $query_var, $querystring );
 	}
 
 	/**

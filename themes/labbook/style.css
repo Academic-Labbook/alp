@@ -8,7 +8,7 @@ Version: 1.1.9
 License: GNU General Public License v3 or later
 License URI: LICENSE
 Text Domain: labbook
-Tags: custom-background, custom-logo, custom-menu, editor-style, education, theme-options, threaded-comments, translation-ready, two-columns
+Tags: custom-background, custom-logo, custom-menu, editor-style, education, sticky-post, theme-options, threaded-comments, translation-ready, two-columns
 
 This theme, like WordPress, is licensed under the GPL.
 Use it to make something cool, have fun, and share what you've learned with others.
@@ -599,7 +599,7 @@ th {
         "footer";
 }
 
-/* Small devices (e.g. tablets) */
+/* Small devices (e.g. tablets) and above */
 @media (min-width: 768px) {
     #page {
         /* minmax(0, 1fr) stops <pre> expanding column: https://stackoverflow.com/questions/52587749/why-does-a-1fr-css-grid-column-neutralize-overflow-scroll-of-its-child-pre */
@@ -613,7 +613,7 @@ th {
     }
 }
 
-/* Medium devices (desktops) */
+/* Medium devices (desktops) and above */
 @media (min-width: 992px) {
     #page {
         /* minmax(0, 1fr) stops <pre> expanding column: https://stackoverflow.com/questions/52587749/why-does-a-1fr-css-grid-column-neutralize-overflow-scroll-of-its-child-pre */
@@ -1185,7 +1185,8 @@ a:hover, a:active {
 }
 
 .post,
-.page {
+.page,
+.ssl_alp_inventory {
     margin: 0 0 1.5em 0;
 }
 
@@ -1223,6 +1224,34 @@ a:hover, a:active {
     padding: 1em;
 }
 
+/* Container for all post header stuff */
+.entry-header-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    grid-template-areas:
+        "breadcrumbs"
+        "title-meta"
+        "thumbnail";
+}
+
+/* Small devices (e.g. tablets) and above */
+@media (min-width: 600px) {
+    .entry-header-container {
+        /* 100px right column, together with max-height: 100px, maintains thumbnail aspect ratio. */
+        grid-template-columns: 1fr 100px;
+        grid-template-rows: auto 1fr;
+        grid-template-areas:
+            "breadcrumbs thumbnail"
+            "title-meta thumbnail";
+        max-height: 100px;
+    }
+}
+
+.entry-header {
+    grid-area: title-meta;
+}
+
 .entry-header, .entry-footer {
 	clear: both;
 	color: #0b789c;
@@ -1233,6 +1262,14 @@ a:hover, a:active {
 /* space after icons in post header and footer */
 .entry-header .fa, .entry-footer .fa {
 	margin-right: 0.5em;
+}
+
+.entry-thumbnail {
+    grid-area: thumbnail;
+}
+
+.entry-thumbnail img {
+    display: block;
 }
 
 .labbook-read-button {
@@ -1283,6 +1320,7 @@ a:hover, a:active {
 }
 
 .breadcrumbs {
+    grid-area: breadcrumbs;
     font-size: 85%;
 }
 

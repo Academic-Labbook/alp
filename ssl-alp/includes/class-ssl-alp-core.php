@@ -169,6 +169,50 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 	}
 
 	/**
+	 * Sanitize term querystring, returning an array of integers.
+	 *
+	 * Used for e.g. coauthor__in, coauthor__not_in, ssl_alp_inventory_item__and, etc.
+	 *
+	 * @param WP_Query $query     Query object.
+	 * @param string   $query_var Query var whose contents to sanitize.
+	 */
+	public function sanitize_querystring( $query, $query_var ) {
+		$querystring = $query->get( $query_var, array() );
+		$querystring = array_map( 'absint', array_unique( (array) $querystring ) );
+
+		// Update querystring.
+		$query->set( $query_var, $querystring );
+	}
+
+	/**
+	 * Checks if the current user (including not logged in users), can read the specified post.
+	 *
+	 * @param WP_Post $post The post.
+	 *
+	 * @return bool|null The permission, or null if the post is invalid.
+	 */
+	public function current_user_can_read_post( $post ) {
+		$post = get_post( $post );
+
+		if ( is_null( $post ) ) {
+			return;
+		}
+
+		if ( is_user_logged_in() ) {
+			$post_type_obj = get_post_type_object( $post->post_type );
+
+			if ( is_null( $post_type_obj ) ) {
+				return;
+			}
+
+			return current_user_can( $post_type_obj->cap->read_post, $post );
+		} else {
+			// Anonymous user on a public site.
+			return 'publish' === get_post_status( $post );
+		}
+	}
+
+	/**
 	 * Filters supplied media type string into an array.
 	 *
 	 * @param string|array $media_types Media types to filter.
