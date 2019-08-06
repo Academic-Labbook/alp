@@ -267,6 +267,10 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 
 		$screen = get_current_screen();
 
+		if ( is_null( $screen ) || ! property_exists( $screen, 'base' ) || ! property_exists( $screen, 'post_type' ) ) {
+			return;
+		}
+
 		if ( 'edit' === $screen->base && 'ssl_alp_inventory' === $screen->post_type && ! isset( $_GET['orderby'] ) ) {
 			$query->set( 'orderby', 'title' );
 			$query->set( 'order', 'ASC' );
