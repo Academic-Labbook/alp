@@ -77,6 +77,10 @@ itself. This can in most cases be mitigated with appropriate HTTP server configu
 ### Term management
 ALP adds the ability to merge tags and categories in bulk.
 
+### Post changes
+ALP prevents posts being published with the "Uncategorized" category if the author has specified
+another category. In such cases, the "Uncategorized" category is silently removed.
+
 ### Page changes
 ALP modifies pages to work more like wiki pages. When using the *Labbook* theme, authors and dates
 are removed from the title area, a breadcrumb trail is shown back to the home page, and there is
