@@ -130,7 +130,7 @@ function labbook_customize_register( $wp_customize ) {
 				'priority'    => 110,
 			)
 		);
-	} // End if().
+	}
 
 	/**
 	 * Cross-references section.

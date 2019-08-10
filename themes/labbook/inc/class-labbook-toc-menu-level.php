@@ -139,8 +139,8 @@ if ( ! function_exists( 'labbook_generate_post_contents' ) ) :
 		 * See https://php.net/manual/en/domdocument.loadhtml.php#95251.
 		 */
 
-		foreach ( $document->childNodes as $item ) {
-			if ( XML_PI_NODE === $item->nodeType ) {
+		foreach ( $document->childNodes as $item ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+			if ( XML_PI_NODE === $item->nodeType ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 				// Remove XML encoding element.
 				$document->removeChild( $item );
 			}
@@ -193,7 +193,7 @@ if ( ! function_exists( 'labbook_generate_post_contents' ) ) :
 		 */
 		foreach ( $xpath_query as $header ) {
 			// Get header's level.
-			sscanf( $header->tagName, 'h%u', $current_level );
+			sscanf( $header->tagName, 'h%u', $current_level ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 
 			// Update parent pointer.
 			if ( $current_level < $last_level ) {
@@ -227,12 +227,12 @@ if ( ! function_exists( 'labbook_generate_post_contents' ) ) :
 			$child->set_menu_data(
 				array(
 					'id'    => $header_id,
-					'title' => $header->textContent,
+					'title' => $header->textContent, // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 				)
 			);
 
 			$head->add_child_menu( $child );
-		} // End foreach().
+		}
 
 		// Convert DOM with any changes made back into HTML.
 		return $document->saveHTML();
@@ -252,7 +252,7 @@ if ( ! function_exists( 'labbook_tag_unique_id' ) ) :
 
 		if ( empty( $id ) ) {
 			// No ID; convert text content into ID.
-			$id = _text_to_id( $tag->textContent );
+			$id = labbook_text_to_id( $tag->textContent ); // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 		}
 
 		if ( labbook_tag_id_exists( $id, $dom ) && $dom->getElementById( $id ) !== $tag ) {
@@ -291,14 +291,14 @@ if ( ! function_exists( 'labbook_tag_id_exists' ) ) :
 	}
 endif;
 
-if ( ! function_exists( '_text_to_id' ) ) :
+if ( ! function_exists( 'labbook_text_to_id' ) ) :
 	/**
 	 * Convert text within HTML tag to a valid ID.
 	 *
 	 * @param string $text      Text to convert.
 	 * @param string $delimiter Delimiter to use. Defaults to hyphen.
 	 */
-	function _text_to_id( $text, $delimiter = null ) {
+	function labbook_text_to_id( $text, $delimiter = null ) {
 		// Convert to lowercase.
 		$text = strtolower( $text );
 

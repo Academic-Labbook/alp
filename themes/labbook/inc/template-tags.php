@@ -89,7 +89,7 @@ if ( ! function_exists( 'labbook_the_post_title' ) ) :
 					esc_attr( $unread_class )
 				);
 			}
-		} // End if().
+		}
 
 		if ( $url ) {
 			// Wrap title in its permalink.
@@ -616,7 +616,7 @@ if ( ! function_exists( 'labbook_the_revisions' ) ) :
 		<?php
 
 		if ( $pages > 1 ) {
-			echo paginate_links(
+			echo paginate_links( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				array(
 					'base'    => get_permalink( $post ) . '%_%#post-revisions',
 					'format'  => '?revision_page=%#%',
@@ -710,7 +710,7 @@ if ( ! function_exists( 'labbook_the_revision_description_row' ) ) :
 
 		if ( $author ) {
 			// Print author link.
-			echo labbook_format_author( $author );
+			echo labbook_format_author( $author ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		echo '</td>';
@@ -953,7 +953,7 @@ if ( ! function_exists( 'labbook_referenced_post_list_item' ) ) {
 
 		// Post type (only for non-posts).
 		if ( 'post' !== $referenced_post->post_type ) {
-			$post_type = get_post_type_object( $referenced_post->post_type );
+			$post_type       = get_post_type_object( $referenced_post->post_type );
 			$post_type_label = sprintf(
 				/* translators: 1: referenced post type label */
 				__( '(%1$s)', 'labbook' ),
@@ -969,7 +969,7 @@ if ( ! function_exists( 'labbook_referenced_post_list_item' ) ) {
 
 		echo '</li>';
 	}
-} // End if().
+}
 
 if ( ! function_exists( 'labbook_the_page_breadcrumbs' ) ) :
 	/**
@@ -1029,7 +1029,7 @@ if ( ! function_exists( 'labbook_the_inventory_breadcrumbs' ) ) :
 			),
 			array(
 				'title' => __( 'Inventory', 'labbook' ),
-			)
+			),
 		);
 
 		labbook_the_breadcrumb_trail( $breadcrumbs );
@@ -1094,8 +1094,8 @@ if ( ! function_exists( 'labbook_the_inventory_item_posts_link' ) ) :
 		echo '<em>';
 
 		if ( $term->count ) {
-			/* translators: number of inventory item posts */
 			$link_str = sprintf(
+				/* translators: number of inventory item posts */
 				_n(
 					'View %s post associated with this item',
 					'View %s posts associated with this item',
@@ -1298,7 +1298,7 @@ if ( ! function_exists( 'labbook_the_advanced_search_dropdown' ) ) :
 			'<select name="%1$s"%2$s%3$s>',
 			$name,
 			( true === $multiple ) ? ' multiple="true"' : '',
-			( ! is_null( $size ) ) ? ' size="' . absint( $size ) . '"' : ''
+			( ! is_null( $size ) ) ? ' size="' . absint( $size ) . '"' : '' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		);
 
 		if ( $blank ) {
@@ -1310,10 +1310,10 @@ if ( ! function_exists( 'labbook_the_advanced_search_dropdown' ) ) :
 
 			if ( ! is_null( $selected ) ) {
 				if ( is_array( $selected ) ) {
-					if ( in_array( $value, $selected ) ) { // Fuzzy compare required.
+					if ( in_array( $value, $selected ) ) { // phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict
 						$item_selected = true;
 					}
-				} elseif ( $value == $selected ) { // Fuzzy compare required.
+				} elseif ( $value == $selected ) { // phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
 					$item_selected = true;
 				}
 			}
@@ -1360,7 +1360,7 @@ if ( ! function_exists( 'labbook_the_advanced_search_term_multiselect' ) ) :
 			'<select name="%1$s"%2$s%3$s>',
 			$name,
 			( true === $args['multiple'] ) ? ' multiple="true"' : '',
-			( ! is_null( $args['size'] ) ) ? ' size="' . absint( $args['size'] ) . '"' : ''
+			( ! is_null( $args['size'] ) ) ? ' size="' . absint( $args['size'] ) . '"' : '' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		);
 
 		$depth = intval( $args['depth'] );
@@ -1371,7 +1371,7 @@ if ( ! function_exists( 'labbook_the_advanced_search_term_multiselect' ) ) :
 		unset( $args['depth'] );
 
 		// Create hierarchical list.
-		echo $walker->walk( $items, $depth, $args );
+		echo $walker->walk( $items, $depth, $args ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 		echo '</select>';
 	}

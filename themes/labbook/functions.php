@@ -326,7 +326,7 @@ if ( ! function_exists( 'labbook_get_content_with_toc' ) ) :
 			return $content;
 		}
 
-		$toc = '<div class="entry-toc entry-toc-' . get_the_ID() . '">';
+		$toc  = '<div class="entry-toc entry-toc-' . get_the_ID() . '">';
 		$toc .= '<h3 class="entry-toc-title">' . esc_html__( 'Contents', 'labbook' ) . '</h3>';
 		$toc .= labbook_get_toc( $hierarchy, labbook_get_option( 'table_of_contents_max_depth' ) );
 		$toc .= '</div>';
