@@ -261,7 +261,9 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 			return;
 		}
 
-		if ( ! is_admin() ) {
+		// Need to check if the ``get_current_screen` function exists for the Customizer, which
+		// is both admin and front end.
+		if ( ! is_admin() || ! function_exists( 'get_current_screen' ) ) {
 			return;
 		}
 
