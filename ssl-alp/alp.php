@@ -62,7 +62,7 @@ define( 'SSL_ALP_REST_ROUTE', 'ssl-alp/v1' );
  */
 
 // KaTeX version.
-define( 'SSL_ALP_KATEX_VERSION', '0.10.1' );
+define( 'SSL_ALP_KATEX_VERSION', '0.10.2' );
 
 // Recent revisions widget cache timeout.
 define( 'SSL_ALP_RECENT_REVISIONS_CACHE_TIMEOUT', 5 * 60 );
