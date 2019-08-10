@@ -212,7 +212,7 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 	public function core_settings_overridden() {
 		$current_settings = array_map( 'get_option', array_keys( $this->overrideable_settings ) );
 
-		return array_values( $this->overrideable_settings ) == $current_settings; // Fuzzy comparison ok.
+		return array_values( $this->overrideable_settings ) == $current_settings; // Fuzzy comparison required.
 	}
 
 	/**

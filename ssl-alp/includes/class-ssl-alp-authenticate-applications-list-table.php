@@ -57,7 +57,7 @@ class SSL_ALP_Authenticate_Applications_List_Table extends WP_List_Table {
 		$orderby  = ( isset( $_GET['orderby'] ) ) ? wp_unslash( $_GET['orderby'] ) : 'last_used';
 		$order    = ( isset( $_GET['order'] ) ) ? wp_unslash( $_GET['order'] ) : 'desc';
 
-		if ( array_key_exists( $orderby, $this->get_sortable_columns() )) {
+		if ( array_key_exists( $orderby, $this->get_sortable_columns() ) ) {
 			// Sort columns.
 			$this->items = wp_list_sort( $this->items, $orderby, $order );
 		}
@@ -88,11 +88,11 @@ class SSL_ALP_Authenticate_Applications_List_Table extends WP_List_Table {
 	}
 
 	public function column_cb( $item ) {
-        return sprintf(
+		return sprintf(
 			'<input type="checkbox" name="ssl_alp_applications[]" value="%s" />',
 			$item['slug']
-        );
-    }
+		);
+	}
 
 	public function column_password( $item ) {
 		// Break password into chunks.
@@ -155,7 +155,7 @@ class SSL_ALP_Authenticate_Applications_List_Table extends WP_List_Table {
 		}
 
 		$actions = array(
-			'revoke' => $ssl_alp->auth->get_revoke_url( $application )
+			'revoke' => $ssl_alp->auth->get_revoke_url( $application ),
 		);
 
 		return $this->row_actions( $actions );

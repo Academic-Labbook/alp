@@ -210,8 +210,8 @@ class SSL_ALP_Authenticate extends SSL_ALP_Module {
 
 		// Create array with unique slugs as keys.
 		foreach ( $this->get_user_applications() as $application ) {
-			$slug = $this->generate_application_slug( $application );
-			$application['slug'] = $slug;
+			$slug                  = $this->generate_application_slug( $application );
+			$application['slug']   = $slug;
 			$applications[ $slug ] = $application;
 		}
 
@@ -268,7 +268,7 @@ class SSL_ALP_Authenticate extends SSL_ALP_Module {
 		}
 
 		switch ( $_GET['message'] ) {
-			case  'ssl_alp_add_success':
+			case 'ssl_alp_add_success':
 				echo '<div class="notice notice-success is-dismissible">';
 				echo '<p>' . esc_html__( 'Application added.', 'ssl-alp' ) . '</p>';
 				echo '</div>';
@@ -308,7 +308,13 @@ class SSL_ALP_Authenticate extends SSL_ALP_Module {
 		return sprintf(
 			'<a href="%1$s" class="ssl-alp-application-revoke" aria-label="$2$s">%3$s</a>',
 			wp_nonce_url( "admin-post.php?&amp;action=ssl-alp-revoke-application&amp;ssl_alp_applications[]={$application['slug']}", 'ssl-alp-manage-applications', 'ssl_alp_manage_applications_nonce' ),
-			esc_attr( sprintf( __( 'Revoke &#8220;%s&#8221;', 'ssl-alp' ), $application['name'] ) ),
+			esc_attr(
+				sprintf(
+					/* translators: application name to revoke */
+					__( 'Revoke &#8220;%s&#8221;', 'ssl-alp' ),
+					$application['name']
+				)
+			),
 			esc_html__( 'Revoke', 'ssl-alp' )
 		);
 	}
@@ -551,7 +557,7 @@ class SSL_ALP_Authenticate extends SSL_ALP_Module {
 	}
 
 	private function authenticate_application_password( $username, $password ) {
-		$user = get_user_by( 'login',  $username );
+		$user = get_user_by( 'login', $username );
 
 		if ( ! $user ) {
 			return false;

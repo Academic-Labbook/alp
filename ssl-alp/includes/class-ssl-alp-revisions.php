@@ -238,14 +238,14 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		}
 
 		// Get revision's edit summary.
-		$edit_summary = get_post_meta( $revision->ID, 'ssl_alp_edit_summary', true );
+		$edit_summary           = get_post_meta( $revision->ID, 'ssl_alp_edit_summary', true );
 		$edit_summary_revert_id = get_post_meta( $revision->ID, 'ssl_alp_edit_summary_revert_id', true );
 
 		$source_edit_summary = null;
 
 		if ( ! empty( $edit_summary_revert_id ) ) {
 			// Get original source revision.
-			$source_revision = $this->get_source_revision( $revision );
+			$source_revision     = $this->get_source_revision( $revision );
 			$source_edit_summary = get_post_meta( $source_revision->ID, 'ssl_alp_edit_summary', true );
 		}
 
@@ -886,10 +886,10 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 			$supported_post_types = get_post_types_by_support( 'revisions' );
 
-			$maxiter = 10 * $number;
-			$iter = 0;
-			$offset = 0;
-			$posts = array();
+			$maxiter   = 10 * $number;
+			$iter      = 0;
+			$offset    = 0;
+			$posts     = array();
 			$last_post = null;
 			// Array of user IDs and the post IDs they've edited contained in the $posts array.
 			$user_post_revisions = array();
@@ -918,7 +918,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 				}
 
 				$offset++;
-				$post = $post[0];
+				$post   = $post[0];
 				$parent = get_post( $post->post_parent );
 
 				if ( is_null( $parent ) ) {
@@ -964,13 +964,13 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 				}
 
 				if ( array_key_exists( $post->post_author, $user_post_revisions ) ) {
-					if ( in_array( $parent->ID, $user_post_revisions[ $post->post_author ] ) ) {
+					if ( in_array( $parent->ID, $user_post_revisions[ $post->post_author ], true ) ) {
 						// User has already edited this post more recently.
 						continue;
 					}
 				}
 
-				$posts[] = $post;
+				$posts[]   = $post;
 				$last_post = $post;
 
 				if ( ! array_key_exists( $post->post_author, $user_post_revisions ) ) {

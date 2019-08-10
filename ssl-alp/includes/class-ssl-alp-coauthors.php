@@ -1206,7 +1206,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$post_author = get_user_by( 'id', $post->post_author );
 
 		// Try to ensure at least the post's primary author is in the list of coauthors.
-		if ( ! empty( $post_author ) && ! in_array( $post_author, $coauthors, false ) ) {
+		if ( ! empty( $post_author ) && ! in_array( $post_author, $coauthors, false ) ) { // Fuzzy comparison required.
 			// Post primary author exists but isn't listed as a coauthor,
 			// so add them to the start of the coauthors array.
 			array_unshift( $coauthors, $post_author );

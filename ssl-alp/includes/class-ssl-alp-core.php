@@ -324,7 +324,7 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 
 		foreach ( $extra_media_types as $key => $extra_media_type ) {
 			// Trim whitespace.
-			$extra_media_type = array_map( 'trim', $extra_media_type );
+			$extra_media_type          = array_map( 'trim', $extra_media_type );
 			$extra_media_types[ $key ] = $extra_media_type;
 		}
 
@@ -363,9 +363,9 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 	 * set by the block editor (in contrast to the classic editor).
 	 *
 	 * @param int    $object_id Object ID.
-     * @param array  $terms     An array of object terms.
-     * @param array  $tt_ids    An array of term taxonomy IDs.
-     * @param string $taxonomy  Taxonomy slug.
+	 * @param array  $terms     An array of object terms.
+	 * @param array  $tt_ids    An array of term taxonomy IDs.
+	 * @param string $taxonomy  Taxonomy slug.
 	 */
 	public function remove_superfluous_uncategorised( $object_id, $terms, $tt_ids, $taxonomy ) {
 		if ( 'category' !== $taxonomy ) {
@@ -382,13 +382,13 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 			return;
 		}
 
-    	// Get default category.
+		// Get default category.
 		$default_category = get_term_by( 'id', get_option( 'default_category' ), $taxonomy );
 
 		// Rebuild list of terms using $tt_ids and not the provided $terms, since
 		// $terms can be mixed type and is unsanitised by `wp_set_object_terms`.
 		$terms = array();
-		foreach( $tt_ids as $tt_id ) {
+		foreach ( $tt_ids as $tt_id ) {
 			$term = get_term_by( 'term_taxonomy_id', $tt_id, $taxonomy );
 
 			if ( $term ) {

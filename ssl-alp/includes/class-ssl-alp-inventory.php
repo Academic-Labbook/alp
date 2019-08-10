@@ -20,8 +20,8 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 	 * @var array
 	 */
 	protected $supported_post_types = array(
-        'post',
-    );
+		'post',
+	);
 
 	/**
 	 * Register hooks.
@@ -33,28 +33,28 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 		 * Inventory post type.
 		 */
 
-        // Register inventory post type.
-        $loader->add_action( 'init', $this, 'register_post_type' );
+		// Register inventory post type.
+		$loader->add_action( 'init', $this, 'register_post_type' );
 
-        // Remove month dropdown filter on admin page list.
-        $loader->add_action( 'months_dropdown_results', $this, 'disable_months_dropdown_results', 10, 2 );
+		// Remove month dropdown filter on admin page list.
+		$loader->add_action( 'months_dropdown_results', $this, 'disable_months_dropdown_results', 10, 2 );
 
-        // Remove date column from admin post list.
+		// Remove date column from admin post list.
 		$loader->add_filter( 'manage_edit-ssl_alp_inventory_columns', $this, 'remove_date_edit_column' );
 
 		// Make the post title the default sort order.
 		$loader->add_action( 'pre_get_posts', $this, 'sort_posts_by_title' );
 
-        // Create/delete corresponding inventory item terms whenever posts are created/deleted.
-        $loader->add_action( 'save_post', $this, 'associate_inventory_post_with_term', 10, 2 );
+		// Create/delete corresponding inventory item terms whenever posts are created/deleted.
+		$loader->add_action( 'save_post', $this, 'associate_inventory_post_with_term', 10, 2 );
 		$loader->add_action( 'deleted_post', $this, 'delete_associated_inventory_post_term' );
 
 		// Add admin revisions tables.
 		$loader->add_action( 'admin_menu', $this, 'add_revisions_page' );
 
-        /**
-         * Inventory taxonomy.
-         */
+		/**
+		 * Inventory taxonomy.
+		 */
 
 		// Register inventory item taxonomy.
 		$loader->add_action( 'init', $this, 'register_taxonomy' );
@@ -145,79 +145,79 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 		remove_filter( 'pre_insert_term', array( $this, 'disallow_insert_term' ), 10, 2 );
 	}
 
-    /**
-     * Register the inventory post type.
-     */
-    public function register_post_type() {
+	/**
+	 * Register the inventory post type.
+	 */
+	public function register_post_type() {
 		if ( ! get_option( 'ssl_alp_enable_inventory' ) ) {
 			// Inventory disabled.
 			return;
-        }
+		}
 
-        $labels = array(
-            'name'                     => __( 'Inventory', 'ssl-alp' ),
-            'singular_name'            => __( 'Inventory', 'ssl-alp' ),
-            'add_new_item'             => __( 'Add New Item', 'ssl-alp' ),
-            'edit_item'                => __( 'Edit Item', 'ssl-alp' ),
-            'new_item'                 => __( 'New Item', 'ssl-alp' ),
-            'view_item'                => __( 'View Item', 'ssl-alp' ),
-            'view_items'               => __( 'View Items', 'ssl-alp' ),
-            'search_items'             => __( 'Search Items', 'ssl-alp' ),
-            'not_found'                => __( 'No items found.', 'ssl-alp' ),
-            'not_found_in_trash'       => __( 'No items found in Trash.', 'ssl-alp' ),
-            'all_items'                => __( 'All Items', 'ssl-alp' ),
-            'attributes'               => __( 'Item Attributes', 'ssl-alp' ),
-            'insert_into_item'         => __( 'Insert into item', 'ssl-alp' ),
-            'uploaded_to_this_item'    => __( 'Uploaded to this item', 'ssl-alp' ),
-            'featured_image'           => __( 'Item Image', 'ssl-alp' ),
-            'set_featured_image'       => __( 'Set item image', 'ssl-alp' ),
-            'remove_featured_image'    => __( 'Remove item image', 'ssl-alp' ),
-            'use_featured_image'       => __( 'Use as item image', 'ssl-alp' ),
-            'filter_items_list'        => __( 'Filter items list', 'ssl-alp' ),
-            'items_list_navigation'    => __( 'Items list navigation', 'ssl-alp' ),
-            'items_list'               => __( 'Items list', 'ssl-alp' ),
-            'item_published'           => __( 'Item created.', 'ssl-alp' ),
-            'item_published_privately' => __( 'Item created privately.', 'ssl-alp' ),
-            'item_reverted_to_draft'   => __( 'Item reverted to draft.', 'ssl-alp' ),
-            'item_updated'             => __( 'Item updated.', 'ssl-alp' ),
-        );
+		$labels = array(
+			'name'                     => __( 'Inventory', 'ssl-alp' ),
+			'singular_name'            => __( 'Inventory', 'ssl-alp' ),
+			'add_new_item'             => __( 'Add New Item', 'ssl-alp' ),
+			'edit_item'                => __( 'Edit Item', 'ssl-alp' ),
+			'new_item'                 => __( 'New Item', 'ssl-alp' ),
+			'view_item'                => __( 'View Item', 'ssl-alp' ),
+			'view_items'               => __( 'View Items', 'ssl-alp' ),
+			'search_items'             => __( 'Search Items', 'ssl-alp' ),
+			'not_found'                => __( 'No items found.', 'ssl-alp' ),
+			'not_found_in_trash'       => __( 'No items found in Trash.', 'ssl-alp' ),
+			'all_items'                => __( 'All Items', 'ssl-alp' ),
+			'attributes'               => __( 'Item Attributes', 'ssl-alp' ),
+			'insert_into_item'         => __( 'Insert into item', 'ssl-alp' ),
+			'uploaded_to_this_item'    => __( 'Uploaded to this item', 'ssl-alp' ),
+			'featured_image'           => __( 'Item Image', 'ssl-alp' ),
+			'set_featured_image'       => __( 'Set item image', 'ssl-alp' ),
+			'remove_featured_image'    => __( 'Remove item image', 'ssl-alp' ),
+			'use_featured_image'       => __( 'Use as item image', 'ssl-alp' ),
+			'filter_items_list'        => __( 'Filter items list', 'ssl-alp' ),
+			'items_list_navigation'    => __( 'Items list navigation', 'ssl-alp' ),
+			'items_list'               => __( 'Items list', 'ssl-alp' ),
+			'item_published'           => __( 'Item created.', 'ssl-alp' ),
+			'item_published_privately' => __( 'Item created privately.', 'ssl-alp' ),
+			'item_reverted_to_draft'   => __( 'Item reverted to draft.', 'ssl-alp' ),
+			'item_updated'             => __( 'Item updated.', 'ssl-alp' ),
+		);
 
-        // Register new post type to represent inventory items.
-        $args = array(
-            'labels'          => $labels,
-            'description'     => __( 'Inventory items.', 'ssl-alp' ),
-            'public'          => true,
-            'hierarchical'    => false,
-			'show_in_rest'    => true,
-			'template'        => array(
+		// Register new post type to represent inventory items.
+		$args = array(
+			'labels'       => $labels,
+			'description'  => __( 'Inventory items.', 'ssl-alp' ),
+			'public'       => true,
+			'hierarchical' => false,
+			'show_in_rest' => true,
+			'template'     => array(
 				array(
 					'core/heading',
 					array(
-						'content'     => 'Location',
-					)
+						'content' => 'Location',
+					),
 				),
 				array(
 					'core/paragraph',
 					array(
 						'placeholder' => 'Location...',
-					)
+					),
 				),
 			),
-			'menu_icon'       => 'dashicons-book-alt',
-            'supports'        => array(
-                'title',
-                'editor',
-                'revisions',
-                'page-attributes',
-                'thumbnail',
-            ),
-            'rewrite'         => array(
-                'slug' => 'inventory',
-            ),
-        );
+			'menu_icon'    => 'dashicons-book-alt',
+			'supports'     => array(
+				'title',
+				'editor',
+				'revisions',
+				'page-attributes',
+				'thumbnail',
+			),
+			'rewrite'      => array(
+				'slug' => 'inventory',
+			),
+		);
 
-        register_post_type( 'ssl_alp_inventory', $args );
-    }
+		register_post_type( 'ssl_alp_inventory', $args );
+	}
 
 	/**
 	 * Disable months dropdown box in admin inventory posts list.
@@ -288,7 +288,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 	private function update_inventory_item_term( $post ) {
 		$post = get_post( $post );
 
-        if ( is_null( $post ) ) {
+		if ( is_null( $post ) ) {
 			// Invalid post.
 			return;
 		}
@@ -309,12 +309,12 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 			wp_insert_term( $post->post_title, 'ssl_alp_inventory_item', $args );
 		} else {
 			// Update term.
-            $args = array(
-                'name' => $post->post_title,
-                'slug' => $this->get_inventory_term_slug( $post ),
-            );
+			$args = array(
+				'name' => $post->post_title,
+				'slug' => $this->get_inventory_term_slug( $post ),
+			);
 
-            wp_update_term( $term->term_id, 'ssl_alp_inventory_item', $args );
+			wp_update_term( $term->term_id, 'ssl_alp_inventory_item', $args );
 		}
 
 		// Re-enable the filter.
@@ -324,7 +324,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 	public function get_inventory_term( $post ) {
 		$post = get_post( $post );
 
-        if ( is_null( $post ) ) {
+		if ( is_null( $post ) ) {
 			// Invalid post.
 			return;
 		}
@@ -339,16 +339,16 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 	 *
 	 * @param WP_Post $post    The inventory post.
 	 */
-    private function get_inventory_term_slug( $post ) {
-        $post = get_post( $post );
+	private function get_inventory_term_slug( $post ) {
+		$post = get_post( $post );
 
-        if ( is_null( $post ) ) {
+		if ( is_null( $post ) ) {
 			// Invalid post.
 			return;
-        }
+		}
 
-        return $post->ID;
-    }
+		return $post->ID;
+	}
 
 	/**
 	 * Get post from inventory term.
@@ -362,64 +362,64 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 		return get_post( $term->slug );
 	}
 
-    /**
-     * Associate a post in the ssl_alp_inventory custom post type with a corresponding
-     * ssl_alp_inventory_item term when created or saved.
-     *
-     * @param int     $post_id The post ID.
-     * @param WP_Post $post    The post object.
-     */
-    public function associate_inventory_post_with_term( $post_id, $post ) {
+	/**
+	 * Associate a post in the ssl_alp_inventory custom post type with a corresponding
+	 * ssl_alp_inventory_item term when created or saved.
+	 *
+	 * @param int     $post_id The post ID.
+	 * @param WP_Post $post    The post object.
+	 */
+	public function associate_inventory_post_with_term( $post_id, $post ) {
 		if ( ! get_option( 'ssl_alp_enable_inventory' ) ) {
 			// Inventory disabled.
 			return;
-        }
+		}
 
-        if ( 'ssl_alp_inventory' !== $post->post_type ) {
-            return;
-        }
+		if ( 'ssl_alp_inventory' !== $post->post_type ) {
+			return;
+		}
 
-        if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
-            // Don't create term for autosaves.
-            return;
-        }
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			// Don't create term for autosaves.
+			return;
+		}
 
-        if ( 'publish' !== $post->post_status ) {
-            // Don't create a term unless the post is being published.
-            return;
+		if ( 'publish' !== $post->post_status ) {
+			// Don't create a term unless the post is being published.
+			return;
 		}
 
 		// Add or update the associated term.
 		$this->update_inventory_item_term( $post );
-    }
+	}
 
-    /**
-     * Delete associated inventory post term before an inventory post is deleted.
-     *
-     * @param int $post_id The post ID.
-     */
-    public function delete_associated_inventory_post_term( $post_id ) {
+	/**
+	 * Delete associated inventory post term before an inventory post is deleted.
+	 *
+	 * @param int $post_id The post ID.
+	 */
+	public function delete_associated_inventory_post_term( $post_id ) {
 		if ( ! get_option( 'ssl_alp_enable_inventory' ) ) {
 			// Inventory disabled.
 			return;
 		}
 
-        $post = get_post( $post_id );
+		$post = get_post( $post_id );
 
-        if ( is_null( $post ) ) {
+		if ( is_null( $post ) ) {
 			// Invalid post.
 			return;
 		}
 
-        if ( 'ssl_alp_inventory' !== $post->post_type ) {
-            return;
+		if ( 'ssl_alp_inventory' !== $post->post_type ) {
+			return;
 		}
 
-        $term = $this->get_inventory_term( $post );
+		$term = $this->get_inventory_term( $post );
 
-        if ( ! $term ) {
-            // No term to delete.
-            return;
+		if ( ! $term ) {
+			// No term to delete.
+			return;
 		}
 
 		wp_delete_term( $term->term_id, 'ssl_alp_inventory_item' );
@@ -471,30 +471,30 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 
 		// Register new taxonomy so that we can store inventory item and post relationships.
 		$args = array(
-			'hierarchical'          => false,
-			'labels'                => array(
-                'name'                       => __( 'Inventory', 'ssl-alp' ),
-                'singular_name'              => __( 'Item', 'ssl-alp' ),
-                'search_items'               => __( 'Search Items', 'ssl-alp' ),
-                'popular_items'              => __( 'Popular Items', 'ssl-alp' ),
-                'all_items'                  => __( 'All Items', 'ssl-alp' ),
-                'edit_item'                  => __( 'Edit Item', 'ssl-alp' ),
-                'update_item'                => __( 'Update Item', 'ssl-alp' ),
-                'add_new_item'               => __( 'Add New Item', 'ssl-alp' ),
-                'new_item_name'              => __( 'New Item Name', 'ssl-alp' ),
-                'separate_items_with_commas' => __( 'Separate items with commas', 'ssl-alp' ),
-                'add_or_remove_items'        => __( 'Add or remove items', 'ssl-alp' ),
-                'choose_from_most_used'      => __( 'Choose from the most used items', 'ssl-alp' ),
-                'not_found'                  => __( 'No items found.', 'ssl-alp' ),
-                'no_terms'                   => __( 'No items', 'ssl-alp' ),
-            ),
-			'public'                => true,
-            'show_in_menu'          => false, // Disable term edit page.
-			'show_in_rest'          => true,  // Needed for block editor support.
-			'show_admin_column'     => true,  // Show associated terms in admin edit screen.
-			'rewrite'         => array(
-                'slug' => 'inventory-posts',
-            ),
+			'hierarchical'      => false,
+			'labels'            => array(
+				'name'                       => __( 'Inventory', 'ssl-alp' ),
+				'singular_name'              => __( 'Item', 'ssl-alp' ),
+				'search_items'               => __( 'Search Items', 'ssl-alp' ),
+				'popular_items'              => __( 'Popular Items', 'ssl-alp' ),
+				'all_items'                  => __( 'All Items', 'ssl-alp' ),
+				'edit_item'                  => __( 'Edit Item', 'ssl-alp' ),
+				'update_item'                => __( 'Update Item', 'ssl-alp' ),
+				'add_new_item'               => __( 'Add New Item', 'ssl-alp' ),
+				'new_item_name'              => __( 'New Item Name', 'ssl-alp' ),
+				'separate_items_with_commas' => __( 'Separate items with commas', 'ssl-alp' ),
+				'add_or_remove_items'        => __( 'Add or remove items', 'ssl-alp' ),
+				'choose_from_most_used'      => __( 'Choose from the most used items', 'ssl-alp' ),
+				'not_found'                  => __( 'No items found.', 'ssl-alp' ),
+				'no_terms'                   => __( 'No items', 'ssl-alp' ),
+			),
+			'public'            => true,
+			'show_in_menu'      => false, // Disable term edit page.
+			'show_in_rest'      => true,  // Needed for block editor support.
+			'show_admin_column' => true,  // Show associated terms in admin edit screen.
+			'rewrite'           => array(
+				'slug' => 'inventory-posts',
+			),
 		);
 
 		// Create inventory taxonomy.
@@ -557,9 +557,9 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 	/**
 	 * Override term links to point towards the inventory post page instead of the term archive.
 	 *
-     * @param string $termlink Term link URL.
-     * @param object $term     Term object.
-     * @param string $taxonomy Taxonomy slug.
+	 * @param string $termlink Term link URL.
+	 * @param object $term     Term object.
+	 * @param string $taxonomy Taxonomy slug.
 	 *
 	 * @return string The overridden term link.
 	 */
@@ -815,16 +815,16 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 			// Disallow in all circumstances.
 			$all_capabilities['edit_term']   = false;
 			$all_capabilities['delete_term'] = false;
-        }
+		}
 
-        return $all_capabilities;
+		return $all_capabilities;
 	}
 
 	/**
 	 * Filter capabilities of super admins to stop them editing or deleting inventory terms.
 	 *
 	 * Inventory terms are essential to the correct operation of the inventory system and are
-     * managed only by the inventory custom post type.
+	 * managed only by the inventory custom post type.
 	 *
 	 * @param array  $caps    All capabilities.
 	 * @param string $cap     Capability being checked.

@@ -333,10 +333,10 @@ class SSL_ALP_Uninstaller {
 				$wpdb->delete(
 					$wpdb->posts,
 					array(
-						'post_parent' => $post_id
+						'post_parent' => $post_id,
 					),
 					array(
-						'%d'
+						'%d',
 					)
 				);
 
@@ -344,10 +344,10 @@ class SSL_ALP_Uninstaller {
 				$wpdb->delete(
 					$wpdb->posts,
 					array(
-						'ID' => $post_id
+						'ID' => $post_id,
 					),
 					array(
-						'%d'
+						'%d',
 					)
 				);
 			}

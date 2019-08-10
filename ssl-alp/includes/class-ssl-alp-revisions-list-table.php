@@ -450,7 +450,7 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 			$h_time = mysql2date( __( 'Y/m/d' ), $m_time );
 		}
 
-		$title = esc_html( 'Last Modified', 'ssl-alp' ) . '<br/>';
+		$title  = esc_html( 'Last Modified', 'ssl-alp' ) . '<br/>';
 		$title .= '<abbr title="' . esc_attr( $t_time ) . '">' . esc_html( $h_time ) . '</abbr>';
 
 		return $title;
