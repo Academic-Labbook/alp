@@ -164,7 +164,7 @@
 		</div>
 		<div class="ssl-alp-tools-card">
 			<h2 class="title"><?php _e( 'Rebuild coauthor terms', 'ssl-alp' ); ?></h2>
-			<p><?php _e( 'This tool will rebuild the coauthor terms used to allow the setting of multiple authors for posts. This tool is intended to be run on sites which had users before the Academic Labbook Plugin was installed, allowing these users to be chosen as coauthors on posts.', 'ssl-alp' ); ?></p>
+			<p><?php _e( 'This tool will rebuild the coauthor terms used to show post coauthors and to allow the setting of coauthors for posts. This tool is intended to be run on sites which had users and posts before the Academic Labbook Plugin was installed, allowing these users to be chosen as coauthors on posts, and to show them as authors of their existing posts.', 'ssl-alp' ); ?></p>
 			<form method="post" action="">
 				<input type="hidden" name="ssl_alp_rebuild_coauthors_submitted" value="1"/>
 				<p class="submit">

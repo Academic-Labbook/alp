@@ -438,6 +438,9 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 	/**
 	 * Rebuild coauthor terms.
+	 *
+	 * This adds coauthor terms for all users, generating them if necessary, and assigns posts
+	 * authored by those users to those coauthor terms.
 	 */
 	public function rebuild_coauthors() {
 		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
@@ -449,7 +452,24 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$users = get_users();
 
 		foreach ( $users as $user ) {
+			// Add coauthor terms.
 			$this->add_coauthor_term( $user->ID );
+
+			// Get all of the user's posts.
+			$posts = get_posts(
+				array(
+					'post_author' => $user->ID,
+					'post_type'   => $this->supported_post_types,
+					'post_status' => 'any',
+					'numberposts' => -1,
+				)
+			);
+
+			// Set coauthor terms on each of the user's posts.
+			foreach ( $posts as $post ) {
+				$coauthors = $this->get_coauthors( $post );
+				$this->set_coauthors( $post, $coauthors );
+			}
 		}
 	}
 
