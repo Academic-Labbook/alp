@@ -147,7 +147,7 @@ class SSL_ALP_Uninstaller {
 	private static function delete_taxonomies() {
 		self::delete_taxonomy( 'ssl_alp_coauthor' );
 		self::delete_taxonomy( 'ssl_alp_crossreference' );
-		self::delete_taxonomy( 'ssl_alp_read_flag' );
+		self::delete_taxonomy( 'ssl_alp_unread_flag' );
 		self::delete_taxonomy( 'ssl_alp_inventory_item' );
 	}
 
@@ -316,6 +316,8 @@ class SSL_ALP_Uninstaller {
 	 * @global $wpdb
 	 */
 	private static function delete_custom_post_type_posts( $post_type, $new_post_type = null ) {
+		global $wpdb;
+
 		if ( is_null( $new_post_type ) ) {
 			$post_ids = $wpdb->get_col(
 				$wpdb->prepare(
