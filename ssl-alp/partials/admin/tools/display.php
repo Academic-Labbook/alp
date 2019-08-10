@@ -31,78 +31,87 @@
 <?php endif; ?>
 <div class="wrap">
 	<h2><?php _e('Academic Labbook Tools', 'ssl-alp'); ?></h2>
-	<p class="description"><?php esc_html_e( sprintf( 'You are running Academic Labbook Plugin %s.', SSL_ALP_VERSION ), 'ssl-alp' ); ?></p>
+	<p class="description"><?php printf( esc_html__( 'You are running Academic Labbook Plugin %s.', 'ssl-alp' ), SSL_ALP_VERSION ); ?></p>
 	<div class="ssl-alp-tools-cards">
 		<div class="ssl-alp-tools-card">
-			<h2 class="title"><?php _e( 'Activate theme', 'ssl-alp' ); ?></h2>
+			<h2 class="title"><?php esc_html_e( 'Activate theme', 'ssl-alp' ); ?></h2>
 			<p><?php _e( 'It is highly recommended to use the <em>Labbook</em> theme on this site. This theme, or a child theme derived from it, must be enabled in order for most of Academic Labbook Plugin\'s functionality to appear.', 'ssl-alp' ); ?></p>
 			<?php if ( $supported_theme_active ) : ?>
 			<p class="description"><?php _e( '<em>Labbook</em>, or a child theme derived from it, is already active.', 'ssl-alp' ); ?></p>
 			<?php elseif ( $supported_theme_installed ) : ?>
 			<p class="description"><?php _e( '<em>Labbook</em>, or a child theme derived from it, is not active. Visit the <a href="themes.php">themes page</a> to activate it. On network sites, you may have to network activate the theme first.', 'ssl-alp' ); ?></p>
 			<?php else : ?>
-			<p class="description"><?php _e( sprintf( '<em>Labbook</em> is not installed. Visit the <a href="%s">ALP website</a> to download it.', 'https://alp.attackllama.com/documentation/themes/' ), 'ssl-alp' ); ?></p>
+			<p class="description"><?php printf( __( '<em>Labbook</em> is not installed. Visit the <a href="%s">ALP website</a> to download it.', 'ssl-alp' ), 'https://alp.attackllama.com/documentation/themes/' ); ?></p>
 			<?php endif; ?>
 		</div>
 		<div class="ssl-alp-tools-card">
-			<h2 class="title"><?php _e( 'Optimise core WordPress settings for private labbook', 'ssl-alp' ); ?></h2>
-			<p><?php _e( 'This tool allows you to change core WordPress settings to make them appropriate for a private academic labbook. The presumption behind these setting changes is that you control access to the labbook and trust the users whom you grant access to.', 'ssl-alp' ); ?></p>
+			<h2 class="title"><?php esc_html_e( 'Enable pretty permalinks', 'ssl-alp' ); ?></h2>
+			<p><?php esc_html_e( 'It is recommended to enable pretty permalinks to allow cross-references to be made between different post types. WordPress is only capable of extracting links to standard posts and pages from post text when plain permalinks are used, and not links to custom post types added by Academic Labbook Plugin such as inventory pages. With pretty permalinks enabled, WordPress can detect and therefore display cross-references between all types of post.', 'ssl-alp' ); ?></p>
+			<?php if ( $pretty_permalinks_enabled ) : ?>
+			<p class="description"><?php esc_html_e( 'Pretty permalinks are enabled.', 'ssl-alp' ); ?></p>
+			<?php else : ?>
+			<p class="description"><?php _e( sprintf( 'Pretty permalinks are disabled. Visit <a href="%s">this settings page</a> to enable them.', 'options-permalink.php' ), 'ssl-alp' ); ?></p>
+			<?php endif; ?>
+		</div>
+		<div class="ssl-alp-tools-card">
+			<h2 class="title"><?php esc_html_e( 'Optimise core WordPress settings for private labbook', 'ssl-alp' ); ?></h2>
+			<p><?php esc_html_e( 'This tool allows you to change core WordPress settings to make them appropriate for a private academic labbook. The presumption behind these setting changes is that you control access to the labbook and trust the users whom you grant access to.', 'ssl-alp' ); ?></p>
 			<table class="widefat fixed striped ssl-alp-builtin-settings" cellspacing="0">
 				<thead>
 					<tr>
-						<th class="column-setting"><?php _e( 'Setting to update', 'ssl-alp' ); ?></th>
-						<th class="column-control"><?php _e( 'New value', 'ssl-alp' ); ?></th>
+						<th class="column-setting"><?php esc_html_e( 'Setting to update', 'ssl-alp' ); ?></th>
+						<th class="column-control"><?php esc_html_e( 'New value', 'ssl-alp' ); ?></th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
 						<th>
-							<strong><?php _e( 'Attempt to notify any blogs linked to from the article' ); ?></strong>
-							<p class="description"><?php _e( 'This is not necessary for private sites.', 'ssl-alp' ); ?></p>
+							<strong><?php esc_html_e( 'Attempt to notify any blogs linked to from the article', 'ssl-alp' ); ?></strong>
+							<p class="description"><?php esc_html_e( 'This is not necessary for private sites.', 'ssl-alp' ); ?></p>
 						</th>
-						<td><?php _e( 'No' ); ?></td>
+						<td><?php _e( 'No', 'ssl-alp' ); ?></td>
 					</tr>
 					<tr>
 						<th>
-							<strong><?php _e( 'Allow link notifications from other blogs (pingbacks and trackbacks) on new articles' ); ?></strong>
-							<p class="description"><?php _e( 'This is not necessary for private sites.', 'ssl-alp' ); ?></p>
+							<strong><?php esc_html_e( 'Allow link notifications from other blogs (pingbacks and trackbacks) on new articles', 'ssl-alp' ); ?></strong>
+							<p class="description"><?php esc_html_e( 'This is not necessary for private sites.', 'ssl-alp' ); ?></p>
 						</th>
-						<td><?php _e( 'No' ); ?></td>
+						<td><?php esc_html_e( 'No', 'ssl-alp' ); ?></td>
 					</tr>
 					<tr>
 						<th>
-							<strong><?php _e( 'Users must be registered and logged in to comment' ); ?></strong>
-							<p class="description"><?php _e( 'This prevents anonymous comments if the site is made publicly visible in the future.', 'ssl-alp' ); ?></p>
+							<strong><?php esc_html_e( 'Users must be registered and logged in to comment', 'ssl-alp' ); ?></strong>
+							<p class="description"><?php esc_html_e( 'This prevents anonymous comments if the site is made publicly visible in the future.', 'ssl-alp' ); ?></p>
 						</th>
-						<td><?php _e( 'Yes' ); ?></td>
+						<td><?php esc_html_e( 'Yes', 'ssl-alp' ); ?></td>
 					</tr>
 					<tr>
 						<th>
-							<strong><?php _e( 'Comment author must have a previously approved comment' ); ?></strong>
-							<p class="description"><?php _e( 'This is not necessary for private sites with trusted users.', 'ssl-alp' ); ?></p>
+							<strong><?php esc_html_e( 'Comment author must have a previously approved comment', 'ssl-alp' ); ?></strong>
+							<p class="description"><?php esc_html_e( 'This is not necessary for private sites with trusted users.', 'ssl-alp' ); ?></p>
 						</th>
-						<td><?php _e( 'No' ); ?></td>
+						<td><?php esc_html_e( 'No', 'ssl-alp' ); ?></td>
 					</tr>
 					<tr>
 						<th>
-							<strong><?php _e( 'Hold a comment in the moderation queue if it contains more than the following number of links', 'ssl-alp' ); ?></strong>
-							<p class="description"><?php _e( 'This is not necessary for private sites with trusted users. Setting it to 0 disables this check.', 'ssl-alp' ); ?></p>
+							<strong><?php esc_html_e( 'Hold a comment in the moderation queue if it contains more than the following number of links', 'ssl-alp' ); ?></strong>
+							<p class="description"><?php esc_html_e( 'This is not necessary for private sites with trusted users. Setting it to 0 disables this check.', 'ssl-alp' ); ?></p>
 						</th>
 						<td>0</td>
 					</tr>
 					<tr>
 						<th>
-							<strong><?php _e( 'Discourage search engines from indexing this site' ); ?></strong>
-							<p class="description"><?php _e( 'This is not necessary for private sites.', 'ssl-alp' ); ?></p>
+							<strong><?php esc_html_e( 'Discourage search engines from indexing this site', 'ssl-alp' ); ?></strong>
+							<p class="description"><?php esc_html_e( 'This is not necessary for private sites.', 'ssl-alp' ); ?></p>
 						</th>
-						<td><?php _e( 'Yes' ); ?></td>
+						<td><?php esc_html_e( 'Yes', 'ssl-alp' ); ?></td>
 					</tr>
 					<tr>
 						<th>
-							<strong><?php _e( 'For each article in a feed, show full text', 'ssl-alp' ); ?></strong>
-							<p class="description"><?php _e( 'This allows your users to read full article texts via syndication feed aggregator clients and services.', 'ssl-alp' ); ?></p>
+							<strong><?php esc_html_e( 'For each article in a feed, show full text', 'ssl-alp' ); ?></strong>
+							<p class="description"><?php esc_html_e( 'This allows your users to read full article texts via syndication feed aggregator clients and services.', 'ssl-alp' ); ?></p>
 						</th>
-						<td><?php _e( 'Yes' ); ?></td>
+						<td><?php esc_html_e( 'Yes', 'ssl-alp' ); ?></td>
 					</tr>
 				</tbody>
 			</table>
@@ -114,14 +123,14 @@
 				<?php wp_nonce_field( 'ssl-alp-manage-core-settings', 'ssl_alp_manage_core_settings_nonce' ); ?>
 			</form>
 			<?php if ( $core_settings_overridden ) : ?>
-			<p class="description"><?php _e( 'Core settings are already set to the above values.', 'ssl-alp' ); ?></p>
+			<p class="description"><?php esc_html_e( 'Core settings are already set to the above values.', 'ssl-alp' ); ?></p>
 			<?php elseif ( ! $require_login ) : ?>
 			<p class="description"><?php _e( sprintf( 'The <a href="options-general.php?page=ssl-alp-admin-options">%1$s</a> setting is not enabled. Please enable it first before running this tool.', __( ' Require login to access site', 'ssl-alp' ) ), 'ssl-alp' ); ?></p>
 			<?php endif; ?>
 		</div>
 		<div class="ssl-alp-tools-card">
-			<h2 class="title"><?php _e( 'Convert user roles', 'ssl-alp' ); ?></h2>
-			<p><?php _e( 'This tool will convert the default WordPress user roles into roles more suitable for an academic labbook.', 'ssl-alp' ); ?></p>
+			<h2 class="title"><?php esc_html_e( 'Convert user roles', 'ssl-alp' ); ?></h2>
+			<p><?php esc_html_e( 'This tool will convert the default WordPress user roles into roles more suitable for an academic labbook.', 'ssl-alp' ); ?></p>
 			<ul>
 				<li><?php printf( __( 'The <strong>%1$s</strong> role is unchanged from the WordPress default. Users with this role can edit, delete and change the role of other users.', 'ssl-alp' ), __( 'Administrator' ) ); ?></li>
 				<li><?php printf( __( 'The <strong>%1$s</strong> role is changed to <strong>%2$s</strong>. This is intended for research group members. Users with this role can, among other capabilities, create, edit and delete their own and others\' posts, create, edit and delete pages, and manage comments, categories and uploaded media. This role is the default for new users.', 'ssl-alp' ), __( 'Editor' ), __( 'Researcher', 'ssl-alp' ) ); ?></li>
@@ -131,30 +140,30 @@
 				<li><?php printf( __( 'The <strong>%1$s</strong> role is added, with no permissions to perform any actions on the site, including to read it. This is intended for users who are no longer to be given access to the site. On private sites, this avoids the need to delete a user\'s account in order to remove their access, which would also delete their contributions.', 'ssl-alp' ), __( 'Excluded', 'ssl-alp' ) ); ?></li>
 			</ul>
 			<p><?php _e( 'This action <strong>deletes</strong> the default WordPress roles from the database, meaning that these roles will remain even if the Academic Labbook Plugin is disabled or uninstalled in the future. For more information on roles, please see <a href="https://codex.wordpress.org/Roles_and_Capabilities">Roles and Capabilities</a> in the WordPress Codex.', 'ssl-alp' ); ?></p>
-			<p><strong><?php _e( 'This action cannot be undone.', 'ssl-alp' ); ?></strong></p>
+			<p><strong><?php esc_html_e( 'This action cannot be undone.', 'ssl-alp' ); ?></strong></p>
 			<form method="post" action="">
 				<input type="hidden" name="ssl_alp_convert_role_submitted" value="1"/>
 				<input type="checkbox" id="ssl_alp_convert_role_confirm_checkbox" name="ssl_alp_convert_role_confirm" value="1"<?php if ( ! $roles_convertable ) : ?> disabled<?php endif; ?>/>
-				<label for="ssl_alp_convert_role_confirm_checkbox"><?php _e( 'I have read and understood the above information', 'ssl-alp' ); ?></label>
+				<label for="ssl_alp_convert_role_confirm_checkbox"><?php esc_html_e( 'I have read and understood the above information', 'ssl-alp' ); ?></label>
 				<p class="submit">
-					<input name="submit" id="submit" class="button button-primary" value="<?php _e( 'Convert User Roles', 'ssl-alp' ); ?>" type="submit"<?php if ( ! $roles_convertable ) : ?> disabled<?php endif; ?>/>
+					<input name="submit" id="submit" class="button button-primary" value="<?php esc_html_e( 'Convert User Roles', 'ssl-alp' ); ?>" type="submit"<?php if ( ! $roles_convertable ) : ?> disabled<?php endif; ?>/>
 				</p>
 				<?php wp_nonce_field( 'ssl-alp-convert-user-roles', 'ssl_alp_convert_user_roles_nonce' ); ?>
 			</form>
 			<?php if ( $roles_converted ) : ?>
-			<p class="description"><?php _e( 'User roles have already been converted.', 'ssl-alp' ); ?></p>
+			<p class="description"><?php esc_html_e( 'User roles have already been converted.', 'ssl-alp' ); ?></p>
 			<?php else : ?>
-			<p class="description"><?php _e( 'User roles are not currently set to WordPress defaults, and so cannot be converted.', 'ssl-alp' ); ?></p>
+			<p class="description"><?php esc_html_e( 'User roles are not currently set to WordPress defaults, and so cannot be converted.', 'ssl-alp' ); ?></p>
 			<?php endif; ?>
 		</div>
 		<div class="ssl-alp-tools-card">
-			<h2 class="title"><?php _e( 'Rebuild cross-references', 'ssl-alp' ); ?></h2>
-			<p><?php _e( 'This tool will rebuild the cross-references related to each published post and page. This is useful for extracting cross-references from posts or pages created or edited during any time in which the cross-references feature was disabled, and from posts or pages created before the plugin was installed or activated.', 'ssl-alp' ); ?></p>
+			<h2 class="title"><?php esc_html_e( 'Rebuild cross-references', 'ssl-alp' ); ?></h2>
+			<p><?php esc_html_e( 'This tool will rebuild the cross-references related to each published post and page. This is useful for extracting cross-references from posts or pages created or edited during any time in which the cross-references feature was disabled, and from posts or pages created before the plugin was installed or activated.', 'ssl-alp' ); ?></p>
 			<p class="description"><?php _e( sprintf( 'Note: this tool may take a long time to execute on large sites. Due to server configuration settings, the execution may time out. You may instead wish to <a href="%s">run this tool via WP-CLI</a>.', esc_url( "https://alp.attackllama.com/documentation/rebuilding-cross-references/" ) ), 'ssl-alp' ); ?></p>
 			<form method="post" action="">
 				<input type="hidden" name="ssl_alp_rebuild_references_submitted" value="1"/>
 				<p class="submit">
-					<input name="submit" id="submit" class="button button-primary" value="<?php _e( 'Rebuild Cross-References', 'ssl-alp' ); ?>" type="submit"<?php if ( ! $references_enabled ) : ?> disabled<?php endif; ?>/>
+					<input name="submit" id="submit" class="button button-primary" value="<?php esc_html_e( 'Rebuild Cross-References', 'ssl-alp' ); ?>" type="submit"<?php if ( ! $references_enabled ) : ?> disabled<?php endif; ?>/>
 				</p>
 				<?php wp_nonce_field( 'ssl-alp-rebuild-references', 'ssl_alp_rebuild_references_nonce' ); ?>
 			</form>
@@ -163,12 +172,12 @@
 			<?php endif; ?>
 		</div>
 		<div class="ssl-alp-tools-card">
-			<h2 class="title"><?php _e( 'Rebuild coauthor terms', 'ssl-alp' ); ?></h2>
-			<p><?php _e( 'This tool will rebuild the coauthor terms used to show post coauthors and to allow the setting of coauthors for posts. This tool is intended to be run on sites which had users and posts before the Academic Labbook Plugin was installed, allowing these users to be chosen as coauthors on posts, and to show them as authors of their existing posts.', 'ssl-alp' ); ?></p>
+			<h2 class="title"><?php esc_html_e( 'Rebuild coauthor terms', 'ssl-alp' ); ?></h2>
+			<p><?php esc_html_e( 'This tool will rebuild the coauthor terms used to show post coauthors and to allow the setting of coauthors for posts. This tool is intended to be run on sites which had users and posts before the Academic Labbook Plugin was installed, allowing these users to be chosen as coauthors on posts, and to show them as authors of their existing posts.', 'ssl-alp' ); ?></p>
 			<form method="post" action="">
 				<input type="hidden" name="ssl_alp_rebuild_coauthors_submitted" value="1"/>
 				<p class="submit">
-					<input name="submit" id="submit" class="button button-primary" value="<?php _e( 'Rebuild Coauthor Terms', 'ssl-alp' ); ?>" type="submit"<?php if ( ! $coauthors_enabled ) : ?> disabled<?php endif; ?>/>
+					<input name="submit" id="submit" class="button button-primary" value="<?php esc_html_e( 'Rebuild Coauthor Terms', 'ssl-alp' ); ?>" type="submit"<?php if ( ! $coauthors_enabled ) : ?> disabled<?php endif; ?>/>
 				</p>
 				<?php wp_nonce_field( 'ssl-alp-rebuild-coauthors', 'ssl_alp_rebuild_coauthors_nonce' ); ?>
 			</form>

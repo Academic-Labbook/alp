@@ -86,6 +86,7 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 		// Default completed action states.
 		$supported_theme_installed        = false;
 		$supported_theme_active           = false;
+		$pretty_permalinks_enabled        = false;
 		$override_core_settings_completed = false;
 		$role_conversion_completed        = false;
 		$rebuild_references_completed     = false;
@@ -108,6 +109,12 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 				$supported_theme_active = true;
 			}
 		}
+
+		/**
+		 * Check pretty permalinks.
+		 */
+
+		$pretty_permalinks_enabled = ! empty( get_option( 'permalink_structure' ) );
 
 		/**
 		 * Handle manage core settings form.
