@@ -46,6 +46,12 @@ account in order to access the content. Combined with WordPress's disable login
 setting, and perhaps an LDAP authentication plugin, access can be tightly
 controlled.
 
+An "Inventory" system is added which lets your users create pages for lab
+equipment such as electronics. These pages can be used in whatever way you wish,
+such as to store manuals, images, guides and background information. Posts can
+also be tagged with inventory, and links to the corresponding inventory pages
+are shown under the post.
+
 ALP provides a tool to convert user roles from the blog-centric WordPress
 defaults to one more suitable for an academic group. The primary role becomes
 "Researcher" instead of "Editor", allowing users with this role to create, edit

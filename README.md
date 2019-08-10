@@ -118,6 +118,8 @@ Features:
  - Provides recent revisions sidebar widget showing recently edited posts and pages
  - Shows cross-references (links in the post body) between posts and pages under each post or page
  - Allows posts to be set as read or unread
+ - Adds an "Inventory" system to allow you to create pages for inventory items to add e.g. manuals,
+   schematics, images, etc., and lets you tag posts with inventory to provide links to these pages
  - Supports display of an institute logo and icon
  - Provides two menu locations for providing links to site or external pages or URLs
  - Provides customisable copyright notice and ability to hide branding
