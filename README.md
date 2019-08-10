@@ -40,11 +40,6 @@ pages. This is particularly useful for finding out whether newer posts on a part
 been made, as long as the author of the newer post remembered to link back to the older one. This
 feature acts like a bit like a "related posts" list on other websites.
 
-### Mathematical markup support
-ALP adds a TeX block to the Gutenberg editor in WordPress 5.0, allowing users to create equations.
-The equation is rendered within the editor so the user can check their markup, and the markup can be
-edited later alongside the rest of the post.
-
 ### Unread flags
 ALP tracks whether logged-in users have read new posts. When a new post is made, everyone except
 the post's author sees the new post as unread, designated in the *Labbook* theme using a closed
@@ -55,6 +50,12 @@ also click a link in the top bar to view a list of all unread posts.
 
 When a post undergoes significant edits, a post is again marked as unread to all users except the
 author.
+
+### Inventory system
+ALP adds an inventory system to allow you to create pages for inventory items. These pages can be
+used as a central place to store e.g. manuals, schematics, images, etc., and the system lets your
+users tag posts with inventory items which then provides links to these pages under the
+corresponding posts.
 
 ### Advanced search
 When used with the *Labbook* theme, ALP adds advanced search capabilities allowing users to
@@ -73,6 +74,11 @@ searches.
 
 Note: images are still accessible when the direct link is known - this is a shortcoming in WordPress
 itself. This can in most cases be mitigated with appropriate HTTP server configuration.
+
+### Mathematical markup support
+ALP adds a TeX block to the Gutenberg editor in WordPress 5.0, allowing users to create equations.
+The equation is rendered within the editor so the user can check their markup, and the markup can be
+edited later alongside the rest of the post.
 
 ### Term management
 ALP adds the ability to merge tags and categories in bulk.
@@ -122,8 +128,6 @@ Features:
  - Provides recent revisions sidebar widget showing recently edited posts and pages
  - Shows cross-references (links in the post body) between posts and pages under each post or page
  - Allows posts to be set as read or unread
- - Adds an "Inventory" system to allow you to create pages for inventory items to add e.g. manuals,
-   schematics, images, etc., and lets you tag posts with inventory to provide links to these pages
  - Supports display of an institute logo and icon
  - Provides two menu locations for providing links to site or external pages or URLs
  - Provides customisable copyright notice and ability to hide branding
