@@ -489,6 +489,14 @@ big {
     font-size: 125%;
 }
 
+.entry-title,
+.entry-content,
+.entry-summary,
+.nav-links {
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
 /*--------------------------------------------------------------
 # Elements
 --------------------------------------------------------------*/
@@ -1240,8 +1248,9 @@ a:hover, a:active {
 /* Small devices (e.g. tablets) and above */
 @media (min-width: 600px) {
     .entry-header-container {
-        /* 100px right column, together with max-height: 100px, maintains thumbnail aspect ratio. */
-        grid-template-columns: 1fr 100px;
+        /* Note: second grid column is constrained to 100px by .entry-thumbnail. The `auto` here
+           allows the column width to shrink to 0 when there is no thumbnail. */
+        grid-template-columns: 1fr auto;
         grid-template-rows: auto 1fr;
         grid-template-areas:
             "breadcrumbs thumbnail"
@@ -1268,6 +1277,7 @@ a:hover, a:active {
 
 .entry-thumbnail {
     grid-area: thumbnail;
+    max-width: 100px;
 }
 
 .entry-thumbnail img {
@@ -1285,7 +1295,6 @@ a:hover, a:active {
 .entry-title {
     font-size: 1.9em;
     margin: 0 0 0.25em 0;
-    word-wrap: break-word;
 }
 
 /* show visited posts' titles in different colour */
@@ -1301,7 +1310,6 @@ a:hover, a:active {
     margin-bottom: 1em;
     padding-top: 1em;
     padding-bottom: 1em;
-    word-wrap: break-word;
 }
 
 .entry-content h1,
