@@ -1164,8 +1164,8 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 */
 	public static function add_unread_post_rewrite_rules() {
 		add_rewrite_rule(
-			'^unread/?(.*)/?$',
-			'index.php?unread=' . self::$unread_flag_term_slug_prefix . '$matches[1]',
+			'^unread\/?(?:page\/(\d+))?\/?$',
+			'index.php?unread=ssl_alp_unread_flag&paged=$matches[1]',
 			'top' // Required to avoid page matching rule.
 		);
 	}
@@ -1222,23 +1222,12 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			// Cannot show useful unread posts page.
 			$wp_query->set_404();
 		} else {
-			if ( get_query_var( 'unread' ) === self::$unread_flag_term_slug_prefix ) {
-				// No unread term is set (it defaults to the slug prefix) - use current user's slug.
+			if ( 'ssl_alp_unread_flag' === get_query_var( 'unread' ) ) {
+				// The request is for unread flags.
+				// Set the unread flag queryvar to the user's unread term slug.
 				set_query_var( 'unread', $this->get_unread_flag_term_slug() );
 			} else {
-				// An unread archive slug is set, but does the user have permission to view it?
-				$term = get_term_by( 'slug', get_query_var( 'unread' ), 'ssl_alp_unread_flag' );
-
-				if ( $term ) {
-					$user = $this->get_user_from_unread_flag_term( $term );
-
-					if ( ! $this->check_unread_flag_permission( $user ) ) {
-						// User cannot view this page.
-						$wp_query->set_404();
-					}
-				} else {
-					$wp_query->set_404();
-				}
+				$wp_query->set_404();
 			}
 		}
 	}
