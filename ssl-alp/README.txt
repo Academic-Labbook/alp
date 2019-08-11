@@ -15,7 +15,7 @@ more.
 == Description ==
 Please also visit [our website](https://alp.attackllama.com/)!
 
-Academic Labbook Plugin (ALP) provides a lightweight but powerful set of tools
+Academic Labbook Plugin (ALP) provides a powerful set of tools
 on top of core WordPress to allow researchers to write about their work,
 leveraging the powerful WordPress platform. With ALP, you can benefit from
 WordPress's post compositition, tagging and categorisation, media management and

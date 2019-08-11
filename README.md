@@ -167,11 +167,10 @@ outdated browsers, and this project is not concerned about losing sales from use
 ## Design principles
  - **Clean code**: there's an awful lot of terribly written code in the WordPress ecosystem. This
    plugin attempts to conform to coding standards, and to interfere minimally with the default
-   WordPress behaviour where possible. For some of the more major features, like coauthors,
-   some quiet major modifications are required to core behaviour, which means that ALP may not be
-   compatible with certain other plugins.
- - **Modular**: most/all features can be enabled or disabled, and work independently from each
-   other.
+   WordPress behaviour where possible.
+ - **Modular**: most features can be enabled or disabled via the settings page, and work
+   independently from each other. The plugin can also be used without the corresponding theme,
+   though this hides a lot of the useful parts of the plugin from users.
 
 ## Future development plans
 The basic behaviour of ALP is already in place, but the plan is to keep adding useful features
