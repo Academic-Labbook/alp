@@ -85,12 +85,6 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 
 		// Support inventory item querystrings in WP_Query.
 		$loader->add_action( 'parse_tax_query', $this, 'parse_query_vars' );
-
-		// Filter to stop users from editing or deleting inventory terms directly.
-		$loader->add_filter( 'user_has_cap', $this, 'filter_user_has_cap', 10, 4 );
-
-		// Stop super admins deleting inventory terms.
-		$loader->add_filter( 'map_meta_cap', $this, 'filter_capabilities', 10, 4 );
 	}
 
 	/**
@@ -488,8 +482,14 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 				'not_found'                  => __( 'No items found.', 'ssl-alp' ),
 				'no_terms'                   => __( 'No items', 'ssl-alp' ),
 			),
+			'capabilities' => array(
+				'manage_terms'  =>   'do_not_allow',
+				'edit_terms'    =>   'do_not_allow',
+				'delete_terms'  =>   'do_not_allow',
+				'assign_terms'  =>   'edit_posts', // Needed to allow assignment in block editor.
+			),
 			'public'            => true,
-			'show_in_menu'      => false, // Disable term edit page.
+			'show_in_menu'      => false, // Hide term edit page.
 			'show_in_rest'      => true,  // Needed for block editor support.
 			'show_admin_column' => true,  // Show associated terms in admin edit screen.
 			'rewrite'           => array(
@@ -793,71 +793,5 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 
 		// Merge new taxonomy filters into existing ones.
 		$query->tax_query->queries = wp_parse_args( $tax_query, $query->tax_query->queries );
-	}
-
-	/**
-	 * Stop users editing or deleting inventory terms.
-	 *
-	 * @param array   $all_capabilities All user capabilities.
-	 * @param mixed   $unused           Unused.
-	 * @param array   $args             Capability arguments.
-	 * @param WP_User $user             User object.
-	 */
-	public function filter_user_has_cap( $all_capabilities, $unused, $args, $user ) {
-		if ( ! get_option( 'ssl_alp_enable_inventory' ) ) {
-			// Inventory disabled.
-			return $all_capabilities;
-		}
-
-		$requested_capability = $args[0];
-
-		if ( in_array( $requested_capability, array( 'edit_term', 'delete_term' ), true ) ) {
-			// Disallow in all circumstances.
-			$all_capabilities['edit_term']   = false;
-			$all_capabilities['delete_term'] = false;
-		}
-
-		return $all_capabilities;
-	}
-
-	/**
-	 * Filter capabilities of super admins to stop them editing or deleting inventory terms.
-	 *
-	 * Inventory terms are essential to the correct operation of the inventory system and are
-	 * managed only by the inventory custom post type.
-	 *
-	 * @param array  $caps    All capabilities.
-	 * @param string $cap     Capability being checked.
-	 * @param int    $user_id User ID.
-	 * @param array  $args    Capability arguments.
-	 */
-	public function filter_capabilities( $caps, $cap, $user_id, $args ) {
-		// Construct list of capabilities based on post type.
-		$filtered_caps = array(
-			// Terms.
-			'edit_term',
-			'delete_term',
-		);
-
-		if ( ! in_array( $cap, $filtered_caps, true ) ) {
-			// this is not a capability we need to filter.
-			return $caps;
-		}
-
-		// Get term.
-		$term = get_term( $args[0] );
-
-		if ( is_null( $term ) ) {
-			return $caps;
-		}
-
-		$taxonomy = get_taxonomy( $term->taxonomy );
-
-		if ( 'ssl_alp_inventory_item' === $taxonomy->name ) {
-			// Disallow.
-			$caps[] = 'do_not_allow';
-		}
-
-		return $caps;
 	}
 }

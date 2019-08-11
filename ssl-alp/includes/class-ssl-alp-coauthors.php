@@ -104,11 +104,8 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// Delete or reassign user terms from posts when a user is deleted on a network site installation.
 		$loader->add_action( 'remove_user_from_blog', $this, 'remove_user_from_blog', 10, 3 );
 
-		// Filter to allow coauthors to edit posts and stop users deleting coauthor terms.
+		// Filter to allow coauthors to edit posts.
 		$loader->add_filter( 'user_has_cap', $this, 'filter_user_has_cap', 10, 4 );
-
-		// Stop super admins deleting coauthor terms.
-		$loader->add_filter( 'map_meta_cap', $this, 'filter_capabilities', 10, 4 );
 
 		/**
 		 * Display hooks.
@@ -211,14 +208,20 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			'query_var'             => false,
 			'rewrite'               => false,
 			'public'                => false,
-			'sort'                  => true, // Remember order terms are added to posts.
+			'sort'                  => true,  // Remember order terms are added to posts.
 			'args'                  => array(
 				// Default arguments used by `wp_get_object_terms`, see https://core.trac.wordpress.org/ticket/40496.
 				'orderby' => 'term_order',
 			),
-			'show_ui'               => true, // Show selector on edit page.
-			'show_in_menu'          => false, // Disable term edit page.
-			'show_in_rest'          => true, // Needed for block editor support.
+			'capabilities' => array(
+				'manage_terms'  =>   'do_not_allow',
+				'edit_terms'    =>   'do_not_allow',
+				'delete_terms'  =>   'do_not_allow',
+				'assign_terms'  =>   'edit_posts', // Needed to allow assignment in block editor.
+			),
+			'show_ui'               => true,  // Show selector on edit page.
+			'show_in_menu'          => false, // Hide term edit page.
+			'show_in_rest'          => true,  // Needed for block editor support.
 			'show_admin_column'     => true,  // Show associated terms in admin edit screen.
 			'update_count_callback' => array( $this, 'update_users_posts_count' ), // Override count.
 		);
@@ -584,8 +587,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Allows coauthors to edit the post they're coauthors of, and stop
-	 * users deleting coauthor terms.
+	 * Allows coauthors to edit the post they're coauthors of.
 	 *
 	 * @param array   $all_capabilities All user capabilities.
 	 * @param mixed   $unused           Unused.
@@ -599,14 +601,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		$requested_capability = $args[0];
-
-		if ( in_array( $requested_capability, array( 'edit_term', 'delete_term' ), true ) ) {
-			// Disallow in all circumstances.
-			$all_capabilities['edit_term']   = false;
-			$all_capabilities['delete_term'] = false;
-
-			return $all_capabilities;
-		}
 
 		// Assume post.
 		$post = get_post( isset( $args[2] ) ? $args[2] : 0 );
@@ -652,46 +646,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$all_capabilities[ $post_type->cap->edit_others_posts ] = true;
 
 		return $all_capabilities;
-	}
-
-	/**
-	 * Filter capabilities of super admins to stop them editing or deleting coauthor terms.
-	 *
-	 * Coauthor terms are essential to the correct operation of the coauthors system.
-	 *
-	 * @param array  $caps    All capabilities.
-	 * @param string $cap     Capability being checked.
-	 * @param int    $user_id User ID.
-	 * @param array  $args    Capability arguments.
-	 */
-	public function filter_capabilities( $caps, $cap, $user_id, $args ) {
-		// Construct list of capabilities based on post type.
-		$filtered_caps = array(
-			// Terms.
-			'edit_term',
-			'delete_term',
-		);
-
-		if ( ! in_array( $cap, $filtered_caps, true ) ) {
-			// this is not a capability we need to filter.
-			return $caps;
-		}
-
-		// Get term.
-		$term = get_term( $args[0] );
-
-		if ( is_null( $term ) ) {
-			return $caps;
-		}
-
-		$taxonomy = get_taxonomy( $term->taxonomy );
-
-		if ( 'ssl_alp_coauthor' === $taxonomy->name ) {
-			// Disallow.
-			$caps[] = 'do_not_allow';
-		}
-
-		return $caps;
 	}
 
 	/**
