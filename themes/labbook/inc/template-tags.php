@@ -1013,7 +1013,7 @@ if ( ! function_exists( 'labbook_the_inventory_breadcrumbs' ) ) :
 			return;
 		}
 
-		if ( 'ssl_alp_inventory' !== $post->post_type ) {
+		if ( 'ssl-alp-inventory' !== $post->post_type ) {
 			return;
 		}
 
@@ -1080,7 +1080,7 @@ if ( ! function_exists( 'labbook_the_inventory_item_posts_link' ) ) :
 
 		$post = get_post();
 
-		if ( 'ssl_alp_inventory' !== $post->post_type ) {
+		if ( 'ssl-alp-inventory' !== $post->post_type ) {
 			return;
 		}
 

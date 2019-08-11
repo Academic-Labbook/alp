@@ -42,7 +42,7 @@ get_header();
 
 			endwhile;
 
-			the_post_navigation(
+			the_posts_navigation(
 				array(
 					'next_text' => __( 'Newer posts', 'labbook' ) . ' <i class="fa fa-chevron-right" aria-hidden="true"></i>',
 					'prev_text' => '<i class="fa fa-chevron-left" aria-hidden="true"></i> ' . __( 'Older posts', 'labbook' ),

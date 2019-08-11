@@ -40,7 +40,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 		$loader->add_action( 'months_dropdown_results', $this, 'disable_months_dropdown_results', 10, 2 );
 
 		// Remove date column from admin post list.
-		$loader->add_filter( 'manage_edit-ssl_alp_inventory_columns', $this, 'remove_date_edit_column' );
+		$loader->add_filter( 'manage_edit-ssl-alp-inventory_columns', $this, 'remove_date_edit_column' );
 
 		// Make the post title the default sort order.
 		$loader->add_action( 'pre_get_posts', $this, 'sort_posts_by_title' );
@@ -60,10 +60,10 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 		$loader->add_action( 'init', $this, 'register_taxonomy' );
 
 		// Add posts column to admin post list and make it sortable.
-		$loader->add_filter( 'manage_edit-ssl_alp_inventory_columns', $this, 'add_posts_column_to_edit_table' );
+		$loader->add_filter( 'manage_edit-ssl-alp-inventory_columns', $this, 'add_posts_column_to_edit_table' );
 
 		// Add posts to rows of the admin post list.
-		$loader->add_action( 'manage_ssl_alp_inventory_posts_custom_column', $this, 'add_posts_row_data', 10, 2 );
+		$loader->add_action( 'manage_ssl-alp-inventory_posts_custom_column', $this, 'add_posts_row_data', 10, 2 );
 
 		// Override default term links to point towards the term custom post instead of term
 		// archive.
@@ -114,7 +114,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 		 * Post multiple author settings field.
 		 */
 		add_settings_field(
-			'ssl_alp_inventory_settings',
+			'ssl-alp-inventory_settings',
 			__( 'Inventory', 'ssl-alp' ),
 			array( $this, 'inventory_settings_callback' ),
 			SSL_ALP_SITE_SETTINGS_PAGE,
@@ -216,7 +216,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 			),
 		);
 
-		register_post_type( 'ssl_alp_inventory', $args );
+		register_post_type( 'ssl-alp-inventory', $args );
 	}
 
 	/**
@@ -227,7 +227,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 	 * @return array Empty array if post type is page, otherwise $months.
 	 */
 	public function disable_months_dropdown_results( $months, $post_type ) {
-		if ( 'ssl_alp_inventory' === $post_type ) {
+		if ( 'ssl-alp-inventory' === $post_type ) {
 			// Return empty array to force it to hide (see months_dropdown() in class-wp-list-table.php).
 			return array();
 		}
@@ -273,7 +273,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 			return;
 		}
 
-		if ( 'edit' === $screen->base && 'ssl_alp_inventory' === $screen->post_type && ! isset( $_GET['orderby'] ) ) {
+		if ( 'edit' === $screen->base && 'ssl-alp-inventory' === $screen->post_type && ! isset( $_GET['orderby'] ) ) {
 			$query->set( 'orderby', 'title' );
 			$query->set( 'order', 'ASC' );
 		}
@@ -363,7 +363,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Associate a post in the ssl_alp_inventory custom post type with a corresponding
+	 * Associate a post in the ssl-alp-inventory custom post type with a corresponding
 	 * ssl_alp_inventory_item term when created or saved.
 	 *
 	 * @param int     $post_id The post ID.
@@ -375,7 +375,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 			return;
 		}
 
-		if ( 'ssl_alp_inventory' !== $post->post_type ) {
+		if ( 'ssl-alp-inventory' !== $post->post_type ) {
 			return;
 		}
 
@@ -411,7 +411,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 			return;
 		}
 
-		if ( 'ssl_alp_inventory' !== $post->post_type ) {
+		if ( 'ssl-alp-inventory' !== $post->post_type ) {
 			return;
 		}
 
@@ -435,7 +435,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 		global $ssl_alp;
 
 		$hook_suffix = add_submenu_page(
-			'edit.php?post_type=ssl_alp_inventory',
+			'edit.php?post_type=ssl-alp-inventory',
 			__( 'Revisions', 'ssl-alp' ),
 			__( 'Revisions', 'ssl-alp' ),
 			'read',
@@ -457,7 +457,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 	public function load_revisions_page_screen_options() {
 		global $ssl_alp;
 
-		return $ssl_alp->revisions->load_revisions_page_screen_options( 'ssl_alp_inventory', SSL_ALP_INVENTORY_REVISIONS_MENU_SLUG );
+		return $ssl_alp->revisions->load_revisions_page_screen_options( 'ssl-alp-inventory', SSL_ALP_INVENTORY_REVISIONS_MENU_SLUG );
 	}
 
 	/**

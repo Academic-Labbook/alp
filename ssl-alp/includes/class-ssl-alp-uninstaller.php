@@ -271,9 +271,10 @@ class SSL_ALP_Uninstaller {
 		self::delete_user_meta( 'ssl_alp_applications_per_page' );
 
 		// Screen column settings.
-		self::delete_user_meta( 'manageposts_page_ssl-alp-admin-revisionscolumnshidden' );
+		self::delete_user_meta( 'manageposts_page_ssl-alp-admin-post-revisionscolumnshidden' );
+		self::delete_user_meta( 'managepages_page_ssl-alp-admin-page-revisionscolumnshidden' );
+		self::delete_user_meta( 'managessl-alp-inventory_page_ssl-alp-admin-inventory-revisionscolumnshidden' );
 		self::delete_user_meta( 'manageusers_page_ssl-alp-admin-applicationscolumnshidden' );
-		self::delete_user_meta( 'managessl_alp_inventory_page_ssl-alp-admin-inventory-revisionscolumnshidden' );
 	}
 
 	/**
@@ -302,7 +303,7 @@ class SSL_ALP_Uninstaller {
 	 */
 	private static function delete_custom_post_types() {
 		// Change inventory posts to pages.
-		self::delete_custom_post_type_posts( 'ssl_alp_inventory', 'page' );
+		self::delete_custom_post_type_posts( 'ssl-alp-inventory', 'page' );
 	}
 
 	/**

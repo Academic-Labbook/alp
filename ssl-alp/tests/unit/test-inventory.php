@@ -49,11 +49,11 @@ class InventoryTests extends WP_UnitTestCase {
 
 		$post = $this->factory->post->create_and_get(
 			array(
-				'post_type' => 'ssl_alp_inventory',
+				'post_type' => 'ssl-alp-inventory',
 			)
         );
 
-        $this->assertEquals( $post->post_type, 'ssl_alp_inventory' );
+        $this->assertEquals( $post->post_type, 'ssl-alp-inventory' );
         // A corresponding term should have been created.
         $term = get_term_by( 'slug', $post->ID, 'ssl_alp_inventory_item' );
         $this->assertNotFalse( $term );
@@ -65,11 +65,11 @@ class InventoryTests extends WP_UnitTestCase {
 
 		$post = $this->factory->post->create_and_get(
 			array(
-				'post_type' => 'ssl_alp_inventory',
+				'post_type' => 'ssl-alp-inventory',
 			)
         );
 
-        $this->assertEquals( $post->post_type, 'ssl_alp_inventory' );
+        $this->assertEquals( $post->post_type, 'ssl-alp-inventory' );
         $term = get_term_by( 'slug', $post->ID, 'ssl_alp_inventory_item' );
         $this->assertNotFalse( $term );
         $this->assertEquals( $term->slug, $post->ID );
@@ -87,11 +87,11 @@ class InventoryTests extends WP_UnitTestCase {
 
 		$post = $this->factory->post->create_and_get(
 			array(
-				'post_type' => 'ssl_alp_inventory',
+				'post_type' => 'ssl-alp-inventory',
 			)
         );
 
-        $this->assertEquals( $post->post_type, 'ssl_alp_inventory' );
+        $this->assertEquals( $post->post_type, 'ssl-alp-inventory' );
         $term = get_term_by( 'slug', $post->ID, 'ssl_alp_inventory_item' );
         $this->assertNotFalse( $term );
         $this->assertEquals( $term->slug, $post->ID );

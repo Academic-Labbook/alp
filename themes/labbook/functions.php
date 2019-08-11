@@ -167,7 +167,7 @@ if ( ! function_exists( 'labbook_setup' ) ) :
 		 * Add support for showing featured images on inventory items.
 		 */
 		if ( labbook_ssl_alp_inventory_enabled() ) {
-			add_theme_support( 'post-thumbnails', array( 'ssl_alp_inventory' ) );
+			add_theme_support( 'post-thumbnails', array( 'ssl-alp-inventory' ) );
 		}
 
 		// Get default theme options.
