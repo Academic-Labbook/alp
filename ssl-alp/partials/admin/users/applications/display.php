@@ -6,7 +6,7 @@
 ?>
 
 <div class="wrap">
-    <h2><?php esc_html_e( 'Applications', 'ssl-alp' ); ?></h2>
+	<h2><?php esc_html_e( 'Applications', 'ssl-alp' ); ?></h2>
 	<p><?php esc_html_e( 'Passwords can be generated here for external applications to allow them to have access to your account without having to providing your actual password. Application passwords can be used to access feeds and the REST API but cannot be used to log in to the normal site. They can be easily revoked using the table below.', 'ssl-alp' ); ?></p>
 	<div id="col-container" class="wp-clearfix">
 		<div id="col-left">

@@ -5,33 +5,44 @@
  */
 ?>
 
-<?php if ( $override_core_settings_completed ): ?>
+<?php if ( $override_core_settings_completed ) : ?>
 <div class="notice notice-success is-dismissible">
 	<p><?php esc_html_e( 'Core settings changed.', 'ssl-alp' ); ?></p>
 </div>
 <?php endif; ?>
-<?php if ( $role_conversion_completed ): ?>
+<?php if ( $role_conversion_completed ) : ?>
 <div class="notice notice-success is-dismissible">
 	<p><?php esc_html_e( 'User roles converted.', 'ssl-alp' ); ?></p>
 </div>
-<?php elseif ( $role_conversion_unconfirmed ): ?>
+<?php elseif ( $role_conversion_unconfirmed ) : ?>
 <div class="notice notice-error is-dismissible">
 	<p><?php esc_html_e( 'Please click the confirmation checkbox below.', 'ssl-alp' ); ?></p>
 </div>
 <?php endif; ?>
-<?php if ( $rebuild_references_completed ): ?>
+<?php if ( $rebuild_references_completed ) : ?>
 <div class="notice notice-success is-dismissible">
 	<p><?php esc_html_e( 'References rebuilt.', 'ssl-alp' ); ?></p>
 </div>
 <?php endif; ?>
-<?php if ( $rebuild_coauthors_completed ): ?>
+<?php if ( $rebuild_coauthors_completed ) : ?>
 <div class="notice notice-success is-dismissible">
 	<p><?php esc_html_e( 'Coauthor terms rebuilt.', 'ssl-alp' ); ?></p>
 </div>
 <?php endif; ?>
 <div class="wrap">
-	<h2><?php esc_html_e('Academic Labbook Tools', 'ssl-alp'); ?></h2>
-	<p class="description"><?php printf( esc_html__( 'You are running Academic Labbook Plugin %s.', 'ssl-alp' ), SSL_ALP_VERSION ); ?></p>
+	<h2><?php esc_html_e( 'Academic Labbook Tools', 'ssl-alp' ); ?></h2>
+	<p class="description">
+	<?php
+	printf(
+		/* translators: ALP version */
+		esc_html__(
+			'You are running Academic Labbook Plugin %s.',
+			'ssl-alp'
+		),
+		SSL_ALP_VERSION
+	);
+	?>
+	</p>
 	<div class="ssl-alp-tools-cards">
 		<div class="ssl-alp-tools-card">
 			<h2 class="title"><?php esc_html_e( 'Activate theme', 'ssl-alp' ); ?></h2>
@@ -39,9 +50,32 @@
 			<?php if ( $supported_theme_active ) : ?>
 			<p class="description"><?php echo wp_kses_post( __( '<em>Labbook</em>, or a child theme derived from it, is already active.', 'ssl-alp' ) ); ?></p>
 			<?php elseif ( $supported_theme_installed ) : ?>
-			<p class="description"><?php echo wp_kses_post( sprintf( __( '<em>Labbook</em>, or a child theme derived from it, is not active. Visit the <a href="%s">themes page</a> to activate it. On network sites, you may have to network activate the theme first.', 'ssl-alp' ), 'themes.php' ) ); ?></p>
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* translators: WordPress themes settings URL */
+						__(
+							'<em>Labbook</em>, or a child theme derived from it, is not active. Visit the <a href="%s">themes page</a> to activate it. On network sites, you may have to network activate the theme first.',
+							'ssl-alp'
+						),
+						'themes.php'
+					)
+				);
+				?>
+				</p>
 			<?php else : ?>
-			<p class="description"><?php echo wp_kses_post( sprintf( __( '<em>Labbook</em> is not installed. Visit the <a href="%s">ALP website</a> to download it.', 'ssl-alp' ), 'https://alp.attackllama.com/documentation/themes/' ) ); ?></p>
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* translators: ALP theme documentation URL */
+						__( '<em>Labbook</em> is not installed. Visit the <a href="%s">ALP website</a> to download it.', 'ssl-alp' ),
+						'https://alp.attackllama.com/documentation/themes/'
+					)
+				);
+				?>
+			</p>
 			<?php endif; ?>
 		</div>
 		<div class="ssl-alp-tools-card">
@@ -50,7 +84,17 @@
 			<?php if ( $pretty_permalinks_enabled ) : ?>
 			<p class="description"><?php esc_html_e( 'Pretty permalinks are enabled.', 'ssl-alp' ); ?></p>
 			<?php else : ?>
-			<p class="description"><?php _e( sprintf( 'Pretty permalinks are disabled. Visit <a href="%s">this settings page</a> to enable them.', 'options-permalink.php' ), 'ssl-alp' ); ?></p>
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* translators: WordPress permalinks settings URL */
+						__( 'Pretty permalinks are disabled. Visit <a href="%s">this settings page</a> to enable them.', 'ssl-alp' ),
+						'options-permalink.php'
+					)
+				);
+				?>
+			</p>
 			<?php endif; ?>
 		</div>
 		<div class="ssl-alp-tools-card">
@@ -123,7 +167,17 @@
 				<?php wp_nonce_field( 'ssl-alp-manage-core-settings', 'ssl_alp_manage_core_settings_nonce' ); ?>
 			</form>
 			<?php if ( ! $require_login ) : ?>
-			<p class="description"><?php echo wp_kses_post( sprintf( __( 'The <a href="%s">Require login to access site</a> setting is not enabled. Please enable it first before running this tool.', 'ssl-alp' ), 'options-general.php?page=ssl-alp-site-options' ) ); ?></p>
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* translators: ALP site options page URL */
+						__( 'The <a href="%s">Require login to access site</a> setting is not enabled. Please enable it first before running this tool.', 'ssl-alp' ),
+						'options-general.php?page=ssl-alp-site-options'
+					)
+				);
+				?>
+			</p>
 			<?php elseif ( $core_settings_overridden ) : ?>
 			<p class="description"><?php esc_html_e( 'Core settings are already set to the above values.', 'ssl-alp' ); ?></p>
 			<?php endif; ?>
@@ -139,7 +193,17 @@
 				<li><?php echo wp_kses_post( __( 'The <strong>Subscriber</strong> role is unchanged from the WordPress default. This can be used to provide read-only access to a user. Subscribers can still comment on posts.', 'ssl-alp' ) ); ?></li>
 				<li><?php echo wp_kses_post( __( 'The <strong>Exluded</strong> role is added, with no permissions to perform any actions on the site, including to read it. This is intended for users who are no longer to be given access to the site. On private sites, this avoids the need to delete a user\'s account in order to remove their access, which would also delete their contributions.', 'ssl-alp' ) ); ?></li>
 			</ul>
-			<p><?php echo wp_kses_post( sprintf( __( 'This action <strong>deletes</strong> the default WordPress roles from the database, meaning that these roles will remain even if the Academic Labbook Plugin is disabled or uninstalled in the future. For more information on roles, please see <a href="%s">Roles and Capabilities</a> in the WordPress Codex.', 'ssl-alp' ), 'https://codex.wordpress.org/Roles_and_Capabilities' ) ); ?></p>
+			<p>
+			<?php
+			echo wp_kses_post(
+				sprintf(
+					/* translators: WordPress Codex URL */
+					__( 'This action <strong>deletes</strong> the default WordPress roles from the database, meaning that these roles will remain even if the Academic Labbook Plugin is disabled or uninstalled in the future. For more information on roles, please see <a href="%s">Roles and Capabilities</a> in the WordPress Codex.', 'ssl-alp' ),
+					'https://codex.wordpress.org/Roles_and_Capabilities'
+				)
+			);
+			?>
+			</p>
 			<p><strong><?php esc_html_e( 'This action cannot be undone.', 'ssl-alp' ); ?></strong></p>
 			<form method="post" action="">
 				<input type="hidden" name="ssl_alp_convert_role_submitted" value="1"/>
@@ -159,7 +223,17 @@
 		<div class="ssl-alp-tools-card">
 			<h2 class="title"><?php esc_html_e( 'Rebuild cross-references', 'ssl-alp' ); ?></h2>
 			<p><?php esc_html_e( 'This tool will rebuild the cross-references related to each published post and page. This is useful for extracting cross-references from posts or pages created or edited during any time in which the cross-references feature was disabled, and from posts or pages created before the plugin was installed or activated.', 'ssl-alp' ); ?></p>
-			<p class="description"><?php echo wp_kses_post( sprintf( __( 'Note: this tool may take a long time to execute on large sites. Due to server configuration settings, the execution may time out. You may instead wish to <a href="%s">run this tool via WP-CLI</a>.', 'ssl-alp' ), 'https://alp.attackllama.com/documentation/rebuilding-cross-references/' ) ); ?></p>
+			<p class="description">
+			<?php
+			echo wp_kses_post(
+				sprintf(
+					/* translators: ALP cross-reference documentation URL */
+					__( 'Note: this tool may take a long time to execute on large sites. Due to server configuration settings, the execution may time out. You may instead wish to <a href="%s">run this tool via WP-CLI</a>.', 'ssl-alp' ),
+					'https://alp.attackllama.com/documentation/rebuilding-cross-references/'
+				)
+			);
+			?>
+			</p>
 			<form method="post" action="">
 				<input type="hidden" name="ssl_alp_rebuild_references_submitted" value="1"/>
 				<p class="submit">
@@ -168,7 +242,17 @@
 				<?php wp_nonce_field( 'ssl-alp-rebuild-references', 'ssl_alp_rebuild_references_nonce' ); ?>
 			</form>
 			<?php if ( ! $references_enabled ) : ?>
-			<p class="description"><?php echo wp_kses_post( sprintf( __( 'Cross-references are disabled. To enable them, go to <a href="%s">this settings page</a>.', 'ssl-alp' ), 'options-general.php?page=ssl-alp-site-options' ) ); ?></p>
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* translators: ALP settings page URL */
+						__( 'Cross-references are disabled. To enable them, go to <a href="%s">this settings page</a>.', 'ssl-alp' ),
+						'options-general.php?page=ssl-alp-site-options'
+					)
+				);
+				?>
+				</p>
 			<?php endif; ?>
 		</div>
 		<div class="ssl-alp-tools-card">
@@ -177,12 +261,22 @@
 			<form method="post" action="">
 				<input type="hidden" name="ssl_alp_rebuild_coauthors_submitted" value="1"/>
 				<p class="submit">
-					<input name="submit" id="submit" class="button button-primary" value="<?php esc_html_e( 'Rebuild Coauthor Terms', 'ssl-alp' ); ?>" type="submit"<?php if ( ! $coauthors_enabled ) : ?> disabled<?php endif; ?>/>
+					<input name="submit" id="submit" class="button button-primary" value="<?php esc_html_e( 'Rebuild Coauthor Terms', 'ssl-alp' ); ?>" type="submit" <?php if ( ! $coauthors_enabled ) : ?> disabled<?php endif; ?>/>
 				</p>
 				<?php wp_nonce_field( 'ssl-alp-rebuild-coauthors', 'ssl_alp_rebuild_coauthors_nonce' ); ?>
 			</form>
 			<?php if ( ! $coauthors_enabled ) : ?>
-			<p class="description"><?php echo wp_kses_post( sprintf( __( 'Coauthors are disabled. To enable them, go to <a href="%s">this settings page</a>.', 'ssl-alp' ), 'options-general.php?page=ssl-alp-site-options' ) ); ?></p>
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* translators: ALP settings page URL */
+						__( 'Coauthors are disabled. To enable them, go to <a href="%s">this settings page</a>.', 'ssl-alp' ),
+						'options-general.php?page=ssl-alp-site-options'
+					)
+				);
+				?>
+				</p>
 			<?php endif; ?>
 		</div>
 	</div>

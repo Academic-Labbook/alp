@@ -4,4 +4,4 @@
  * The post settings section
  */
 
-?>
+
