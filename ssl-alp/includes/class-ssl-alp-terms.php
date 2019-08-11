@@ -74,7 +74,7 @@ class SSL_ALP_Terms extends SSL_ALP_Module {
 	 * Check if the current user can manage terms.
 	 */
 	private function user_can_manage_terms() {
-		if ( in_array( 'taxonomy', $_REQUEST, true ) ) {
+		if ( array_key_exists( 'taxonomy', $_REQUEST ) ) {
 			$taxonomy = $_REQUEST['taxonomy'];
 		} else {
 			$taxonomy = 'post_tag';
@@ -82,7 +82,7 @@ class SSL_ALP_Terms extends SSL_ALP_Module {
 
 		$taxonomy = get_taxonomy( $taxonomy );
 
-		if ( ! $taxonomy ) {
+		if ( ! $taxonomy || is_wp_error( $taxonomy ) ) {
 			return false;
 		}
 
