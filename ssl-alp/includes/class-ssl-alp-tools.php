@@ -247,7 +247,7 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 			'subscriber',
 		);
 
-		// Uf the WP_Roles settings are the same as above, the default roles are present.
+		// If the WP_Roles settings are the same as above, the default roles are present.
 		return array_keys( $roles->role_names ) === $default_role_names;
 	}
 
