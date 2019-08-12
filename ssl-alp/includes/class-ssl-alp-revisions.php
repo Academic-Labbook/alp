@@ -1075,7 +1075,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		}
 
 		$term_name = $this->get_unread_flag_term_name( $user );
-		$term      = get_term_by( 'name', $term_name, 'ssl_alp_unread_flag' );
+		$term      = get_term_by( 'name', $term_name, 'ssl-alp-unread-flag' );
 
 		if ( ! $term ) {
 			// Term doesn't yet exist.
@@ -1084,13 +1084,13 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			);
 
 			// Insert term using slugified username as term name.
-			$new_term_data = wp_insert_term( $term_name, 'ssl_alp_unread_flag', $args );
+			$new_term_data = wp_insert_term( $term_name, 'ssl-alp-unread-flag', $args );
 
 			if ( is_wp_error( $new_term_data ) ) {
 				return false;
 			}
 
-			$term = get_term_by( 'id', $new_term_data['term_id'], 'ssl_alp_unread_flag' );
+			$term = get_term_by( 'id', $new_term_data['term_id'], 'ssl-alp-unread-flag' );
 		}
 
 		return $term;
@@ -1119,7 +1119,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		);
 
 		// Create read flag taxonomy for posts.
-		register_taxonomy( 'ssl_alp_unread_flag', 'post', $args );
+		register_taxonomy( 'ssl-alp-unread-flag', 'post', $args );
 	}
 
 	/**
@@ -1165,7 +1165,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	public static function add_unread_post_rewrite_rules() {
 		add_rewrite_rule(
 			'^unread\/?(?:page\/(\d+))?\/?$',
-			'index.php?unread=ssl_alp_unread_flag&paged=$matches[1]',
+			'index.php?unread=show&paged=$matches[1]',
 			'top' // Required to avoid page matching rule.
 		);
 	}
@@ -1222,7 +1222,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			// Cannot show useful unread posts page.
 			$wp_query->set_404();
 		} else {
-			if ( 'ssl_alp_unread_flag' === get_query_var( 'unread' ) ) {
+			if ( 'show' === get_query_var( 'unread' ) ) {
 				// The request is for unread flags.
 				// Set the unread flag queryvar to the user's unread term slug.
 				set_query_var( 'unread', $this->get_unread_flag_term_slug() );
@@ -1728,7 +1728,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		}
 
 		// The term is assigned to the post if the post is unread.
-		return ! has_term( $user_unread_flag_term->name, 'ssl_alp_unread_flag', $post );
+		return ! has_term( $user_unread_flag_term->name, 'ssl-alp-unread-flag', $post );
 	}
 
 	/**
@@ -1784,10 +1784,10 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		if ( $read ) {
 			// Remove unread flag.
-			$success = wp_remove_object_terms( $post->ID, array( $user_unread_flag_term->name ), 'ssl_alp_unread_flag' );
+			$success = wp_remove_object_terms( $post->ID, array( $user_unread_flag_term->name ), 'ssl-alp-unread-flag' );
 		} else {
 			// Set unread flag.
-			$success = wp_set_post_terms( $post->ID, array( $user_unread_flag_term->name ), 'ssl_alp_unread_flag', true );
+			$success = wp_set_post_terms( $post->ID, array( $user_unread_flag_term->name ), 'ssl-alp-unread-flag', true );
 		}
 
 		if ( is_wp_error( $success ) ) {
@@ -1862,7 +1862,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		// Build URL arguments.
 		$unread_flag_args = array(
-			'taxonomy' => 'ssl_alp_unread_flag',
+			'taxonomy' => 'ssl-alp-unread-flag',
 			'term'     => $unread_flag_slug,
 		);
 
@@ -1870,7 +1870,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		$request_term = get_query_var( 'term' );
 
 		// Check if the current page is the "Mine" view.
-		if ( 'ssl_alp_unread_flag' === $request_tax && $unread_flag_slug === $request_term ) {
+		if ( 'ssl-alp-unread-flag' === $request_tax && $unread_flag_slug === $request_term ) {
 			$class = 'current';
 		} else {
 			$class = '';
@@ -1898,7 +1898,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * @param string $title The archive page title.
 	 */
 	public function set_unread_post_archive_title( $title ) {
-		if ( ! is_tax( 'ssl_alp_unread_flag' ) ) {
+		if ( ! is_tax( 'ssl-alp-unread-flag' ) ) {
 			// Not this taxonomy's page.
 			return $title;
 		}
@@ -1911,7 +1911,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		$term = get_queried_object();
 		$tax  = get_taxonomy( $term->taxonomy );
 
-		if ( 'ssl_alp_unread_flag' !== $tax->name ) {
+		if ( 'ssl-alp-unread-flag' !== $tax->name ) {
 			return $title;
 		}
 
