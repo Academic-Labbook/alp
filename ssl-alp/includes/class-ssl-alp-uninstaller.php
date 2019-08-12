@@ -146,7 +146,7 @@ class SSL_ALP_Uninstaller {
 	 */
 	private static function delete_taxonomies() {
 		self::delete_taxonomy( 'ssl_alp_coauthor' );
-		self::delete_taxonomy( 'ssl_alp_crossreference' );
+		self::delete_taxonomy( 'ssl-alp-crossreference' );
 		self::delete_taxonomy( 'ssl-alp-unread-flag' );
 		self::delete_taxonomy( 'ssl-alp-inventory-item' );
 	}

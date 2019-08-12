@@ -86,7 +86,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		}
 
 		register_taxonomy(
-			'ssl_alp_crossreference',
+			'ssl-alp-crossreference',
 			array_keys( $this->supported_reference_post_types ),
 			array(
 				'hierarchical' => false,
@@ -152,12 +152,12 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		}
 
 		// Update post's reference taxonomy terms (replaces any existing terms).
-		wp_set_post_terms( $post->ID, array_keys( $terms ), 'ssl_alp_crossreference' );
+		wp_set_post_terms( $post->ID, array_keys( $terms ), 'ssl-alp-crossreference' );
 
 		// Set internal term metadata.
 		foreach ( $terms as $term_name => $referenced_post_id ) {
 			// Get term.
-			$term = get_term_by( 'name', $term_name, 'ssl_alp_crossreference' );
+			$term = get_term_by( 'name', $term_name, 'ssl-alp-crossreference' );
 
 			// Add term metadata.
 			update_term_meta( $term->term_id, 'reference-to-post-id', $referenced_post_id );
@@ -238,7 +238,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 			return;
 		}
 
-		$terms = get_the_terms( $post, 'ssl_alp_crossreference' );
+		$terms = get_the_terms( $post, 'ssl-alp-crossreference' );
 
 		$posts = array();
 
@@ -253,7 +253,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 			$referenced_post_id = get_term_meta(
 				$term->term_id,
 				'reference-to-post-id',
-				'ssl_alp_crossreference'
+				'ssl-alp-crossreference'
 			);
 
 			$referenced_post = get_post( $referenced_post_id );
@@ -327,7 +327,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 					",
 					'reference-to-post-id',
 					$post->ID,
-					'ssl_alp_crossreference'
+					'ssl-alp-crossreference'
 				)
 			);
 
