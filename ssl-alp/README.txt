@@ -4,7 +4,7 @@ Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
 Requires at least: 5.1.0
 Tested up to: 5.2.0
 Requires PHP: 7.0.0
-Stable tag: 0.15.2
+Stable tag: 0.16.0
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -78,6 +78,27 @@ with maximum control. Please see [this guide](https://alp.attackllama.com/docume
 on the ALP website.
 
 == Changelog ==
+
+= 0.16.0 =
+ - Renamed taxonomy term names. This is a BREAKING change and requires some
+   custom queries to be run to update old terms. See the GitHub release notes
+   for details.
+ - Added inventory system.
+ - Changed post revisions widget to show only posts with line changes.
+ - Changed post revision widget to use transients instead of cache; default
+   update time set to 5 minutes.
+ - Added check to remove "Uncategorised" category from posts with at least one
+   other category.
+ - Added check to avoid referenced posts which cannot be read by user from
+   showing in the cross-references list.
+ - Simplified permission checks when editing custom taxonomy terms.
+ - Updated KaTeX to 0.10.2.
+ - Fixed bug with coauthors not being assigned to posts on sites with existing
+   posts.
+ - Fixed bug with unread posts list pagination.
+ - Added tool to detect pretty permalink status.
+ - Expanded admin documentation.
+ - Numerous minor bug fixes.
 
 = 0.15.2 =
  - Fixed bug with media type definitions where trailing spaces caused types not
