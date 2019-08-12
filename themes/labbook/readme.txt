@@ -3,7 +3,7 @@ Contributors: seanleavey
 Tags: custom-background, custom-logo, custom-menu, editor-style, education, sticky-post, theme-options, threaded-comments, translation-ready, two-columns
 Requires at least: 5.0.0
 Tested up to: 5.2.2
-Stable tag: 1.1.9
+Stable tag: 1.1.10
 Requires PHP: 7.0.0
 License: GNU General Public License v3 or later
 License URI: LICENCE
@@ -51,6 +51,17 @@ Labbook supports Academic Labbook Plugin - indeed, use of it is highly encourage
 of features provided in this theme.
 
 == Changelog ==
+
+= 1.1.10 - 2019-08-12 =
+* Added support for inventory post tag display to post footer.
+* Added inventory post type template.
+* Added thumbnail support for inventory post types.
+* Changed cross-reference list to display post type in brackets after title if
+  not a standard post.
+* Fixed bug with adjacent posts links.
+* Fixed bug with unread posts pagination.
+* Fixed post title overflows.
+* Fixed overflow of long table columns.
 
 = 1.1.9 - 2019-07-22 =
 * Fixed page IDs being printed incorrectly in page tables of contents.
