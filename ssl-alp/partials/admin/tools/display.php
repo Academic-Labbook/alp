@@ -31,6 +31,17 @@
 <?php endif; ?>
 <div class="wrap">
 	<h2><?php esc_html_e( 'Academic Labbook Tools', 'ssl-alp' ); ?></h2>
+	<p>
+	<?php
+	echo wp_kses_post(
+		sprintf(
+			/* translators: WP-CLI URL */
+			__( 'This page lists some tools to help administrate a site running Academic Labbook Plugin. It is <strong>highly recommended</strong> to take a backup of your database before running these commands, as some require long execution times and so may time out or run out of memory without properly finishing. You can also run some of these commands via <a href="%s">WP-CLI</a> to avoid these issues - see the notes under the relevant tools for more details.', 'ssl-alp' ),
+			'https://wp-cli.org/'
+		)
+	);
+	?>
+	</p>
 	<p class="description">
 	<?php
 	printf(
@@ -228,7 +239,7 @@
 			echo wp_kses_post(
 				sprintf(
 					/* translators: ALP cross-reference documentation URL */
-					__( 'Note: this tool may take a long time to execute on large sites. Due to server configuration settings, the execution may time out. You may instead wish to <a href="%s">run this tool via WP-CLI</a>.', 'ssl-alp' ),
+					__( 'Note: this tool may take a long time to execute on large sites. Due to server configuration settings, the execution may time out or run out of memory. You may instead wish to <a href="%s">run this tool via WP-CLI</a>.', 'ssl-alp' ),
 					'https://alp.attackllama.com/documentation/rebuilding-cross-references/'
 				)
 			);
@@ -258,6 +269,17 @@
 		<div class="ssl-alp-tools-card">
 			<h2 class="title"><?php esc_html_e( 'Rebuild coauthor terms', 'ssl-alp' ); ?></h2>
 			<p><?php esc_html_e( 'This tool will rebuild the coauthor terms used to show post coauthors and to allow the setting of coauthors for posts. This tool is intended to be run on sites which had users and posts before the Academic Labbook Plugin was installed, allowing these users to be chosen as coauthors on posts, and to show them as authors of their existing posts.', 'ssl-alp' ); ?></p>
+			<p class="description">
+			<?php
+			echo wp_kses_post(
+				sprintf(
+					/* translators: ALP coauthor documentation URL */
+					__( 'Note: this tool may take a long time to execute on large sites. Due to server configuration settings, the execution may time out or run out of memory. You may instead wish to <a href="%s">run this tool via WP-CLI</a>.', 'ssl-alp' ),
+					'https://alp.attackllama.com/documentation/rebuilding-coauthors/'
+				)
+			);
+			?>
+			</p>
 			<form method="post" action="">
 				<input type="hidden" name="ssl_alp_rebuild_coauthors_submitted" value="1"/>
 				<p class="submit">
