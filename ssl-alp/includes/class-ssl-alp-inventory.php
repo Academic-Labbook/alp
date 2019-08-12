@@ -183,20 +183,6 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 			'public'       => true,
 			'hierarchical' => false,
 			'show_in_rest' => true,
-			'template'     => array(
-				array(
-					'core/heading',
-					array(
-						'content' => 'Location',
-					),
-				),
-				array(
-					'core/paragraph',
-					array(
-						'placeholder' => 'Location...',
-					),
-				),
-			),
 			'menu_icon'    => 'dashicons-book-alt',
 			'supports'     => array(
 				'title',
