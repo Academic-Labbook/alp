@@ -4,4 +4,4 @@
  * The site settings section
  */
 
-?>
+

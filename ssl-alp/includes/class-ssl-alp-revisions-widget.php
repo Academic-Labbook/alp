@@ -93,6 +93,9 @@ class SSL_ALP_Revisions_Widget extends WP_Widget {
 		$instance['title']  = ! empty( $new_instance['title'] ) ? wp_strip_all_tags( $new_instance['title'] ) : '';
 		$instance['number'] = absint( $new_instance['number'] );
 
+		// Invalidate cached recent revisions.
+		delete_transient( 'ssl-alp-recent-revisions' );
+
 		return $instance;
 	}
 
@@ -136,6 +139,22 @@ class SSL_ALP_Revisions_Widget extends WP_Widget {
 						esc_html( $parent->post_title )
 					)
 				);
+
+				// Post type (only for non-posts).
+				if ( 'post' !== $parent->post_type ) {
+					$post_type       = get_post_type_object( $parent->post_type );
+					$post_type_label = sprintf(
+						/* translators: 1: referenced post type label */
+						__( '(%1$s)', 'ssl-alp' ),
+						$post_type->labels->singular_name
+					);
+
+					echo '&nbsp;';
+					printf(
+						'<span>%1$s</span>',
+						esc_html( $post_type_label )
+					);
+				}
 
 				echo '</li>';
 			}

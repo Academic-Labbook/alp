@@ -158,6 +158,9 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 		// Filter ssl_alp_additional_media_types option.
 		$loader->add_filter( 'sanitize_option_ssl_alp_additional_media_types', $this, 'sanitize_additional_media_types', 10, 1 );
 
+		// Remove "Uncategorised" category on posts where other categories have been set.
+		$loader->add_action( 'set_object_terms', $this, 'remove_superfluous_uncategorised', 10, 4 );
+
 		// Remove WordPress link in meta widget.
 		$loader->add_filter( 'widget_meta_poweredby', $this, 'filter_powered_by' );
 
@@ -166,6 +169,50 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 
 		// Disable post trackbacks.
 		$loader->add_action( 'init', $this, 'disable_post_trackbacks' );
+	}
+
+	/**
+	 * Sanitize term querystring, returning an array of integers.
+	 *
+	 * Used for e.g. coauthor__in, coauthor__not_in, ssl_alp_inventory_item__and, etc.
+	 *
+	 * @param WP_Query $query     Query object.
+	 * @param string   $query_var Query var whose contents to sanitize.
+	 */
+	public function sanitize_querystring( $query, $query_var ) {
+		$querystring = $query->get( $query_var, array() );
+		$querystring = array_map( 'absint', array_unique( (array) $querystring ) );
+
+		// Update querystring.
+		$query->set( $query_var, $querystring );
+	}
+
+	/**
+	 * Checks if the current user (including not logged in users), can read the specified post.
+	 *
+	 * @param WP_Post $post The post.
+	 *
+	 * @return bool|null The permission, or null if the post is invalid.
+	 */
+	public function current_user_can_read_post( $post ) {
+		$post = get_post( $post );
+
+		if ( is_null( $post ) ) {
+			return;
+		}
+
+		if ( is_user_logged_in() ) {
+			$post_type_obj = get_post_type_object( $post->post_type );
+
+			if ( is_null( $post_type_obj ) ) {
+				return;
+			}
+
+			return current_user_can( $post_type_obj->cap->read_post, $post );
+		} else {
+			// Anonymous user on a public site.
+			return 'publish' === get_post_status( $post );
+		}
 	}
 
 	/**
@@ -277,7 +324,7 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 
 		foreach ( $extra_media_types as $key => $extra_media_type ) {
 			// Trim whitespace.
-			$extra_media_type = array_map( 'trim', $extra_media_type );
+			$extra_media_type          = array_map( 'trim', $extra_media_type );
 			$extra_media_types[ $key ] = $extra_media_type;
 		}
 
@@ -305,6 +352,56 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 		}
 
 		return $media_types;
+	}
+
+	/**
+	 * Remove unnecessary "Uncategorised" category on posts saved with another, non-default
+	 * category.
+	 *
+	 * This is performed on the `set_object_terms` action as part of `wp_set_object_terms` function
+	 * because the `save_post` action, where this would logically be run, is run *before* terms are
+	 * set by the block editor (in contrast to the classic editor).
+	 *
+	 * @param int    $object_id Object ID.
+	 * @param array  $terms     An array of object terms.
+	 * @param array  $tt_ids    An array of term taxonomy IDs.
+	 * @param string $taxonomy  Taxonomy slug.
+	 */
+	public function remove_superfluous_uncategorised( $object_id, $terms, $tt_ids, $taxonomy ) {
+		if ( 'category' !== $taxonomy ) {
+			return;
+		}
+
+		$post = get_post( $object_id );
+
+		if ( is_null( $post ) || 'post' !== $post->post_type ) {
+			return;
+		}
+
+		if ( count( $terms ) <= 1 ) {
+			return;
+		}
+
+		// Get default category.
+		$default_category = get_term_by( 'id', get_option( 'default_category' ), $taxonomy );
+
+		// Rebuild list of terms using $tt_ids and not the provided $terms, since
+		// $terms can be mixed type and is unsanitised by `wp_set_object_terms`.
+		$terms = array();
+		foreach ( $tt_ids as $tt_id ) {
+			$term = get_term_by( 'term_taxonomy_id', $tt_id, $taxonomy );
+
+			if ( $term ) {
+				$terms[] = $term;
+			}
+		}
+
+		if ( ! in_array( $default_category->term_id, wp_list_pluck( $terms, 'term_id' ), true ) ) {
+			return;
+		}
+
+		// Remove the default category from the post.
+		wp_remove_object_terms( $post->ID, $default_category->term_id, 'category' );
 	}
 
 	/**

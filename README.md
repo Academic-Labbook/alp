@@ -40,11 +40,6 @@ pages. This is particularly useful for finding out whether newer posts on a part
 been made, as long as the author of the newer post remembered to link back to the older one. This
 feature acts like a bit like a "related posts" list on other websites.
 
-### Mathematical markup support
-ALP adds a TeX block to the Gutenberg editor in WordPress 5.0, allowing users to create equations.
-The equation is rendered within the editor so the user can check their markup, and the markup can be
-edited later alongside the rest of the post.
-
 ### Unread flags
 ALP tracks whether logged-in users have read new posts. When a new post is made, everyone except
 the post's author sees the new post as unread, designated in the *Labbook* theme using a closed
@@ -55,6 +50,12 @@ also click a link in the top bar to view a list of all unread posts.
 
 When a post undergoes significant edits, a post is again marked as unread to all users except the
 author.
+
+### Inventory system
+ALP adds an inventory system to allow you to create pages for inventory items. These pages can be
+used as a central place to store e.g. manuals, schematics, images, etc., and the system lets your
+users tag posts with inventory items which then provides links to these pages under the
+corresponding posts.
 
 ### Advanced search
 When used with the *Labbook* theme, ALP adds advanced search capabilities allowing users to
@@ -74,8 +75,17 @@ searches.
 Note: images are still accessible when the direct link is known - this is a shortcoming in WordPress
 itself. This can in most cases be mitigated with appropriate HTTP server configuration.
 
+### Mathematical markup support
+ALP adds a TeX block to the Gutenberg editor in WordPress 5.0, allowing users to create equations.
+The equation is rendered within the editor so the user can check their markup, and the markup can be
+edited later alongside the rest of the post.
+
 ### Term management
 ALP adds the ability to merge tags and categories in bulk.
+
+### Post changes
+ALP prevents posts being published with the "Uncategorized" category if the author has specified
+another category. In such cases, the "Uncategorized" category is silently removed.
 
 ### Page changes
 ALP modifies pages to work more like wiki pages. When using the *Labbook* theme, authors and dates
@@ -157,11 +167,10 @@ outdated browsers, and this project is not concerned about losing sales from use
 ## Design principles
  - **Clean code**: there's an awful lot of terribly written code in the WordPress ecosystem. This
    plugin attempts to conform to coding standards, and to interfere minimally with the default
-   WordPress behaviour where possible. For some of the more major features, like coauthors,
-   some quiet major modifications are required to core behaviour, which means that ALP may not be
-   compatible with certain other plugins.
- - **Modular**: most/all features can be enabled or disabled, and work independently from each
-   other.
+   WordPress behaviour where possible.
+ - **Modular**: most features can be enabled or disabled via the settings page, and work
+   independently from each other. The plugin can also be used without the corresponding theme,
+   though this hides a lot of the useful parts of the plugin from users.
 
 ## Future development plans
 The basic behaviour of ALP is already in place, but the plan is to keep adding useful features

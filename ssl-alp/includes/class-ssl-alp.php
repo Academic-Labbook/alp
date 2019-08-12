@@ -136,6 +136,14 @@ class SSL_ALP {
 		$this->terms = new SSL_ALP_Terms( $this );
 
 		/**
+		 * Inventory.
+		 */
+
+		require_once SSL_ALP_BASE_DIR . 'includes/class-ssl-alp-inventory.php';
+
+		$this->inventory = new SSL_ALP_Inventory( $this );
+
+		/**
 		 * Page functionality.
 		 */
 
@@ -204,6 +212,7 @@ class SSL_ALP {
 		$this->auth->register();
 		$this->search->register();
 		$this->terms->register();
+		$this->inventory->register();
 		$this->pages->register();
 		$this->coauthors->register();
 		$this->revisions->register();

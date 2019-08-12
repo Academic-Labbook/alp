@@ -4,4 +4,4 @@
  * The media settings section
  */
 
-?>
+

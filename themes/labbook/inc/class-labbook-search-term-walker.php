@@ -61,7 +61,7 @@ class Labbook_Search_Term_Walker extends Walker {
 
 		if ( ! is_null( $args['selected'] ) ) {
 			if ( is_array( $args['selected'] ) ) {
-				if ( in_array( (string) $value, $args['selected'] ) ) { // Fuzzy compare required.
+				if ( in_array( (string) $value, $args['selected'] ) ) { // phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict
 					$item_selected = true;
 				}
 			} elseif ( (string) $value === (string) $args['selected'] ) {

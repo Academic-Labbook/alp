@@ -3,7 +3,7 @@
  * Plugin Name:  Academic Labbook
  * Plugin URI:   https://alp.attackllama.com/
  * Description:  Turn WordPress into a collaborative academic labbook.
- * Version:      0.15.2
+ * Version:      0.16.0
  * Author:       Sean Leavey
  * Author URI:   https://attackllama.com/
  * License:      GPL3
@@ -21,7 +21,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Current plugin version.
  */
 
-define( 'SSL_ALP_VERSION', '0.15.2' );
+define( 'SSL_ALP_VERSION', '0.16.0' );
 
 /**
  * Plugin name
@@ -48,6 +48,7 @@ define( 'SSL_ALP_NETWORK_SETTINGS_MENU_SLUG', 'ssl-alp-network-options' );
 define( 'SSL_ALP_SITE_TOOLS_MENU_SLUG', 'ssl-alp-admin-tools' );
 define( 'SSL_ALP_POST_REVISIONS_MENU_SLUG', 'ssl-alp-admin-post-revisions' );
 define( 'SSL_ALP_PAGE_REVISIONS_MENU_SLUG', 'ssl-alp-admin-page-revisions' );
+define( 'SSL_ALP_INVENTORY_REVISIONS_MENU_SLUG', 'ssl-alp-admin-inventory-revisions' );
 define( 'SSL_ALP_APPLICATIONS_MENU_SLUG', 'ssl-alp-admin-applications' );
 
 /**
@@ -60,7 +61,11 @@ define( 'SSL_ALP_REST_ROUTE', 'ssl-alp/v1' );
  * Default settings
  */
 
-define( 'SSL_ALP_KATEX_VERSION', '0.10.1' );
+// KaTeX version.
+define( 'SSL_ALP_KATEX_VERSION', '0.10.2' );
+
+// Recent revisions widget cache timeout.
+define( 'SSL_ALP_RECENT_REVISIONS_CACHE_TIMEOUT', 5 * 60 );
 
 /**
  * Code to run on plugin activation and deactivation.

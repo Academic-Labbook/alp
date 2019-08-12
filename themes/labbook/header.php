@@ -51,8 +51,8 @@
 			<?php
 			$labbook_description = get_bloginfo( 'description', 'display' );
 			if ( $labbook_description || is_customize_preview() ) :
-			?>
-				<p class="site-description"><?php echo $labbook_description; /* WPCS: xss ok. */ ?></p>
+				?>
+				<p class="site-description"><?php echo $labbook_description; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
 			<?php endif; ?>
 			</div>
 		</div><!-- .site-branding -->

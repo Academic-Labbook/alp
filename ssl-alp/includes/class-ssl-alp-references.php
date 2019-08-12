@@ -21,8 +21,9 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	 * @var array
 	 */
 	protected $supported_reference_post_types = array(
-		'post' => true,
-		'page' => false,
+		'post'              => true,
+		'page'              => false,
+		'ssl-alp-inventory' => false,
 	);
 
 	/**
@@ -85,7 +86,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		}
 
 		register_taxonomy(
-			'ssl_alp_crossreference',
+			'ssl-alp-crossreference',
 			array_keys( $this->supported_reference_post_types ),
 			array(
 				'hierarchical' => false,
@@ -151,12 +152,12 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		}
 
 		// Update post's reference taxonomy terms (replaces any existing terms).
-		wp_set_post_terms( $post->ID, array_keys( $terms ), 'ssl_alp_crossreference' );
+		wp_set_post_terms( $post->ID, array_keys( $terms ), 'ssl-alp-crossreference' );
 
 		// Set internal term metadata.
 		foreach ( $terms as $term_name => $referenced_post_id ) {
 			// Get term.
-			$term = get_term_by( 'name', $term_name, 'ssl_alp_crossreference' );
+			$term = get_term_by( 'name', $term_name, 'ssl-alp-crossreference' );
 
 			// Add term metadata.
 			update_term_meta( $term->term_id, 'reference-to-post-id', $referenced_post_id );
@@ -208,9 +209,9 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		foreach ( array_keys( $this->supported_reference_post_types ) as $post_type ) {
 			$posts = get_posts(
 				array(
-					'post_type'      => $post_type,
-					'post_status'    => 'published',
-					'posts_per_page' => -1, // Needed to get all.
+					'post_type'   => $post_type,
+					'post_status' => 'published',
+					'nopaging'    => true,
 				)
 			);
 
@@ -225,15 +226,19 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	 *
 	 * @param int|WP_Post|null $post Post ID or post object. Defaults to global $post.
 	 * @return array|null Referenced posts, or null if invalid post specified.
+	 *
+	 * @global $ssl_alp
 	 */
 	public function get_reference_to_posts( $post = null ) {
+		global $ssl_alp;
+
 		$post = get_post( $post );
 
 		if ( is_null( $post ) ) {
 			return;
 		}
 
-		$terms = get_the_terms( $post, 'ssl_alp_crossreference' );
+		$terms = get_the_terms( $post, 'ssl-alp-crossreference' );
 
 		$posts = array();
 
@@ -248,7 +253,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 			$referenced_post_id = get_term_meta(
 				$term->term_id,
 				'reference-to-post-id',
-				'ssl_alp_crossreference'
+				'ssl-alp-crossreference'
 			);
 
 			$referenced_post = get_post( $referenced_post_id );
@@ -259,6 +264,16 @@ class SSL_ALP_References extends SSL_ALP_Module {
 
 			if ( 'publish' !== $referenced_post->post_status ) {
 				// Ignore unpublished posts.
+				continue;
+			}
+
+			if ( ! post_type_exists( $referenced_post->post_type ) ) {
+				// The referenced post is some type that doesn't exist any more.
+				continue;
+			}
+
+			// Check user permission to view.
+			if ( ! $ssl_alp->core->current_user_can_read_post( $referenced_post ) ) {
 				continue;
 			}
 
@@ -274,9 +289,10 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	 * @param int|WP_Post|null $post Post ID or post object. Defaults to global $post.
 	 * @return array|null Referencing posts, or null if invalid post specified.
 	 * @global $wpdb
+	 * @global $ssl_alp;
 	 */
 	public function get_reference_from_posts( $post = null ) {
-		global $wpdb;
+		global $wpdb, $ssl_alp;
 
 		$post = get_post( $post );
 
@@ -311,7 +327,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 					",
 					'reference-to-post-id',
 					$post->ID,
-					'ssl_alp_crossreference'
+					'ssl-alp-crossreference'
 				)
 			);
 
@@ -327,6 +343,16 @@ class SSL_ALP_References extends SSL_ALP_Module {
 
 				if ( 'publish' !== $referenced_post->post_status ) {
 					// Ignore unpublished posts.
+					continue;
+				}
+
+				if ( ! post_type_exists( $referenced_post->post_type ) ) {
+					// The referenced post is some type that doesn't exist any more.
+					continue;
+				}
+
+				// Check user permission to view.
+				if ( ! $ssl_alp->core->current_user_can_read_post( $referenced_post ) ) {
 					continue;
 				}
 

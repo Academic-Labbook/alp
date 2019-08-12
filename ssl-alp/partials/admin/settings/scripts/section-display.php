@@ -4,4 +4,4 @@
  * The scripts settings section
  */
 
-?>
+

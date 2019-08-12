@@ -86,6 +86,7 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 		// Default completed action states.
 		$supported_theme_installed        = false;
 		$supported_theme_active           = false;
+		$pretty_permalinks_enabled        = false;
 		$override_core_settings_completed = false;
 		$role_conversion_completed        = false;
 		$rebuild_references_completed     = false;
@@ -108,6 +109,12 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 				$supported_theme_active = true;
 			}
 		}
+
+		/**
+		 * Check pretty permalinks.
+		 */
+
+		$pretty_permalinks_enabled = ! empty( get_option( 'permalink_structure' ) );
 
 		/**
 		 * Handle manage core settings form.
@@ -212,7 +219,7 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 	public function core_settings_overridden() {
 		$current_settings = array_map( 'get_option', array_keys( $this->overrideable_settings ) );
 
-		return array_values( $this->overrideable_settings ) == $current_settings; // Fuzzy comparison ok.
+		return array_values( $this->overrideable_settings ) == $current_settings; // Fuzzy comparison required.
 	}
 
 	/**
@@ -240,7 +247,7 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 			'subscriber',
 		);
 
-		// Uf the WP_Roles settings are the same as above, the default roles are present.
+		// If the WP_Roles settings are the same as above, the default roles are present.
 		return array_keys( $roles->role_names ) === $default_role_names;
 	}
 

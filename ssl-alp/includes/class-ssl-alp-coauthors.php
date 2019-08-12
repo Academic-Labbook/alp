@@ -56,6 +56,12 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// Set the current user as the default coauthor on new drafts.
 		$loader->add_action( 'save_post', $this, 'add_user_to_draft', 10, 2 );
 
+		// Disallow creation of new terms directly (this is temporarily disabled by
+		// `associate_inventory_post_with_term`).
+		// NOTE: if this line is changed, the enable_disallow_insert_term_filter and
+		// disable_disallow_insert_term_filter functions must also be updated.
+		$loader->add_filter( 'pre_insert_term', $this, 'disallow_insert_term', 10, 2 );
+
 		// Delete any invalid coauthors when post terms are set.
 		$loader->add_action( 'added_term_relationship', $this, 'reject_invalid_coauthor_terms', 10, 3 );
 
@@ -68,10 +74,10 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$loader->add_filter( 'posts_groupby', $this, 'posts_groupby_filter', 10, 2 );
 
 		// Allow public coauthor query vars.
-		$loader->add_filter( 'query_vars', $this, 'whitelist_coauthor_search_query_vars' );
+		$loader->add_filter( 'query_vars', $this, 'whitelist_search_query_vars' );
 
 		// Support coauthor querystrings in WP_Query.
-		$loader->add_action( 'parse_tax_query', $this, 'parse_coauthor_query_vars' );
+		$loader->add_action( 'parse_tax_query', $this, 'parse_query_vars' );
 
 		// Filter to send comment notification/moderation emails to multiple authors.
 		$loader->add_filter( 'comment_notification_recipients', $this, 'filter_comment_notification_email_recipients', 10, 2 );
@@ -98,11 +104,8 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// Delete or reassign user terms from posts when a user is deleted on a network site installation.
 		$loader->add_action( 'remove_user_from_blog', $this, 'remove_user_from_blog', 10, 3 );
 
-		// Filter to allow coauthors to edit posts and stop users deleting coauthor terms.
+		// Filter to allow coauthors to edit posts.
 		$loader->add_filter( 'user_has_cap', $this, 'filter_user_has_cap', 10, 4 );
-
-		// Stop super admins deleting coauthor terms.
-		$loader->add_filter( 'map_meta_cap', $this, 'filter_capabilities', 10, 4 );
 
 		/**
 		 * Display hooks.
@@ -128,7 +131,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$loader->add_filter( 'the_author', $this, 'fix_author_page_filter', 10, 1 );
 
 		// Filter the display of coauthor terms in the admin post list.
-		$loader->add_filter( 'ssl_alp_coauthor_name', $this, 'filter_coauthor_term_display', 10, 3 );
+		$loader->add_filter( 'ssl-alp-coauthor_name', $this, 'filter_coauthor_term_display', 10, 3 );
 
 		/**
 		 * Authors widget.
@@ -174,6 +177,14 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/author-settings-display.php';
 	}
 
+	public function enable_disallow_insert_term_filter() {
+		add_filter( 'pre_insert_term', array( $this, 'disallow_insert_term' ), 10, 2 );
+	}
+
+	public function disable_disallow_insert_term_filter() {
+		remove_filter( 'pre_insert_term', array( $this, 'disallow_insert_term' ), 10, 2 );
+	}
+
 	/**
 	 * Register users widget.
 	 */
@@ -197,20 +208,26 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			'query_var'             => false,
 			'rewrite'               => false,
 			'public'                => false,
-			'sort'                  => true, // Remember order terms are added to posts.
+			'sort'                  => true,  // Remember order terms are added to posts.
 			'args'                  => array(
 				// Default arguments used by `wp_get_object_terms`, see https://core.trac.wordpress.org/ticket/40496.
 				'orderby' => 'term_order',
 			),
-			'show_ui'               => true, // Show selector on edit page.
-			'show_in_menu'          => false, // Disable term edit page.
-			'show_in_rest'          => true, // Needed for block editor support.
+			'capabilities' => array(
+				'manage_terms'  =>   'do_not_allow',
+				'edit_terms'    =>   'do_not_allow',
+				'delete_terms'  =>   'do_not_allow',
+				'assign_terms'  =>   'edit_posts', // Needed to allow assignment in block editor.
+			),
+			'show_ui'               => true,  // Show selector on edit page.
+			'show_in_menu'          => false, // Hide term edit page.
+			'show_in_rest'          => true,  // Needed for block editor support.
 			'show_admin_column'     => true,  // Show associated terms in admin edit screen.
 			'update_count_callback' => array( $this, 'update_users_posts_count' ), // Override count.
 		);
 
 		// Create coauthor taxonomy.
-		register_taxonomy( 'ssl_alp_coauthor', $this->supported_post_types, $args );
+		register_taxonomy( 'ssl-alp-coauthor', $this->supported_post_types, $args );
 	}
 
 	/**
@@ -285,7 +302,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		// Retrieve term associated with the user.
-		return get_term_by( 'slug', $this->get_coauthor_term_slug( $user ), 'ssl_alp_coauthor' );
+		return get_term_by( 'slug', $this->get_coauthor_term_slug( $user ), 'ssl-alp-coauthor' );
 	}
 
 	/**
@@ -313,7 +330,14 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 				'slug' => $this->get_coauthor_term_slug( $coauthor ),
 			);
 
-			wp_insert_term( $coauthor->display_name, 'ssl_alp_coauthor', $args );
+			// Temporarily disable the filter that blocks creation of terms in the ssl-alp-coauthor
+			// taxonomy.
+			$this->disable_disallow_insert_term_filter();
+
+			wp_insert_term( $coauthor->display_name, 'ssl-alp-coauthor', $args );
+
+			// Re-enable the filter.
+			$this->enable_disallow_insert_term_filter();
 		} else {
 			// Update term.
 			$this->update_coauthor_term( $coauthor->ID, $coauthor );
@@ -342,8 +366,15 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			'slug' => $this->get_coauthor_term_slug( $user ),
 		);
 
+		// Temporarily disable the filter that blocks creation of terms in the ssl-alp-coauthor
+		// taxonomy.
+		$this->disable_disallow_insert_term_filter();
+
 		// Set term name.
-		wp_update_term( $term->term_id, 'ssl_alp_coauthor', $args );
+		wp_update_term( $term->term_id, 'ssl-alp-coauthor', $args );
+
+		// Re-enable the filter.
+		$this->enable_disallow_insert_term_filter();
 	}
 
 	/**
@@ -391,7 +422,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 		if ( $term ) {
 			// Delete user's term.
-			wp_delete_term( $term->term_id, 'ssl_alp_coauthor' );
+			wp_delete_term( $term->term_id, 'ssl-alp-coauthor' );
 		}
 	}
 
@@ -410,6 +441,9 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 	/**
 	 * Rebuild coauthor terms.
+	 *
+	 * This adds coauthor terms for all users, generating them if necessary, and assigns posts
+	 * authored by those users to those coauthor terms.
 	 */
 	public function rebuild_coauthors() {
 		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
@@ -421,7 +455,24 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$users = get_users();
 
 		foreach ( $users as $user ) {
+			// Add coauthor terms.
 			$this->add_coauthor_term( $user->ID );
+
+			// Get all of the user's posts.
+			$posts = get_posts(
+				array(
+					'post_author' => $user->ID,
+					'post_type'   => $this->supported_post_types,
+					'post_status' => 'any',
+					'numberposts' => -1,
+				)
+			);
+
+			// Set coauthor terms on each of the user's posts.
+			foreach ( $posts as $post ) {
+				$coauthors = $this->get_coauthors( $post );
+				$this->set_coauthors( $post, $coauthors );
+			}
 		}
 	}
 
@@ -440,7 +491,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return;
 		}
 
-		if ( 'ssl_alp_coauthor' !== $taxonomy ) {
+		if ( 'ssl-alp-coauthor' !== $taxonomy ) {
 			// Not our taxonomy.
 			return $terms_to_edit;
 		}
@@ -448,7 +499,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// Get terms in descending chronological order.
 		$terms = wp_get_object_terms(
 			$post->ID,
-			'ssl_alp_coauthor',
+			'ssl-alp-coauthor',
 			array(
 				'orderby' => 'term_order',
 				'order'   => 'ASC',
@@ -523,7 +574,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		if ( $post_count > 0 ) {
 			$column_value .= sprintf(
 				'<a href="%1$s" title="%2$s" class="edit">%3$d</a>',
-				esc_url( 'edit.php?taxonomy=ssl_alp_coauthor&amp;term=' . $this->get_coauthor_term_slug( $user ) ),
+				esc_url( 'edit.php?taxonomy=ssl-alp-coauthor&amp;term=' . $this->get_coauthor_term_slug( $user ) ),
 				esc_attr__( 'View posts by this author', 'ssl-alp' ),
 				esc_html( $post_count )
 			);
@@ -536,8 +587,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Allows coauthors to edit the post they're coauthors of, and stop
-	 * users deleting coauthor terms.
+	 * Allows coauthors to edit the post they're coauthors of.
 	 *
 	 * @param array   $all_capabilities All user capabilities.
 	 * @param mixed   $unused           Unused.
@@ -551,14 +601,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		$requested_capability = $args[0];
-
-		if ( in_array( $requested_capability, array( 'edit_term', 'delete_term' ), true ) ) {
-			// Disallow in all circumstances.
-			$all_capabilities['edit_term']   = false;
-			$all_capabilities['delete_term'] = false;
-
-			return $all_capabilities;
-		}
 
 		// Assume post.
 		$post = get_post( isset( $args[2] ) ? $args[2] : 0 );
@@ -607,46 +649,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Filter capabilities of super admins to stop them editing or deleting coauthor terms.
-	 *
-	 * Coauthor terms are essential to the correct operation of the coauthors system.
-	 *
-	 * @param array  $caps    All capabilities.
-	 * @param string $cap     Capability being checked.
-	 * @param int    $user_id User ID.
-	 * @param array  $args    Capability arguments.
-	 */
-	public function filter_capabilities( $caps, $cap, $user_id, $args ) {
-		// Construct list of capabilities based on post type.
-		$filtered_caps = array(
-			// Terms.
-			'edit_term',
-			'delete_term',
-		);
-
-		if ( ! in_array( $cap, $filtered_caps, true ) ) {
-			// this is not a capability we need to filter.
-			return $caps;
-		}
-
-		// Get term.
-		$term = get_term( $args[0] );
-
-		if ( is_null( $term ) ) {
-			return $caps;
-		}
-
-		$taxonomy = get_taxonomy( $term->taxonomy );
-
-		if ( 'ssl_alp_coauthor' === $taxonomy->name ) {
-			// Disallow.
-			$caps[] = 'do_not_allow';
-		}
-
-		return $caps;
-	}
-
-	/**
 	 * Filter the views listed on the admin post list to add a "Mine" view.
 	 *
 	 * @param array $views Post list views.
@@ -674,7 +676,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 		// Build URL arguments.
 		$mine_args = array(
-			'taxonomy' => 'ssl_alp_coauthor',
+			'taxonomy' => 'ssl-alp-coauthor',
 			'term'     => $coauthor_slug,
 		);
 
@@ -682,7 +684,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$request_term = get_query_var( 'term' );
 
 		// Check if the current page is the "Mine" view.
-		if ( 'ssl_alp_coauthor' === $request_tax && $coauthor_slug === $request_term ) {
+		if ( 'ssl-alp-coauthor' === $request_tax && $coauthor_slug === $request_term ) {
 			$class = 'current';
 		} else {
 			$class = '';
@@ -719,7 +721,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * @param WP_Taxonomy $taxonomy Taxonomy.
 	 */
 	public function update_users_posts_count( $tt_ids, $taxonomy ) {
-		if ( 'ssl_alp_coauthor' !== $taxonomy->name ) {
+		if ( 'ssl-alp-coauthor' !== $taxonomy->name ) {
 			return;
 		}
 
@@ -770,14 +772,14 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			GROUP BY {$wpdb->posts}.ID
 			HAVING MAX( IF ( {$wpdb->term_taxonomy}.taxonomy = %s, IF ( {$having_terms}, 2, 1 ), 0 ) ) <> 1
 			",
-			'ssl_alp_coauthor'
+			'ssl-alp-coauthor'
 		);
 
 		$count = $wpdb->query( $query );
 		$wpdb->update( $wpdb->term_taxonomy, array( 'count' => $count ), array( 'term_taxonomy_id' => $term->term_taxonomy_id ) );
 
 		// Invalidate term cache.
-		clean_term_cache( $term->term_id, 'ssl_alp_coauthor', false );
+		clean_term_cache( $term->term_id, 'ssl-alp-coauthor', false );
 	}
 
 	/**
@@ -823,7 +825,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return $join;
 		}
 
-		if ( ! empty( $query->query_vars['post_type'] ) && ! is_object_in_taxonomy( $query->query_vars['post_type'], 'ssl_alp_coauthor' ) ) {
+		if ( ! empty( $query->query_vars['post_type'] ) && ! is_object_in_taxonomy( $query->query_vars['post_type'], 'ssl-alp-coauthor' ) ) {
 			// Not a valid post type, so return unmodified.
 			return $join;
 		}
@@ -862,7 +864,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return $where;
 		}
 
-		if ( ! empty( $query->query_vars['post_type'] ) && ! is_object_in_taxonomy( $query->query_vars['post_type'], 'ssl_alp_coauthor' ) ) {
+		if ( ! empty( $query->query_vars['post_type'] ) && ! is_object_in_taxonomy( $query->query_vars['post_type'], 'ssl-alp-coauthor' ) ) {
 			// Not a valid post type, so return unmodified.
 			return $where;
 		}
@@ -901,7 +903,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			$this->having_terms = '';
 
 			foreach ( $terms as $term ) {
-				$terms_implode      .= "({$wpdb->term_taxonomy}.taxonomy = 'ssl_alp_coauthor' AND {$wpdb->term_taxonomy}.term_id = '{$term->term_id}') OR ";
+				$terms_implode      .= "({$wpdb->term_taxonomy}.taxonomy = 'ssl-alp-coauthor' AND {$wpdb->term_taxonomy}.term_id = '{$term->term_id}') OR ";
 				$this->having_terms .= " {$wpdb->term_taxonomy}.term_id = '{$term->term_id}' OR ";
 			}
 
@@ -909,7 +911,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			$this->having_terms = rtrim( $this->having_terms, ' OR' );
 
 			// Match "wp_posts.post_author = [number]" or "wp_posts.post_author IN ([list of numbers])"
-			// and append "OR (wp_term_taxonomy.taxonomy = 'ssl_alp_coauthor' AND wp_term_taxonomy.term_id = '6')".
+			// and append "OR (wp_term_taxonomy.taxonomy = 'ssl-alp-coauthor' AND wp_term_taxonomy.term_id = '6')".
 			$where = preg_replace(
 				'/(\b(?:' . $wpdb->posts . '\.)?post_author\s*(?:=|IN)\s*\(?(\d+)\)?)/',
 				'($1 OR ' . $terms_implode . ')',
@@ -941,13 +943,13 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return $groupby;
 		}
 
-		if ( ! empty( $query->query_vars['post_type'] ) && ! is_object_in_taxonomy( $query->query_vars['post_type'], 'ssl_alp_coauthor' ) ) {
+		if ( ! empty( $query->query_vars['post_type'] ) && ! is_object_in_taxonomy( $query->query_vars['post_type'], 'ssl-alp-coauthor' ) ) {
 			// Not a valid post type, so return unmodified.
 			return $groupby;
 		}
 
 		if ( $this->having_terms ) {
-			$having  = "MAX( IF ( {$wpdb->term_taxonomy}.taxonomy = 'ssl_alp_coauthor', IF ( {$this->having_terms}, 2, 1 ), 0 ) ) <> 1 ";
+			$having  = "MAX( IF ( {$wpdb->term_taxonomy}.taxonomy = 'ssl-alp-coauthor', IF ( {$this->having_terms}, 2, 1 ), 0 ) ) <> 1 ";
 			$groupby = "{$wpdb->posts}.ID HAVING {$having}";
 		}
 
@@ -990,6 +992,33 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
+	 * Disallow the creation of new terms under normal circumstances.
+	 *
+	 * This is to avoid users being able to create terms in the coauthor taxonomy directly; terms
+	 * should only be created when a new user is created.
+	 *
+	 * This filter is disabled temporarily by `enable_disallow_insert_term_filter` to allow creation
+	 * of new terms in acceptable circumstances, then reenabled by
+	 * `enable_disallow_insert_term_filter`.
+	 *
+	 * @param string $term     The term.
+	 * @param string $taxonomy The taxonomy.
+	 *
+	 * @return string|WP_Error $term The term, or error.
+	 */
+	public function disallow_insert_term( $term, $taxonomy ) {
+		if ( 'ssl-alp-coauthor' !== $taxonomy ) {
+			return $term;
+		}
+
+		// Return an error in all circumstances.
+		return new WP_Error(
+			'disallow_insert_term',
+			__( 'Your role does not have permission to add terms to this taxonomy', 'ssl-alp' )
+		);
+	}
+
+	/**
 	 * Delete invalid coauthors when a post is saved.
 	 *
 	 * Unfortunately there is no way to filter terms before they are set on a post, so this function
@@ -1000,7 +1029,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * @param string $taxonomy  Taxonomy slug.
 	 */
 	public function reject_invalid_coauthor_terms( $object_id, $tt_id, $taxonomy ) {
-		if ( 'ssl_alp_coauthor' !== $taxonomy ) {
+		if ( 'ssl-alp-coauthor' !== $taxonomy ) {
 			return;
 		}
 
@@ -1009,7 +1038,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return;
 		}
 
-		$term = get_term_by( 'term_taxonomy_id', $tt_id, 'ssl_alp_coauthor' );
+		$term = get_term_by( 'term_taxonomy_id', $tt_id, 'ssl-alp-coauthor' );
 
 		if ( ! $term ) {
 			// Nothing to do here.
@@ -1017,11 +1046,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		// Check term is valid.
-		$author_term = $this->get_user_from_coauthor_term( $term );
+		$coauthor = $this->get_user_from_coauthor_term( $term );
 
-		if ( ! $author_term ) {
+		if ( ! $coauthor ) {
 			// This is not a valid coauthor term - delete it.
-			wp_delete_term( $term->term_id, 'ssl_alp_coauthor' );
+			wp_delete_term( $term->term_id, 'ssl-alp-coauthor' );
 		}
 	}
 
@@ -1041,7 +1070,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	public function check_post_author( $post_id, $term_ids, $tt_ids, $taxonomy ) {
 		global $wpdb;
 
-		if ( 'ssl_alp_coauthor' !== $taxonomy ) {
+		if ( 'ssl-alp-coauthor' !== $taxonomy ) {
 			return;
 		}
 
@@ -1067,7 +1096,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$terms = array();
 
 		foreach ( $term_ids as $term_id ) {
-			$terms[] = get_term( $term_id, 'ssl_alp_coauthor' );
+			$terms[] = get_term( $term_id, 'ssl-alp-coauthor' );
 		}
 
 		$first_term = reset( $terms );
@@ -1131,7 +1160,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$post_author = get_user_by( 'id', $post->post_author );
 
 		// Try to ensure at least the post's primary author is in the list of coauthors.
-		if ( ! empty( $post_author ) && ! in_array( $post_author, $coauthors, false ) ) {
+		if ( ! empty( $post_author ) && ! in_array( $post_author, $coauthors, false ) ) { // Fuzzy comparison required.
 			// Post primary author exists but isn't listed as a coauthor,
 			// so add them to the start of the coauthors array.
 			array_unshift( $coauthors, $post_author );
@@ -1177,7 +1206,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$coauthor_term_ids = wp_list_pluck( $coauthor_terms, 'term_id' );
 
 		// Update post's coauthors.
-		wp_set_post_terms( $post->ID, $coauthor_term_ids, 'ssl_alp_coauthor', false );
+		wp_set_post_terms( $post->ID, $coauthor_term_ids, 'ssl-alp-coauthor', false );
 	}
 
 	/**
@@ -1187,7 +1216,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 *
 	 * @param string[] $public_query_vars Array of public query vars.
 	 */
-	public function whitelist_coauthor_search_query_vars( $public_query_vars ) {
+	public function whitelist_search_query_vars( $public_query_vars ) {
 		global $ssl_alp;
 
 		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
@@ -1201,7 +1230,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		// Custom query vars to make public. These are sanitised and handled by
-		// `parse_coauthor_query_vars`.
+		// `parse_query_vars`.
 		$custom_query_vars = array(
 			'ssl_alp_coauthor__and',
 			'ssl_alp_coauthor__in',
@@ -1220,7 +1249,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 *
 	 * @param WP_Query $query The query.
 	 */
-	public function parse_coauthor_query_vars( $query ) {
+	public function parse_query_vars( $query ) {
 		global $ssl_alp;
 
 		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
@@ -1237,9 +1266,9 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$tax_query = array();
 
 		// Sanitize submitted values.
-		$this->sanitize_coauthor_querystring( $query, 'ssl_alp_coauthor__and' );
-		$this->sanitize_coauthor_querystring( $query, 'ssl_alp_coauthor__in' );
-		$this->sanitize_coauthor_querystring( $query, 'ssl_alp_coauthor__not_in' );
+		$ssl_alp->core->sanitize_querystring( $query, 'ssl_alp_coauthor__and' );
+		$ssl_alp->core->sanitize_querystring( $query, 'ssl_alp_coauthor__in' );
+		$ssl_alp->core->sanitize_querystring( $query, 'ssl_alp_coauthor__not_in' );
 
 		// Get coauthor query vars.
 		$coauthor_and    = $query->get( 'ssl_alp_coauthor__and' );
@@ -1266,7 +1295,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 				// applies the relation as part of its instantiation.
 				'relation' => 'AND',
 				array(
-					'taxonomy'         => 'ssl_alp_coauthor',
+					'taxonomy'         => 'ssl-alp-coauthor',
 					'terms'            => $coauthor_and,
 					'field'            => 'term_id',
 					'operator'         => 'AND',
@@ -1278,7 +1307,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		if ( ! empty( $coauthor_in ) ) {
 			// Coauthor IN search criterion specified.
 			$tax_query[] = array(
-				'taxonomy'         => 'ssl_alp_coauthor',
+				'taxonomy'         => 'ssl-alp-coauthor',
 				'terms'            => $coauthor_in,
 				'field'            => 'term_id',
 				'include_children' => false,
@@ -1288,7 +1317,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		if ( ! empty( $coauthor_not_in ) ) {
 			// Coauthor NOT IN search criterion specified.
 			$tax_query[] = array(
-				'taxonomy'         => 'ssl_alp_coauthor',
+				'taxonomy'         => 'ssl-alp-coauthor',
 				'terms'            => $coauthor_not_in,
 				'field'            => 'term_id',
 				'operator'         => 'NOT IN',
@@ -1301,22 +1330,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 		// Merge new taxonomy filters into existing ones.
 		$query->tax_query->queries = wp_parse_args( $tax_query, $query->tax_query->queries );
-	}
-
-	/**
-	 * Sanitize coauthor querystring, returning an array of integers.
-	 *
-	 * Used for coauthor__in and coauthor__not_in.
-	 *
-	 * @param WP_Query $query     Query object.
-	 * @param string   $query_var Query var whose contents to sanitize.
-	 */
-	private function sanitize_coauthor_querystring( $query, $query_var ) {
-		$querystring = $query->get( $query_var, array() );
-		$querystring = array_map( 'absint', array_unique( (array) $querystring ) );
-
-		// Update querystring.
-		$query->set( $query_var, $querystring );
 	}
 
 	/**
@@ -1493,7 +1506,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		// Get objects associated with term (assume everything is a post).
-		$term_objects = get_objects_in_term( $user_term->term_id, 'ssl_alp_coauthor' );
+		$term_objects = get_objects_in_term( $user_term->term_id, 'ssl-alp-coauthor' );
 
 		foreach ( $term_objects as $post_id ) {
 			// get_objects_in_term returns strings.
@@ -1723,7 +1736,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 		$coauthor_terms = wp_get_object_terms(
 			$post->ID,
-			'ssl_alp_coauthor',
+			'ssl-alp-coauthor',
 			array(
 				'orderby' => 'term_order',
 				'order'   => 'ASC',
@@ -1822,7 +1835,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return $value;
 		}
 
-		$term = get_term_by( 'id', $term_id, 'ssl_alp_coauthor' );
+		$term = get_term_by( 'id', $term_id, 'ssl-alp-coauthor' );
 
 		// Get user from term.
 		$user = $this->get_user_from_coauthor_term( $term );

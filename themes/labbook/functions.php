@@ -8,7 +8,7 @@
  */
 
 // Theme version.
-define( 'LABBOOK_VERSION', '1.1.9' );
+define( 'LABBOOK_VERSION', '1.1.10' );
 
 // Required PHP version.
 define( 'LABBOOK_MINIMUM_PHP_VERSION', '7.0.0' );
@@ -163,6 +163,13 @@ if ( ! function_exists( 'labbook_setup' ) ) :
 		 */
 		add_theme_support( 'ssl-alp-cross-references' );
 
+		/**
+		 * Add support for showing featured images on inventory items.
+		 */
+		if ( labbook_ssl_alp_inventory_enabled() ) {
+			add_theme_support( 'post-thumbnails', array( 'ssl-alp-inventory' ) );
+		}
+
 		// Get default theme options.
 		$labbook_default_options = labbook_get_theme_option_defaults();
 	}
@@ -209,7 +216,7 @@ add_action( 'widgets_init', 'labbook_widgets_init' );
 function labbook_scripts() {
 	wp_enqueue_style(
 		'fontawesome',
-		get_template_directory_uri() . '/vendor/font-awesome/css/font-awesome.css',
+		get_template_directory_uri() . '/vendor/font-awesome/css/font-awesome.min.css',
 		array(),
 		LABBOOK_VERSION
 	);
@@ -319,7 +326,7 @@ if ( ! function_exists( 'labbook_get_content_with_toc' ) ) :
 			return $content;
 		}
 
-		$toc = '<div class="entry-toc entry-toc-' . get_the_ID() . '">';
+		$toc  = '<div class="entry-toc entry-toc-' . get_the_ID() . '">';
 		$toc .= '<h3 class="entry-toc-title">' . esc_html__( 'Contents', 'labbook' ) . '</h3>';
 		$toc .= labbook_get_toc( $hierarchy, labbook_get_option( 'table_of_contents_max_depth' ) );
 		$toc .= '</div>';
@@ -423,6 +430,23 @@ function labbook_ssl_alp_unread_flags_enabled() {
 		return false;
 	} elseif ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
 		// Unread flags are disabled.
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Check if inventory capabilities provided by the ALP plugin are available and enabled.
+ */
+function labbook_ssl_alp_inventory_enabled() {
+	global $ssl_alp;
+
+	if ( ! labbook_ssl_alp_active() ) {
+		// Plugin is disabled.
+		return false;
+	} elseif ( ! get_option( 'ssl_alp_enable_inventory' ) ) {
+		// Inventory is disabled.
 		return false;
 	}
 

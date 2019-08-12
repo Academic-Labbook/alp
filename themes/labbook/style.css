@@ -3,12 +3,12 @@ Theme Name: Labbook
 Theme URI: https://alp.attackllama.com/documentation/themes/labbook/
 Author: Sean Leavey
 Author URI: https://attackllama.com/
-Description: Laboratory notebook theme, intended to be used in combination with Academic Labbook Plugin.
-Version: 1.1.9
+Description: Laboratory notebook theme, intended to be used in combination with Academic Labbook Plugin (ALP). ALP adds a whole bunch of features to WordPress to convert it into an electronic laboratory notebook. The Labbook theme enables the display of the front-end features provided by ALP. ALP is currently in beta and can be installed using the instructions here: https://alp.attackllama.com/documentation/installation/.
+Version: 1.1.10
 License: GNU General Public License v3 or later
 License URI: LICENSE
 Text Domain: labbook
-Tags: custom-background, custom-logo, custom-menu, editor-style, education, theme-options, threaded-comments, translation-ready, two-columns
+Tags: custom-background, custom-logo, custom-menu, editor-style, education, sticky-post, theme-options, threaded-comments, translation-ready, two-columns
 
 This theme, like WordPress, is licensed under the GPL.
 Use it to make something cool, have fun, and share what you've learned with others.
@@ -489,6 +489,14 @@ big {
     font-size: 125%;
 }
 
+.entry-title,
+.entry-content,
+.entry-summary,
+.nav-links {
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
 /*--------------------------------------------------------------
 # Elements
 --------------------------------------------------------------*/
@@ -572,6 +580,8 @@ table {
     margin: 0 0 1.5em;
     border-collapse: collapse;
     width: 100%;
+    display: block;
+    overflow: auto;
 }
 
 td,
@@ -599,7 +609,7 @@ th {
         "footer";
 }
 
-/* Small devices (e.g. tablets) */
+/* Small devices (e.g. tablets) and above */
 @media (min-width: 768px) {
     #page {
         /* minmax(0, 1fr) stops <pre> expanding column: https://stackoverflow.com/questions/52587749/why-does-a-1fr-css-grid-column-neutralize-overflow-scroll-of-its-child-pre */
@@ -613,7 +623,7 @@ th {
     }
 }
 
-/* Medium devices (desktops) */
+/* Medium devices (desktops) and above */
 @media (min-width: 992px) {
     #page {
         /* minmax(0, 1fr) stops <pre> expanding column: https://stackoverflow.com/questions/52587749/why-does-a-1fr-css-grid-column-neutralize-overflow-scroll-of-its-child-pre */
@@ -1185,7 +1195,8 @@ a:hover, a:active {
 }
 
 .post,
-.page {
+.page,
+.ssl-alp-inventory {
     margin: 0 0 1.5em 0;
 }
 
@@ -1223,6 +1234,35 @@ a:hover, a:active {
     padding: 1em;
 }
 
+/* Container for all post header stuff */
+.entry-header-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    grid-template-areas:
+        "breadcrumbs"
+        "title-meta"
+        "thumbnail";
+}
+
+/* Small devices (e.g. tablets) and above */
+@media (min-width: 600px) {
+    .entry-header-container {
+        /* Note: second grid column is constrained to 100px by .entry-thumbnail. The `auto` here
+           allows the column width to shrink to 0 when there is no thumbnail. */
+        grid-template-columns: 1fr auto;
+        grid-template-rows: auto 1fr;
+        grid-template-areas:
+            "breadcrumbs thumbnail"
+            "title-meta thumbnail";
+        max-height: 100px;
+    }
+}
+
+.entry-header {
+    grid-area: title-meta;
+}
+
 .entry-header, .entry-footer {
 	clear: both;
 	color: #0b789c;
@@ -1233,6 +1273,15 @@ a:hover, a:active {
 /* space after icons in post header and footer */
 .entry-header .fa, .entry-footer .fa {
 	margin-right: 0.5em;
+}
+
+.entry-thumbnail {
+    grid-area: thumbnail;
+    max-width: 100px;
+}
+
+.entry-thumbnail img {
+    display: block;
 }
 
 .labbook-read-button {
@@ -1246,7 +1295,6 @@ a:hover, a:active {
 .entry-title {
     font-size: 1.9em;
     margin: 0 0 0.25em 0;
-    word-wrap: break-word;
 }
 
 /* show visited posts' titles in different colour */
@@ -1262,7 +1310,6 @@ a:hover, a:active {
     margin-bottom: 1em;
     padding-top: 1em;
     padding-bottom: 1em;
-    word-wrap: break-word;
 }
 
 .entry-content h1,
@@ -1274,8 +1321,10 @@ a:hover, a:active {
     clear: left; /* disable clear: right to allow table of contents to float to right */
 }
 
-/* category and tag links */
-.entry-footer .cat-links a, .entry-footer .tag-links a {
+/* post term links */
+.entry-footer .cat-links a,
+.entry-footer .tag-links a,
+.entry-footer .inventory-item-links a {
 	background-color: #F5DF44;
     border-radius: 4px;
     padding: 2px;
@@ -1283,6 +1332,7 @@ a:hover, a:active {
 }
 
 .breadcrumbs {
+    grid-area: breadcrumbs;
     font-size: 85%;
 }
 
