@@ -513,7 +513,7 @@ if ( ! function_exists( 'labbook_the_footer' ) ) :
 
 		if ( labbook_ssl_alp_inventory_enabled() ) {
 			/* translators: used between list items, there is a space after the comma. */
-			$inventory_list = get_the_term_list( $post->ID, 'ssl_alp_inventory_item', '', __( ', ', 'labbook' ) );
+			$inventory_list = get_the_term_list( $post->ID, 'ssl-alp-inventory-item', '', __( ', ', 'labbook' ) );
 
 			if ( $inventory_list ) {
 				printf(
@@ -1731,7 +1731,7 @@ if ( ! function_exists( 'labbook_the_advanced_search_inventory_filter_table' ) )
 
 		$inventory_items = get_terms(
 			array(
-				'taxonomy' => 'ssl_alp_inventory_item',
+				'taxonomy' => 'ssl-alp-inventory-item',
 				'orderby'  => 'name',
 				'order'    => 'ASC',
 			)

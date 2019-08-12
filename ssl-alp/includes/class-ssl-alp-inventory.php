@@ -291,7 +291,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 		$term = $this->get_inventory_term( $post );
 
 		// Temporarily disable the filter that blocks creation of terms in the
-		// ssl_alp_inventory_item taxonomy.
+		// ssl-alp-inventory-item taxonomy.
 		$this->disable_disallow_insert_term_filter();
 
 		if ( ! $term ) {
@@ -300,7 +300,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 				'slug' => $this->get_inventory_term_slug( $post ),
 			);
 
-			wp_insert_term( $post->post_title, 'ssl_alp_inventory_item', $args );
+			wp_insert_term( $post->post_title, 'ssl-alp-inventory-item', $args );
 		} else {
 			// Update term.
 			$args = array(
@@ -308,7 +308,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 				'slug' => $this->get_inventory_term_slug( $post ),
 			);
 
-			wp_update_term( $term->term_id, 'ssl_alp_inventory_item', $args );
+			wp_update_term( $term->term_id, 'ssl-alp-inventory-item', $args );
 		}
 
 		// Re-enable the filter.
@@ -324,7 +324,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 		}
 
 		$slug = $this->get_inventory_term_slug( $post );
-		return get_term_by( 'slug', $slug, 'ssl_alp_inventory_item' );
+		return get_term_by( 'slug', $slug, 'ssl-alp-inventory-item' );
 	}
 
 	/**
@@ -358,7 +358,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 
 	/**
 	 * Associate a post in the ssl-alp-inventory custom post type with a corresponding
-	 * ssl_alp_inventory_item term when created or saved.
+	 * ssl-alp-inventory-item term when created or saved.
 	 *
 	 * @param int     $post_id The post ID.
 	 * @param WP_Post $post    The post object.
@@ -416,8 +416,8 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 			return;
 		}
 
-		wp_delete_term( $term->term_id, 'ssl_alp_inventory_item' );
-		clean_term_cache( array( $term->term_id ), 'ssl_alp_inventory_item' );
+		wp_delete_term( $term->term_id, 'ssl-alp-inventory-item' );
+		clean_term_cache( array( $term->term_id ), 'ssl-alp-inventory-item' );
 	}
 
 	/**
@@ -498,7 +498,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 		);
 
 		// Create inventory taxonomy.
-		register_taxonomy( 'ssl_alp_inventory_item', $this->supported_post_types, $args );
+		register_taxonomy( 'ssl-alp-inventory-item', $this->supported_post_types, $args );
 	}
 
 	/**
@@ -545,7 +545,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 		if ( $term->count > 0 ) {
 			printf(
 				'<a href="%1$s" title="%2$s" class="edit">%3$d</a>',
-				esc_url( 'edit.php?taxonomy=ssl_alp_inventory_item&amp;term=' . $this->get_inventory_term_slug( $post_id ) ),
+				esc_url( 'edit.php?taxonomy=ssl-alp-inventory-item&amp;term=' . $this->get_inventory_term_slug( $post_id ) ),
 				esc_attr__( 'View posts for this inventory item', 'ssl-alp' ),
 				esc_html( number_format_i18n( $term->count ) )
 			);
@@ -564,7 +564,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 	 * @return string The overridden term link.
 	 */
 	public function override_term_link( $link, $term, $taxonomy ) {
-		if ( 'ssl_alp_inventory_item' !== $taxonomy ) {
+		if ( 'ssl-alp-inventory-item' !== $taxonomy ) {
 			return $link;
 		}
 
@@ -594,14 +594,14 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 			return;
 		}
 
-		if ( 'ssl_alp_inventory_item' !== $term->taxonomy ) {
+		if ( 'ssl-alp-inventory-item' !== $term->taxonomy ) {
 			return;
 		}
 
 		// Temporarily disable filter that overrides term link.
 		$this->disable_override_term_link();
 
-		$url = get_term_link( $term, 'ssl_alp_inventory_item' );
+		$url = get_term_link( $term, 'ssl-alp-inventory-item' );
 
 		// Re-enable filter.
 		$this->enable_override_term_link();
@@ -625,7 +625,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 	 * @return string|WP_Error $term The term, or error.
 	 */
 	public function disallow_insert_term( $term, $taxonomy ) {
-		if ( 'ssl_alp_inventory_item' !== $taxonomy ) {
+		if ( 'ssl-alp-inventory-item' !== $taxonomy ) {
 			return $term;
 		}
 
@@ -647,7 +647,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 	 * @param string $taxonomy  Taxonomy slug.
 	 */
 	public function reject_invalid_inventory_terms( $object_id, $tt_id, $taxonomy ) {
-		if ( 'ssl_alp_inventory_item' !== $taxonomy ) {
+		if ( 'ssl-alp-inventory-item' !== $taxonomy ) {
 			return;
 		}
 
@@ -656,7 +656,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 			return;
 		}
 
-		$term = get_term_by( 'term_taxonomy_id', $tt_id, 'ssl_alp_inventory_item' );
+		$term = get_term_by( 'term_taxonomy_id', $tt_id, 'ssl-alp-inventory-item' );
 
 		if ( ! $term ) {
 			// Nothing to do here.
@@ -668,7 +668,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 
 		if ( ! $inventory_post ) {
 			// This is not a valid inventory term - delete it.
-			wp_delete_term( $term->term_id, 'ssl_alp_inventory_item' );
+			wp_delete_term( $term->term_id, 'ssl-alp-inventory-item' );
 		}
 	}
 
@@ -758,7 +758,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 				// applies the relation as part of its instantiation.
 				'relation' => 'AND',
 				array(
-					'taxonomy'         => 'ssl_alp_inventory_item',
+					'taxonomy'         => 'ssl-alp-inventory-item',
 					'terms'            => $inventory_item_and,
 					'field'            => 'term_id',
 					'operator'         => 'AND',
@@ -770,7 +770,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 		if ( ! empty( $inventory_item_in ) ) {
 			// Coauthor IN search criterion specified.
 			$tax_query[] = array(
-				'taxonomy'         => 'ssl_alp_inventory_item',
+				'taxonomy'         => 'ssl-alp-inventory-item',
 				'terms'            => $inventory_item_in,
 				'field'            => 'term_id',
 				'include_children' => false,
@@ -780,7 +780,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 		if ( ! empty( $inventory_not_in ) ) {
 			// Coauthor NOT IN search criterion specified.
 			$tax_query[] = array(
-				'taxonomy'         => 'ssl_alp_inventory_item',
+				'taxonomy'         => 'ssl-alp-inventory-item',
 				'terms'            => $inventory_not_in,
 				'field'            => 'term_id',
 				'operator'         => 'NOT IN',

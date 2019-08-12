@@ -55,7 +55,7 @@ class InventoryTests extends WP_UnitTestCase {
 
         $this->assertEquals( $post->post_type, 'ssl-alp-inventory' );
         // A corresponding term should have been created.
-        $term = get_term_by( 'slug', $post->ID, 'ssl_alp_inventory_item' );
+        $term = get_term_by( 'slug', $post->ID, 'ssl-alp-inventory-item' );
         $this->assertNotFalse( $term );
         $this->assertEquals( $term->slug, $post->ID );
     }
@@ -70,7 +70,7 @@ class InventoryTests extends WP_UnitTestCase {
         );
 
         $this->assertEquals( $post->post_type, 'ssl-alp-inventory' );
-        $term = get_term_by( 'slug', $post->ID, 'ssl_alp_inventory_item' );
+        $term = get_term_by( 'slug', $post->ID, 'ssl-alp-inventory-item' );
         $this->assertNotFalse( $term );
         $this->assertEquals( $term->slug, $post->ID );
 
@@ -78,7 +78,7 @@ class InventoryTests extends WP_UnitTestCase {
         wp_delete_post( $post->ID, true );
 
         // The term should be deleted too.
-        $term = get_term_by( 'slug', $post->ID, 'ssl_alp_inventory_item' );
+        $term = get_term_by( 'slug', $post->ID, 'ssl-alp-inventory-item' );
         $this->assertFalse( $term );
     }
 
@@ -92,7 +92,7 @@ class InventoryTests extends WP_UnitTestCase {
         );
 
         $this->assertEquals( $post->post_type, 'ssl-alp-inventory' );
-        $term = get_term_by( 'slug', $post->ID, 'ssl_alp_inventory_item' );
+        $term = get_term_by( 'slug', $post->ID, 'ssl-alp-inventory-item' );
         $this->assertNotFalse( $term );
         $this->assertEquals( $term->slug, $post->ID );
 
@@ -100,7 +100,7 @@ class InventoryTests extends WP_UnitTestCase {
         wp_trash_post( $post->ID );
 
         // The term should still be present.
-        $term = get_term_by( 'slug', $post->ID, 'ssl_alp_inventory_item' );
+        $term = get_term_by( 'slug', $post->ID, 'ssl-alp-inventory-item' );
         $this->assertNotFalse( $term );
         $this->assertEquals( $term->slug, $post->ID );
 
@@ -108,7 +108,7 @@ class InventoryTests extends WP_UnitTestCase {
         wp_delete_post( $post->ID );
 
         // The term should be deleted too.
-        $term = get_term_by( 'slug', $post->ID, 'ssl_alp_inventory_item' );
+        $term = get_term_by( 'slug', $post->ID, 'ssl-alp-inventory-item' );
         $this->assertFalse( $term );
     }
 
@@ -123,7 +123,7 @@ class InventoryTests extends WP_UnitTestCase {
 
         foreach ( $users as $user ) {
             wp_set_current_user( $user->ID );
-            $term = wp_insert_term( 'Test', 'ssl_alp_inventory_item' );
+            $term = wp_insert_term( 'Test', 'ssl-alp-inventory-item' );
             $this->assertTrue( is_wp_error( $term ) );
         }
     }
