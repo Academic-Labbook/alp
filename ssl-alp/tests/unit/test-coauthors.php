@@ -41,7 +41,7 @@ class CoauthorsTest extends WP_UnitTestCase {
         );
 
         if ( ! empty( $terms ) ) {
-            wp_set_post_terms( $post->ID, $terms, "ssl_alp_coauthor" );
+            wp_set_post_terms( $post->ID, $terms, "ssl-alp-coauthor" );
         }
 
         return $post;
@@ -1401,14 +1401,14 @@ class CoauthorsTest extends WP_UnitTestCase {
         $ssl_alp->coauthors->disable_disallow_insert_term_filter();
         $junk1 = wp_insert_term(
             'junk_term',
-            'ssl_alp_coauthor',
+            'ssl-alp-coauthor',
             array(
                 'slug' => 'junk-term',
             )
         );
         $junk2 = wp_insert_term(
             'ssl_alp_coauthor_nonexistent_user',
-            'ssl_alp_coauthor',
+            'ssl-alp-coauthor',
             array(
                 'slug' => 'ssl-alp-coauthor-nonexistent-user',
             )
@@ -1421,12 +1421,12 @@ class CoauthorsTest extends WP_UnitTestCase {
         $set_terms[] = $junk2['term_id'];
 
         // Set terms.
-        wp_set_post_terms( $post->ID, $set_terms, 'ssl_alp_coauthor' );
+        wp_set_post_terms( $post->ID, $set_terms, 'ssl-alp-coauthor' );
 
         // Get post terms.
 		$new_terms = wp_get_object_terms(
 			$post->ID,
-			'ssl_alp_coauthor'
+			'ssl-alp-coauthor'
         );
 
         $new_term_ids = wp_list_pluck( $new_terms, 'term_id' );

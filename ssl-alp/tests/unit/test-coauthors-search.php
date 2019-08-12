@@ -68,7 +68,7 @@ class CoauthorsSearchTest extends WP_UnitTestCase {
         );
 
         if ( ! empty( $terms ) ) {
-            wp_set_post_terms( $post->ID, $terms, 'ssl_alp_coauthor' );
+            wp_set_post_terms( $post->ID, $terms, 'ssl-alp-coauthor' );
         }
 
         return $post;
