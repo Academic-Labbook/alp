@@ -1207,7 +1207,7 @@ if ( ! function_exists( 'labbook_the_advanced_search_form' ) ) :
 		);
 
 		printf(
-			'<input type="submit" class="search-submit screen-reader-text" id="searchsubmit" value="%1$s" />',
+			'<input type="submit" class="search-submit" id="searchsubmit" value="%1$s" />',
 			esc_attr_x( 'Search', 'submit button', 'labbook' )
 		);
 
@@ -1271,6 +1271,13 @@ if ( ! function_exists( 'labbook_the_advanced_search_form' ) ) :
 		printf(
 			'<input type="submit" value="%1$s"/>',
 			esc_html__( 'Search', 'labbook' )
+		);
+
+		echo '&nbsp;';
+
+		printf(
+			'<input type="reset" value="%1$s"/>',
+			esc_html__( 'Reset', 'labbook' )
 		);
 
 		echo '</div>';
