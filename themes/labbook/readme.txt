@@ -3,7 +3,7 @@ Contributors: seanleavey
 Tags: custom-background, custom-logo, custom-menu, editor-style, education, sticky-post, theme-options, threaded-comments, translation-ready, two-columns
 Requires at least: 5.0.0
 Tested up to: 5.2.2
-Stable tag: 1.1.10
+Stable tag: 1.1.11
 Requires PHP: 7.0.0
 License: GNU General Public License v3 or later
 License URI: LICENCE
@@ -51,6 +51,11 @@ Labbook supports Academic Labbook Plugin - indeed, use of it is highly encourage
 of features provided in this theme.
 
 == Changelog ==
+
+= 1.1.11 - 2019-08-14 =
+* Fixed text overflow regression introduced in 1.1.10.
+* Tweaked padding on form buttons.
+* Added extra submit and reset buttons to advanced search form.
 
 = 1.1.10 - 2019-08-12 =
 * Added support for inventory post tag display to post footer.
