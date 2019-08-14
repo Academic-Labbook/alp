@@ -397,6 +397,11 @@ template {
 /*--------------------------------------------------------------
 # Typography
 --------------------------------------------------------------*/
+body {
+    /* Wrap long words mid-word if necessary to prevent overflow. */
+    overflow-wrap: anywhere;
+}
+
 body,
 button,
 input,
@@ -487,12 +492,6 @@ mark, ins {
 
 big {
     font-size: 125%;
-}
-
-.entry-title,
-.nav-links {
-    word-wrap: break-word;
-    word-break: break-all;
 }
 
 /*--------------------------------------------------------------
