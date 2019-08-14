@@ -1086,14 +1086,10 @@ if ( ! function_exists( 'labbook_the_inventory_item_posts_link' ) ) :
 
 		$term = $ssl_alp->inventory->get_inventory_term( $post );
 
-		if ( is_null( $term ) ) {
-			return;
-		}
-
 		echo '<div class="ssl-alp-inventory-post-count">';
 		echo '<em>';
 
-		if ( $term->count ) {
+		if ( ! empty( $term ) && $term->count ) {
 			$link_str = sprintf(
 				/* translators: number of inventory item posts */
 				_n(
