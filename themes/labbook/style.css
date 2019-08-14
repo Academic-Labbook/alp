@@ -490,8 +490,6 @@ big {
 }
 
 .entry-title,
-.entry-content,
-.entry-summary,
 .nav-links {
     word-wrap: break-word;
     word-break: break-all;
