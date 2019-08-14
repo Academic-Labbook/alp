@@ -763,7 +763,7 @@ input[type="submit"] {
     font-size: 12px;
     font-size: 0.75rem;
     line-height: 1;
-    padding: .6em 1em .4em;
+    padding: .5em 1em .5em;
 }
 
 button:hover,
