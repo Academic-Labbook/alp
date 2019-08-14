@@ -301,6 +301,12 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 		$this->enable_disallow_insert_term_filter();
 	}
 
+	/**
+	 * Get the inventory term for a given inventory post type post.
+	 *
+	 * @param WP_Post $post The post.
+	 * @return WP_Term|false The term, or false is the term doesn't exist.
+	 */
 	public function get_inventory_term( $post ) {
 		$post = get_post( $post );
 
@@ -524,7 +530,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 
 		$term = $this->get_inventory_term( $post_id );
 
-		if ( is_null( $term ) ) {
+		if ( ! $term ) {
 			return;
 		}
 
@@ -573,7 +579,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 	 *
 	 * @param WP_Term $term The term.
 	 *
-	 * @return string|null The term archive URL, or null if term not found or invalid.
+	 * @return string|WP_Error The term archive URL, or error if term not found or invalid.
 	 */
 	public function get_inventory_term_archive_url( $term ) {
 		if ( is_null( $term ) ) {

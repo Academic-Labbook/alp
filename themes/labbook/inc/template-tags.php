@@ -1086,14 +1086,10 @@ if ( ! function_exists( 'labbook_the_inventory_item_posts_link' ) ) :
 
 		$term = $ssl_alp->inventory->get_inventory_term( $post );
 
-		if ( is_null( $term ) ) {
-			return;
-		}
-
 		echo '<div class="ssl-alp-inventory-post-count">';
 		echo '<em>';
 
-		if ( $term->count ) {
+		if ( ! empty( $term ) && $term->count ) {
 			$link_str = sprintf(
 				/* translators: number of inventory item posts */
 				_n(
@@ -1211,7 +1207,7 @@ if ( ! function_exists( 'labbook_the_advanced_search_form' ) ) :
 		);
 
 		printf(
-			'<input type="submit" class="search-submit screen-reader-text" id="searchsubmit" value="%1$s" />',
+			'<input type="submit" class="search-submit" id="searchsubmit" value="%1$s" />',
 			esc_attr_x( 'Search', 'submit button', 'labbook' )
 		);
 
@@ -1275,6 +1271,13 @@ if ( ! function_exists( 'labbook_the_advanced_search_form' ) ) :
 		printf(
 			'<input type="submit" value="%1$s"/>',
 			esc_html__( 'Search', 'labbook' )
+		);
+
+		echo '&nbsp;';
+
+		printf(
+			'<input type="reset" value="%1$s"/>',
+			esc_html__( 'Reset', 'labbook' )
 		);
 
 		echo '</div>';
