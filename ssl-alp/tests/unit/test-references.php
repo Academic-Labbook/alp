@@ -256,7 +256,7 @@ class CrossReferencesTest extends WP_UnitTestCase {
 		$ssl_alp->references->rebuild_references();
 
 		// Post 1 references don't include the new post.
-		$this->assertEquals(
+		$this->assertEqualSets(
 			$ssl_alp->references->get_reference_from_posts( $this->post_1 ),
 			array( $this->post_2, $this->post_3, $this->page_2 )
 		);
