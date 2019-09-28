@@ -106,15 +106,15 @@ class CrossReferencesTest extends WP_UnitTestCase {
 		 * test get_reference_to_posts can handle post IDs or objects
 		 */
 
-		$this->assertEquals(
+		$this->assertEqualSets(
 			$ssl_alp->references->get_reference_to_posts( $this->post_1 ),
 			$ssl_alp->references->get_reference_to_posts( $this->post_1->ID )
 		);
-		$this->assertEquals(
+		$this->assertEqualSets(
 			$ssl_alp->references->get_reference_to_posts( $this->post_2 ),
 			$ssl_alp->references->get_reference_to_posts( $this->post_2->ID )
 		);
-		$this->assertEquals(
+		$this->assertEqualSets(
 			$ssl_alp->references->get_reference_to_posts( $this->post_3 ),
 			$ssl_alp->references->get_reference_to_posts( $this->post_3->ID )
 		);
@@ -123,15 +123,15 @@ class CrossReferencesTest extends WP_UnitTestCase {
 		 * test get_reference_from_posts can handle post IDs or objects
 		 */
 
-		$this->assertEquals(
+		$this->assertEqualSets(
 			$ssl_alp->references->get_reference_from_posts( $this->post_1 ),
 			$ssl_alp->references->get_reference_from_posts( $this->post_1->ID )
 		);
-		$this->assertEquals(
+		$this->assertEqualSets(
 			$ssl_alp->references->get_reference_from_posts( $this->post_2 ),
 			$ssl_alp->references->get_reference_from_posts( $this->post_2->ID )
 		);
-		$this->assertEquals(
+		$this->assertEqualSets(
 			$ssl_alp->references->get_reference_from_posts( $this->post_3 ),
 			$ssl_alp->references->get_reference_from_posts( $this->post_3->ID )
 		);
@@ -147,13 +147,13 @@ class CrossReferencesTest extends WP_UnitTestCase {
 			wp_set_current_user( $user->ID );
 
 			// post 1 references nothing
-			$this->assertEquals(
+			$this->assertEqualSets(
 				$ssl_alp->references->get_reference_to_posts( $this->post_1 ),
 				array()
 			);
 
 			// post 2 references post 1
-			$this->assertEquals(
+			$this->assertEqualSets(
 				$ssl_alp->references->get_reference_to_posts( $this->post_2 ),
 				array( $this->post_1 )
 			);
@@ -165,13 +165,13 @@ class CrossReferencesTest extends WP_UnitTestCase {
 			);
 
 			// page 1 references nothing
-			$this->assertEquals(
+			$this->assertEqualSets(
 				$ssl_alp->references->get_reference_to_posts( $this->page_1 ),
 				array()
 			);
 
 			// page 2 references post 1
-			$this->assertEquals(
+			$this->assertEqualSets(
 				$ssl_alp->references->get_reference_to_posts( $this->page_2 ),
 				array( $this->post_1 )
 			);
@@ -196,25 +196,25 @@ class CrossReferencesTest extends WP_UnitTestCase {
 			);
 
 			// post 2 referenced by post 3
-			$this->assertEquals(
+			$this->assertEqualSets(
 				$ssl_alp->references->get_reference_from_posts( $this->post_2 ),
 				array( $this->post_3 )
 			);
 
 			// post 3 referenced by nothing
-			$this->assertEquals(
+			$this->assertEqualSets(
 				$ssl_alp->references->get_reference_from_posts( $this->post_3 ),
 				array()
 			);
 
 			// page 1 referenced by nothing
-			$this->assertEquals(
+			$this->assertEqualSets(
 				$ssl_alp->references->get_reference_from_posts( $this->page_1 ),
 				array()
 			);
 
 			// page 2 referenced by nothing
-			$this->assertEquals(
+			$this->assertEqualSets(
 				$ssl_alp->references->get_reference_from_posts( $this->page_2 ),
 				array()
 			);
@@ -233,7 +233,7 @@ class CrossReferencesTest extends WP_UnitTestCase {
 		);
 
 		// external reference shouldn't show up
-		$this->assertEquals(
+		$this->assertEqualSets(
 			$ssl_alp->references->get_reference_from_posts( $post ),
 			array()
 		);
@@ -276,7 +276,7 @@ class CrossReferencesTest extends WP_UnitTestCase {
 		);
 
 		// reference should only show up once for each post
-		$this->assertEquals(
+		$this->assertEqualSets(
 			$ssl_alp->references->get_reference_to_posts( $post ),
 			array( $this->post_1, $this->post_2 )
 		);
@@ -298,7 +298,7 @@ class CrossReferencesTest extends WP_UnitTestCase {
 		);
 
 		// no references
-		$this->assertEquals(
+		$this->assertEqualSets(
 			$ssl_alp->references->get_reference_from_posts( $post ),
 			array()
 		);
@@ -315,7 +315,7 @@ class CrossReferencesTest extends WP_UnitTestCase {
 		);
 
 		// one reference now
-		$this->assertEquals(
+		$this->assertEqualSets(
 			$ssl_alp->references->get_reference_to_posts( $post ),
 			array( $this->post_1 )
 		);
@@ -333,7 +333,7 @@ class CrossReferencesTest extends WP_UnitTestCase {
 		);
 
 		// two references now
-		$this->assertEquals(
+		$this->assertEqualSets(
 			$ssl_alp->references->get_reference_to_posts( $post ),
 			array( $this->post_1, $this->post_2 )
 		);
@@ -349,7 +349,7 @@ class CrossReferencesTest extends WP_UnitTestCase {
 		wp_restore_post_revision( $first_revision->ID );
 
 		// only one reference like the first time
-		$this->assertEquals(
+		$this->assertEqualSets(
 			$ssl_alp->references->get_reference_to_posts( $post ),
 			array( $this->post_1 )
 		);
@@ -385,7 +385,7 @@ class CrossReferencesTest extends WP_UnitTestCase {
 		);
 
 		// self reference shouldn't show up, but other reference should
-		$this->assertEquals(
+		$this->assertEqualSets(
 			$ssl_alp->references->get_reference_to_posts( $post ),
 			array( $this->post_1 )
 		);
@@ -420,13 +420,13 @@ class CrossReferencesTest extends WP_UnitTestCase {
 		);
 
 		// Draft post should show link to published post.
-		$this->assertEquals(
+		$this->assertEqualSets(
 			$ssl_alp->references->get_reference_to_posts( $draft ),
 			array( $published )
 		);
 
 		// Published post should not show link from draft.
-		$this->assertEquals(
+		$this->assertEqualSets(
 			$ssl_alp->references->get_reference_from_posts( $published ),
 			array()
 		);
