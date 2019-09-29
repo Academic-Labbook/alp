@@ -263,6 +263,13 @@ Link: [Term Management Tools](https://wordpress.org/plugins/term-management-tool
 Most of the code has been copied with a few minor changes, but the "change taxonomy" function has
 been removed and the "merge" function user interface has been tweaked.
 
+### Advanced Posts Blocks
+Author: Hiroshi Urabe
+
+Link: [Advanced Posts Blocks](https://wordpress.org/plugins/advanced-posts-blocks/)
+
+The children posts block was forked and simplified.
+
 ### Simple Life
 Author: Nilambar Sharma
 
