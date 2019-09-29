@@ -34,11 +34,11 @@ class SSL_ALP_Pages extends SSL_ALP_Module {
 		$loader->add_filter( 'manage_edit-page_columns', $this, 'manage_edit_columns' );
 
 		/**
-		 * Blocks.
+		 * Page children block.
 		 */
 
-		// Register blocks.
-		$loader->add_action( 'init', $this, 'register_block_scripts' );
+		// Register page children block.
+		$loader->add_action( 'init', $this, 'register_page_children_block_scripts' );
 	}
 
 	/**
@@ -82,9 +82,9 @@ class SSL_ALP_Pages extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Register block scripts.
+	 * Register page child block scripts.
 	 */
-	public function register_block_scripts() {
+	public function register_page_children_block_scripts() {
 		wp_register_script(
 			'ssl-alp-page-children-block-editor',
 			esc_url( SSL_ALP_BASE_URL . 'blocks/children/block.js' ),
