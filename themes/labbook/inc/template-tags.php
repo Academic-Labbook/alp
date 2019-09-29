@@ -130,7 +130,7 @@ if ( ! function_exists( 'labbook_get_post_date' ) ) :
 		$date_str = $modified ? get_the_modified_date( $datetime_fmt, $post ) : get_the_date( $datetime_fmt, $post );
 
 		// How long ago.
-		$human_date = $modified ? labbook_get_human_date( $post->post_modified ) : labbook_get_human_date( $post->post_date );
+		$human_date = labbook_get_post_human_time_diff( $post, $modified );
 
 		// Different time class defending on whether we're showing publication or modification date.
 		$time_class = $modified ? 'updated' : 'entry-date published';
@@ -186,20 +186,28 @@ if ( ! function_exists( 'labbook_get_date_format' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'labbook_get_human_date' ) ) :
+if ( ! function_exists( 'labbook_get_post_human_time_diff' ) ) :
 	/**
-	 * Get human formatted date, e.g. "3 hours ago".
+	 * Get human formatted publication or modification time, e.g. "3 hours ago".
 	 *
-	 * @param string $date_str Date format string.
+	 * @param WP_Post $post     The post.
+	 * @param bool    $modified Whether to return the modified time or not.
 	 * @return string
 	 */
-	function labbook_get_human_date( $date_str ) {
-		$timestamp = strtotime( $date_str );
+	function labbook_get_post_human_time_diff( $post, $modified = false ) {
+		$post = get_post( $post );
+
+		// Use GMT to avoid server timezone misconfiguration issues.
+		if ( ! $modified ) {
+			$time = get_post_time( 'G', true, $post );
+		} else {
+			$time = get_post_modified_time( 'G', true, $post );
+		}
 
 		return sprintf(
 			/* translators: 1: time ago */
 			__( '%s ago', 'labbook' ),
-			human_time_diff( $timestamp )
+			human_time_diff( $time )
 		);
 	}
 endif;
@@ -702,7 +710,7 @@ if ( ! function_exists( 'labbook_the_revision_description_row' ) ) :
 		printf(
 			'<span title="%1$s">%2$s</span>',
 			esc_attr( get_the_modified_date( labbook_get_date_format( true ), $revision ) ),
-			esc_html( labbook_get_human_date( $revision->post_modified ) )
+			esc_html( labbook_get_post_human_time_diff( $revision, true ) )
 		);
 
 		echo '</td>';
