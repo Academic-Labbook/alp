@@ -195,14 +195,14 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 		$katex_copy_css_url = $this->get_katex_copy_css_url();
 
 		wp_register_style(
-			'tex-block',
+			'ssl-alp-tex-block',
 			esc_url( SSL_ALP_BASE_URL . 'blocks/tex/style.css' ),
 			array(),
 			$this->get_version()
 		);
 
 		wp_register_style(
-			'tex-block-editor',
+			'ssl-alp-tex-block-editor',
 			esc_url( SSL_ALP_BASE_URL . 'blocks/tex/editor.css' ),
 			array(),
 			$this->get_version()
@@ -260,7 +260,7 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 		);
 
 		wp_register_script(
-			'tex-block-editor',
+			'ssl-alp-tex-block-editor',
 			esc_url( SSL_ALP_BASE_URL . 'blocks/tex/block.js' ),
 			array(
 				'wp-blocks',
@@ -274,9 +274,9 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 		register_block_type(
 			'ssl-alp/tex',
 			array(
-				'editor_script' => 'tex-block-editor',
-				'editor_style'  => 'tex-block-editor',
-				'style'         => 'tex-block',
+				'editor_script' => 'ssl-alp-tex-block-editor',
+				'editor_style'  => 'ssl-alp-tex-block-editor',
+				'style'         => 'ssl-alp-tex-block',
 			)
 		);
 	}
