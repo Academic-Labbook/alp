@@ -122,6 +122,7 @@ class SSL_ALP_Activator {
 		add_option( 'ssl_alp_enable_inventory', true );
 		add_option( 'ssl_alp_allow_multiple_authors', true );
 		add_option( 'ssl_alp_disable_post_trackbacks', true );
+		add_option( 'ssl_alp_disable_social_media_blocks', true );
 		add_option( 'ssl_alp_enable_crossreferences', true );
 		add_option( 'ssl_alp_enable_edit_summaries', true );
 		add_option( 'ssl_alp_flag_unread_posts', true );

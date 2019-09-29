@@ -77,6 +77,15 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 			)
 		);
 
+		// Disable social media blocks.
+		register_setting(
+			SSL_ALP_SITE_SETTINGS_PAGE,
+			'ssl_alp_disable_social_media_blocks',
+			array(
+				'type' => 'boolean',
+			)
+		);
+
 		// Additional upload media types allowed.
 		register_setting(
 			SSL_ALP_NETWORK_SETTINGS_PAGE,
@@ -169,6 +178,9 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 
 		// Disable post trackbacks.
 		$loader->add_action( 'init', $this, 'disable_post_trackbacks' );
+
+		// Disable social link blocks.
+		$loader->add_action( 'enqueue_block_editor_assets', $this, 'disable_social_link_blocks' );
 	}
 
 	/**
@@ -431,5 +443,28 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 		}
 
 		remove_post_type_support( 'post', 'trackbacks' );
+	}
+
+	/**
+	 * Remove social link blocks.
+	 */
+	public function disable_social_link_blocks() {
+		if ( ! get_option( 'ssl_alp_disable_social_media_blocks' ) ) {
+			return;
+		}
+
+		wp_enqueue_script(
+			'ssl-alp-blacklist-blocks',
+			SSL_ALP_BASE_URL . 'js/blacklist-social-media-blocks.js',
+			array(
+				'wp-blocks',
+				'wp-dom-ready',
+				// Note: this dependency is required to prevent a race condition to ensure that
+				// all blocks are registered by the time the script runs.
+				'wp-edit-post',
+			),
+			$this->get_version(),
+			false
+		);
 	}
 }
