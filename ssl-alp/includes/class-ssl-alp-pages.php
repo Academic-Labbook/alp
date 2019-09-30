@@ -20,6 +20,10 @@ class SSL_ALP_Pages extends SSL_ALP_Module {
 	public function register_hooks() {
 		$loader = $this->get_loader();
 
+		/**
+		 * Admin page list changes.
+		 */
+
 		// Remove comment, author and thumbnail support from pages.
 		$loader->add_action( 'init', $this, 'disable_post_type_support' );
 
@@ -28,6 +32,13 @@ class SSL_ALP_Pages extends SSL_ALP_Module {
 
 		// Remove date column from admin page list.
 		$loader->add_filter( 'manage_edit-page_columns', $this, 'manage_edit_columns' );
+
+		/**
+		 * Page children block.
+		 */
+
+		// Register page children block.
+		$loader->add_action( 'init', $this, 'register_page_children_block_scripts' );
 	}
 
 	/**
@@ -68,5 +79,70 @@ class SSL_ALP_Pages extends SSL_ALP_Module {
 		}
 
 		return $columns;
+	}
+
+	/**
+	 * Register page child block scripts.
+	 */
+	public function register_page_children_block_scripts() {
+		wp_register_script(
+			'ssl-alp-page-children-block-editor',
+			esc_url( SSL_ALP_BASE_URL . 'blocks/children/block.js' ),
+			array(
+				'wp-blocks',
+				'wp-components',
+				'wp-i18n',
+				'wp-element',
+				'wp-data',
+			),
+			$this->get_version(),
+			true
+		);
+
+		register_block_type(
+			'ssl-alp/page-children',
+			array(
+				'editor_script'   => 'ssl-alp-page-children-block-editor',
+				'render_callback' => array( $this, 'render_page_children_block' ),
+				'attributes'      => array(
+					'className' => array(
+						'type' => 'string',
+					)
+				)
+			)
+		);
+	}
+
+	/**
+	 * Render the page children block contents.
+	 *
+	 * @param array $attributes The block attributes.
+	 * @return string The block contents.
+	 */
+	public function render_page_children_block( $attributes ) {
+		$extra_classes = array( 'wp-block-ssl-alp-page-children' );
+
+		if ( array_key_exists( 'className', $attributes ) ) {
+			$classes = preg_split('/\s+/', $attributes['className'] );
+			$extra_classes = array_merge( $extra_classes, $classes );
+		}
+
+		// CSS class string.
+		$ssl_alp_page_children_extra_classes = implode( ' ', $extra_classes );
+
+		$args = array(
+			'post_parent' => get_the_ID(),
+			'orderby'     => 'menu_order',
+			'order'       => 'asc',
+		);
+
+		$ssl_alp_page_children = get_children( $args );
+
+		ob_start();
+		require_once SSL_ALP_BASE_DIR . 'partials/blocks/children/display.php';
+		$output = ob_get_contents();
+		ob_end_clean();
+
+		return $output;
 	}
 }

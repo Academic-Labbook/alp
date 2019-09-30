@@ -96,7 +96,8 @@ an option to generate and show tables of contents for each page.
 The XML-RPC is disabled by ALP, since this is an old scheme which is entirely superceded in
 functionality by the REST API.
 
-Post trackbacks are disabled, since these are usually only useful for commercial sites.
+Settings are provided to disable post trackbacks and social media embed blocks, since these are
+usually only useful for commercial sites.
 
 When used on a network, extra media (MIME) types can be specified in addition to the core WordPress
 ones, to allow your users to upload special files without triggering securty errors.
@@ -261,6 +262,13 @@ Link: [Term Management Tools](https://wordpress.org/plugins/term-management-tool
 
 Most of the code has been copied with a few minor changes, but the "change taxonomy" function has
 been removed and the "merge" function user interface has been tweaked.
+
+### Advanced Posts Blocks
+Author: Hiroshi Urabe
+
+Link: [Advanced Posts Blocks](https://wordpress.org/plugins/advanced-posts-blocks/)
+
+The children posts block was forked and simplified.
 
 ### Simple Life
 Author: Nilambar Sharma

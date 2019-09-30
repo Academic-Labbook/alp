@@ -127,6 +127,7 @@ class SSL_ALP_Uninstaller {
 		delete_option( 'ssl_alp_enable_inventory' );
 		delete_option( 'ssl_alp_allow_multiple_authors' );
 		delete_option( 'ssl_alp_disable_post_trackbacks' );
+		delete_option( 'ssl_alp_disable_social_media_blocks' );
 		delete_option( 'ssl_alp_enable_crossreferences' );
 		delete_option( 'ssl_alp_enable_edit_summaries' );
 		delete_option( 'ssl_alp_flag_unread_posts' );

@@ -93,15 +93,7 @@
 		)
 	);
 
-	/**
-	 * Every block starts by registering a new block type definition.
-	 * @see https://wordpress.org/gutenberg/handbook/block-api/
-	 */
 	registerBlockType( 'ssl-alp/tex', {
-		/**
-		 * This is the display title for your block, which can be translated with `i18n` functions.
-		 * The block inserter will show this name.
-		 */
 		title: __( 'TeX', 'ssl-alp' ),
 
 		description: __( 'Render mathematical markup using TeX syntax.', 'ssl-alp' ),
@@ -112,20 +104,10 @@
 			__( 'Equation', 'ssl-alp' )
 		],
 
-		/**
-		 * This is the icon.
-		 */
 		icon: texIcon,
 
-		/**
-		 * Blocks are grouped into categories to help users browse and discover them.
-		 * The categories provided by core are `common`, `embed`, `formatting`, `layout` and `widgets`.
-		 */
 		category: 'common',
 
-		/**
-		 * Saved block attributes.
-		 */
 		attributes: {
 			formula: {
 				source: 'html',
@@ -134,9 +116,6 @@
 			},
 		},
 
-		/**
-		 * Optional block extended support features.
-		 */
 		supports: {
 			// Removes support for editing in HTML mode.
 			html: false,
@@ -144,14 +123,6 @@
 			className: false,
 		},
 
-		/**
-		 * The edit function describes the structure of your block in the context of the editor.
-		 * This represents what the editor will render when the block is used.
-		 * @see https://wordpress.org/gutenberg/handbook/block-edit-save/#edit
-		 *
-		 * @param {Object} [props] Properties passed from the editor.
-		 * @return {Element}       Element to render.
-		 */
 		edit: function( props ) {
 			const { isSelected, attributes, setAttributes, className } = props;
 			const { formula } = attributes;
@@ -198,13 +169,6 @@
 			}
 		},
 
-		/**
-		 * The save function defines the way in which the different attributes should be combined
-		 * into the final markup, which is then serialized by Gutenberg into `post_content`.
-		 * @see https://wordpress.org/gutenberg/handbook/block-edit-save/#save
-		 *
-		 * @return {Element}       Element to render.
-		 */
 		save: function save( { attributes } ) {
 			const { formula } = attributes;
 

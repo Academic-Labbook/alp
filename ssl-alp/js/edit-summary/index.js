@@ -166,8 +166,8 @@ class EditSummaryPlugin extends Component {
                     name: 'ssl_alp_edit_summary',
                     label: __( 'Edit summary', 'ssl-alp' ),
                     help: __( 'Briefly summarise your changes', 'ssl-alp' ),
-                    spellcheck: true,
-                    maxlength: 100,
+                    spellCheck: true,
+                    maxLength: 100,
                     value: this.state.editSummary,
                     onChange: ( value ) => {
                         // update text
