@@ -119,20 +119,7 @@ suitable for academic contexts:
 ALP is intended to be used with the specially created "Labbook" theme, which supports display of
 multiple authors, edit summaries, cross-references, etc. provided by ALP.
 
-Features:
- - Displays multiple authors
- - Displays revision history under posts and pages
- - Displays breadcrumb trail on pages showing page hierarchy
- - Displays table of contents on pages based on page headings
- - Provides users sidebar widget showing links to view lists of each authors' posts, including those
-   coauthored
- - Provides recent revisions sidebar widget showing recently edited posts and pages
- - Shows cross-references (links in the post body) between posts and pages under each post or page
- - Allows posts to be set as read or unread
- - Supports display of an institute logo and icon
- - Provides two menu locations for providing links to site or external pages or URLs
- - Provides customisable copyright notice and ability to hide branding
- - Responsive to screen size: viewable on mobile, tablet and desktop browsers
+See the [themes repository](https://github.com/Academic-Labbook/themes) for more details.
 
 ## Uninstallation
 ALP can be uninstalled via the normal procedure, using the plugin page in the admin area.
@@ -269,12 +256,3 @@ Author: Hiroshi Urabe
 Link: [Advanced Posts Blocks](https://wordpress.org/plugins/advanced-posts-blocks/)
 
 The children posts block was forked and simplified.
-
-### Simple Life
-Author: Nilambar Sharma
-
-Link: [Simple Life](https://wordpress.org/themes/simple-life/)
-
-The look and feel of the Labbook theme recommended for use with ALP has been inspired by Simple Life,
-but the templates are not based on Simple Life's code, but rather based on boilerplate code provided
-by [Underscores](https://underscores.me/).
