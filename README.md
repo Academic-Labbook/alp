@@ -1,5 +1,5 @@
 # ALP - Academic Labbook Plugin
-[![Build Status](https://travis-ci.com/SeanDS/alp.svg?branch=master)](https://travis-ci.com/SeanDS/alp)
+[![Build Status](https://travis-ci.com/Academic-Labbook/alp.svg?branch=master)](https://travis-ci.com/Academic-Labbook/alp)
 
 ALP leverages the powerful WordPress platform to provide an electronic laboratory notebook fit
 for academic and scientific purposes. It's free, open source, regularly updated and attempts to be
