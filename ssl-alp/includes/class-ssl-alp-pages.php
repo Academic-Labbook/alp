@@ -127,11 +127,14 @@ class SSL_ALP_Pages extends SSL_ALP_Module {
 			$extra_classes = array_merge( $extra_classes, $classes );
 		}
 
+		$post = get_post();
+
 		// CSS class string.
 		$ssl_alp_page_children_extra_classes = implode( ' ', $extra_classes );
 
 		$args = array(
-			'post_parent' => get_the_ID(),
+			'post_parent' => $post->ID,
+			'post_type'   => $post->post_type,
 			'orderby'     => 'menu_order',
 			'order'       => 'asc',
 		);
