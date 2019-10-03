@@ -248,18 +248,6 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 		);
 
 		wp_register_script(
-			'ssl-alp-katex-inline',
-			esc_url( SSL_ALP_BASE_URL . 'blocks/tex/inline.js' ),
-			array(
-				'wp-element',
-				'wp-i18n',
-				'wp-editor',
-			),
-			$this->get_version(),
-			true
-		);
-
-		wp_register_script(
 			'ssl-alp-tex-block-editor',
 			esc_url( SSL_ALP_BASE_URL . 'blocks/tex/block.js' ),
 			array(
