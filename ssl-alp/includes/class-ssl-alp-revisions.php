@@ -54,6 +54,26 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	protected $revisions_list_table;
 
 	/**
+	 * Register scripts.
+	 */
+	public function register_scripts() {
+		// Edit summary block editor plugin.
+		wp_register_script(
+			'ssl-alp-edit-summary-block-editor-js',
+			esc_url( SSL_ALP_BASE_URL . 'js/edit-summary/index.js' ),
+			array(
+				'wp-edit-post',
+				'wp-plugins',
+				'wp-i18n',
+				'wp-element',
+				'wp-compose',
+			),
+			$this->get_version(),
+			true
+		);
+	}
+
+	/**
 	 * Register settings.
 	 */
 	public function register_settings() {
@@ -93,13 +113,6 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Revisions settings partial.
-	 */
-	public function revisions_settings_callback() {
-		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/revisions-settings-display.php';
-	}
-
-	/**
 	 * Register hooks.
 	 */
 	public function register_hooks() {
@@ -114,9 +127,6 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		// Register REST API endpoint for setting edit summaries with the block editor.
 		$loader->add_action( 'rest_api_init', $this, 'rest_register_edit_summary_route' );
-
-		// Add edit summary box to block editor.
-		$loader->add_action( 'enqueue_block_editor_assets', $this, 'add_edit_summary_control' );
 
 		// Force all revisions to be saved.
 		// This avoids confusion with block editor edit summary not being
@@ -181,6 +191,26 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		$loader->add_filter( 'bulk_actions-edit-post', $this, 'register_read_unread_bulk_actions' );
 		$loader->add_filter( 'handle_bulk_actions-edit-post', $this, 'handle_read_unread_bulk_actions', 10, 3 );
 		$loader->add_action( 'admin_notices', $this, 'read_unread_admin_notice' );
+	}
+
+	/**
+	 * Enqueue block editor scripts.
+	 */
+	public function enqueue_block_editor_scripts() {
+		// Get post being edited.
+		$post = get_post();
+
+		if ( $this->edit_summary_allowed( $post ) ) {
+			// Enqueue block editor plugin script.
+			wp_enqueue_script( 'ssl-alp-edit-summary-block-editor-js' );
+		}
+	}
+
+	/**
+	 * Revisions settings partial.
+	 */
+	public function revisions_settings_callback() {
+		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/revisions-settings-display.php';
 	}
 
 	/**
@@ -310,37 +340,6 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		}
 
 		return $edit_summary;
-	}
-
-	/**
-	 * Add edit summary field to the block editor.
-	 *
-	 * @global $ssl_alp
-	 */
-	public function add_edit_summary_control() {
-		global $ssl_alp;
-
-		// Get post being edited.
-		$post = get_post();
-
-		if ( ! $this->edit_summary_allowed( $post ) ) {
-			return;
-		}
-
-		// Enqueue block editor plugin script.
-		wp_enqueue_script(
-			'ssl-alp-edit-summary-block-editor-js',
-			SSL_ALP_BASE_URL . 'js/edit-summary/index.js',
-			array(
-				'wp-edit-post',
-				'wp-plugins',
-				'wp-i18n',
-				'wp-element',
-				'wp-compose',
-			),
-			$ssl_alp->get_version(),
-			true
-		);
 	}
 
 	/**

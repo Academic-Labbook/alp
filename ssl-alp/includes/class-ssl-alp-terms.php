@@ -26,31 +26,15 @@ class SSL_ALP_Terms extends SSL_ALP_Module {
 	protected $editing_terms = false;
 
 	/**
-	 * Enqueue scripts.
+	 * Register admin scripts.
 	 */
-	public function enqueue_admin_scripts() {
-		global $taxonomy;
-
-		if ( ! $this->editing_terms ) {
-			return;
-		}
-
-		if ( ! $this->user_can_manage_terms() ) {
-			return;
-		}
-
-		wp_enqueue_script(
+	public function register_admin_scripts() {
+		wp_register_script(
 			'ssl-alp-term-management-tools',
-			SSL_ALP_BASE_URL . 'js/admin-term-management.js',
+			esc_url( SSL_ALP_BASE_URL . 'js/admin-term-management.js' ),
 			array( 'jquery' ),
 			$this->get_version(),
 			true
-		);
-
-		wp_localize_script(
-			'ssl-alp-term-management-tools',
-			'ssl_alp_term_management_actions',
-			$this->get_actions( $taxonomy )
 		);
 	}
 
@@ -68,6 +52,25 @@ class SSL_ALP_Terms extends SSL_ALP_Module {
 
 		// Print hidden inputs for term management list.
 		$loader->add_action( 'admin_footer', $this, 'print_inputs' );
+	}
+
+	/**
+	 * Enqueue scripts.
+	 *
+	 * @global $taxonomy
+	 */
+	public function enqueue_admin_scripts() {
+		global $taxonomy;
+
+		if ( $this->editing_terms && $this->user_can_manage_terms() ) {
+			wp_enqueue_script( 'ssl-alp-term-management-tools' );
+
+			wp_localize_script(
+				'ssl-alp-term-management-tools',
+				'ssl_alp_term_management_actions',
+				$this->get_actions( $taxonomy )
+			);
+		}
 	}
 
 	/**
@@ -96,11 +99,9 @@ class SSL_ALP_Terms extends SSL_ALP_Module {
 	 * @return array Array of actions and their descriptions.
 	 */
 	private function get_actions( $taxonomy ) {
-		$actions = array(
+		return array(
 			'merge' => __( 'Merge', 'ssl-alp' ),
 		);
-
-		return $actions;
 	}
 
 	/**

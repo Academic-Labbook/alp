@@ -65,35 +65,53 @@ abstract class SSL_ALP_Module {
 		$loader->add_action( 'admin_init', $this, 'register_settings', 5 ); // High priority.
 		$loader->add_action( 'admin_init', $this, 'register_settings_fields' );
 
+		// Register styles and scripts.
+		$loader->add_action( 'init', $this, 'register_styles' );
+		$loader->add_action( 'init', $this, 'register_scripts' );
+		$loader->add_action( 'admin_init', $this, 'register_admin_styles' );
+		$loader->add_action( 'admin_init', $this, 'register_admin_scripts' );
+
 		// Enqueue module styles and scripts.
 		$loader->add_action( 'wp_enqueue_scripts', $this, 'enqueue_styles' );
 		$loader->add_action( 'wp_enqueue_scripts', $this, 'enqueue_scripts' );
 		$loader->add_action( 'admin_enqueue_scripts', $this, 'enqueue_admin_styles' );
 		$loader->add_action( 'admin_enqueue_scripts', $this, 'enqueue_admin_scripts' );
+		$loader->add_action( 'login_enqueue_scripts', $this, 'enqueue_login_styles' );
+		$loader->add_action( 'login_enqueue_scripts', $this, 'enqueue_login_scripts' );
+		$loader->add_action( 'enqueue_block_editor_assets', $this, 'enqueue_block_editor_styles' );
+		$loader->add_action( 'enqueue_block_editor_assets', $this, 'enqueue_block_editor_scripts' );
+
+		// Register blocks.
+		$loader->add_action( 'init', $this, 'register_blocks' );
 
 		// Register module hooks.
 		$this->register_hooks();
 	}
 
 	/**
-	 * Enqueue styles in the page header.
+	 * Register styles.
 	 */
-	public function enqueue_styles() {}
+	public function register_styles() {}
 
 	/**
-	 * Enqueue styles in the admin header.
+	 * Register admin styles.
 	 */
-	public function enqueue_admin_styles() {}
+	public function register_admin_styles() {}
 
 	/**
-	 * Enqueue scripts in the page header.
+	 * Register scripts.
 	 */
-	public function enqueue_scripts() {}
+	public function register_scripts() {}
 
 	/**
-	 * Enqueue scripts in the admin header.
+	 * Register admin scripts.
 	 */
-	public function enqueue_admin_scripts() {}
+	public function register_admin_scripts() {}
+
+	/**
+	 * Register blocks.
+	 */
+	public function register_blocks() {}
 
 	/**
 	 * Register settings.
@@ -109,4 +127,44 @@ abstract class SSL_ALP_Module {
 	 * Register hooks.
 	 */
 	public function register_hooks() {}
+
+	/**
+	 * Enqueue styles in the page header.
+	 */
+	public function enqueue_styles() {}
+
+	/**
+	 * Enqueue styles in the admin header.
+	 */
+	public function enqueue_admin_styles() {}
+
+	/**
+	 * Enqueue styles in the login header.
+	 */
+	public function enqueue_login_styles() {}
+
+	/**
+	 * Enqueue block editor styles.
+	 */
+	public function enqueue_block_editor_styles() {}
+
+	/**
+	 * Enqueue scripts in the page header.
+	 */
+	public function enqueue_scripts() {}
+
+	/**
+	 * Enqueue scripts in the admin header.
+	 */
+	public function enqueue_admin_scripts() {}
+
+	/**
+	 * Enqueue scripts in the login header.
+	 */
+	public function enqueue_login_scripts() {}
+
+	/**
+	 * Enqueue block editor scripts.
+	 */
+	public function enqueue_block_editor_scripts() {}
 }

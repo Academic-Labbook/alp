@@ -57,13 +57,6 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Reference settings partial.
-	 */
-	public function reference_settings_callback() {
-		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/reference-settings-display.php';
-	}
-
-	/**
 	 * Register hooks.
 	 */
 	public function register_hooks() {
@@ -74,6 +67,13 @@ class SSL_ALP_References extends SSL_ALP_Module {
 
 		// Extract references from saved posts.
 		$loader->add_action( 'save_post', $this, 'extract_crossreferences', 10, 2 );
+	}
+
+	/**
+	 * Reference settings partial.
+	 */
+	public function reference_settings_callback() {
+		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/reference-settings-display.php';
 	}
 
 	/**

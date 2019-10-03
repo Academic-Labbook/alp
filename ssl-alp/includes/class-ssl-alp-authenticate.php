@@ -47,6 +47,20 @@ class SSL_ALP_Authenticate extends SSL_ALP_Module {
 	const APPLICATION_PASSWORD_LENGTH = 30;
 
 	/**
+	 * Register styles.
+	 */
+	public function register_styles() {
+		if ( get_option( 'ssl_alp_require_login' ) ) {
+			wp_register_style(
+				'ssl-alp-login-hide-backlink-css',
+				esc_url( SSL_ALP_BASE_URL . 'css/login-hide-backlink.css' ),
+				array(),
+				$this->get_version()
+			);
+		}
+	}
+
+	/**
 	 * Register settings.
 	 */
 	public function register_settings() {
@@ -97,9 +111,6 @@ class SSL_ALP_Authenticate extends SSL_ALP_Module {
 		// Disable XML-RPC interface.
 		$loader->add_action( 'xmlrpc_enabled', $this, '__return_false' );
 
-		// Remove "Back to [Blog]" from login page if login is required.
-		$loader->add_action( 'login_enqueue_scripts', $this, 'remove_back_link' );
-
 		// Add admin applications page.
 		$loader->add_action( 'admin_menu', $this, 'add_applications_page' );
 
@@ -112,6 +123,19 @@ class SSL_ALP_Authenticate extends SSL_ALP_Module {
 
 		// Handle admin notices.
 		$loader->add_action( 'admin_notices', $this, 'print_admin_notices' );
+	}
+
+	/**
+	 * Enqueue styles in the login header.
+	 */
+	public function enqueue_login_styles() {
+		if ( ! get_option( 'ssl_alp_require_login' ) ) {
+			return;
+		}
+
+		// Remove "Back to [Blog]" from login page if login is required.
+		// Use CSS to hide it as there is no hook for this link.
+		wp_enqueue_style( 'ssl-alp-login-hide-backlink-css' );
 	}
 
 	/**
@@ -352,18 +376,6 @@ class SSL_ALP_Authenticate extends SSL_ALP_Module {
 
 		// Default authentication procedure.
 		return 'front-end';
-	}
-
-	/**
-	 * Remove "Back to [Blog]" link from login page if login is required.
-	 */
-	public function remove_back_link() {
-		if ( ! get_option( 'ssl_alp_require_login' ) ) {
-			return;
-		}
-
-		// Use CSS to hide it as there is no hook for this link.
-		wp_enqueue_style( 'ssl-alp-login-hide-backlink-css', SSL_ALP_BASE_URL . 'css/login-hide-backlink.css', array(), $this->get_version(), 'all' );
 	}
 
 	/**

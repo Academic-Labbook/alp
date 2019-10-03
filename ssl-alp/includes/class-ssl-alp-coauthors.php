@@ -38,6 +38,35 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	protected $having_terms = '';
 
 	/**
+	 * Register settings.
+	 */
+	public function register_settings() {
+		register_setting(
+			SSL_ALP_SITE_SETTINGS_PAGE,
+			'ssl_alp_allow_multiple_authors',
+			array(
+				'type' => 'boolean',
+			)
+		);
+	}
+
+	/**
+	 * Register settings fields.
+	 */
+	public function register_settings_fields() {
+		/**
+		 * Post multiple author settings field.
+		 */
+		add_settings_field(
+			'ssl_alp_author_settings',
+			__( 'Authors', 'ssl-alp' ),
+			array( $this, 'author_settings_callback' ),
+			SSL_ALP_SITE_SETTINGS_PAGE,
+			'ssl_alp_post_settings_section'
+		);
+	}
+
+	/**
 	 * Register hooks.
 	 */
 	public function register_hooks() {
@@ -139,35 +168,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 		// Register the authors widget.
 		$loader->add_action( 'widgets_init', $this, 'register_users_widget' );
-	}
-
-	/**
-	 * Register settings.
-	 */
-	public function register_settings() {
-		register_setting(
-			SSL_ALP_SITE_SETTINGS_PAGE,
-			'ssl_alp_allow_multiple_authors',
-			array(
-				'type' => 'boolean',
-			)
-		);
-	}
-
-	/**
-	 * Register settings fields.
-	 */
-	public function register_settings_fields() {
-		/**
-		 * Post multiple author settings field.
-		 */
-		add_settings_field(
-			'ssl_alp_author_settings',
-			__( 'Authors', 'ssl-alp' ),
-			array( $this, 'author_settings_callback' ),
-			SSL_ALP_SITE_SETTINGS_PAGE,
-			'ssl_alp_post_settings_section'
-		);
 	}
 
 	/**
