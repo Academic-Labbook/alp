@@ -4,7 +4,7 @@ Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
 Requires at least: 5.1.0
 Tested up to: 5.2.3
 Requires PHP: 7.0.0
-Stable tag: 0.17.1
+Stable tag: 0.17.2
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -78,6 +78,10 @@ with maximum control. Please see [this guide](https://alp.attackllama.com/docume
 on the ALP website.
 
 == Changelog ==
+
+= 0.17.2 =
+ - Fixed bug when rebuilding coauthors on sites with existing posts before ALP
+   was installed.
 
 = 0.17.1 =
  - Fixed bug with children block showing all post types and not just those
