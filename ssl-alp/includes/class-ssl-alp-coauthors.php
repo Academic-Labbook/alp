@@ -468,7 +468,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			)
 		);
 
-		// Set coauthor terms on each of the posts.
+		// Set coauthor terms on each of the posts. The get_coauthors() function will return at a
+		// minimum the existing post author if no additional coauthors are tagged against the post,
+		// which is the case for sites with existing posts and users before this plugin is enabled;
+		// therefore, this loop effectively populates the coauthor term taxonomy relationships to
+		// each post.
 		foreach ( $posts as $post ) {
 			$coauthors = $this->get_coauthors( $post );
 			$this->set_coauthors( $post, $coauthors );
