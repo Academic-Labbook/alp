@@ -457,22 +457,21 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		foreach ( $users as $user ) {
 			// Add coauthor terms.
 			$this->add_coauthor_term( $user->ID );
+		}
 
-			// Get all of the user's posts.
-			$posts = get_posts(
-				array(
-					'post_author' => $user->ID,
-					'post_type'   => $this->supported_post_types,
-					'post_status' => 'any',
-					'numberposts' => -1,
-				)
-			);
+		// Get all posts.
+		$posts = get_posts(
+			array(
+				'post_type'   => $this->supported_post_types,
+				'post_status' => get_post_stati(),
+				'numberposts' => -1,
+			)
+		);
 
-			// Set coauthor terms on each of the user's posts.
-			foreach ( $posts as $post ) {
-				$coauthors = $this->get_coauthors( $post );
-				$this->set_coauthors( $post, $coauthors );
-			}
+		// Set coauthor terms on each of the posts.
+		foreach ( $posts as $post ) {
+			$coauthors = $this->get_coauthors( $post );
+			$this->set_coauthors( $post, $coauthors );
 		}
 	}
 
@@ -1157,7 +1156,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		// Get the post's primary author.
-		$post_author = get_user_by( 'id', $post->post_author );
+		$post_author = get_user_by( 'ID', $post->post_author );
 
 		// Try to ensure at least the post's primary author is in the list of coauthors.
 		if ( ! empty( $post_author ) && ! in_array( $post_author, $coauthors, false ) ) { // Fuzzy comparison required.
