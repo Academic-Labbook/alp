@@ -24,6 +24,35 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 	);
 
 	/**
+	 * Register settings.
+	 */
+	public function register_settings() {
+		register_setting(
+			SSL_ALP_SITE_SETTINGS_PAGE,
+			'ssl_alp_enable_inventory',
+			array(
+				'type' => 'boolean',
+			)
+		);
+	}
+
+	/**
+	 * Register settings fields.
+	 */
+	public function register_settings_fields() {
+		/**
+		 * Post multiple author settings field.
+		 */
+		add_settings_field(
+			'ssl-alp-inventory_settings',
+			__( 'Inventory', 'ssl-alp' ),
+			array( $this, 'inventory_settings_callback' ),
+			SSL_ALP_SITE_SETTINGS_PAGE,
+			'ssl_alp_site_settings_section'
+		);
+	}
+
+	/**
 	 * Register hooks.
 	 */
 	public function register_hooks() {
@@ -85,35 +114,6 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 
 		// Support inventory item querystrings in WP_Query.
 		$loader->add_action( 'parse_tax_query', $this, 'parse_query_vars' );
-	}
-
-	/**
-	 * Register settings.
-	 */
-	public function register_settings() {
-		register_setting(
-			SSL_ALP_SITE_SETTINGS_PAGE,
-			'ssl_alp_enable_inventory',
-			array(
-				'type' => 'boolean',
-			)
-		);
-	}
-
-	/**
-	 * Register settings fields.
-	 */
-	public function register_settings_fields() {
-		/**
-		 * Post multiple author settings field.
-		 */
-		add_settings_field(
-			'ssl-alp-inventory_settings',
-			__( 'Inventory', 'ssl-alp' ),
-			array( $this, 'inventory_settings_callback' ),
-			SSL_ALP_SITE_SETTINGS_PAGE,
-			'ssl_alp_site_settings_section'
-		);
 	}
 
 	/**

@@ -15,55 +15,110 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class SSL_ALP_Tex extends SSL_ALP_Module {
 	/**
-	 * Register the stylesheets.
+	 * Register styles.
 	 */
-	public function enqueue_styles() {
+	public function register_styles() {
 		if ( get_option( 'ssl_alp_enable_tex' ) ) {
-			wp_enqueue_style( 'ssl-alp-katex' );
-			wp_enqueue_style( 'ssl-alp-katex-contrib-copy' );
+			wp_register_style(
+				'ssl-alp-tex-block',
+				esc_url( SSL_ALP_BASE_URL . 'blocks/tex/style.css' ),
+				array(),
+				$this->get_version()
+			);
+
+			wp_register_style(
+				'ssl-alp-tex-block-editor',
+				esc_url( SSL_ALP_BASE_URL . 'blocks/tex/editor.css' ),
+				array(),
+				$this->get_version()
+			);
+
+			wp_register_style(
+				'ssl-alp-katex',
+				esc_url( $this->get_katex_css_url() ),
+				array(),
+				SSL_ALP_KATEX_VERSION
+			);
+
+			wp_register_style(
+				'ssl-alp-katex-contrib-copy',
+				esc_url( $this->get_katex_copy_css_url() ),
+				array(),
+				SSL_ALP_KATEX_VERSION
+			);
 		}
 	}
 
 	/**
-	 * Register the JavaScript for the public-facing side of the site.
+	 * Register scripts.
 	 */
-	public function enqueue_scripts() {
+	public function register_scripts() {
 		if ( get_option( 'ssl_alp_enable_tex' ) ) {
-			wp_enqueue_script( 'ssl-alp-katex' );
-			wp_enqueue_script( 'ssl-alp-katex-contrib-copy' );
-			wp_enqueue_script( 'ssl-alp-katex-render' );
-		}
-	}
+			wp_register_script(
+				'ssl-alp-katex',
+				esc_url( $this->get_katex_js_url() ),
+				array(),
+				SSL_ALP_KATEX_VERSION,
+				true
+			);
 
-	/**
-	 * Enqueue styles in the admin header.
-	 */
-	public function enqueue_admin_styles() {
-		if ( get_option( 'ssl_alp_enable_tex' ) ) {
-			wp_enqueue_style( 'ssl-alp-katex' );
-		}
-	}
+			// KaTeX copy support.
+			wp_register_script(
+				'ssl-alp-katex-contrib-copy',
+				esc_url( $this->get_katex_copy_js_url() ),
+				array(),
+				SSL_ALP_KATEX_VERSION,
+				true
+			);
 
-	/**
-	 * Enqueue scripts in the admin header.
-	 */
-	public function enqueue_admin_scripts() {
-		$screen = get_current_screen();
+			wp_register_script(
+				'ssl-alp-katex-render',
+				esc_url( SSL_ALP_BASE_URL . 'js/katex.js' ),
+				array(),
+				$this->get_version(),
+				true
+			);
 
-		$setting_menu_slug = 'settings_page_' . SSL_ALP_NETWORK_SETTINGS_MENU_SLUG . '-network';
-
-		if ( $setting_menu_slug === $screen->id ) {
-			wp_enqueue_script(
-				'ssl-alp-tex-settings-js',
-				SSL_ALP_BASE_URL . 'js/admin-network-settings-tex.js',
-				array( 'jquery' ),
+			wp_register_script(
+				'ssl-alp-tex-block-editor',
+				esc_url( SSL_ALP_BASE_URL . 'blocks/tex/block.js' ),
+				array(
+					'wp-blocks',
+					'wp-i18n',
+					'wp-element',
+				),
 				$this->get_version(),
 				true
 			);
 		}
+	}
 
+	/**
+	 * Register admin scripts.
+	 */
+	public function register_admin_scripts() {
+		wp_register_script(
+			'ssl-alp-tex-settings-js',
+			esc_url( SSL_ALP_BASE_URL . 'js/admin-network-settings-tex.js' ),
+			array( 'jquery' ),
+			$this->get_version(),
+			true
+		);
+	}
+
+	/**
+	 * Register blocks.
+	 */
+	public function register_blocks() {
 		if ( get_option( 'ssl_alp_enable_tex' ) ) {
-			wp_enqueue_script( 'ssl-alp-katex' );
+			register_block_type(
+				'ssl-alp/tex',
+				array(
+					'editor_script' => 'ssl-alp-tex-block-editor',
+					'editor_style'  => 'ssl-alp-tex-block-editor',
+					'style'         => 'ssl-alp-tex-block',
+				)
+			);
 		}
 	}
 
@@ -157,6 +212,53 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 	}
 
 	/**
+	 * Enqueue styles in the page header.
+	 */
+	public function enqueue_styles() {
+		if ( get_option( 'ssl_alp_enable_tex' ) ) {
+			wp_enqueue_style( 'ssl-alp-katex' );
+			wp_enqueue_style( 'ssl-alp-katex-contrib-copy' );
+		}
+	}
+
+	/**
+	 * Enqueue scripts in the page header.
+	 */
+	public function enqueue_scripts() {
+		if ( get_option( 'ssl_alp_enable_tex' ) ) {
+			wp_enqueue_script( 'ssl-alp-katex' );
+			wp_enqueue_script( 'ssl-alp-katex-contrib-copy' );
+			wp_enqueue_script( 'ssl-alp-katex-render' );
+		}
+	}
+
+	/**
+	 * Enqueue styles in the admin header.
+	 */
+	public function enqueue_admin_styles() {
+		if ( get_option( 'ssl_alp_enable_tex' ) ) {
+			wp_enqueue_style( 'ssl-alp-katex' );
+		}
+	}
+
+	/**
+	 * Enqueue scripts in the admin header.
+	 */
+	public function enqueue_admin_scripts() {
+		$screen = get_current_screen();
+
+		$setting_menu_slug = 'settings_page_' . SSL_ALP_NETWORK_SETTINGS_MENU_SLUG . '-network';
+
+		if ( $setting_menu_slug === $screen->id ) {
+			wp_enqueue_script( 'ssl-alp-tex-settings-js' );
+		}
+
+		if ( get_option( 'ssl_alp_enable_tex' ) ) {
+			wp_enqueue_script( 'ssl-alp-katex' );
+		}
+	}
+
+	/**
 	 * TeX scripts settings partial.
 	 */
 	public function tex_scripts_settings_callback() {
@@ -168,117 +270,6 @@ class SSL_ALP_Tex extends SSL_ALP_Module {
 	 */
 	public function tex_display_settings_callback() {
 		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/tex-display-settings-display.php';
-	}
-
-	/**
-	 * Register hooks
-	 */
-	public function register_hooks() {
-		$loader = $this->get_loader();
-
-		// Add JavaScript.
-		$loader->add_action( 'init', $this, 'register_tex_scripts' );
-	}
-
-	/**
-	 * Register TeX scripts.
-	 */
-	public function register_tex_scripts() {
-		if ( ! get_option( 'ssl_alp_enable_tex' ) ) {
-			return;
-		}
-
-		// JavaScript and CSS URLs.
-		$katex_js_url       = $this->get_katex_js_url();
-		$katex_copy_js_url  = $this->get_katex_copy_js_url();
-		$katex_css_url      = $this->get_katex_css_url();
-		$katex_copy_css_url = $this->get_katex_copy_css_url();
-
-		wp_register_style(
-			'ssl-alp-tex-block',
-			esc_url( SSL_ALP_BASE_URL . 'blocks/tex/style.css' ),
-			array(),
-			$this->get_version()
-		);
-
-		wp_register_style(
-			'ssl-alp-tex-block-editor',
-			esc_url( SSL_ALP_BASE_URL . 'blocks/tex/editor.css' ),
-			array(),
-			$this->get_version()
-		);
-
-		wp_register_script(
-			'ssl-alp-katex',
-			esc_url( $katex_js_url ),
-			array(),
-			SSL_ALP_KATEX_VERSION,
-			true
-		);
-
-		wp_register_style(
-			'ssl-alp-katex',
-			esc_url( $katex_css_url ),
-			array(),
-			SSL_ALP_KATEX_VERSION
-		);
-
-		// KaTeX copy support.
-		wp_register_script(
-			'ssl-alp-katex-contrib-copy',
-			esc_url( $katex_copy_js_url ),
-			array(),
-			SSL_ALP_KATEX_VERSION,
-			true
-		);
-
-		wp_register_style(
-			'ssl-alp-katex-contrib-copy',
-			esc_url( $katex_copy_css_url ),
-			array(),
-			SSL_ALP_KATEX_VERSION
-		);
-
-		wp_register_script(
-			'ssl-alp-katex-render',
-			esc_url( SSL_ALP_BASE_URL . 'js/katex.js' ),
-			array(),
-			$this->get_version(),
-			true
-		);
-
-		wp_register_script(
-			'ssl-alp-katex-inline',
-			esc_url( SSL_ALP_BASE_URL . 'blocks/tex/inline.js' ),
-			array(
-				'wp-element',
-				'wp-i18n',
-				'wp-editor',
-			),
-			$this->get_version(),
-			true
-		);
-
-		wp_register_script(
-			'ssl-alp-tex-block-editor',
-			esc_url( SSL_ALP_BASE_URL . 'blocks/tex/block.js' ),
-			array(
-				'wp-blocks',
-				'wp-i18n',
-				'wp-element',
-			),
-			$this->get_version(),
-			true
-		);
-
-		register_block_type(
-			'ssl-alp/tex',
-			array(
-				'editor_script' => 'ssl-alp-tex-block-editor',
-				'editor_style'  => 'ssl-alp-tex-block-editor',
-				'style'         => 'ssl-alp-tex-block',
-			)
-		);
 	}
 
 	/**

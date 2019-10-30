@@ -23,45 +23,35 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 	protected $media_type_regex = '/^([a-z|]+)(\s+[\w]+\/[\w\-\.\+]+)\h*(\h+\/\/\h*.*)?$/';
 
 	/**
-	 * Register the stylesheets for the public-facing side of the site.
+	 * Register admin styles.
 	 */
-	public function enqueue_styles() {
-		// Public CSS.
-		wp_enqueue_style(
-			'ssl-alp-public-css',
-			SSL_ALP_BASE_URL . 'css/public.css',
-			array(),
-			$this->get_version(),
-			'all'
-		);
-	}
-
-	/**
-	 * Register the stylesheets for the admin panel.
-	 */
-	public function enqueue_admin_styles() {
-		// Admin CSS.
-		wp_enqueue_style(
+	public function register_admin_styles() {
+		wp_register_style(
 			'ssl-alp-admin-css',
-			SSL_ALP_BASE_URL . 'css/admin.css',
+			esc_url( SSL_ALP_BASE_URL . 'css/admin.css' ),
 			array(),
-			$this->get_version(),
-			'all'
+			$this->get_version()
 		);
 	}
 
 	/**
-	 * Register the JavaScript for the public-facing side of the site.
+	 * Register scripts.
 	 */
-	public function enqueue_scripts() {
-		// Public JavaScript.
-		wp_enqueue_script(
-			'ssl-alp-public-js',
-			SSL_ALP_BASE_URL . 'js/public.js',
-			array( 'jquery' ),
-			$this->get_version(),
-			false
-		);
+	public function register_scripts() {
+		if ( get_option( 'ssl_alp_disable_social_media_blocks' ) ) {
+			wp_register_script(
+				'ssl-alp-blacklist-blocks',
+				esc_url( SSL_ALP_BASE_URL . 'js/blacklist-social-media-blocks.js' ),
+				array(
+					'wp-blocks',
+					'wp-dom-ready',
+					// Note: this dependency is required to prevent a race condition to ensure that
+					// all blocks are registered by the time the script runs.
+					'wp-edit-post',
+				),
+				$this->get_version()
+			);
+		}
 	}
 
 	/**
@@ -135,27 +125,6 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Access settings partial.
-	 */
-	public function access_settings_callback() {
-		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/site/access-settings-display.php';
-	}
-
-	/**
-	 * Meta settings partial.
-	 */
-	public function meta_settings_callback() {
-		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/meta-settings-display.php';
-	}
-
-	/**
-	 * Media types settings partial.
-	 */
-	public function media_types_settings_callback() {
-		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/media/media-types-settings-display.php';
-	}
-
-	/**
 	 * Register hooks.
 	 */
 	public function register_hooks() {
@@ -178,9 +147,43 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 
 		// Disable post trackbacks.
 		$loader->add_action( 'init', $this, 'disable_post_trackbacks' );
+	}
 
-		// Disable social link blocks.
-		$loader->add_action( 'enqueue_block_editor_assets', $this, 'disable_social_link_blocks' );
+	/**
+	 * Enqueue styles in the admin header.
+	 */
+	public function enqueue_admin_styles() {
+		wp_enqueue_style( 'ssl-alp-admin-css' );
+	}
+
+	/**
+	 * Enqueue block editor scripts.
+	 */
+	public function enqueue_block_editor_scripts() {
+		if ( get_option( 'ssl_alp_disable_social_media_blocks' ) ) {
+			wp_enqueue_script( 'ssl-alp-blacklist-blocks' );
+		}
+	}
+
+	/**
+	 * Access settings partial.
+	 */
+	public function access_settings_callback() {
+		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/site/access-settings-display.php';
+	}
+
+	/**
+	 * Meta settings partial.
+	 */
+	public function meta_settings_callback() {
+		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/meta-settings-display.php';
+	}
+
+	/**
+	 * Media types settings partial.
+	 */
+	public function media_types_settings_callback() {
+		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/media/media-types-settings-display.php';
 	}
 
 	/**
@@ -443,28 +446,5 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 		}
 
 		remove_post_type_support( 'post', 'trackbacks' );
-	}
-
-	/**
-	 * Remove social link blocks.
-	 */
-	public function disable_social_link_blocks() {
-		if ( ! get_option( 'ssl_alp_disable_social_media_blocks' ) ) {
-			return;
-		}
-
-		wp_enqueue_script(
-			'ssl-alp-blacklist-blocks',
-			SSL_ALP_BASE_URL . 'js/blacklist-social-media-blocks.js',
-			array(
-				'wp-blocks',
-				'wp-dom-ready',
-				// Note: this dependency is required to prevent a race condition to ensure that
-				// all blocks are registered by the time the script runs.
-				'wp-edit-post',
-			),
-			$this->get_version(),
-			false
-		);
 	}
 }

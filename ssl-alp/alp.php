@@ -3,7 +3,7 @@
  * Plugin Name:  Academic Labbook
  * Plugin URI:   https://alp.attackllama.com/
  * Description:  Turn WordPress into a collaborative academic labbook.
- * Version:      0.17.1
+ * Version:      0.17.2
  * Author:       Sean Leavey
  * Author URI:   https://attackllama.com/
  * License:      GPL3
@@ -21,7 +21,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Current plugin version.
  */
 
-define( 'SSL_ALP_VERSION', '0.17.1' );
+define( 'SSL_ALP_VERSION', '0.17.2' );
 
 /**
  * Plugin name

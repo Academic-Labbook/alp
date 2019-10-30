@@ -15,19 +15,16 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class SSL_ALP_Search extends SSL_ALP_Module {
 	/**
-	 * Register hooks.
+	 * Register admin scripts.
 	 */
-	public function register_hooks() {
-		$loader = $this->get_loader();
-
-		// Allow extra public query vars.
-		$loader->add_filter( 'query_vars', $this, 'whitelist_advanced_search_query_vars' );
-
-		// Support date querystrings in WP_Query.
-		$loader->add_action( 'pre_get_posts', $this, 'parse_date_query_vars' );
-
-		// Fix inconsistent behaviour applied to tag and category AND queries.
-		$loader->add_action( 'parse_tax_query', $this, 'fix_category_tag_and_query_var_inconsistency' );
+	public function register_admin_scripts() {
+		wp_register_script(
+			'ssl-alp-search-settings-js',
+			esc_url( SSL_ALP_BASE_URL . 'js/admin-settings-search.js' ),
+			array( 'jquery' ),
+			$this->get_version(),
+			true
+		);
 	}
 
 	/**
@@ -60,10 +57,19 @@ class SSL_ALP_Search extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Search settings partial.
+	 * Register hooks.
 	 */
-	public function search_settings_callback() {
-		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/site/search-settings-display.php';
+	public function register_hooks() {
+		$loader = $this->get_loader();
+
+		// Allow extra public query vars.
+		$loader->add_filter( 'query_vars', $this, 'whitelist_advanced_search_query_vars' );
+
+		// Support date querystrings in WP_Query.
+		$loader->add_action( 'pre_get_posts', $this, 'parse_date_query_vars' );
+
+		// Fix inconsistent behaviour applied to tag and category AND queries.
+		$loader->add_action( 'parse_tax_query', $this, 'fix_category_tag_and_query_var_inconsistency' );
 	}
 
 	/**
@@ -75,14 +81,15 @@ class SSL_ALP_Search extends SSL_ALP_Module {
 		$setting_menu_slug = 'settings_page_' . SSL_ALP_SITE_SETTINGS_MENU_SLUG;
 
 		if ( $setting_menu_slug === $screen->id ) {
-			wp_enqueue_script(
-				'ssl-alp-search-settings-js',
-				SSL_ALP_BASE_URL . 'js/admin-settings-search.js',
-				array( 'jquery' ),
-				$this->get_version(),
-				true
-			);
+			wp_enqueue_script( 'ssl-alp-search-settings-js' );
 		}
+	}
+
+	/**
+	 * Search settings partial.
+	 */
+	public function search_settings_callback() {
+		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/site/search-settings-display.php';
 	}
 
 	/**

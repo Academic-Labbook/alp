@@ -15,6 +15,43 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class SSL_ALP_Pages extends SSL_ALP_Module {
 	/**
+	 * Register admin scripts.
+	 */
+	public function register_admin_scripts() {
+		wp_register_script(
+			'ssl-alp-page-children-block-editor',
+			esc_url( SSL_ALP_BASE_URL . 'blocks/children/block.js' ),
+			array(
+				'wp-blocks',
+				'wp-components',
+				'wp-i18n',
+				'wp-element',
+				'wp-data',
+			),
+			$this->get_version(),
+			true
+		);
+	}
+
+	/**
+	 * Register blocks.
+	 */
+	public function register_blocks() {
+		register_block_type(
+			'ssl-alp/page-children',
+			array(
+				'editor_script'   => 'ssl-alp-page-children-block-editor',
+				'render_callback' => array( $this, 'render_page_children_block' ),
+				'attributes'      => array(
+					'className' => array(
+						'type' => 'string',
+					)
+				)
+			)
+		);
+	}
+
+	/**
 	 * Register hooks.
 	 */
 	public function register_hooks() {
@@ -32,13 +69,6 @@ class SSL_ALP_Pages extends SSL_ALP_Module {
 
 		// Remove date column from admin page list.
 		$loader->add_filter( 'manage_edit-page_columns', $this, 'manage_edit_columns' );
-
-		/**
-		 * Page children block.
-		 */
-
-		// Register page children block.
-		$loader->add_action( 'init', $this, 'register_page_children_block_scripts' );
 	}
 
 	/**
@@ -79,38 +109,6 @@ class SSL_ALP_Pages extends SSL_ALP_Module {
 		}
 
 		return $columns;
-	}
-
-	/**
-	 * Register page child block scripts.
-	 */
-	public function register_page_children_block_scripts() {
-		wp_register_script(
-			'ssl-alp-page-children-block-editor',
-			esc_url( SSL_ALP_BASE_URL . 'blocks/children/block.js' ),
-			array(
-				'wp-blocks',
-				'wp-components',
-				'wp-i18n',
-				'wp-element',
-				'wp-data',
-			),
-			$this->get_version(),
-			true
-		);
-
-		register_block_type(
-			'ssl-alp/page-children',
-			array(
-				'editor_script'   => 'ssl-alp-page-children-block-editor',
-				'render_callback' => array( $this, 'render_page_children_block' ),
-				'attributes'      => array(
-					'className' => array(
-						'type' => 'string',
-					)
-				)
-			)
-		);
 	}
 
 	/**
