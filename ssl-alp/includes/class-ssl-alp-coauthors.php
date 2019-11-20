@@ -480,6 +480,10 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// therefore, this loop effectively populates the coauthor term taxonomy relationships to
 		// each post.
 		foreach ( $posts as $post ) {
+			if ( wp_is_post_autosave( $post ) || $this->is_post_autodraft( $post ) ) {
+				continue;
+			}
+
 			$coauthors = $this->get_coauthors( $post );
 			$this->set_coauthors( $post, $coauthors );
 		}
