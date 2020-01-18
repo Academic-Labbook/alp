@@ -23,7 +23,6 @@
 	 */
     var el = wp.element.createElement;
     var Component = wp.element.Component;
-    var Fragment = wp.element.Fragment;
 
     /**
      * Components.
