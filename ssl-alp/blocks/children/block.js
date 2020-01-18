@@ -80,15 +80,12 @@
 
                 return (
                     el(
-                        Fragment,
-                        {},
-                        ServerSideRender(
-                            {
-                                className,
-                                block: blockName,
-                                attributes
-                            }
-                        )
+                        ServerSideRender,
+                        {
+                            className,
+                            block: blockName,
+                            attributes
+                        }
                     )
                 );
             }
