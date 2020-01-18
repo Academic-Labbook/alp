@@ -84,6 +84,15 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 				'type' => 'string',
 			)
 		);
+
+		// Override upload media types.
+		register_setting(
+			SSL_ALP_NETWORK_SETTINGS_PAGE,
+			'ssl_alp_override_media_types',
+			array(
+				'type' => 'boolean',
+			)
+		);
 	}
 
 	/**
@@ -132,6 +141,10 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 
 		// Add additional media type support.
 		$loader->add_filter( 'upload_mimes', $this, 'filter_media_types' );
+
+		// Handle when media type reported by PHP's finfo_open is different from the type inferred
+		// from the filename.
+		$loader->add_filter( 'wp_check_filetype_and_ext', $this, 'check_file_type', 10, 3 );
 
 		// Filter ssl_alp_additional_media_types option.
 		$loader->add_filter( 'sanitize_option_ssl_alp_additional_media_types', $this, 'sanitize_additional_media_types', 10, 1 );
@@ -367,6 +380,40 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 		}
 
 		return $media_types;
+	}
+
+	/**
+	 * Handle when media type reported by PHP's finfo is different from the type inferred from the
+     * filename. This hook changes the media type reported by PHP to match the one defined by the
+	 * admin if the file extension is in the list of media types to allow uploads for.
+	 *
+	 * @param array  $fileinfo File data array (may be empty).
+	 * @param string $filepath Full path to the file.
+	 * @param string $filename The name of the file (may differ from $filepath).
+	 */
+	public function check_file_type( $fileinfo, $filepath, $filename ) {
+		if ( ! get_site_option( 'ssl_alp_override_media_types' ) ) {
+			// Media type overriding disabled.
+			return $fileinfo;
+		}
+
+		$pieces = explode( '.' , $filename );
+		$ext    = strtolower( array_pop( $pieces ) );
+
+		$extra_media_types = $this->get_allowed_media_types();
+
+		foreach ( $extra_media_types as $extra_media_type ) {
+			if ( $extra_media_type['extension'] === $ext ) {
+				// The extension is in the admin-defined override list.
+				$fileinfo['ext']             = $ext;
+				$fileinfo['type']            = $extra_media_type['media_type'];
+				$fileinfo['proper_filename'] = $filename;
+
+				break;
+			}
+		}
+
+		return $fileinfo;
 	}
 
 	/**
