@@ -23,7 +23,6 @@
 	 */
     var el = wp.element.createElement;
     var Component = wp.element.Component;
-    var Fragment = wp.element.Fragment;
 
     /**
      * Components.
@@ -80,15 +79,12 @@
 
                 return (
                     el(
-                        Fragment,
-                        {},
-                        ServerSideRender(
-                            {
-                                className,
-                                block: blockName,
-                                attributes
-                            }
-                        )
+                        ServerSideRender,
+                        {
+                            className,
+                            block: blockName,
+                            attributes
+                        }
                     )
                 );
             }

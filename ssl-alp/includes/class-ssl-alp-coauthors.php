@@ -451,12 +451,18 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return;
 		}
 
+		// Allow unlimited execution time.
+		ini_set( 'max_execution_time', 0 );
+
 		// Get all user IDs.
 		$users = get_users();
 
 		foreach ( $users as $user ) {
 			// Add coauthor terms.
 			$this->add_coauthor_term( $user->ID );
+
+			// Remove user from cache to help reduce memory usage.
+			clean_user_cache( $user );
 		}
 
 		// Get all posts.
@@ -464,7 +470,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			array(
 				'post_type'   => $this->supported_post_types,
 				'post_status' => get_post_stati(),
-				'numberposts' => -1,
+				'nopaging'    => true,
 			)
 		);
 
@@ -474,6 +480,10 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// therefore, this loop effectively populates the coauthor term taxonomy relationships to
 		// each post.
 		foreach ( $posts as $post ) {
+			if ( wp_is_post_autosave( $post ) || $this->is_post_autodraft( $post ) ) {
+				continue;
+			}
+
 			$coauthors = $this->get_coauthors( $post );
 			$this->set_coauthors( $post, $coauthors );
 		}

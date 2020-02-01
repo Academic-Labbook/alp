@@ -79,3 +79,8 @@ pre.ssl-alp-application-password {
 {
     float: none; /* prevent label floating right of select */
 }
+
+/* Fix box shadow issue when using `error` class within a card div. */
+div.ssl-alp-tools-card div.ssl-alp-tools-error {
+    box-shadow: none;
+}

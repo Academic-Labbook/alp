@@ -181,7 +181,7 @@ WordPress is in a period of transition: the new [Gutenberg](https://wordpress.or
 has introduced a completely different way of writing content. The feature roadmap shows a plan to
 eventually replace most of the configurable parts of WordPress with Gutenberg-based assets.
 
-Two changes of particular note are:
+Some changes of particular note are:
 
   - The navigation menu and sidebar will probably eventually be
     [converted](https://make.wordpress.org/core/2018/12/08/9-priorities-for-2019/) to use Gutenberg
@@ -192,6 +192,7 @@ Two changes of particular note are:
     [this](https://github.com/WordPress/gutenberg/issues/7115) and
     [this](https://github.com/WordPress/gutenberg/issues/6182)). The ALP table of contents block is
     auto-generated on page load, so it probably won't disrupt too much to use the new block instead.
+  - Application passwords [may eventually be made available in core](https://make.wordpress.org/core/2019/11/19/rest-api-chat-summary-november-14/).
 
 ## Credits
 This plugin was entirely authored by [Sean Leavey](https://attackllama.com/), but in some cases
