@@ -2,9 +2,9 @@
 Contributors: seanleavey
 Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
 Requires at least: 5.1.0
-Tested up to: 5.2.3
+Tested up to: 5.3.2
 Requires PHP: 7.0.0
-Stable tag: 0.17.2
+Stable tag: 0.18.0
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -78,6 +78,24 @@ with maximum control. Please see [this guide](https://alp.attackllama.com/docume
 on the ALP website.
 
 == Changelog ==
+
+= 0.18.0 =
+ - Fix bug with child block which appeared from 5.3.
+ - Fix bug whereby media types detected by WordPress/PHP to have different media
+   types to those specified by the network administrator were disallowed. A new
+   setting has been added, 'ssl_alp_override_media_types', to control whether
+   this mode is enabled.
+ - Fix bug with hanging coauthor rebuild.
+ - Added permissions checks before displaying and allowing tools to be run (in
+   addition to the usual check for 'manage_options' before displaying the tools
+   page). This prevents non-super admins on network installations from running
+   coauthor and cross-reference rebuild tools.
+ - Gracefully handle situations with admin revision tables when revision changes
+   cannot be determined.
+ - Added a note to the readme about application passwords potentially becoming
+   available in core and therefore being liable for future removal.
+ - Updated tools page notices.
+ - Other minor tweaks.
 
 = 0.17.2 =
  - Fixed bug when rebuilding coauthors on sites with existing posts before ALP
