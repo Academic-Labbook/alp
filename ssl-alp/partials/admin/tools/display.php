@@ -42,6 +42,7 @@
 	);
 	?>
 	</p>
+	<p><?php esc_html_e( 'Note: tools only appear below if you have relevant permissions.', 'ssl-alp' ); ?></p>
 	<p class="description">
 	<?php
 	printf(
@@ -55,6 +56,8 @@
 	?>
 	</p>
 	<div class="ssl-alp-tools-cards">
+
+		<?php if ( current_user_can( 'switch_themes' ) ) : ?>
 		<div class="ssl-alp-tools-card">
 			<h2 class="title"><?php esc_html_e( 'Activate theme', 'ssl-alp' ); ?></h2>
 			<p><?php echo wp_kses_post( __( 'It is highly recommended to use the <em>Labbook</em> theme on this site. This theme, or a child theme derived from it, must be enabled in order for most of Academic Labbook Plugin\'s functionality to appear.', 'ssl-alp' ) ); ?></p>
@@ -89,6 +92,9 @@
 			</p>
 			<?php endif; ?>
 		</div>
+		<?php endif; ?>
+
+		<?php if ( current_user_can( 'manage_options' ) ) : ?>
 		<div class="ssl-alp-tools-card">
 			<h2 class="title"><?php esc_html_e( 'Enable pretty permalinks', 'ssl-alp' ); ?></h2>
 			<p><?php esc_html_e( 'It is recommended to enable pretty permalinks to allow cross-references to be made between different post types. WordPress is only capable of extracting links to standard posts and pages from post text when plain permalinks are used, and not links to custom post types added by Academic Labbook Plugin such as inventory pages. With pretty permalinks enabled, WordPress can detect and therefore display cross-references between all types of post.', 'ssl-alp' ); ?></p>
@@ -108,6 +114,9 @@
 			</p>
 			<?php endif; ?>
 		</div>
+		<?php endif; ?>
+
+		<?php if ( current_user_can( 'manage_options' ) ) : ?>
 		<div class="ssl-alp-tools-card">
 			<h2 class="title"><?php esc_html_e( 'Optimise core WordPress settings for private labbook', 'ssl-alp' ); ?></h2>
 			<p><?php esc_html_e( 'This tool allows you to change core WordPress settings to make them appropriate for a private academic labbook. The presumption behind these setting changes is that you control access to the labbook and trust the users whom you grant access to.', 'ssl-alp' ); ?></p>
@@ -193,6 +202,9 @@
 			<p class="description"><?php esc_html_e( 'Core settings are already set to the above values.', 'ssl-alp' ); ?></p>
 			<?php endif; ?>
 		</div>
+		<?php endif; ?>
+
+		<?php if ( $user_can_convert_roles ) : ?>
 		<div class="ssl-alp-tools-card">
 			<h2 class="title"><?php esc_html_e( 'Convert user roles', 'ssl-alp' ); ?></h2>
 			<p><?php esc_html_e( 'This tool will convert the default WordPress user roles into roles more suitable for an academic labbook.', 'ssl-alp' ); ?></p>
@@ -231,20 +243,25 @@
 			<p class="description"><?php esc_html_e( 'User roles are not currently set to WordPress defaults, and so cannot be converted.', 'ssl-alp' ); ?></p>
 			<?php endif; ?>
 		</div>
+		<?php endif; ?>
+
+		<?php if ( $can_rebuild ) : ?>
 		<div class="ssl-alp-tools-card">
 			<h2 class="title"><?php esc_html_e( 'Rebuild cross-references', 'ssl-alp' ); ?></h2>
 			<p><?php esc_html_e( 'This tool will rebuild the cross-references related to each published post and page. This is useful for extracting cross-references from posts or pages created or edited during any time in which the cross-references feature was disabled, and from posts or pages created before the plugin was installed or activated.', 'ssl-alp' ); ?></p>
-			<p class="description">
-			<?php
-			echo wp_kses_post(
-				sprintf(
-					/* translators: ALP cross-reference documentation URL */
-					__( 'Note: this tool may take a long time to execute on large sites. Due to server configuration settings, the execution may time out or run out of memory. You may instead wish to <a href="%s">run this tool via WP-CLI</a>.', 'ssl-alp' ),
-					'https://alp.attackllama.com/documentation/rebuilding-cross-references/'
-				)
-			);
-			?>
-			</p>
+			<div class="error inline ssl-alp-tools-error">
+				<p>
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* translators: ALP cross-reference documentation URL */
+						__( 'Note: this tool may take a long time to execute on large sites. Due to server configuration settings, the execution may time out or run out of memory. You may instead wish to <a href="%s">run this tool via WP-CLI</a>.', 'ssl-alp' ),
+						'https://alp.attackllama.com/documentation/rebuilding-cross-references/'
+					)
+				);
+				?>
+				</p>
+			</div>
 			<form method="post" action="">
 				<input type="hidden" name="ssl_alp_rebuild_references_submitted" value="1"/>
 				<p class="submit">
@@ -266,20 +283,25 @@
 				</p>
 			<?php endif; ?>
 		</div>
+		<?php endif; ?>
+
+		<?php if ( $can_rebuild ) : ?>
 		<div class="ssl-alp-tools-card">
 			<h2 class="title"><?php esc_html_e( 'Rebuild coauthor terms', 'ssl-alp' ); ?></h2>
 			<p><?php esc_html_e( 'This tool will rebuild the coauthor terms used to show post coauthors and to allow the setting of coauthors for posts. This tool is intended to be run on sites which had users and posts before the Academic Labbook Plugin was installed, allowing these users to be chosen as coauthors on posts, and to show them as authors of their existing posts.', 'ssl-alp' ); ?></p>
-			<p class="description">
-			<?php
-			echo wp_kses_post(
-				sprintf(
-					/* translators: ALP coauthor documentation URL */
-					__( 'Note: this tool may take a long time to execute on large sites. Due to server configuration settings, the execution may time out or run out of memory. You may instead wish to <a href="%s">run this tool via WP-CLI</a>.', 'ssl-alp' ),
-					'https://alp.attackllama.com/documentation/rebuilding-coauthors/'
-				)
-			);
-			?>
-			</p>
+			<div class="error inline ssl-alp-tools-error">
+				<p>
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* translators: ALP coauthor documentation URL */
+						__( 'Note: this tool may take a long time to execute on large sites. Due to server configuration settings, the execution may time out or run out of memory. You may instead wish to <a href="%s">run this tool via WP-CLI</a>.', 'ssl-alp' ),
+						'https://alp.attackllama.com/documentation/rebuilding-coauthors/'
+					)
+				);
+				?>
+				</p>
+			</div>
 			<form method="post" action="">
 				<input type="hidden" name="ssl_alp_rebuild_coauthors_submitted" value="1"/>
 				<p class="submit">
@@ -301,5 +323,6 @@
 				</p>
 			<?php endif; ?>
 		</div>
+		<?php endif; ?>
 	</div>
 </div>
