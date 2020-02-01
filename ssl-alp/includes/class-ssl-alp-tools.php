@@ -17,7 +17,7 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 	/**
 	 * Overrideable settings and their overridden values
 	 *
-	 * Note: soome settings are set to null if switched off, others to boolean false.
+	 * Note: some settings are set to null if switched off, others to boolean false.
 	 *
 	 * @var array
 	 */
@@ -131,6 +131,13 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 				// User has submitted the form, verify the nonce.
 				check_admin_referer( 'ssl-alp-manage-core-settings', 'ssl_alp_manage_core_settings_nonce' );
 
+				if ( ! current_user_can( 'manage_options' ) ) {
+					wp_die(
+						'<h1>' . esc_html__( 'You need a higher level of permission.', 'ssl-alp' ) . '</h1>' .
+						'<p>' . esc_html__( 'Sorry, you are not allowed to manage options for this site.', 'ssl-alp' ) . '</p>'
+					);
+				}
+
 				// Do action.
 				$this->override_core_settings();
 
@@ -145,6 +152,11 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 		 * Handle convert roles form.
 		 */
 
+		// Check if user has permission. We allow only admins on single sites and super admins on
+		// network sites to change roles.
+		// https://wordpress.org/support/article/roles-and-capabilities/#additional-admin-capabilities
+		$user_can_convert_roles = current_user_can( 'edit_users' );
+
 		// Check if user roles can be changed.
 		$roles_convertable = $this->roles_are_default();
 
@@ -155,6 +167,13 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 			if ( array_key_exists( 'ssl_alp_convert_role_submitted', $_POST ) && (bool) $_POST['ssl_alp_convert_role_submitted'] ) {
 				// User has submitted the form, verify the nonce.
 				check_admin_referer( 'ssl-alp-convert-user-roles', 'ssl_alp_convert_user_roles_nonce' );
+
+				if ( ! $user_can_convert_roles ) {
+					wp_die(
+						'<h1>' . esc_html__( 'You need a higher level of permission.', 'ssl-alp' ) . '</h1>' .
+						'<p>' . esc_html__( 'Sorry, you are not allowed to manage options for this site.', 'ssl-alp' ) . '</p>'
+					);
+				}
 
 				// Check they checked the checkbox.
 				if ( array_key_exists( 'ssl_alp_convert_role_confirm', $_POST ) && (bool) $_POST['ssl_alp_convert_role_confirm'] ) {
@@ -172,6 +191,15 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 		}
 
 		/**
+		 * Rebuild tool permission check.
+		 */
+
+		// Check if user has permission. We allow only admins on single sites and super admins on
+		// network sites to change roles.
+		// https://wordpress.org/support/article/roles-and-capabilities/#additional-admin-capabilities
+		$can_rebuild = current_user_can( 'edit_users' );
+
+		/**
 		 * Handle rebuild references form.
 		 */
 
@@ -182,6 +210,13 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 			if ( array_key_exists( 'ssl_alp_rebuild_references_submitted', $_POST ) && (bool) $_POST['ssl_alp_rebuild_references_submitted'] ) {
 				// User has submitted the form, verify the nonce.
 				check_admin_referer( 'ssl-alp-rebuild-references', 'ssl_alp_rebuild_references_nonce' );
+
+				if ( ! $can_rebuild ) {
+					wp_die(
+						'<h1>' . esc_html__( 'You need a higher level of permission.', 'ssl-alp' ) . '</h1>' .
+						'<p>' . esc_html__( 'Sorry, you are not allowed to manage options for this site.', 'ssl-alp' ) . '</p>'
+					);
+				}
 
 				// Do action.
 				$this->rebuild_references();
@@ -202,6 +237,13 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 				// User has submitted the form.
 				// Verify the nonce.
 				check_admin_referer( 'ssl-alp-rebuild-coauthors', 'ssl_alp_rebuild_coauthors_nonce' );
+
+				if ( ! $can_rebuild ) {
+					wp_die(
+						'<h1>' . esc_html__( 'You need a higher level of permission.', 'ssl-alp' ) . '</h1>' .
+						'<p>' . esc_html__( 'Sorry, you are not allowed to manage options for this site.', 'ssl-alp' ) . '</p>'
+					);
+				}
 
 				// Do action.
 				$this->rebuild_coauthors();
