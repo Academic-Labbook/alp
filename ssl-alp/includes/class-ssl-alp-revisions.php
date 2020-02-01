@@ -957,8 +957,8 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 					}
 				}
 
-				if ( ! $this->have_post_content_lines_changed( $post ) ) {
-					// Insufficient changes.
+				if ( empty( $this->have_post_content_lines_changed( $post ) ) ) {
+					// Insufficient changes or changes can't be determined.
 					continue;
 				}
 
@@ -1599,7 +1599,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 				require ABSPATH . WPINC . '/wp-diff.php';
 			}
 
-			if ( ! $this->have_post_content_lines_changed( $post_after, $post_before ) ) {
+			if ( empty( $this->have_post_content_lines_changed( $post_after, $post_before ) ) ) {
 				return;
 			}
 		}
@@ -1671,11 +1671,15 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * @param WP_Post      $new_revision New revision.
 	 * @param WP_Post|null $old_revision Previous revision. If not specified, the revision
 	 *                                   immediately prior to $new_revision is used.
-	 * @return bool Whether post content lines changed.
+	 * @return bool|null Whether post content lines changed, or null if this can't be determined.
 	 */
 	public function have_post_content_lines_changed( $new_revision, $old_revision = null ) {
 		// Compute text difference between old and new posts.
 		$diff = $this->get_post_text_differences( $new_revision, $old_revision );
+
+		if ( is_null( $diff ) ) {
+			return;
+		}
 
 		// Post content is deemed changed if there are new or deleted lines.
 		return $diff['added'] > 1 || $diff['removed'] > 1;
