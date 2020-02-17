@@ -24,10 +24,11 @@ if ( ! defined( 'WPINC' ) ) {
 define( 'SSL_ALP_VERSION', '0.18.0' );
 
 /**
- * Plugin name
+ * Plugin name and path
  */
 
 define( 'SSL_ALP_PLUGIN_NAME', 'Academic Labbook' );
+define( 'SSL_ALP_PLUGIN_PATH', 'ssl-alp/alp.php' );
 
 /**
  * Base plugin directory

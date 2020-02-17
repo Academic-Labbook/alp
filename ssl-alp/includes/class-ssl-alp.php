@@ -232,9 +232,14 @@ class SSL_ALP {
 	}
 
 	/**
-	 * Register the network settings page, if network is enabled.
+	 * Register the network settings page, if plugin is enabled network-wide.
 	 */
 	public function add_network_admin_menu() {
+		if ( ! is_plugin_active_for_network( SSL_ALP_PLUGIN_PATH ) ) {
+			// Network settings only available when plugin is network active.
+			return;
+		}
+
 		add_submenu_page(
 			'settings.php', // Network settings page.
 			__( 'Academic Labbook Settings', 'ssl-alp' ),
@@ -294,6 +299,11 @@ class SSL_ALP {
 	 * Handle settings data posted from the network settings page.
 	 */
 	public function update_network_options() {
+		if ( ! is_plugin_active_for_network( SSL_ALP_PLUGIN_PATH ) ) {
+			// Network settings only available when plugin is network active.
+			return;
+		}
+
 		// Check nonce.
 		check_admin_referer( 'ssl-alp-network-admin-options' );
 
