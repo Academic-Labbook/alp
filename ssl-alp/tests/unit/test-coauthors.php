@@ -299,7 +299,7 @@ class CoauthorsTest extends WP_UnitTestCase {
 
         $query = new WP_Query(
             array(
-			    'author_name' => $user->user_login
+			    'author_name' => $user->user_nicename,
             )
         );
 
@@ -328,7 +328,7 @@ class CoauthorsTest extends WP_UnitTestCase {
 
 		$query = new WP_Query(
             array(
-			    'author_name' => $user->user_login,
+			    'author_name' => $user->user_nicename,
 			    'tag' => 'test',
             )
         );
@@ -337,7 +337,7 @@ class CoauthorsTest extends WP_UnitTestCase {
 		$this->assertEquals( $post->ID, $query->posts[ 0 ]->ID );
     }
 
-	public function tests__author_name_arg_plus_tax_query__is_coauthor() {
+	public function test__author_name_arg_plus_tax_query__is_coauthor() {
         global $ssl_alp;
 
         $user_1 = $this->factory->user->create_and_get();
@@ -356,7 +356,7 @@ class CoauthorsTest extends WP_UnitTestCase {
 
 		$query = new WP_Query(
             array(
-			    'author_name' => $user_2->user_login,
+			    'author_name' => $user_2->user_nicename,
 			    'tag' => 'test',
             )
         );
