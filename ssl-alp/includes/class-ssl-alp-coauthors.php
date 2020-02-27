@@ -31,11 +31,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	protected $coauthor_term_slug_prefix = 'ssl-alp-coauthor-';
 
 	/**
-	 * HAVING SQL clause.
+	 * Whether we're doing an author query or not.
 	 *
-	 * @var string
+	 * @var bool
 	 */
-	protected $having_terms = '';
+	protected $is_author_query = false;
 
 	/**
 	 * Register settings.
@@ -98,9 +98,13 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$loader->add_action( 'set_object_terms', $this, 'check_post_author', 10, 4 );
 
 		// Modify SQL queries to include coauthors where appropriate.
-		$loader->add_filter( 'posts_where', $this, 'posts_where_filter', 10, 2 );
-		$loader->add_filter( 'posts_join', $this, 'posts_join_filter', 10, 2 );
-		$loader->add_filter( 'posts_groupby', $this, 'posts_groupby_filter', 10, 2 );
+		$loader->add_filter( 'pre_get_posts', $this, 'add_coauthor_posts_to_query' );
+
+		// Make sure we've correctly set author query flag on author pages.
+		$loader->add_action( 'posts_selection', $this, 'fix_author_query', 10, 0 );
+
+		// Make sure the author data is correctly set after an author query.
+		$loader->add_action( 'wp', $this, 'fix_author_query_data', 10, 0 );
 
 		// Allow public coauthor query vars.
 		$loader->add_filter( 'query_vars', $this, 'whitelist_search_query_vars' );
@@ -153,11 +157,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// also doesn't have hooks to allow filtering; therefore know that this filter doesn't catch
 		// every count event.
 		$loader->add_filter( 'get_usernumposts', $this, 'filter_count_user_posts', 10, 2 );
-
-		// Make sure we've correctly set author data on author pages.
-		// Use posts_selection since it's after WP_Query has built the request and before it's queried any posts.
-		$loader->add_action( 'posts_selection', $this, 'fix_author_page', 10, 0 );
-		$loader->add_filter( 'the_author', $this, 'fix_author_page_filter', 10, 1 );
 
 		// Filter the display of coauthor terms in the admin post list.
 		$loader->add_filter( 'ssl-alp-coauthor_name', $this, 'filter_coauthor_term_display', 10, 3 );
@@ -393,7 +392,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 *
 	 * @param WP_Term $term Coauthor term.
 	 *
-	 * @return WP_User
+	 * @return WP_User|false
 	 */
 	private function get_user_from_coauthor_term( $term ) {
 		if ( substr( $term->slug, 0, strlen( $this->coauthor_term_slug_prefix ) ) !== $this->coauthor_term_slug_prefix ) {
@@ -819,154 +818,143 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Modify the author query posts SQL to include posts co-authored.
+	 * Modify the WP_Query to match coauthored posts when an author query is being made.
 	 *
-	 * @param string $join  JOIN SQL clause.
-	 * @param string $query SQL query.
-	 * @return string
+	 * This modifies the query by removing the match against post author and replacing it with a
+	 * coauthor taxonomy term search. This allows the post query to match posts that are coauthored
+	 * by the author as well as those they wrote as primary author.
+	 *
+	 * This function removes the 'author' and 'author_name' query variables. The function
+	 * `fix_author_query` restores 'author' to avoid WP::handle_404 throwing a 404 when an author
+	 * is a member of a blog but has no posts.
+	 *
+	 * @param WP_Query $query The WP_Query instance (passed by reference).
+	 * @return null
 	 */
-	public function posts_join_filter( $join, $query ) {
+	public function add_coauthor_posts_to_query( $query ) {
 		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
 			// Coauthors disabled.
-			return $join;
-		}
-
-		global $wpdb;
-
-		if ( ! $query->is_author() ) {
-			// Not an author query, so return unmodified.
-			return $join;
+			return;
 		}
 
 		if ( ! empty( $query->query_vars['post_type'] ) && ! is_object_in_taxonomy( $query->query_vars['post_type'], 'ssl-alp-coauthor' ) ) {
-			// Not a valid post type, so return unmodified.
-			return $join;
+			// The query is for a particular post type and it's not one that we add coauthors to.
+			return;
 		}
 
-		if ( empty( $this->having_terms ) ) {
-			return $join;
-		}
+		$queried_author_name = $query->query_vars['author_name'];
+		$queried_author_id   = $query->query_vars['author'];
 
-		$term_relationship_join = " LEFT JOIN {$wpdb->term_relationships} AS tr1 ON ({$wpdb->posts}.ID = tr1.object_id)";
-
-		$term_taxonomy_join = " LEFT JOIN {$wpdb->term_taxonomy} ON ( tr1.term_taxonomy_id = {$wpdb->term_taxonomy}.term_taxonomy_id )";
-
-		$join .= $term_relationship_join;
-		$join .= $term_taxonomy_join;
-
-		return $join;
-	}
-
-	/**
-	 * Modify the author query posts SQL to include posts co-authored.
-	 *
-	 * @param string $where WHERE SQL clause.
-	 * @param string $query SQL query.
-	 * @return string
-	 */
-	public function posts_where_filter( $where, $query ) {
-		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
-			// Coauthors disabled.
-			return $where;
-		}
-
-		global $wpdb;
-
-		if ( ! $query->is_author() ) {
-			// Not an author query, so return unmodified.
-			return $where;
-		}
-
-		if ( ! empty( $query->query_vars['post_type'] ) && ! is_object_in_taxonomy( $query->query_vars['post_type'], 'ssl-alp-coauthor' ) ) {
-			// Not a valid post type, so return unmodified.
-			return $where;
-		}
-
-		if ( $query->get( 'author_name' ) ) {
-			// author_name is actually user_nicename.
-			$author_nicename = $query->get( 'author_name' );
-
-			if ( is_null( $author_nicename ) ) {
-				// No author defined.
-				return $where;
-			}
-
-			// user_nicename == slug.
-			$coauthor = get_user_by( 'slug', $author_nicename );
+		if ( ! empty( $queried_author_name ) ) {
+			// author_name is the user nicename which is also the slug.
+			$coauthor = get_user_by( 'slug', $queried_author_name );
+		} elseif ( ! empty( $queried_author_id ) ) {
+			// author is the user ID.
+			$coauthor = get_user_by( 'id', $queried_author_id );
 		} else {
-			$author_data = get_userdata( $query->get( 'author' ) );
-
-			if ( ! is_object( $author_data ) ) {
-				// No author defined.
-				return $where;
-			}
-
-			$coauthor = get_user_by( 'login', $author_data->user_login );
+			// This is not an author query.
+			return;
 		}
 
-		$terms       = array();
-		$author_term = $this->get_coauthor_term( $coauthor );
-
-		if ( $author_term ) {
-			$terms[] = $author_term;
+		if ( ! $coauthor ) {
+			// Coauthor not found.
+			return;
 		}
 
-		if ( ! empty( $terms ) ) {
-			$terms_implode      = '';
-			$this->having_terms = '';
+		$term = $this->get_coauthor_term( $coauthor );
 
-			foreach ( $terms as $term ) {
-				$terms_implode      .= "({$wpdb->term_taxonomy}.taxonomy = 'ssl-alp-coauthor' AND {$wpdb->term_taxonomy}.term_id = '{$term->term_id}') OR ";
-				$this->having_terms .= " {$wpdb->term_taxonomy}.term_id = '{$term->term_id}' OR ";
-			}
-
-			$terms_implode      = rtrim( $terms_implode, ' OR' );
-			$this->having_terms = rtrim( $this->having_terms, ' OR' );
-
-			// Match "wp_posts.post_author = [number]" or "wp_posts.post_author IN ([list of numbers])"
-			// and append "OR (wp_term_taxonomy.taxonomy = 'ssl-alp-coauthor' AND wp_term_taxonomy.term_id = '6')".
-			$where = preg_replace(
-				'/(\b(?:' . $wpdb->posts . '\.)?post_author\s*(?:=|IN)\s*\(?(\d+)\)?)/',
-				'($1 OR ' . $terms_implode . ')',
-				$where,
-				1
-			);
+		if ( ! $term ) {
+			// No coauthor term available for the specified user.
+			return;
 		}
 
-		return $where;
+		// Set that we're doing an author query.
+		$this->is_author_query = true;
+
+		// Unset author query (we replace it with taxonomy query). This is necessary otherwise
+		// WP_Query will AND the post primary author into the query, which will only return
+		// primary authored posts for this author.
+		unset( $query->query_vars['author_name'] );
+		unset( $query->query_vars['author'] );
+
+		$query->query_vars['taxonomy'] = 'ssl-alp-coauthor';
+		$query->query_vars['term']     = $term->slug;
 	}
 
 	/**
-	 * Modify the author query posts SQL to include posts co-authored.
+	 * Fix internal WP_Query fields due to changes to the author query in
+	 * `add_coauthor_posts_to_query`.
 	 *
-	 * @param string $groupby GROUP BY SQL clause.
-	 * @param string $query   SQL query.
-	 * @return string
+	 * @global WP_Query $wp_query
 	 */
-	public function posts_groupby_filter( $groupby, $query ) {
+	public function fix_author_query() {
+		global $wp_query;
+
 		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
 			// Coauthors disabled.
-			return $groupby;
+			return;
 		}
 
-		global $wpdb;
-
-		if ( ! $query->is_author() ) {
-			// Not an author query, so return unmodified.
-			return $groupby;
+		if ( ! $this->is_author_query ) {
+			// Not an author post query.
+			return;
 		}
 
-		if ( ! empty( $query->query_vars['post_type'] ) && ! is_object_in_taxonomy( $query->query_vars['post_type'], 'ssl-alp-coauthor' ) ) {
-			// Not a valid post type, so return unmodified.
-			return $groupby;
+		if ( ! empty( $wp_query->tax_query->queried_terms ) ) {
+			$queried_taxonomies = array_keys( $wp_query->tax_query->queried_terms );
+			$matched_taxonomy   = reset( $queried_taxonomies );
+			$query              = $wp_query->tax_query->queried_terms[ $matched_taxonomy ];
+
+			if ( ! empty( $query['terms'] ) ) {
+				if ( 'term_id' == $query['field'] ) {
+					$term = get_term( reset( $query['terms'] ), $matched_taxonomy );
+				} else {
+					$term = get_term_by( $query['field'], reset( $query['terms'] ), $matched_taxonomy );
+				}
+			}
+
+			if ( ! empty( $term ) && ! is_wp_error( $term ) ) {
+				// Get author from term.
+				$author = $this->get_user_from_coauthor_term( $term );
+
+				if ( $author ) {
+					// Set queried object.
+					$wp_query->queried_object    = $author;
+					$wp_query->queried_object_id = (int) $author->ID;
+
+					// Set flags as if we had loaded an author page.
+					$wp_query->is_author  = true;
+					$wp_query->is_archive = true;
+
+					// To avoid the WP::handle_404 throwing a 404 when there is no author query var,
+					// set it here.
+					set_query_var( 'author', $author->ID );
+				}
+			}
+		}
+	}
+
+	/**
+	 * Fix author data shown on author archive page.
+	 *
+	 * We override the author query to include coauthored posts, so there is a chance the first
+	 * retrieved post has another author as its primary author. WordPress uses the display name of
+	 * the primary author of the first retrieved post on the author archive page, so we have to
+	 * manually set this to the real author.
+	 *
+	 * @global WP_Query $wp_query
+	 * @global WP_User $authordata
+	 */
+	public function fix_author_query_data() {
+		global $wp_query, $authordata;
+
+		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
+			// Coauthors disabled.
+			return;
 		}
 
-		if ( $this->having_terms ) {
-			$having  = "MAX( IF ( {$wpdb->term_taxonomy}.taxonomy = 'ssl-alp-coauthor', IF ( {$this->having_terms}, 2, 1 ), 0 ) ) <> 1 ";
-			$groupby = "{$wpdb->posts}.ID HAVING {$having}";
-		}
-
-		return $groupby;
+		// Use the queried author set by `fix_author_query`.
+		$authordata = $wp_query->queried_object;
 	}
 
 	/**
@@ -1561,88 +1549,6 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		return $user_term->count;
-	}
-
-	/**
-	 * Fix for author pages 404ing or not properly displaying on author pages
-	 *
-	 * If an author has no posts, we only want to force the queried object to be
-	 * the author if they're a member of the blog.
-	 *
-	 * If the author does have posts, it doesn't matter that they're not an author.
-	 *
-	 * Alternatively, on an author page, if the first story has coauthors and
-	 * the first author is NOT the same as the author for the archive,
-	 * the query_var is changed.
-	 */
-	public function fix_author_page() {
-		global $wp_query, $authordata;
-
-		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
-			// Coauthors disabled.
-			return;
-		}
-
-		if ( ! is_author() ) {
-			// Page is not an author page.
-			return;
-		}
-
-		$author_id   = absint( get_query_var( 'author' ) );
-		$author_name = sanitize_title( get_query_var( 'author_name' ) );
-
-		if ( isset( $author_id ) ) {
-			// Get author by ID.
-			$author = get_user_by( 'id', $author_id );
-		} elseif ( isset( $author_name ) ) {
-			// Get author by specified name.
-			$author = get_user_by( 'slug', $author_name );
-		} else {
-			// No query variable was specified; not much we can do.
-			return;
-		}
-
-		if ( is_object( $author ) ) {
-			// Override the authordata global with the requested author, in case the first post's
-			// primary author is not the requested author.
-			$authordata = $author;
-			$term       = $this->get_coauthor_term( $authordata );
-		}
-
-		if ( ( is_object( $authordata ) ) || ( ! empty( $term ) ) ) {
-			// Update the query to the requested author.
-			$wp_query->queried_object    = $authordata;
-			$wp_query->queried_object_id = $authordata->ID;
-		} else {
-			$wp_query->queried_object    = null;
-			$wp_query->queried_object_id = null;
-			$wp_query->is_author         = false;
-			$wp_query->is_archive        = false;
-			$wp_query->is_404            = false;
-		}
-	}
-
-	/**
-	 * Fix author page filter to show author name instead of their coauthor term name.
-	 *
-	 * @param string $author_name Author name.
-	 * @return string
-	 */
-	public function fix_author_page_filter( $author_name ) {
-		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
-			// Coauthors disabled.
-			return $author_name;
-		}
-
-		if ( ! is_author() ) {
-			// Page is not an author page.
-			return $author_name;
-		}
-
-		global $wp_query;
-
-		// Set author from query.
-		return $wp_query->queried_object->display_name;
 	}
 
 	/**
