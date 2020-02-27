@@ -877,8 +877,13 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		unset( $query->query_vars['author_name'] );
 		unset( $query->query_vars['author'] );
 
-		$query->query_vars['taxonomy'] = 'ssl-alp-coauthor';
-		$query->query_vars['term']     = $term->slug;
+		$query->query_vars['tax_query'] = array(
+			array(
+				'taxonomy' => 'ssl-alp-coauthor',
+				'terms'    => array( $term->slug ),
+				'field'    => 'slug',
+			),
+		);
 	}
 
 	/**
