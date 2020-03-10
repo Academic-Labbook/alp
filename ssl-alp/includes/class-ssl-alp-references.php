@@ -27,6 +27,26 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	);
 
 	/**
+	 * Register scripts.
+	 */
+	public function register_scripts() {
+		// Hide cross-references editor plugin.
+		wp_register_script(
+			'ssl-alp-hide-crossreferences-block-editor-js',
+			esc_url( SSL_ALP_BASE_URL . 'js/references/index.js' ),
+			array(
+				'wp-edit-post',
+				'wp-plugins',
+				'wp-i18n',
+				'wp-element',
+				'wp-compose',
+			),
+			$this->get_version(),
+			true
+		);
+	}
+
+	/**
 	 * Register settings.
 	 */
 	public function register_settings() {
@@ -65,8 +85,24 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		// Create cross-reference taxonomy. Priority makes it get called after settings are registered.
 		$loader->add_action( 'init', $this, 'register_crossreference_taxonomy', 20 );
 
+		// Register post meta flag to hide cross-references from the post page.
+		$loader->add_action( 'init', $this, 'register_hide_crossreferences_post_meta', 20 );
+
 		// Extract references from saved posts.
 		$loader->add_action( 'save_post', $this, 'extract_crossreferences', 10, 2 );
+	}
+
+	/**
+	 * Enqueue block editor scripts.
+	 */
+	public function enqueue_block_editor_scripts() {
+		// Get post being edited.
+		$post = get_post();
+
+		if ( $this->is_supported( $post ) ) {
+			// Enqueue block editor plugin script.
+			wp_enqueue_script( 'ssl-alp-hide-crossreferences-block-editor-js' );
+		}
 	}
 
 	/**
@@ -99,6 +135,33 @@ class SSL_ALP_References extends SSL_ALP_Module {
 				),
 			)
 		);
+	}
+
+	/**
+	 * Register the hide cross-references post meta.
+	 *
+	 * This flag is used to avoid displaying cross-references to posts on their
+	 * post page. This can be used for example on posts which get regularly
+	 * linked to by other posts and where you don't want the clutter of having
+	 * these pages linked in the theme.
+	 */
+	public function register_hide_crossreferences_post_meta() {
+		if ( ! get_option( 'ssl_alp_enable_crossreferences' ) ) {
+			// Cross-references are disabled.
+			return;
+		}
+
+		foreach ( array_keys( $this->supported_reference_post_types ) as $post_type ) {
+			register_post_meta(
+				$post_type,
+				'ssl_alp_hide_crossreferences_to',
+				array(
+					'show_in_rest' => true,
+					'single'       => true,
+					'type'         => 'boolean',
+				)
+			);
+		}
 	}
 
 	/**
@@ -222,10 +285,39 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	}
 
 	/**
+	 * Check if the specified post has cross-references hidden.
+	 *
+	 * A post allows cross-references to and from other posts to be shown on the
+	 * theme if it is supported and the post has not had cross-references hidden
+	 * by setting the appropriate meta flag.
+	 *
+	 * @param WP_Post $post Post ID or post object. Defaults to global $post.
+	 * @return boolean|null Whether cross-references are enabled, or null if the
+	 * 						cross-references system is disabled or the post type
+	 *                      is not found or not supported.
+	 */
+	public function crossreferences_hidden( $post ) {
+		if ( ! get_option( 'ssl_alp_enable_crossreferences' ) ) {
+			// Cross-references are disabled.
+			return;
+		}
+
+		$post = get_post( $post );
+
+		if ( is_null( $post ) || ! $this->is_supported( $post ) ) {
+			// Post is invalid or post type is not supported.
+			return;
+		}
+
+		return (bool) get_post_meta( $post->ID, 'ssl_alp_hide_crossreferences_to', true );
+	}
+
+	/**
 	 * Get posts that are referenced by the specified post.
 	 *
 	 * @param int|WP_Post|null $post Post ID or post object. Defaults to global $post.
-	 * @return array|null Referenced posts, or null if invalid post specified.
+	 * @return array|null Referenced posts, or null if invalid post specified or
+	 *                    if the post has been set to hide cross-references.
 	 *
 	 * @global $ssl_alp
 	 */
@@ -235,6 +327,10 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		$post = get_post( $post );
 
 		if ( is_null( $post ) ) {
+			return;
+		}
+
+		if ( $this->crossreferences_hidden( $post ) ) {
 			return;
 		}
 
@@ -287,7 +383,8 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	 * Get posts that reference the specified post.
 	 *
 	 * @param int|WP_Post|null $post Post ID or post object. Defaults to global $post.
-	 * @return array|null Referencing posts, or null if invalid post specified.
+	 * @return array|null Referencing posts, or null if invalid post specified or
+	 *                    if the post has been set to hide cross-references.
 	 * @global $wpdb
 	 * @global $ssl_alp;
 	 */
@@ -297,6 +394,10 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		$post = get_post( $post );
 
 		if ( is_null( $post ) ) {
+			return;
+		}
+
+		if ( $this->crossreferences_hidden( $post ) ) {
 			return;
 		}
 
