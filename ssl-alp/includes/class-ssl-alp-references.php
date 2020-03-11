@@ -316,8 +316,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	 * Get posts that are referenced by the specified post.
 	 *
 	 * @param int|WP_Post|null $post Post ID or post object. Defaults to global $post.
-	 * @return array|null Referenced posts, or null if invalid post specified or
-	 *                    if the post has been set to hide cross-references.
+	 * @return array|null Referenced posts, or null if invalid post specified.
 	 *
 	 * @global $ssl_alp
 	 */
@@ -327,10 +326,6 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		$post = get_post( $post );
 
 		if ( is_null( $post ) ) {
-			return;
-		}
-
-		if ( $this->crossreferences_hidden( $post ) ) {
 			return;
 		}
 
@@ -383,8 +378,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	 * Get posts that reference the specified post.
 	 *
 	 * @param int|WP_Post|null $post Post ID or post object. Defaults to global $post.
-	 * @return array|null Referencing posts, or null if invalid post specified or
-	 *                    if the post has been set to hide cross-references.
+	 * @return array|null Referencing posts, or null if invalid post specified.
 	 * @global $wpdb
 	 * @global $ssl_alp;
 	 */
@@ -394,10 +388,6 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		$post = get_post( $post );
 
 		if ( is_null( $post ) ) {
-			return;
-		}
-
-		if ( $this->crossreferences_hidden( $post ) ) {
 			return;
 		}
 
