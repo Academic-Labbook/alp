@@ -6,7 +6,7 @@
 ?>
 <div class="wrap">
 	<h2><?php esc_html_e( 'Academic Labbook Settings', 'ssl-alp' ); ?></h2>
-	<?php if ( current_user_can( 'manage_network_options' ) ) : ?>
+	<?php if ( is_plugin_active_for_network( SSL_ALP_PLUGIN_PATH ) && current_user_can( 'manage_network_options' ) ) : ?>
 	<p class="description">
 		<?php
 		echo wp_kses_post(

@@ -4,7 +4,7 @@ Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
 Requires at least: 5.1.0
 Tested up to: 5.3.2
 Requires PHP: 7.0.0
-Stable tag: 0.18.0
+Stable tag: 0.19.0
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -78,6 +78,18 @@ with maximum control. Please see [this guide](https://alp.attackllama.com/docume
 on the ALP website.
 
 == Changelog ==
+
+= 0.19.0 =
+ - Removed the manual WP_Query SQL modifications for including coauthors in
+   search results, and replaced with a parameter based search. Due to this
+   functionality not being identical, other changes were made to restore
+   original functionality. This is quite a major change and needs field testing.
+ - Added ability to disable the display of cross-references on supported posts.
+ - Updated edit summary JavaScript (just refactoring, no functionality changes).
+ - Fixed bug where a link to network settings from the site settings page would
+   be displayed to network admins where ALP is active on the site only, not
+   network-wide.
+ - Updated automatic test configuration.
 
 = 0.18.0 =
  - Fix bug with child block which appeared from 5.3.

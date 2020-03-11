@@ -190,6 +190,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 				'revisions',
 				'page-attributes',
 				'thumbnail',
+				'custom-fields',
 			),
 			'rewrite'      => array(
 				'slug' => 'inventory',

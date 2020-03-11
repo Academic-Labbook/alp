@@ -238,6 +238,7 @@ class SSL_ALP_Uninstaller {
 	private static function delete_post_metas() {
 		self::delete_post_meta( 'ssl_alp_edit_summary' );
 		self::delete_post_meta( 'ssl_alp_edit_summary_revert_id' );
+		self::delete_post_meta( 'ssl_alp_hide_crossreferences_to' );
 	}
 
 	/**
