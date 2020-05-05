@@ -4,7 +4,7 @@ Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
 Requires at least: 5.1.0
 Tested up to: 5.3.2
 Requires PHP: 7.0.0
-Stable tag: 0.19.0
+Stable tag: 0.19.1
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -78,6 +78,9 @@ with maximum control. Please see [this guide](https://alp.attackllama.com/docume
 on the ALP website.
 
 == Changelog ==
+
+= 0.19.1 =
+ - Fixed an issue with creation of coauthor terms during a WordPress import.
 
 = 0.19.0 =
  - Removed the manual WP_Query SQL modifications for including coauthors in
