@@ -91,6 +91,10 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// disable_disallow_insert_term_filter functions must also be updated.
 		$loader->add_filter( 'pre_insert_term', $this, 'disallow_insert_term', 10, 2 );
 
+		// Allow term creation during an import with the WordPress importer plugin.
+		$loader->add_filter( 'import_start', $this, 'disable_disallow_insert_term_filter' );
+		$loader->add_filter( 'import_end', $this, 'enable_disallow_insert_term_filter' );
+
 		// Delete any invalid coauthors when post terms are set.
 		$loader->add_action( 'added_term_relationship', $this, 'reject_invalid_coauthor_terms', 10, 3 );
 
