@@ -1005,10 +1005,8 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return;
 		}
 
-		// Get updated coauthors.
-		$coauthors = array( wp_get_current_user() );
-
-		$this->set_coauthors( $post, $coauthors );
+		// Set the draft's coauthors to the current user.
+		$this->set_coauthors( $post, array( wp_get_current_user() ) );
 	}
 
 	/**
@@ -1102,11 +1100,12 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// Get post.
 		$post = get_post( $post_id );
 
-		if ( wp_is_post_autosave( $post ) ) {
+		if ( ! $this->post_supports_coauthors( $post ) ) {
 			return;
 		}
 
-		if ( ! $this->post_supports_coauthors( $post ) ) {
+		if ( wp_is_post_autosave( $post ) || $this->is_post_autodraft( $post ) ) {
+			// Wait until the post is saved by the user.
 			return;
 		}
 
