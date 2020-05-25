@@ -439,6 +439,10 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * @param WP_User $user       User object.
 	 */
 	public function check_coauthor_term_on_login( $user_login, $user ) {
+		if ( ! is_multisite() ) {
+			return;
+		}
+
 		// The hook that calls this function runs in the context of the network, whereas we want
 		// to ensure the terms are set only on the blogs the user is a member of.
 		foreach ( array_keys( get_blogs_of_user( $user->ID ) ) as $blog_id ) {
