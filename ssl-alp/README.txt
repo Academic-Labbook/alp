@@ -2,9 +2,9 @@
 Contributors: seanleavey
 Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
 Requires at least: 5.1.0
-Tested up to: 5.3.2
+Tested up to: 5.4.1
 Requires PHP: 7.0.0
-Stable tag: 0.19.1
+Stable tag: 0.20.0
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -78,6 +78,25 @@ with maximum control. Please see [this guide](https://alp.attackllama.com/docume
 on the ALP website.
 
 == Changelog ==
+
+= 0.20.0 =
+ - Fixed bug with terms on login. When logging in, users of blogs would have
+   their coauthor term added to the primary blog (usually site ID 1) because of
+   the hook 'check_coauthor_term_on_login' which creates the coauthor term if it
+   doesn't exist. This meant that users of secondary blogs who were not users of
+   the primary blog would still be available for selection as authors on the new
+   post screen of the primary blog. They would not however save correctly
+   because the users were not members of that blog; they would be silently
+   discard. This change fixes the creation of the coauthor terms to only create
+   terms on the blogs the user is a member of.
+
+   Existing sites running ALP may still have these terms, however. The rebuild
+   coauthor tool will later be updated to delete terms of users who are not
+   members of the blog.
+ - Fixed potential bug by not now checking post authors are consistent on newly
+   created auto-drafts.
+ - Added ability to hide revisions on post page and header. This requires the
+   latest release of the Labbook theme (1.2.0).
 
 = 0.19.1 =
  - Fixed an issue with creation of coauthor terms during a WordPress import.
