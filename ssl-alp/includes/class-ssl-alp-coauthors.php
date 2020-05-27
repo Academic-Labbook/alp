@@ -91,6 +91,10 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// disable_disallow_insert_term_filter functions must also be updated.
 		$loader->add_filter( 'pre_insert_term', $this, 'disallow_insert_term', 10, 2 );
 
+		// Allow term creation during an import with the WordPress importer plugin.
+		$loader->add_filter( 'import_start', $this, 'disable_disallow_insert_term_filter' );
+		$loader->add_filter( 'import_end', $this, 'enable_disallow_insert_term_filter' );
+
 		// Delete any invalid coauthors when post terms are set.
 		$loader->add_action( 'added_term_relationship', $this, 'reject_invalid_coauthor_terms', 10, 3 );
 
@@ -435,7 +439,17 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * @param WP_User $user       User object.
 	 */
 	public function check_coauthor_term_on_login( $user_login, $user ) {
-		$this->add_coauthor_term( $user );
+		if ( ! is_multisite() ) {
+			return;
+		}
+
+		// The hook that calls this function runs in the context of the network, whereas we want
+		// to ensure the terms are set only on the blogs the user is a member of.
+		foreach ( array_keys( get_blogs_of_user( $user->ID ) ) as $blog_id ) {
+			switch_to_blog( $blog_id );
+			$this->add_coauthor_term( $user );
+			restore_current_blog();
+		}
 	}
 
 	/**
@@ -991,10 +1005,8 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return;
 		}
 
-		// Get updated coauthors.
-		$coauthors = array( wp_get_current_user() );
-
-		$this->set_coauthors( $post, $coauthors );
+		// Set the draft's coauthors to the current user.
+		$this->set_coauthors( $post, array( wp_get_current_user() ) );
 	}
 
 	/**
@@ -1088,11 +1100,12 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// Get post.
 		$post = get_post( $post_id );
 
-		if ( wp_is_post_autosave( $post ) ) {
+		if ( ! $this->post_supports_coauthors( $post ) ) {
 			return;
 		}
 
-		if ( ! $this->post_supports_coauthors( $post ) ) {
+		if ( wp_is_post_autosave( $post ) || $this->is_post_autodraft( $post ) ) {
+			// Wait until the post is saved by the user.
 			return;
 		}
 

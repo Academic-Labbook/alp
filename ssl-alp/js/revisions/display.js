@@ -1,8 +1,8 @@
 /**
- * Cross-reference editor tools.
+ * Revision editor tools.
  *
  * This adds a checkbox to the sidebar when composing or editing a post which
- * when toggled avoids cross-references from appearing under the post.
+ * when toggled avoids revision count and list from appearing on the post page.
  *
  * @package ssl-alp
  */
@@ -18,24 +18,24 @@
     const withSelect = wp.data.withSelect;
     const withDispatch = wp.data.withDispatch;
 
-    class CrossReferencePlugin extends Component {
+    class RevisionDisplayPlugin extends Component {
         render() {
-            const { hideCrossReferences, setHideCrossReferences } = this.props;
+            const { hideRevisions, setHideRevisions } = this.props;
 
             return el(
                 PluginPostStatusInfo,
                 {
-                    className: 'ssl-alp-hide-crossreferences-panel'
+                    className: 'ssl-alp-hide-revisions-panel'
                 },
                 el(
                     CheckboxControl,
                     {
-                        name: 'ssl_alp_hide_crossreferences',
-                        label: __( 'Hide cross-references', 'ssl-alp' ),
-                        help: __( 'Do not display posts linked to/from this one on the post page', 'ssl-alp' ),
-                        checked: hideCrossReferences,
+                        name: 'ssl_alp_hide_revisions',
+                        label: __( 'Hide revisions', 'ssl-alp' ),
+                        help: __( 'Do not display revisions on the post page', 'ssl-alp' ),
+                        checked: hideRevisions,
                         onChange: ( value ) => {
-                            setHideCrossReferences( value );
+                            setHideRevisions( value );
                         }
                     }
                 )
@@ -43,33 +43,33 @@
         }
     }
 
-    const CrossReferencePluginHOC = compose( [
+    const RevisionDisplayPluginHOC = compose( [
         withSelect( ( select ) => {
             const { getEditedPostAttribute } = select( 'core/editor' );
 
             const editedPostAttributes = getEditedPostAttribute( 'meta' );
-            const hideCrossReferences = editedPostAttributes[ 'ssl_alp_hide_crossreferences_to' ];
+            const hideRevisions = editedPostAttributes[ 'ssl_alp_hide_revisions' ];
 
-            return { hideCrossReferences };
+            return { hideRevisions };
         } ),
         withDispatch( ( dispatch ) => {
             const { editPost } = dispatch( 'core/editor' );
 
             return {
-                setHideCrossReferences: function( value ) {
+                setHideRevisions: function( value ) {
                     editPost( {
-                        meta: { ssl_alp_hide_crossreferences_to: value },
+                        meta: { ssl_alp_hide_revisions: value },
                     } );
                 }
             }
         } )
-    ])( CrossReferencePlugin );
+    ])( RevisionDisplayPlugin );
 
     /**
      * Register sidebar plugin with block editor.
      */
-    registerPlugin( 'ssl-alp-hide-crossreferences-plugin', {
-        render: CrossReferencePluginHOC
+    registerPlugin( 'ssl-alp-hide-revisions-plugin', {
+        render: RevisionDisplayPluginHOC
     } );
 } )(
 	window.wp
