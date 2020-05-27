@@ -60,7 +60,22 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		// Edit summary block editor plugin.
 		wp_register_script(
 			'ssl-alp-edit-summary-block-editor-js',
-			esc_url( SSL_ALP_BASE_URL . 'js/edit-summary/index.js' ),
+			esc_url( SSL_ALP_BASE_URL . 'js/revisions/edit-summary.js' ),
+			array(
+				'wp-edit-post',
+				'wp-plugins',
+				'wp-i18n',
+				'wp-element',
+				'wp-compose',
+			),
+			$this->get_version(),
+			true
+		);
+
+		// Hide revisions editor plugin.
+		wp_register_script(
+			'ssl-alp-hide-revisions-block-editor-js',
+			esc_url( SSL_ALP_BASE_URL . 'js/revisions/display.js' ),
 			array(
 				'wp-edit-post',
 				'wp-plugins',
@@ -124,6 +139,9 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		// Register post meta for edit summaries.
 		$loader->add_action( 'init', $this, 'register_edit_summary_post_meta' );
+
+		// Register post meta flag to allow revisions to be hidden from the post page.
+		$loader->add_action( 'init', $this, 'register_hide_revisions_post_meta' );
 
 		// Register REST API endpoint for setting edit summaries with the block editor.
 		$loader->add_action( 'rest_api_init', $this, 'rest_register_edit_summary_route' );
@@ -201,8 +219,9 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		$post = get_post();
 
 		if ( $this->edit_summary_allowed( $post ) ) {
-			// Enqueue block editor plugin script.
+			// Enqueue block editor plugin scripts.
 			wp_enqueue_script( 'ssl-alp-edit-summary-block-editor-js' );
+			wp_enqueue_script( 'ssl-alp-hide-revisions-block-editor-js' );
 		}
 	}
 
@@ -292,7 +311,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	public function register_edit_summary_post_meta() {
 		// Edit summary.
 		register_post_meta(
-			'',
+			'',  // All post types.
 			'ssl_alp_edit_summary',
 			array(
 				'type'              => 'string',
@@ -305,7 +324,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		// Revert target post ID.
 		register_post_meta(
-			'',
+			'',  // All post types.
 			'ssl_alp_edit_summary_revert_id',
 			array(
 				'type'              => 'integer',
@@ -313,6 +332,31 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 				'single'            => true,
 				'sanitize_callback' => 'absint',
 				'show_in_rest'      => false,
+			)
+		);
+	}
+
+	/**
+	 * Register the hide revisions post meta.
+	 *
+	 * This flag is used to avoid displaying post revisions on post pages. This
+	 * can be used for example on posts for which the post history is of no
+	 * interest or is intended to be hidden from the viewer, such as a front
+	 * page.
+	 */
+	public function register_hide_revisions_post_meta() {
+		if ( ! get_option( 'ssl_alp_enable_edit_summaries' ) ) {
+			// Edit summaries disabled for posts.
+			return;
+		}
+
+		register_post_meta(
+			'',  // All post types.
+			'ssl_alp_hide_revisions',
+			array(
+				'show_in_rest' => true,
+				'single'       => true,
+				'type'         => 'boolean',
 			)
 		);
 	}
@@ -1521,6 +1565,33 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 				'status' => 500,
 			)
 		);
+	}
+
+	/**
+	 * Check if the specified post has revisions hidden.
+	 *
+	 * A post allows revisions shown on the theme if it is supported and the
+	 * post has not had revisions hidden by setting the appropriate meta flag.
+	 *
+	 * @param WP_Post $post Post ID or post object. Defaults to global $post.
+	 * @return boolean|null Whether revisions are enabled, or null if the
+	 * 						edit summary system is disabled or the post type
+	 *                      is not found.
+	 */
+	public function revisions_hidden( $post ) {
+		if ( ! get_option( 'ssl_alp_enable_edit_summaries' ) ) {
+			// Edit summaries are disabled.
+			return;
+		}
+
+		$post = get_post( $post );
+
+		if ( is_null( $post ) ) {
+			// Post is invalid.
+			return;
+		}
+
+		return (bool) get_post_meta( $post->ID, 'ssl_alp_hide_revisions', true );
 	}
 
 	/**
