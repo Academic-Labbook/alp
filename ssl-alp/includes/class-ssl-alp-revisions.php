@@ -185,7 +185,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		$loader->add_action( 'init', $this, 'remove_adjacent_links_action' );
 
 		// Add link to unread posts on toolbar.
-		$loader->add_action( 'wp_before_admin_bar_render', $this, 'add_unread_posts_admin_bar_link' );
+		$loader->add_action( 'admin_bar_menu', $this, 'add_unread_posts_admin_bar_link' );
 
 		// Set unread posts page user depending on query, and check permissions.
 		$loader->add_action( 'pre_get_posts', $this, 'set_unread_posts_archive_page_user' );
@@ -1216,11 +1216,9 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	/**
 	 * Add link to unread posts page in admin bar.
 	 *
-	 * @global $wp_admin_bar
+	 * @param WP_Admin_Bar $wp_admin_bar The admin bar.
 	 */
-	public function add_unread_posts_admin_bar_link() {
-		global $wp_admin_bar;
-
+	public function add_unread_posts_admin_bar_link( $admin_bar ) {
 		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
 			// Unread flags disabled.
 			return;
@@ -1232,7 +1230,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			$url = get_site_url( null, '?unread=' . $this->get_unread_flag_term_slug() );
 		}
 
-		$wp_admin_bar->add_menu(
+		$admin_bar->add_menu(
 			array(
 				'parent' => 'top-secondary', // On the right side.
 				'title'  => __( 'Unread Posts', 'ssl-alp' ),
