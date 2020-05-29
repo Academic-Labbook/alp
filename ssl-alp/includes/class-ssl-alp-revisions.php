@@ -1219,6 +1219,10 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * @param WP_Admin_Bar $wp_admin_bar The admin bar.
 	 */
 	public function add_unread_posts_admin_bar_link( $admin_bar ) {
+		if ( ! is_admin_bar_showing() ) {
+			return;
+		}
+
 		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
 			// Unread flags disabled.
 			return;
