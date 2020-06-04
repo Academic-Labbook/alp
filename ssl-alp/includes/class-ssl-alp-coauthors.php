@@ -363,6 +363,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// Get coauthor term (uses nicename from old user).
 		$term = $this->get_coauthor_term( $old_user_object );
 
+		if ( ! $term ) {
+			// The coauthor term does not exist yet.
+			return;
+		}
+
 		// Create updated term arguments.
 		$args = array(
 			'name' => $user->display_name,
@@ -447,7 +452,12 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		// to ensure the terms are set only on the blogs the user is a member of.
 		foreach ( array_keys( get_blogs_of_user( $user->ID ) ) as $blog_id ) {
 			switch_to_blog( $blog_id );
-			$this->add_coauthor_term( $user );
+
+			if ( in_array( SSL_ALP_PLUGIN_PATH, (array) get_blog_option( $blog_id, 'active_plugins', array() ) ) ) {
+				// ALP is active on this blog.
+				$this->add_coauthor_term( $user );
+			}
+
 			restore_current_blog();
 		}
 	}

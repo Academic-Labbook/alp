@@ -294,8 +294,11 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		if ( ! empty( $edit_summary_revert_id ) ) {
 			// Get original source revision.
-			$source_revision     = $this->get_source_revision( $revision );
-			$source_edit_summary = get_post_meta( $source_revision->ID, 'ssl_alp_edit_summary', true );
+			$source_revision = $this->get_source_revision( $revision );
+
+			if ( ! is_null( $source_revision ) ) {
+				$source_edit_summary = get_post_meta( $source_revision->ID, 'ssl_alp_edit_summary', true );
+			}
 		}
 
 		return array(
