@@ -38,6 +38,17 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	protected static $unread_flag_term_slug_prefix = 'ssl-alp-unread-flag-';
 
 	/**
+	 * Supported post types for revisions display.
+	 *
+	 * @var array
+	 */
+	protected static $supported_revision_post_types = array(
+		'post',
+		'page',
+		'ssl-alp-inventory',
+	);
+
+	/**
 	 * Supported post types for unread flags.
 	 *
 	 * @var array
@@ -185,7 +196,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		$loader->add_action( 'init', $this, 'remove_adjacent_links_action' );
 
 		// Add link to unread posts on toolbar.
-		$loader->add_action( 'wp_before_admin_bar_render', $this, 'add_unread_posts_admin_bar_link' );
+		$loader->add_action( 'admin_bar_menu', $this, 'add_unread_posts_admin_bar_link' );
 
 		// Set unread posts page user depending on query, and check permissions.
 		$loader->add_action( 'pre_get_posts', $this, 'set_unread_posts_archive_page_user' );
@@ -294,8 +305,11 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		if ( ! empty( $edit_summary_revert_id ) ) {
 			// Get original source revision.
-			$source_revision     = $this->get_source_revision( $revision );
-			$source_edit_summary = get_post_meta( $source_revision->ID, 'ssl_alp_edit_summary', true );
+			$source_revision = $this->get_source_revision( $revision );
+
+			if ( ! is_null( $source_revision ) ) {
+				$source_edit_summary = get_post_meta( $source_revision->ID, 'ssl_alp_edit_summary', true );
+			}
 		}
 
 		return array(
@@ -927,8 +941,6 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			 * Generate post list.
 			 */
 
-			$supported_post_types = get_post_types_by_support( 'revisions' );
-
 			$maxiter   = 10 * $number;
 			$iter      = 0;
 			$offset    = 0;
@@ -969,7 +981,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 					continue;
 				}
 
-				if ( ! in_array( $parent->post_type, $supported_post_types, true ) ) {
+				if ( ! in_array( $parent->post_type, self::$supported_revision_post_types, true ) ) {
 					// Unsupported post type.
 					continue;
 				}
@@ -1216,10 +1228,12 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	/**
 	 * Add link to unread posts page in admin bar.
 	 *
-	 * @global $wp_admin_bar
+	 * @param WP_Admin_Bar $wp_admin_bar The admin bar.
 	 */
-	public function add_unread_posts_admin_bar_link() {
-		global $wp_admin_bar;
+	public function add_unread_posts_admin_bar_link( $admin_bar ) {
+		if ( ! is_admin_bar_showing() ) {
+			return;
+		}
 
 		if ( ! get_option( 'ssl_alp_flag_unread_posts' ) ) {
 			// Unread flags disabled.
@@ -1232,7 +1246,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			$url = get_site_url( null, '?unread=' . $this->get_unread_flag_term_slug() );
 		}
 
-		$wp_admin_bar->add_menu(
+		$admin_bar->add_menu(
 			array(
 				'parent' => 'top-secondary', // On the right side.
 				'title'  => __( 'Unread Posts', 'ssl-alp' ),
