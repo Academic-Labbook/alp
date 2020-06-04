@@ -38,6 +38,17 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	protected static $unread_flag_term_slug_prefix = 'ssl-alp-unread-flag-';
 
 	/**
+	 * Supported post types for revisions display.
+	 *
+	 * @var array
+	 */
+	protected static $supported_revision_post_types = array(
+		'post',
+		'page',
+		'ssl-alp-inventory',
+	);
+
+	/**
 	 * Supported post types for unread flags.
 	 *
 	 * @var array
@@ -930,8 +941,6 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			 * Generate post list.
 			 */
 
-			$supported_post_types = get_post_types_by_support( 'revisions' );
-
 			$maxiter   = 10 * $number;
 			$iter      = 0;
 			$offset    = 0;
@@ -972,7 +981,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 					continue;
 				}
 
-				if ( ! in_array( $parent->post_type, $supported_post_types, true ) ) {
+				if ( ! in_array( $parent->post_type, self::$supported_revision_post_types, true ) ) {
 					// Unsupported post type.
 					continue;
 				}
