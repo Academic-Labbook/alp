@@ -4,7 +4,7 @@ Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
 Requires at least: 5.1.0
 Tested up to: 5.4.1
 Requires PHP: 7.0.0
-Stable tag: 0.20.0
+Stable tag: 0.20.1
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -78,6 +78,15 @@ with maximum control. Please see [this guide](https://alp.attackllama.com/docume
 on the ALP website.
 
 == Changelog ==
+
+= 0.20.1 =
+ - Add extra check when adding Unread Posts button to admin bar.
+ - Use better hook for adding Unread Posts to admin bar..
+ - Various bug fixes:
+   - Null check for terms in update_coauthor_term; occasionally we've seen the term doesn't exist
+   - Null check for when an old revision has been deleted
+   - Check that ALP is active on blogs when adding coauthor terms on login when ALP is installed in a network but not network active
+   - Stop CSS revisions appearing in the Recent Revisions widget.
 
 = 0.20.0 =
  - Fixed bug with terms on login. When logging in, users of blogs would have
