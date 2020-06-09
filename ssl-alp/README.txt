@@ -4,7 +4,7 @@ Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
 Requires at least: 5.1.0
 Tested up to: 5.4.1
 Requires PHP: 7.0.0
-Stable tag: 0.20.1
+Stable tag: 0.20.2
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -78,6 +78,10 @@ with maximum control. Please see [this guide](https://alp.attackllama.com/docume
 on the ALP website.
 
 == Changelog ==
+
+= 0.20.2 =
+ - Have rebuild coauthors tool remove coauthor terms for users who no longer exist on the site.
+ - Update some URLs pointing to https://alp.attackllama.com/.
 
 = 0.20.1 =
  - Add extra check when adding Unread Posts button to admin bar.
