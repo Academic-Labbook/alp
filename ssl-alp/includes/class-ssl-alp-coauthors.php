@@ -404,6 +404,10 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * @return WP_User|false
 	 */
 	private function get_user_from_coauthor_term( $term ) {
+		if ( 'ssl-alp-coauthor' !== $term->taxonomy ) {
+			return false;
+		}
+
 		if ( substr( $term->slug, 0, strlen( $this->coauthor_term_slug_prefix ) ) !== $this->coauthor_term_slug_prefix ) {
 			// The slug doesn't contain the prefix.
 			return false;
@@ -466,7 +470,8 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	 * Rebuild coauthor terms.
 	 *
 	 * This adds coauthor terms for all users, generating them if necessary, and assigns posts
-	 * authored by those users to those coauthor terms.
+	 * authored by those users to those coauthor terms. It also deletes terms for users who are no
+	 * longer members of the site.
 	 */
 	public function rebuild_coauthors() {
 		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {
@@ -476,6 +481,14 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 
 		// Allow unlimited execution time.
 		ini_set( 'max_execution_time', 0 );
+
+		// Remove terms that no longer map to existing users (for example, if they were deleted
+		// while ALP was disabled).
+		$terms = get_terms( array( 'taxonomy' => 'ssl-alp-coauthor' ) );
+
+		foreach ( $terms as $term ) {
+			$this->ensure_coauthor_term_validity( $term );
+		}
 
 		// Get all user IDs.
 		$users = get_users();
@@ -1073,6 +1086,17 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			return;
 		}
 
+		$this->ensure_coauthor_term_validity( $term );
+	}
+
+	/**
+	 * Ensure the passed coauthor term is valid.
+	 *
+	 * If the term does not map to a current user on the site, it is deleted.
+	 *
+	 * @param WP_Term $term The term to check.
+	 */
+	private function ensure_coauthor_term_validity( $term ) {
 		// Check term is valid.
 		$coauthor = $this->get_user_from_coauthor_term( $term );
 

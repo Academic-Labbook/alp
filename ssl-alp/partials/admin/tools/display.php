@@ -85,7 +85,7 @@
 					sprintf(
 						/* translators: ALP theme documentation URL */
 						__( '<em>Labbook</em> is not installed. Visit the <a href="%s">ALP website</a> to download it.', 'ssl-alp' ),
-						'https://alp.attackllama.com/documentation/themes/'
+						'https://alp.attackllama.com/documentation/for-administrators/themes/'
 					)
 				);
 				?>
@@ -256,7 +256,7 @@
 					sprintf(
 						/* translators: ALP cross-reference documentation URL */
 						__( 'Note: this tool may take a long time to execute on large sites. Due to server configuration settings, the execution may time out or run out of memory. You may instead wish to <a href="%s">run this tool via WP-CLI</a>.', 'ssl-alp' ),
-						'https://alp.attackllama.com/documentation/rebuilding-cross-references/'
+						'https://alp.attackllama.com/documentation/for-administrators/rebuilding-cross-references/'
 					)
 				);
 				?>
@@ -296,7 +296,7 @@
 					sprintf(
 						/* translators: ALP coauthor documentation URL */
 						__( 'Note: this tool may take a long time to execute on large sites. Due to server configuration settings, the execution may time out or run out of memory. You may instead wish to <a href="%s">run this tool via WP-CLI</a>.', 'ssl-alp' ),
-						'https://alp.attackllama.com/documentation/rebuilding-coauthors/'
+						'https://alp.attackllama.com/documentation/for-administrators/rebuilding-coauthors/'
 					)
 				);
 				?>

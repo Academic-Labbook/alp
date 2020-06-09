@@ -8,7 +8,7 @@ echo wp_kses_post(
 <p>
 <?php
 echo wp_kses_post(
-	__( 'For more information, and a list of common additional media types in the required format, see <a href="https://alp.attackllama.com/documentation/media-types/">here</a>.', 'ssl-alp' )
+	__( 'For more information, and a list of common additional media types in the required format, see <a href="https://alp.attackllama.com/documentation/for-administrators/media-types/">here</a>.', 'ssl-alp' )
 );
 ?>
 </p>

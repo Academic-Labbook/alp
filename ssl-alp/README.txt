@@ -4,7 +4,7 @@ Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
 Requires at least: 5.1.0
 Tested up to: 5.4.1
 Requires PHP: 7.0.0
-Stable tag: 0.20.1
+Stable tag: 0.20.2
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -22,7 +22,7 @@ WordPress's post compositition, tagging and categorisation, media management and
 search tools while enabling features useful in an academic context like
 mathematical markup rendering, coauthors, edit summaries and cross-references.
 
-ALP is intended to be used with the corresponding theme [Labbook](https://alp.attackllama.com/documentation/themes/labbook/),
+ALP is intended to be used with the corresponding theme [Labbook](https://alp.attackllama.com/documentation/for-administrators/themes/labbook/),
 which was created in parallel to ALP, and which enables various public-facing
 features provided by the plugin. It is highly encouraged to use this theme, or
 derive a child theme from this base. Various features such as coauthors, edit
@@ -74,10 +74,14 @@ unacceptable.
 == Installation ==
 Installation is slightly more complicated than a usual WordPress plugin, due to
 various configuration steps which are intentionally not automated to provide you
-with maximum control. Please see [this guide](https://alp.attackllama.com/documentation/installation/)
+with maximum control. Please see [this guide](https://alp.attackllama.com/documentation/for-administrators/installation/)
 on the ALP website.
 
 == Changelog ==
+
+= 0.20.2 =
+ - Have rebuild coauthors tool remove coauthor terms for users who no longer exist on the site.
+ - Update some URLs pointing to https://alp.attackllama.com/.
 
 = 0.20.1 =
  - Add extra check when adding Unread Posts button to admin bar.
