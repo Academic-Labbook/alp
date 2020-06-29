@@ -181,7 +181,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 			'labels'       => $labels,
 			'description'  => __( 'Inventory items.', 'ssl-alp' ),
 			'public'       => true,
-			'hierarchical' => false,
+			'hierarchical' => true,
 			'show_in_rest' => true,
 			'menu_icon'    => 'dashicons-book-alt',
 			'supports'     => array(
