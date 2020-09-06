@@ -484,16 +484,14 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * Set edit summary received via REST API.
 	 *
 	 * @param WP_REST_Request $data REST request data.
-	 * @return WP_Error|null Null if ok, or error there was a problem updating the metadata.
 	 */
 	public function rest_update_revision_meta( WP_REST_Request $data ) {
 		// Update the revision's edit summary.
-		$status = update_metadata( 'post', $data['post_id'], 'ssl_alp_edit_summary', $data['value'] );
-
-		if ( empty( $status ) ) {
-			// Something went wrong with the metadata update.
-			return rest_ensure_response( $this->update_revision_meta_unknown_error() );
-		}
+		//
+		// Note: ideally we'd afterwards like to check whether the update worked and issue an error
+		// otherwise, but unfortunately WordPress doesn't provide any way to check that the update
+		// actually worked that can be distinguished from other situations...
+		update_metadata( 'post', $data['post_id'], 'ssl_alp_edit_summary', $data['value'] );
 	}
 
 	/**
@@ -547,19 +545,6 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			__( 'The specified post is an autosave, and therefore cannot have its edit summary set.', 'ssl-alp' ),
 			array(
 				'status' => 400, // Bad request.
-			)
-		);
-	}
-
-	/**
-	 * Unknown REST error.
-	 */
-	private function update_revision_meta_unknown_error() {
-		return new WP_Error(
-			'update_revision_meta_unknown_error',
-			__( 'Unknown error.', 'ssl-alp' ),
-			array(
-				'status' => 500,
 			)
 		);
 	}
