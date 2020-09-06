@@ -4,7 +4,7 @@ Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
 Requires at least: 5.5.0
 Tested up to: 5.5.1
 Requires PHP: 7.0.0
-Stable tag: 0.20.2
+Stable tag: 0.21.0
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -79,9 +79,12 @@ on the ALP website.
 
 == Changelog ==
 
-= latest =
- - WordPress 5.5 now required!
+= 0.21.0 =
+ - WordPress 5.5 now required.
  - Renamed deprecated function and hook calls to reflect [changes in core](https://make.wordpress.org/core/2020/07/23/codebase-language-improvements-in-5-5/).
+ - Inventory can now be hierarchical and use the post children block.
+ - Remove ability in REST API to view other users' post read flags (this was
+   never used by the front end).
 
 = 0.20.2 =
  - Have rebuild coauthors tool remove coauthor terms for users who no longer
