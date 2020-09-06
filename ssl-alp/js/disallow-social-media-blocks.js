@@ -1,5 +1,5 @@
 /**
- * Blacklist social media blocks.
+ * Disallow social media blocks.
  *
  * @package ssl-alp
  */

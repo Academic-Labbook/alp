@@ -40,8 +40,8 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 	public function register_scripts() {
 		if ( get_option( 'ssl_alp_disable_social_media_blocks' ) ) {
 			wp_register_script(
-				'ssl-alp-blacklist-blocks',
-				esc_url( SSL_ALP_BASE_URL . 'js/blacklist-social-media-blocks.js' ),
+				'ssl-alp-disallow-blocks',
+				esc_url( SSL_ALP_BASE_URL . 'js/disallow-social-media-blocks.js' ),
 				array(
 					'wp-blocks',
 					'wp-dom-ready',
@@ -174,7 +174,7 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 	 */
 	public function enqueue_block_editor_scripts() {
 		if ( get_option( 'ssl_alp_disable_social_media_blocks' ) ) {
-			wp_enqueue_script( 'ssl-alp-blacklist-blocks' );
+			wp_enqueue_script( 'ssl-alp-disallow-blocks' );
 		}
 	}
 

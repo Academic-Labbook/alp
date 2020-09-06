@@ -111,7 +111,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$loader->add_action( 'wp', $this, 'fix_author_query_data', 10, 0 );
 
 		// Allow public coauthor query vars.
-		$loader->add_filter( 'query_vars', $this, 'whitelist_search_query_vars' );
+		$loader->add_filter( 'query_vars', $this, 'allow_search_query_vars' );
 
 		// Support coauthor querystrings in WP_Query.
 		$loader->add_action( 'parse_tax_query', $this, 'parse_query_vars' );
@@ -1263,13 +1263,13 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Whitelist coauthor query vars.
+	 * Allow coauthor query vars.
 	 *
 	 * This allows coauthored posts to be queried publicly.
 	 *
 	 * @param string[] $public_query_vars Array of public query vars.
 	 */
-	public function whitelist_search_query_vars( $public_query_vars ) {
+	public function allow_search_query_vars( $public_query_vars ) {
 		global $ssl_alp;
 
 		if ( ! get_option( 'ssl_alp_allow_multiple_authors' ) ) {

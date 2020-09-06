@@ -449,21 +449,19 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			SSL_ALP_REST_ROUTE,
 			'/update-revision-meta',
 			array(
-				'methods'  => 'POST',
-				'callback' => array( $this, 'rest_update_revision_meta' ),
-				'args'     => array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'rest_update_revision_meta' ),
+				'permission_callback' => array( $this, 'rest_revision_meta_update_allowed' ),
+				'args'                => array(
 					'post_id' => array(
 						'required'          => true,
-						'validate_callback' => function( $param, $request, $key ) {
-							return is_numeric( $param );
-						},
-						'sanitize_callback' => 'absint',
+						'validate_callback' => array( $this, 'validate_rest_update_revision_meta_post_id' ),
 					),
-					'key'     => array(
+					'key'    => array(
 						'required'          => true,
-						'validate_callback' => array( $this, 'validate_revision_meta_key' ),
+						'validate_callback' => array( $this, 'validate_rest_update_revision_meta_key' ),
 					),
-					'value'   => array(
+					'value'  => array(
 						'required'          => true,
 						'sanitize_callback' => array( $this, 'sanitize_edit_summary' ),
 					),
@@ -473,59 +471,65 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	}
 
 	/**
+	 * Check user permissions to perform a revision meta update.
+	 *
+	 * @param WP_REST_Request $data REST request data.
+	 * @return bool|WP_Error true if allowed, false otherwise.
+	 */
+	public function rest_revision_meta_update_allowed( WP_REST_Request $data ) {
+		return $this->edit_summary_allowed( get_post( $data['post_id'] ) );
+	}
+
+	/**
 	 * Set edit summary received via REST API.
 	 *
 	 * @param WP_REST_Request $data REST request data.
-	 * @return WP_Error|null Null if ok, or error if post is an autosave or the user lacks
-	 *                       permission to edit it.
 	 */
 	public function rest_update_revision_meta( WP_REST_Request $data ) {
-		if ( is_null( $data['post_id'] ) || is_null( $data['key'] ) || is_null( $data['value'] ) ) {
-			// Invalid data.
-			return;
-		}
+		// Update the revision's edit summary.
+		//
+		// Note: ideally we'd afterwards like to check whether the update worked and issue an error
+		// otherwise, but unfortunately WordPress doesn't provide any way to check that the update
+		// actually worked that can be distinguished from other situations...
+		update_metadata( 'post', $data['post_id'], 'ssl_alp_edit_summary', $data['value'] );
+	}
 
-		if ( 'ssl_alp_edit_summary' !== $data['key'] ) {
-			// Key is incorrect - ignore.
-			return;
-		}
-
-		$revision_id = $data['post_id'];
-
+	/**
+	 * Validate that the post passed from REST to rest_update_revision_meta is valid.
+	 *
+	 * @param string $param The post ID.
+	 * @return WP_Error|bool
+	 */
+	public function validate_rest_update_revision_meta_post_id( $param ) {
 		// Get revision.
-		$post = get_post( $revision_id );
+		$post = get_post( $param );
 
 		if ( is_null( $post ) ) {
-			return;
+			return $this->update_revision_meta_post_not_found_error();
 		} elseif ( wp_is_post_autosave( $post ) ) {
 			return $this->update_revision_meta_post_is_autosave_error();
-		} elseif ( ! $this->edit_summary_allowed( $post ) ) {
-			return $this->update_revision_meta_no_permission_error();
 		}
 
-		$edit_summary = $data['value']; // Sanitized already by REST endpoint callback.
-
-		// Update the revision's edit summary.
-		update_metadata( 'post', $revision_id, 'ssl_alp_edit_summary', $edit_summary );
+		return true;
 	}
 
 	/**
 	 * Validate that the key passed from REST to rest_update_revision_meta is valid.
 	 *
-	 * @param string $key Edit summary key.
+	 * @param string $param Edit summary key.
 	 * @return bool
 	 */
-	public function validate_revision_meta_key( $key ) {
-		return 'ssl_alp_edit_summary' === $key;
+	public function validate_rest_update_revision_meta_key( $param ) {
+		return 'ssl_alp_edit_summary' === $param;
 	}
 
 	/**
-	 * Post is autosave error.
+	 * Post not found error.
 	 */
-	public function update_revision_meta_post_is_autosave_error() {
+	private function update_revision_meta_post_not_found_error() {
 		return new WP_Error(
-			'post_is_autosave',
-			__( 'The specified post is an autosave, and therefore cannot have its edit summary set.', 'ssl-alp' ),
+			'post_not_found',
+			__( 'The specified post was not found.', 'ssl-alp' ),
 			array(
 				'status' => 400, // Bad request.
 			)
@@ -533,14 +537,14 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	}
 
 	/**
-	 * No permission error.
+	 * Post is autosave error.
 	 */
-	public function update_revision_meta_no_permission_error() {
+	private function update_revision_meta_post_is_autosave_error() {
 		return new WP_Error(
-			'post_cannot_read',
-			__( 'Sorry, you are not allowed to edit this post.', 'ssl-alp' ),
+			'post_is_autosave',
+			__( 'The specified post is an autosave, and therefore cannot have its edit summary set.', 'ssl-alp' ),
 			array(
-				'status' => rest_authorization_required_code(),
+				'status' => 400, // Bad request.
 			)
 		);
 	}
@@ -1308,45 +1312,29 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			'/post-read-status',
 			array(
 				array(
-					'methods'  => 'GET',
-					'callback' => array( $this, 'rest_get_post_read_status' ),
-					'args'     => array(
+					'methods'             => 'GET',
+					'callback'            => array( $this, 'rest_get_post_read_status' ),
+					'permission_callback' => 'is_user_logged_in',
+					'args'                => array(
 						'post_id' => array(
 							'required'          => true,
-							'validate_callback' => function( $param, $request, $key ) {
-								return is_numeric( $param );
-							},
-							'sanitize_callback' => 'absint',
-						),
-						'user_id' => array(
-							'required'          => false,
-							'validate_callback' => function( $param, $request, $key ) {
-								return is_numeric( $param );
-							},
+							'validate_callback' => array( $this, 'validate_get_or_set_post_read_status_post_id' ),
 							'sanitize_callback' => 'absint',
 						),
 					),
 				),
 				array(
-					'methods'  => 'POST',
-					'callback' => array( $this, 'rest_set_post_read_status' ),
-					'args'     => array(
+					'methods'             => 'POST',
+					'callback'            => array( $this, 'rest_set_post_read_status' ),
+					'permission_callback' => 'is_user_logged_in',
+					'args'                => array(
 						'read'    => array(
 							'required'          => true,
 							'sanitize_callback' => 'rest_sanitize_boolean',
 						),
 						'post_id' => array(
 							'required'          => true,
-							'validate_callback' => function( $param, $request, $key ) {
-								return is_numeric( $param );
-							},
-							'sanitize_callback' => 'absint',
-						),
-						'user_id' => array(
-							'required'          => false,
-							'validate_callback' => function( $param, $request, $key ) {
-								return is_numeric( $param );
-							},
+							'validate_callback' => array( $this, 'validate_get_or_set_post_read_status_post_id' ),
 							'sanitize_callback' => 'absint',
 						),
 					),
@@ -1356,31 +1344,15 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Check user permission to edit an unread flag.
+	 * Validate that the post passed from REST to rest_get_post_read_status or
+	 * rest_set_post_read_status is valid.
 	 *
-	 * @param int|WP_User|null $user User ID or user object. Defaults to currently logged in user.
-	 * @return bool false if $target_user is not the current user and the
-	 *              current user is not able to edit users, true otherwise.
+	 * @param string $param The post ID.
+	 * @return WP_Error|bool
 	 */
-	private function check_unread_flag_permission( $user = null ) {
-		if ( ! is_a( $user, 'WP_User' ) ) {
-			if ( is_numeric( $user ) ) {
-				// Get user by their ID.
-				$user = get_user_by( 'id', $user );
-			} elseif ( is_user_logged_in() ) {
-				// Try to get logged in user.
-				$user = wp_get_current_user();
-			}
-		}
-
-		if ( ! is_a( $user, 'WP_User' ) ) {
-			// Invalid user.
-			return false;
-		}
-
-		if ( wp_get_current_user()->ID !== $user->ID && ! current_user_can( 'edit_users' ) ) {
-			// No permission to edit another user's flag.
-			return false;
+	public function validate_get_or_set_post_read_status_post_id( $param ) {
+		if ( is_null( get_post( $param ) ) ) {
+			return $this->unread_flag_post_not_found_error();
 		}
 
 		return true;
@@ -1393,40 +1365,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function rest_get_post_read_status( WP_REST_Request $data ) {
-		if ( is_null( $data['post_id'] ) ) {
-			// Invalid data.
-			return rest_ensure_response( $this->unread_flag_invalid_data_error() );
-		}
-
-		$post = get_post( $data['post_id'] );
-
-		if ( is_null( $post ) ) {
-			return rest_ensure_response( $this->unread_flag_post_not_found_error() );
-		}
-
-		if ( is_numeric( $data['user_id'] ) ) {
-			// Get user by their ID.
-			$user = get_user_by( 'id', $data['user_id'] );
-		} else {
-			if ( ! is_user_logged_in() ) {
-				return rest_ensure_response( $this->unread_flag_no_permission_error() );
-			}
-
-			// Try to get logged in user.
-			$user = wp_get_current_user();
-		}
-
-		if ( ! $user ) {
-			// Invalid user.
-			return rest_ensure_response( $this->unread_flag_user_not_found_error() );
-		}
-
-		if ( ! $this->check_unread_flag_permission( $user ) ) {
-			// No permission.
-			return rest_ensure_response( $this->unread_flag_no_permission_error() );
-		}
-
-		$response = $this->get_post_read_status( $post, $user );
+		$response = $this->get_post_read_status( get_post( $data['post_id'] ) );
 
 		if ( ! is_wp_error( $response ) ) {
 			// Make response an array with new flag.
@@ -1445,40 +1384,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function rest_set_post_read_status( WP_REST_Request $data ) {
-		if ( is_null( $data['post_id'] ) || is_null( $data['read'] ) ) {
-			// Invalid data.
-			return rest_ensure_response( $this->unread_flag_invalid_data_error() );
-		}
-
-		$post = get_post( $data['post_id'] );
-
-		if ( is_null( $post ) ) {
-			return rest_ensure_response( $this->unread_flag_post_not_found_error() );
-		}
-
-		if ( is_numeric( $data['user_id'] ) ) {
-			// Get user by their ID.
-			$user = get_user_by( 'id', $data['user_id'] );
-		} else {
-			if ( ! is_user_logged_in() ) {
-				return rest_ensure_response( $this->unread_flag_no_permission_error() );
-			}
-
-			// Try to get logged in user.
-			$user = wp_get_current_user();
-		}
-
-		if ( ! $user ) {
-			// Invalid user.
-			return rest_ensure_response( $this->unread_flag_user_not_found_error() );
-		}
-
-		if ( ! $this->check_unread_flag_permission( $user ) ) {
-			// No permission.
-			return rest_ensure_response( $this->unread_flag_no_permission_error() );
-		}
-
-		$response = $this->set_post_read_status( $data['read'], $post, $user );
+		$response = $this->set_post_read_status( $data['read'], get_post( $data['post_id'] ) );
 
 		if ( ! is_wp_error( $response ) ) {
 			// Make response an array with new flag.
@@ -1488,19 +1394,6 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 		}
 
 		return rest_ensure_response( $response );
-	}
-
-	/**
-	 * Invalid data REST error.
-	 */
-	private function unread_flag_invalid_data_error() {
-		return new WP_Error(
-			'post_unread_flag_invalid_data',
-			__( 'The specified data is invalid.', 'ssl-alp' ),
-			array(
-				'status' => 400, // Bad request.
-			)
-		);
 	}
 
 	/**

@@ -316,9 +316,9 @@ class SSL_ALP {
 		}
 
 		// Get current options.
-		global $new_whitelist_options;
+		global $new_allowed_options;
 
-		$options = $new_whitelist_options[ SSL_ALP_NETWORK_SETTINGS_PAGE ];
+		$options = $new_allowed_options[ SSL_ALP_NETWORK_SETTINGS_PAGE ];
 
 		foreach ( $options as $option ) {
 			if ( isset( $_POST[ $option ] ) ) {
