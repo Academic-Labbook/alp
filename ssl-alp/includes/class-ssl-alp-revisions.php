@@ -492,7 +492,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 
 		if ( empty( $status ) ) {
 			// Something went wrong with the metadata update.
-			return ensure_rest_response( $this->update_revision_meta_unknown_error() );
+			return rest_ensure_response( $this->update_revision_meta_unknown_error() );
 		}
 	}
 
