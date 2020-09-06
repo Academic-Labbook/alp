@@ -63,7 +63,7 @@ class SSL_ALP_Search extends SSL_ALP_Module {
 		$loader = $this->get_loader();
 
 		// Allow extra public query vars.
-		$loader->add_filter( 'query_vars', $this, 'whitelist_advanced_search_query_vars' );
+		$loader->add_filter( 'query_vars', $this, 'allow_advanced_search_query_vars' );
 
 		// Support date querystrings in WP_Query.
 		$loader->add_action( 'pre_get_posts', $this, 'parse_date_query_vars' );
@@ -104,14 +104,14 @@ class SSL_ALP_Search extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Whitelist advanced search query vars.
+	 * Allow advanced search query vars.
 	 *
 	 * This allows posts to be filtered by lists of authors, categories and tags. Note that
 	 * coauthor post filtering is provided by the coauthor module.
 	 *
 	 * @param string[] $public_query_vars Array of public query vars.
 	 */
-	public function whitelist_advanced_search_query_vars( $public_query_vars ) {
+	public function allow_advanced_search_query_vars( $public_query_vars ) {
 		if ( ! $this->current_user_can_advanced_search() ) {
 			// Advanced search disabled.
 			return $public_query_vars;

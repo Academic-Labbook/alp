@@ -1,8 +1,8 @@
 === Academic Labbook ===
 Contributors: seanleavey
 Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
-Requires at least: 5.1.0
-Tested up to: 5.4.1
+Requires at least: 5.5.0
+Tested up to: 5.5.1
 Requires PHP: 7.0.0
 Stable tag: 0.20.2
 License: GNU General Public License v3 or later
@@ -79,17 +79,24 @@ on the ALP website.
 
 == Changelog ==
 
+= latest =
+ - WordPress 5.5 now required!
+ - Renamed deprecated function and hook calls to reflect [changes in core](https://make.wordpress.org/core/2020/07/23/codebase-language-improvements-in-5-5/).
+
 = 0.20.2 =
- - Have rebuild coauthors tool remove coauthor terms for users who no longer exist on the site.
+ - Have rebuild coauthors tool remove coauthor terms for users who no longer
+   exist on the site.
  - Update some URLs pointing to https://alp.attackllama.com/.
 
 = 0.20.1 =
  - Add extra check when adding Unread Posts button to admin bar.
- - Use better hook for adding Unread Posts to admin bar..
+ - Use better hook for adding Unread Posts to admin bar.
  - Various bug fixes:
-   - Null check for terms in update_coauthor_term; occasionally we've seen the term doesn't exist
+   - Null check for terms in update_coauthor_term; occasionally we've seen the
+     term doesn't exist
    - Null check for when an old revision has been deleted
-   - Check that ALP is active on blogs when adding coauthor terms on login when ALP is installed in a network but not network active
+   - Check that ALP is active on blogs when adding coauthor terms on login when
+     ALP is installed in a network but not network active
    - Stop CSS revisions appearing in the Recent Revisions widget.
 
 = 0.20.0 =
@@ -217,17 +224,18 @@ on the ALP website.
  - Removed invalid coauthors attached to posts on save.
 
 = 0.13.1 =
- - Added support for advanced searches, letting users search posts by multiple coauthors, categories
-   and tags, and dates.
- - Added setting to control display of advanced search tools to non-logged-in users.
+ - Added support for advanced searches, letting users search posts by multiple
+   coauthors, categories and tags, and dates.
+ - Added setting to control display of advanced search tools to non-logged-in
+   users.
 
 = 0.13.0 =
- - Added support for read flags, letting users keep track of posts they've read or not read and
-   allowing them to change this flag per-post and view a list of unread posts (requires Labbook
-   theme 1.1.0 or greater for front-end support).
+ - Added support for read flags, letting users keep track of posts they've read
+   or not read and allowing them to change this flag per-post and view a list of
+   unread posts (requires Labbook theme 1.1.0 or greater for front-end support).
  - Fixed bug whereby coauthors were sent notifications for their own comments.
- - Fixed bug with user widget in non-dropdown mode not showing all authors, and with dropdown mode
-   showing authors with zero posts.
+ - Fixed bug with user widget in non-dropdown mode not showing all authors, and
+   with dropdown mode showing authors with zero posts.
  - Removed new default media file feature until Gutenberg bug is fixed.
  - Updated KaTeX to 0.10.1.
 
@@ -235,7 +243,7 @@ on the ALP website.
  - Set new default (media file) for image link targets in block editor.
 
 = 0.12.2 =
- - Fixed bug whereby settings were not added to the database for new blogs when the plugin was
-   already network active.
+ - Fixed bug whereby settings were not added to the database for new blogs when
+   the plugin was already network active.
  - Added routines to clean up database if ALP is uninstalled.
  - Added extra test.

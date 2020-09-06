@@ -110,7 +110,7 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 		$loader->add_action( 'added_term_relationship', $this, 'reject_invalid_inventory_terms', 10, 3 );
 
 		// Allow public inventory item query vars.
-		$loader->add_filter( 'query_vars', $this, 'whitelist_search_query_vars' );
+		$loader->add_filter( 'query_vars', $this, 'allow_search_query_vars' );
 
 		// Support inventory item querystrings in WP_Query.
 		$loader->add_action( 'parse_tax_query', $this, 'parse_query_vars' );
@@ -666,13 +666,13 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 	}
 
 	/**
-	 * Whitelist inventory item query vars.
+	 * Allow inventory item query vars.
 	 *
 	 * This allows inventory items to be queried publicly.
 	 *
 	 * @param string[] $public_query_vars Array of public query vars.
 	 */
-	public function whitelist_search_query_vars( $public_query_vars ) {
+	public function allow_search_query_vars( $public_query_vars ) {
 		global $ssl_alp;
 
 		if ( ! get_option( 'ssl_alp_enable_inventory' ) ) {

@@ -22,13 +22,13 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 	 * @var array
 	 */
 	protected $overrideable_settings = array(
-		'default_pingback_flag' => null, // Attempt to notify other blogs.
-		'default_ping_status'   => 'closed', // Allow link notifications from other blogs.
-		'comment_registration'  => 1, // Require registration for comments.
-		'comment_whitelist'     => null, // Comment author must have a previously approved comment.
-		'comment_max_links'     => 0, // Hold comment in queue if it contains more than x links.
-		'blog_public'           => 0, // Disencourage search engine indexing.
-		'rss_use_excerpt'       => 0, // Show full text in RSS feeds.
+		'default_pingback_flag'       => null,     // Attempt to notify other blogs.
+		'default_ping_status'         => 'closed', // Allow link notifications from other blogs.
+		'comment_registration'        => 1,        // Require registration for comments.
+		'comment_previously_approved' => null,     // Comment author must have a previously approved comment.
+		'comment_max_links'           => 0,        // Hold comment in queue if it contains more than x links.
+		'blog_public'                 => 0,        // Disencourage search engine indexing.
+		'rss_use_excerpt'             => 0,        // Show full text in RSS feeds.
 	);
 
 	/**
