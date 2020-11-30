@@ -85,10 +85,13 @@ class SSL_ALP_Coauthors_Widget extends WP_Widget {
 				);
 
 				// Set element to handle click events for.
-				wp_localize_script(
+				wp_add_inline_script(
 					'ssl-alp-user-widget-js',
-					'ssl_alp_dropdown_id',
-					esc_js( $dropdown_id )
+					sprintf(
+						'var ssl_alp_dropdown_id = "%1$s";',
+						esc_js( $dropdown_id )
+					),
+					'before'
 				);
 
 				// Enclose dropdown in a form so we can handle redirect to user page.
