@@ -1,8 +1,8 @@
 === Academic Labbook ===
 Contributors: seanleavey
 Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
-Requires at least: 5.5.0
-Tested up to: 5.5.1
+Requires at least: 5.6.0
+Tested up to: 5.6.0
 Requires PHP: 7.0.0
 Stable tag: 0.21.0
 License: GNU General Public License v3 or later
@@ -78,6 +78,12 @@ with maximum control. Please see [this guide](https://alp.attackllama.com/docume
 on the ALP website.
 
 == Changelog ==
+
+= develop =
+ - Set default image and gallery image links in the block editor to the
+   corresponding files now that this is [finally supported](https://github.com/WordPress/gutenberg/pull/25578).
+   Note that this feature only becomes visible with WordPress 5.6.
+ - Change use of wp_localize_script to wp_add_inline_script.
 
 = 0.21.0 =
  - WordPress 5.5 now required.

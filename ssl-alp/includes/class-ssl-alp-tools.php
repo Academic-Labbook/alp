@@ -29,6 +29,7 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 		'comment_max_links'           => 0,        // Hold comment in queue if it contains more than x links.
 		'blog_public'                 => 0,        // Disencourage search engine indexing.
 		'rss_use_excerpt'             => 0,        // Show full text in RSS feeds.
+		'image_default_link_type'     => 'file',   // Link images and gallery images to corresponding files by default.
 	);
 
 	/**

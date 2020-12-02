@@ -177,6 +177,13 @@
 						</th>
 						<td><?php esc_html_e( 'Yes', 'ssl-alp' ); ?></td>
 					</tr>
+					<tr>
+						<th>
+							<strong><?php esc_html_e( 'Link to image files by default in the block editor', 'ssl-alp' ); ?></strong>
+							<p class="description"><?php esc_html_e( 'This overrides the default (empty) link in images and galleries to link to corresponding files. The link can still be manually altered by the user.', 'ssl-alp' ); ?></p>
+						</th>
+						<td><?php esc_html_e( 'Yes', 'ssl-alp' ); ?></td>
+					</tr>
 				</tbody>
 			</table>
 			<form method="post" action="">
