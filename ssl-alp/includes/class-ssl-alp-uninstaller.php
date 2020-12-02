@@ -122,7 +122,7 @@ class SSL_ALP_Uninstaller {
 	private static function delete_options() {
 		// Delete site options.
 		delete_option( 'ssl_alp_require_login' );
-		delete_option( 'ssl_alp_enable_applications' );
+		delete_option( 'ssl_alp_allow_application_password_feed_access' );
 		delete_option( 'ssl_alp_disallow_public_advanced_search' );
 		delete_option( 'ssl_alp_enable_inventory' );
 		delete_option( 'ssl_alp_allow_multiple_authors' );
@@ -132,6 +132,9 @@ class SSL_ALP_Uninstaller {
 		delete_option( 'ssl_alp_enable_edit_summaries' );
 		delete_option( 'ssl_alp_flag_unread_posts' );
 		delete_option( 'ssl_alp_enable_tex' );
+
+		// Delete deprecated site options.
+		delete_option( 'ssl_alp_enable_applications' );  // Since 0.22.0.
 
 		// Delete network options.
 		delete_site_option( 'ssl_alp_additional_media_types' );

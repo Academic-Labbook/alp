@@ -79,7 +79,13 @@ on the ALP website.
 
 == Changelog ==
 
-= develop =
+= 0.22.0 =
+ - WordPress 5.6 now required.
+ - Removed application passwords feature provided by ALP in favour of new core
+   application passwords feature. Users using application passwords will now
+   have to regenerate them going to their own user page in the admin area. Note
+   that this removal was planned as listed in the "Development plans in the
+   context of WordPress upgrades" section of the project README file.
  - Set default image and gallery image links in the block editor to the
    corresponding files now that this is [finally supported](https://github.com/WordPress/gutenberg/pull/25578).
    Note that this feature only becomes visible with WordPress 5.6.

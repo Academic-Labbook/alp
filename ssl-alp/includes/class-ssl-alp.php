@@ -115,7 +115,6 @@ class SSL_ALP {
 		 */
 
 		require_once SSL_ALP_BASE_DIR . 'includes/class-ssl-alp-authenticate.php';
-		require_once SSL_ALP_BASE_DIR . 'includes/class-ssl-alp-authenticate-applications-list-table.php';
 
 		$this->auth = new SSL_ALP_Authenticate( $this );
 
