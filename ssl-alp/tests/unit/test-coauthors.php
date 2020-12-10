@@ -28,7 +28,7 @@ class CoauthorsTest extends WP_UnitTestCase {
         $terms = array();
 
         foreach ( $coauthors as $coauthor ) {
-            $terms[] = intval( $ssl_alp->coauthors->get_coauthor_term( $coauthor )->term_id );
+            $terms[] = (int) $ssl_alp->coauthors->get_coauthor_term( $coauthor )->term_id;
         }
 
         // cannot set taxonomy before post creation

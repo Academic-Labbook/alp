@@ -61,9 +61,9 @@ class SSL_ALP_Coauthors_Widget extends WP_Widget {
 
 		// Get users with non-zero post counts. This matches the behaviour of wp_list_authors.
 		foreach ( (array) $users as $id => $user ) {
-			$post_count = $ssl_alp->coauthors->get_user_post_count( $user );
+			$post_count = (int) $ssl_alp->coauthors->get_user_post_count( $user );
 
-			if ( is_null( $post_count ) || 0 === intval( $post_count ) ) {
+			if ( is_null( $post_count ) || 0 === $post_count ) {
 				// Remove user from list.
 				unset( $users[ $id ] );
 			} else {
