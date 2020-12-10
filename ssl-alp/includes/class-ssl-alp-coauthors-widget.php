@@ -94,9 +94,6 @@ class SSL_ALP_Coauthors_Widget extends WP_Widget {
 					'before'
 				);
 
-				// Enclose dropdown in a form so we can handle redirect to user page.
-				printf( '<form action="%s" method="get">', esc_url( home_url() ) );
-
 				// Make select name 'author' so the form redirects to the selected user page.
 				printf( '<select name="author" id="%s">\n', esc_html( $dropdown_id ) );
 
@@ -108,7 +105,7 @@ class SSL_ALP_Coauthors_Widget extends WP_Widget {
 				foreach ( (array) $users as $user ) {
 					printf(
 						'<option value="%1$s">',
-						esc_attr( $user->ID )
+						esc_url( get_author_posts_url( $user->ID, $user->user_nicename ) )
 					);
 
 					printf(
@@ -122,7 +119,6 @@ class SSL_ALP_Coauthors_Widget extends WP_Widget {
 				}
 
 				echo '</select>';
-				echo '</form>';
 			} else {
 				echo '<ul>';
 
@@ -131,7 +127,7 @@ class SSL_ALP_Coauthors_Widget extends WP_Widget {
 
 					$link = sprintf(
 						'<a href="%1$s" title="%2$s">%3$s</a>',
-						get_author_posts_url( $user->ID, $user->user_nicename ),
+						esc_url( get_author_posts_url( $user->ID, $user->user_nicename ) ),
 						/* translators: %s: author's display name */
 						esc_attr( sprintf( __( 'Posts by %s', 'ssl-alp' ), $user->display_name ) ),
 						esc_html( $user->display_name )
