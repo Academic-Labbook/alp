@@ -49,6 +49,6 @@ script:
   - |
     if [[ ! -z "$WP_VERSION" ]] ; then
       cd ssl-alp
-      vendor/bin/phpunit
-      WP_MULTISITE=1 vendor/bin/phpunit
+      vendor/phpunit/phpunit/phpunit
+      WP_MULTISITE=1 vendor/phpunit/phpunit/phpunit
     fi
