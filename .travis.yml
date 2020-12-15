@@ -1,6 +1,6 @@
 os: linux
 
-dist: trusty
+dist: bionic
 
 language: php
 
@@ -36,7 +36,7 @@ before_script:
   - |
     if [[ ! -z "$WP_VERSION" ]] ; then
       bash ssl-alp/bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
-      composer global require "phpunit/phpunit=7.*"
+      composer require "phpunit/phpunit=7.*"
     fi
 
 script:
