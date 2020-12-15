@@ -9,11 +9,6 @@ notifications:
     on_success: never
     on_failure: change
 
-cache:
-  directories:
-    - vendor
-    - $HOME/.composer/cache
-
 jobs:
   include:
     - php: nightly
@@ -32,10 +27,6 @@ jobs:
     - php: nightly
 
 before_script:
-  - export PATH="$PATH:$HOME/.config/composer/vendor/bin:$HOME/.composer/vendor/bin"
-  - ls $HOME/.config/composer
-  - ls $HOME/.config/composer/vendor
-  - ls $HOME/.config/composer/vendor/bin
   - |
     if [ -f ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini ]; then
       phpenv config-rm xdebug.ini
