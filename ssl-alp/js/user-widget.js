@@ -1,14 +1,15 @@
 (function( $ ) {
 	'use strict';
 
-    var dropdown = document.getElementById( ssl_alp_dropdown_id );
-    
+    var $dropdown = document.getElementById( ssl_alp_dropdown_id );
+
 	function onCatChange() {
-		if ( dropdown.options[ dropdown.selectedIndex ].value > 0 ) {
-            dropdown.parentNode.submit();
+        let url = $dropdown.options[ $dropdown.selectedIndex ].value;
+
+		if ( url ) {
+            window.location.href = url;
         }
     }
-    
-    dropdown.onchange = onCatChange;
-    
+
+    $dropdown.onchange = onCatChange;
 })( jQuery );

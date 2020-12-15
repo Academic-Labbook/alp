@@ -1,10 +1,10 @@
 === Academic Labbook ===
 Contributors: seanleavey
 Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
-Requires at least: 5.5.0
-Tested up to: 5.5.1
-Requires PHP: 7.0.0
-Stable tag: 0.21.0
+Requires at least: 5.6.0
+Tested up to: 5.6.0
+Requires PHP: 7.1.0
+Stable tag: 0.22.0
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -78,6 +78,24 @@ with maximum control. Please see [this guide](https://alp.attackllama.com/docume
 on the ALP website.
 
 == Changelog ==
+
+= 0.22.0 =
+ - WordPress 5.6 and PHP 7.1 now required.
+ - Removed application passwords feature provided by ALP in favour of new core
+   application passwords feature. Users using application passwords will now
+   have to regenerate them going to their own user page in the admin area. Note
+   that this removal was planned as listed in the "Development plans in the
+   context of WordPress upgrades" section of the project README file.
+ - Set default image and gallery image links in the block editor to the
+   corresponding files now that this is [finally supported](https://github.com/WordPress/gutenberg/pull/25578).
+   Note that this feature only becomes visible with WordPress 5.6.
+ - Change use of wp_localize_script to wp_add_inline_script.
+ - "Unread Posts" admin bar menu item is now only shown on the front end.
+ - PHP4 style int typecasts replaced with PHP5+ equivalents.
+ - Changed users widget to use URLs conforming to the site's current permalink
+   setting.
+ - Block editor social blocks re-blacklisted after upstream changes enabled
+   them.
 
 = 0.21.0 =
  - WordPress 5.5 now required.

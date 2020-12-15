@@ -64,10 +64,8 @@ certain users or with certain categories or tags, and search for posts with only
 of users, categories or tags.
 
 ### Privacy options
-ALP lets you force users to be logged in to view the site content. Public feeds are only then
-available using HTTP authentication and application passwords (see below). The REST API provided
-by WordPress is still accessible to logged-in users but only if they configure an application
-password see below).
+ALP lets you force users to be logged in to view the site content, keeping the contents private to
+outside users.
 
 Advanced search may be switched off for non-logged-in users to avoid computationally expensive
 searches.
@@ -192,7 +190,6 @@ Some changes of particular note are:
     [this](https://github.com/WordPress/gutenberg/issues/7115) and
     [this](https://github.com/WordPress/gutenberg/issues/6182)). The ALP table of contents block is
     auto-generated on page load, so it probably won't disrupt too much to use the new block instead.
-  - Application passwords [may eventually be made available in core](https://make.wordpress.org/core/2019/11/19/rest-api-chat-summary-november-14/).
 
 ## Credits
 This plugin was entirely authored by [Sean Leavey](https://attackllama.com/), but in some cases
@@ -235,14 +232,12 @@ Links: [WP-Post-Meta-Revisions](https://github.com/adamsilverstein/wp-post-meta-
 
 These plugins inspired parts of the design of ALP's edit summaries feature.
 
-### Authenticator and Application Passwords
-Authors: Inpsyde GmbH, George Stephanis
+### Authenticator
+Authors: Inpsyde GmbH
 
-Links: [Authenticator](https://wordpress.org/plugins/authenticator/) and [Application Passwords](https://wordpress.org/plugins/application-passwords/)
+Link: [Authenticator](https://wordpress.org/plugins/authenticator/)
 
 The core authentication code of Authenticator has been the basis for ALP's private site feature.
-Parts of Application Passwords have been adapted for REST authentication, but expanded to
-authenticate feeds and admin AJAX calls, and the admin interface has been completely replaced.
 
 ### Term Management Tools
 Author: Cristi Burcă

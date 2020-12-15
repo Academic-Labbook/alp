@@ -1784,7 +1784,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		$counts = array();
 
 		foreach ( $user_ids as $user_id ) {
-			$counts[ $user_id ] = $this->get_user_post_count( intval( $user_id ) );
+			$counts[ $user_id ] = $this->get_user_post_count( (int) $user_id );
 		}
 
 		return $counts;

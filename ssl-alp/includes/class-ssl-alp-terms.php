@@ -65,10 +65,13 @@ class SSL_ALP_Terms extends SSL_ALP_Module {
 		if ( $this->editing_terms && $this->user_can_manage_terms() ) {
 			wp_enqueue_script( 'ssl-alp-term-management-tools' );
 
-			wp_localize_script(
+			wp_add_inline_script(
 				'ssl-alp-term-management-tools',
-				'ssl_alp_term_management_actions',
-				$this->get_actions( $taxonomy )
+				sprintf(
+					'var ssl_alp_term_management_actions = %1$s;',
+					wp_json_encode( $this->get_actions( $taxonomy ) )
+				),
+				'before'
 			);
 		}
 	}

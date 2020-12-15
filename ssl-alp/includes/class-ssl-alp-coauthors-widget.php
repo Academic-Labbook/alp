@@ -61,9 +61,9 @@ class SSL_ALP_Coauthors_Widget extends WP_Widget {
 
 		// Get users with non-zero post counts. This matches the behaviour of wp_list_authors.
 		foreach ( (array) $users as $id => $user ) {
-			$post_count = $ssl_alp->coauthors->get_user_post_count( $user );
+			$post_count = (int) $ssl_alp->coauthors->get_user_post_count( $user );
 
-			if ( is_null( $post_count ) || 0 === intval( $post_count ) ) {
+			if ( is_null( $post_count ) || 0 === $post_count ) {
 				// Remove user from list.
 				unset( $users[ $id ] );
 			} else {
@@ -85,14 +85,14 @@ class SSL_ALP_Coauthors_Widget extends WP_Widget {
 				);
 
 				// Set element to handle click events for.
-				wp_localize_script(
+				wp_add_inline_script(
 					'ssl-alp-user-widget-js',
-					'ssl_alp_dropdown_id',
-					esc_js( $dropdown_id )
+					sprintf(
+						'var ssl_alp_dropdown_id = "%1$s";',
+						esc_js( $dropdown_id )
+					),
+					'before'
 				);
-
-				// Enclose dropdown in a form so we can handle redirect to user page.
-				printf( '<form action="%s" method="get">', esc_url( home_url() ) );
 
 				// Make select name 'author' so the form redirects to the selected user page.
 				printf( '<select name="author" id="%s">\n', esc_html( $dropdown_id ) );
@@ -105,7 +105,7 @@ class SSL_ALP_Coauthors_Widget extends WP_Widget {
 				foreach ( (array) $users as $user ) {
 					printf(
 						'<option value="%1$s">',
-						esc_attr( $user->ID )
+						esc_url( get_author_posts_url( $user->ID, $user->user_nicename ) )
 					);
 
 					printf(
@@ -119,7 +119,6 @@ class SSL_ALP_Coauthors_Widget extends WP_Widget {
 				}
 
 				echo '</select>';
-				echo '</form>';
 			} else {
 				echo '<ul>';
 
@@ -128,7 +127,7 @@ class SSL_ALP_Coauthors_Widget extends WP_Widget {
 
 					$link = sprintf(
 						'<a href="%1$s" title="%2$s">%3$s</a>',
-						get_author_posts_url( $user->ID, $user->user_nicename ),
+						esc_url( get_author_posts_url( $user->ID, $user->user_nicename ) ),
 						/* translators: %s: author's display name */
 						esc_attr( sprintf( __( 'Posts by %s', 'ssl-alp' ), $user->display_name ) ),
 						esc_html( $user->display_name )

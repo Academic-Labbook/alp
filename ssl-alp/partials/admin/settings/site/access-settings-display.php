@@ -14,15 +14,18 @@
 	</p>
 </label>
 <br/>
-<label for="ssl_alp_enable_applications_checkbox">
-	<input type="checkbox" name="ssl_alp_enable_applications" id="ssl_alp_enable_applications_checkbox" value="1" <?php checked( get_option( 'ssl_alp_enable_applications' ) ); ?> />
-	<?php esc_html_e( 'Enable application passwords', 'ssl-alp' ); ?>
+<label for="ssl_alp_allow_application_password_feed_access_checkbox">
+	<input type="checkbox" name="ssl_alp_allow_application_password_feed_access" id="ssl_alp_allow_application_password_feed_access_checkbox" value="1" <?php checked( get_option( 'ssl_alp_allow_application_password_feed_access' ) ); ?> />
+	<?php esc_html_e( 'Enable feed access using application passwords', 'ssl-alp' ); ?>
 	<p class="description">
 	<?php
 	echo wp_kses_post(
 		sprintf(
 			/* translators: WordPress documentation URL */
-			__( 'Allow users to generate application passwords to allow external programs to access the site using their account without using their main password. This can be used by users to allow feed readers to access the site\'s feeds when the "Require login to access site" setting is on. It also allows external programs to access the <a href="%s">REST API</a>. This setting does not change user permissions in any way, and application passwords cannot be used to log in to the site.', 'ssl-alp' ),
+			__(
+				'Normally application passwords only allow access to the <a href="%s">REST API</a>. Enabling this option will allow users to access the RSS feeds using application passwords specified using HTTP basic authentication, allowing them to use such passwords with external feed reader programs and services even if the "Require login to access site" setting is enabled above.',
+				'ssl-alp'
+			),
 			'https://developer.wordpress.org/rest-api/'
 		)
 	);

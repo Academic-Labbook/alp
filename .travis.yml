@@ -9,11 +9,6 @@ notifications:
     on_success: never
     on_failure: change
 
-cache:
-  directories:
-    - vendor
-    - $HOME/.composer/cache
-
 jobs:
   include:
     - php: nightly
@@ -26,13 +21,12 @@ jobs:
       env: WP_VERSION=latest
     - php: 7.1
       env: WP_VERSION=latest
-    - php: 7.0
-      env: WP_VERSION=latest
   allow_failures:
     - php: nightly
 
 before_script:
-  - export PATH="$HOME/.composer/vendor/bin:$PATH"
+  - composer install
+  - ./vendor/bin/phpunit --version
   - |
     if [ -f ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini ]; then
       phpenv config-rm xdebug.ini
@@ -42,25 +36,12 @@ before_script:
   - |
     if [[ ! -z "$WP_VERSION" ]] ; then
       bash ssl-alp/bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
-      case "$TRAVIS_PHP_VERSION" in
-        7.4|7.3|7.2|7.1|7.0|nightly)
-          echo "Using PHPUnit 6.x"
-          composer global require "phpunit/phpunit:^6"
-          ;;
-        5.6|5.5|5.4|5.3)
-          echo "Using PHPUnit 5.x"
-          composer global require "phpunit/phpunit:^5"
-          ;;
-        *)
-          echo "No PHPUnit version handling for PHP version $TRAVIS_PHP_VERSION"
-          exit 1
-          ;;
-      esac
     fi
+
 script:
   - |
     if [[ ! -z "$WP_VERSION" ]] ; then
       cd ssl-alp
-      phpunit
-      WP_MULTISITE=1 phpunit
+      ../vendor/bin/phpunit
+      WP_MULTISITE=1 ../vendor/bin/phpunit
     fi

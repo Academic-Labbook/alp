@@ -1,0 +1,10 @@
+{
+	"name": "ssl/alp",
+	"type": "wordpress-plugin",
+	"license": "GPL-2.0-or-later",
+    "description": "Academic Labbook Plugin",
+	"homepage": "https://alp.attackllama.com",
+	"require-dev": {
+		"phpunit/phpunit": "^7"
+	}
+}
