@@ -4,7 +4,7 @@ Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
 Requires at least: 5.6.0
 Tested up to: 5.6.0
 Requires PHP: 7.1.0
-Stable tag: 0.21.0
+Stable tag: 0.22.0
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -90,6 +90,12 @@ on the ALP website.
    corresponding files now that this is [finally supported](https://github.com/WordPress/gutenberg/pull/25578).
    Note that this feature only becomes visible with WordPress 5.6.
  - Change use of wp_localize_script to wp_add_inline_script.
+ - "Unread Posts" admin bar menu item is now only shown on the front end.
+ - PHP4 style int typecasts replaced with PHP5+ equivalents.
+ - Changed users widget to use URLs conforming to the site's current permalink
+   setting.
+ - Block editor social blocks re-blacklisted after upstream changes enabled
+   them.
 
 = 0.21.0 =
  - WordPress 5.5 now required.
