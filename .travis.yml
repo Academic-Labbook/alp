@@ -32,7 +32,7 @@ jobs:
     - php: nightly
 
 before_script:
-  - export PATH="$HOME/.composer/vendor/bin:$PATH"
+  - export PATH="$PATH:$HOME/.config/composer/vendor/bin:$HOME/.composer/vendor/bin"
   - |
     if [ -f ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini ]; then
       phpenv config-rm xdebug.ini
@@ -49,6 +49,6 @@ script:
   - |
     if [[ ! -z "$WP_VERSION" ]] ; then
       cd ssl-alp
-      $HOME/.composer/vendor/bin/phpunit
-      WP_MULTISITE=1 $HOME/.composer/vendor/bin/phpunit
+      phpunit
+      WP_MULTISITE=1 phpunit
     fi
