@@ -33,10 +33,6 @@ jobs:
 
 before_script:
   - export PATH="$PATH:$HOME/.config/composer/vendor/bin:$HOME/.composer/vendor/bin"
-  - ls $HOME
-  - ls $HOME/.composer
-  - ls $HOME/.composer/vendor
-  - ls $HOME/.composer/vendor/bin
   - ls $HOME/.config/composer
   - ls $HOME/.config/composer/vendor
   - ls $HOME/.config/composer/vendor/bin
