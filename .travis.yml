@@ -21,8 +21,6 @@ jobs:
       env: WP_VERSION=latest
     - php: 7.1
       env: WP_VERSION=latest
-    - php: 7.0
-      env: WP_VERSION=latest
   allow_failures:
     - php: nightly
 

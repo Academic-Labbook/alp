@@ -3,7 +3,7 @@ Contributors: seanleavey
 Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
 Requires at least: 5.6.0
 Tested up to: 5.6.0
-Requires PHP: 7.0.0
+Requires PHP: 7.1.0
 Stable tag: 0.21.0
 License: GNU General Public License v3 or later
 License URI: LICENCE
@@ -80,7 +80,7 @@ on the ALP website.
 == Changelog ==
 
 = 0.22.0 =
- - WordPress 5.6 now required.
+ - WordPress 5.6 and PHP 7.1 now required.
  - Removed application passwords feature provided by ALP in favour of new core
    application passwords feature. Users using application passwords will now
    have to regenerate them going to their own user page in the admin area. Note
