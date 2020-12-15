@@ -18,8 +18,6 @@ jobs:
   include:
     - php: nightly
       env: WP_VERSION=latest
-    - php: 8.0
-      env: WP_VERSION=latest
     - php: 7.4
       env: WP_VERSION=latest
     - php: 7.3
@@ -50,6 +48,7 @@ before_script:
 script:
   - |
     if [[ ! -z "$WP_VERSION" ]] ; then
+      cd ssl-alp
       phpunit
       WP_MULTISITE=1 phpunit
     fi
