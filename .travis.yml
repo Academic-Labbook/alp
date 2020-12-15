@@ -28,6 +28,7 @@ jobs:
 
 before_script:
   - composer install
+  - ./vendor/bin/phpunit --version
   - |
     if [ -f ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini ]; then
       phpenv config-rm xdebug.ini
@@ -43,6 +44,6 @@ script:
   - |
     if [[ ! -z "$WP_VERSION" ]] ; then
       cd ssl-alp
-      phpunit
-      WP_MULTISITE=1 phpunit
+      ../vendor/bin/phpunit
+      WP_MULTISITE=1 ../vendor/bin/phpunit
     fi
