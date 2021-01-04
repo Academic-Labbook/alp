@@ -130,8 +130,8 @@ high priority.
 ## Requirements
 
 ### WordPress
-WordPress 5.1.0 or newer is required. ALP adds a block to and extends the sidebar of the new editor
-provided in WordPress 5.
+An up-to-date version of WordPress is required. The exact requirement is listed in `README.txt` in
+the plugin directory.
 
 It is desirable, but not required, to use WordPress in [multisite](https://codex.wordpress.org/Create_A_Network)
 mode. This exposes additional options to network administrators to control upload media (MIME) types
@@ -190,6 +190,39 @@ Some changes of particular note are:
     [this](https://github.com/WordPress/gutenberg/issues/7115) and
     [this](https://github.com/WordPress/gutenberg/issues/6182)). The ALP table of contents block is
     auto-generated on page load, so it probably won't disrupt too much to use the new block instead.
+
+## Development
+The development environment can be configured using [`npm`](https://www.npmjs.com/get-npm):
+
+```bash
+cd /path/to/alp/repository
+npm install
+```
+
+This installs
+[`wp-env`](https://developer.wordpress.org/block-editor/packages/packages-env/), which manages a
+local Docker-based WordPress instance with ALP preinstalled. Changes made to repository code are
+reflected immediately in the running instance.
+
+The environment can be configured using `.wp-env.json` or by creating a local
+`.wp-env.override.json` file in the root directory, then it can be started with:
+
+```bash
+npx wp-env start
+```
+
+Once started, the site will be available at `http://localhost:8888/`. The default credentials are
+`admin` and `password`.
+
+The environment can be stopped with:
+
+```bash
+npx wp-env stop
+```
+
+Refer to the [`wp-env`
+documentation](https://developer.wordpress.org/block-editor/packages/packages-env/) for more
+information.
 
 ## Credits
 This plugin was entirely authored by [Sean Leavey](https://attackllama.com/), but in some cases
