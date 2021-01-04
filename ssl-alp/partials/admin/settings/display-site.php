@@ -21,8 +21,8 @@
 	<?php endif; ?>
 	<div>
 		<form method="post" action="options.php">
-			<?php settings_fields( 'ssl-alp-admin-options' ); ?>
-			<?php do_settings_sections( 'ssl-alp-admin-options' ); ?>
+			<?php settings_fields( SSL_ALP_SITE_SETTINGS_PAGE ); ?>
+			<?php do_settings_sections( SSL_ALP_SITE_SETTINGS_PAGE ); ?>
 			<?php submit_button( esc_html__( 'Save Changes' ) ); ?>
 		</form>
 	</div>
