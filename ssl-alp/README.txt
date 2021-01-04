@@ -4,7 +4,7 @@ Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
 Requires at least: 5.6.0
 Tested up to: 5.6.0
 Requires PHP: 7.1.0
-Stable tag: 0.22.0
+Stable tag: 0.22.1
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -78,6 +78,10 @@ with maximum control. Please see [this guide](https://alp.attackllama.com/docume
 on the ALP website.
 
 == Changelog ==
+
+= 0.22.1 =
+ - Move `image_default_link_type` setting from private site optimisation tool
+   to a separate entry on the settings page.
 
 = 0.22.0 =
  - WordPress 5.6 and PHP 7.1 now required.
