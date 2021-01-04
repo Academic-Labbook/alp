@@ -168,7 +168,7 @@ class SSL_ALP_Authenticate extends SSL_ALP_Module {
 		// Redirect to login or show an error to unauthenticated users.
 		if ( ! is_user_logged_in() ) {
 			$this->redirect_to_login();
-		} else if ( ! current_user_can( 'read' ) ) {
+		} elseif ( ! current_user_can( 'read' ) ) {
 			$this->show_no_permission();
 		}
 	}
@@ -288,9 +288,9 @@ class SSL_ALP_Authenticate extends SSL_ALP_Module {
 	 * Show a no permission error.
 	 */
 	private function show_no_permission() {
-		// Handles various cases depending on request type (HTML, XML, JSON, etc.)
+		// Handles various cases depending on request type (HTML, XML, JSON, etc.).
 		wp_die(
-			__( 'You need a higher level of permission.', 'ssl-alp' ),
+			esc_html__( 'You need a higher level of permission.', 'ssl-alp' ),
 			403
 		);
 	}

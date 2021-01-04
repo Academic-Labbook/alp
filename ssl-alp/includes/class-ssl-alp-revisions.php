@@ -457,11 +457,11 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 						'required'          => true,
 						'validate_callback' => array( $this, 'validate_rest_update_revision_meta_post_id' ),
 					),
-					'key'    => array(
+					'key'     => array(
 						'required'          => true,
 						'validate_callback' => array( $this, 'validate_rest_update_revision_meta_key' ),
 					),
-					'value'  => array(
+					'value'   => array(
 						'required'          => true,
 						'sanitize_callback' => array( $this, 'sanitize_edit_summary' ),
 					),
@@ -950,10 +950,16 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 			$offset    = 0;
 			$posts     = array();
 			$last_post = null;
+
 			// Array of user IDs and the post IDs they've edited contained in the $posts array.
 			$user_post_revisions = array();
 
-			while ( count( $posts ) < $number ) {
+			while ( true ) {
+				if ( count( $posts ) >= $number ) {
+					// We've found the required number of posts.
+					break;
+				}
+
 				if ( ++$iter > $maxiter ) {
 					// Maximum iterations reached without finding $number posts. Proceed with what
 					// we have.
@@ -1232,7 +1238,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	/**
 	 * Add link to unread posts page in admin bar.
 	 *
-	 * @param WP_Admin_Bar $wp_admin_bar The admin bar.
+	 * @param WP_Admin_Bar $admin_bar The admin bar.
 	 */
 	public function add_unread_posts_admin_bar_link( $admin_bar ) {
 		// Don't add the unread posts link if there is no admin bar or we're not
@@ -1484,7 +1490,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 	 *
 	 * @param WP_Post $post Post ID or post object. Defaults to global $post.
 	 * @return boolean|null Whether revisions are enabled, or null if the
-	 * 						edit summary system is disabled or the post type
+	 *                      edit summary system is disabled or the post type
 	 *                      is not found.
 	 */
 	public function revisions_hidden( $post ) {
@@ -1988,7 +1994,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 						'ssl_alp'
 					)
 				),
-				$count
+				esc_html( $count )
 			);
 
 			echo '</p></div>';
@@ -2007,7 +2013,7 @@ class SSL_ALP_Revisions extends SSL_ALP_Module {
 						'ssl_alp'
 					)
 				),
-				number_format_i18n( $count )
+				esc_html( number_format_i18n( $count ) )
 			);
 
 			echo '</p></div>';

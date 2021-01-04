@@ -333,9 +333,9 @@ class SSL_ALP_Uninstaller {
 					SELECT post_id
 					FROM $wpdb->posts
 					WHERE post_type = %s
-					"
-				),
-				$post_type
+					",
+					$post_type
+				)
 			);
 
 			foreach ( $post_ids as $post_id ) {

@@ -180,10 +180,16 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/author-settings-display.php';
 	}
 
+	/**
+	 * Enable the disallow insert term filter.
+	 */
 	public function enable_disallow_insert_term_filter() {
 		add_filter( 'pre_insert_term', array( $this, 'disallow_insert_term' ), 10, 2 );
 	}
 
+	/**
+	 * Disable the disallow insert term filter.
+	 */
 	public function disable_disallow_insert_term_filter() {
 		remove_filter( 'pre_insert_term', array( $this, 'disallow_insert_term' ), 10, 2 );
 	}
@@ -216,11 +222,11 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 				// Default arguments used by `wp_get_object_terms`, see https://core.trac.wordpress.org/ticket/40496.
 				'orderby' => 'term_order',
 			),
-			'capabilities' => array(
-				'manage_terms'  =>   'do_not_allow',
-				'edit_terms'    =>   'do_not_allow',
-				'delete_terms'  =>   'do_not_allow',
-				'assign_terms'  =>   'edit_posts', // Needed to allow assignment in block editor.
+			'capabilities'          => array(
+				'manage_terms' => 'do_not_allow',
+				'edit_terms'   => 'do_not_allow',
+				'delete_terms' => 'do_not_allow',
+				'assign_terms' => 'edit_posts', // Needed to allow assignment in block editor.
 			),
 			'show_ui'               => true,  // Show selector on edit page.
 			'show_in_menu'          => false, // Hide term edit page.
@@ -457,7 +463,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		foreach ( array_keys( get_blogs_of_user( $user->ID ) ) as $blog_id ) {
 			switch_to_blog( $blog_id );
 
-			if ( in_array( SSL_ALP_PLUGIN_PATH, (array) get_blog_option( $blog_id, 'active_plugins', array() ) ) ) {
+			if ( in_array( SSL_ALP_PLUGIN_PATH, (array) get_blog_option( $blog_id, 'active_plugins', array() ), true ) ) {
 				// ALP is active on this blog.
 				$this->add_coauthor_term( $user );
 			}
@@ -480,7 +486,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 		}
 
 		// Allow unlimited execution time.
-		ini_set( 'max_execution_time', 0 );
+		set_time_limit( 0 );
 
 		// Remove terms that no longer map to existing users (for example, if they were deleted
 		// while ALP was disabled).
@@ -948,7 +954,7 @@ class SSL_ALP_Coauthors extends SSL_ALP_Module {
 			$query              = $wp_query->tax_query->queried_terms[ $matched_taxonomy ];
 
 			if ( ! empty( $query['terms'] ) ) {
-				if ( 'term_id' == $query['field'] ) {
+				if ( 'term_id' === $query['field'] ) {
 					$term = get_term( reset( $query['terms'] ), $matched_taxonomy );
 				} else {
 					$term = get_term_by( $query['field'], reset( $query['terms'] ), $matched_taxonomy );

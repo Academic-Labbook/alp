@@ -36,6 +36,7 @@ class SSL_ALP_Revisions_List_Table extends WP_List_Table {
 	 * Constructor.
 	 *
 	 * @param string $post_type Post type to show revisions for.
+	 * @param string $menu_slug The menu slug to use.
 	 */
 	public function __construct( $post_type, $menu_slug ) {
 		parent::__construct(

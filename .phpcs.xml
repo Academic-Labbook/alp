@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<ruleset>
+    <description>The coding standard for Academic Labbook Plugin.</description>
+    <!-- Set the minimum PHP version to test against -->
+    <config name="testVersion" value="7.1-"/>
+
+    <!-- Include WordPress standards-->
+    <rule ref="WordPress"/>
+
+    <!-- Include PHPCompatibility WordPress standards-->
+    <rule ref="PHPCompatibility"/>
+    <rule ref="PHPCompatibilityWP"/>
+
+</ruleset>

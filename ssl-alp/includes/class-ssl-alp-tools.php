@@ -153,8 +153,8 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 		 */
 
 		// Check if user has permission. We allow only admins on single sites and super admins on
-		// network sites to change roles.
-		// https://wordpress.org/support/article/roles-and-capabilities/#additional-admin-capabilities
+		// network sites to change roles. See
+		// https://wordpress.org/support/article/roles-and-capabilities/#additional-admin-capabilities.
 		$user_can_convert_roles = current_user_can( 'edit_users' );
 
 		// Check if user roles can be changed.
@@ -195,8 +195,8 @@ class SSL_ALP_Tools extends SSL_ALP_Module {
 		 */
 
 		// Check if user has permission. We allow only admins on single sites and super admins on
-		// network sites to change roles.
-		// https://wordpress.org/support/article/roles-and-capabilities/#additional-admin-capabilities
+		// network sites to change roles. See
+		// https://wordpress.org/support/article/roles-and-capabilities/#additional-admin-capabilities.
 		$can_rebuild = current_user_can( 'edit_users' );
 
 		/**
