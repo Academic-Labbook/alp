@@ -192,7 +192,18 @@ Some changes of particular note are:
     auto-generated on page load, so it probably won't disrupt too much to use the new block instead.
 
 ## Development
-The development environment can be configured using [`npm`](https://www.npmjs.com/get-npm):
+
+### Dependencies
+[Composer](https://getcomposer.org/) should be installed. Run `composer install`
+in the root directory to install the development dependencies.
+
+### IDE tools
+Settings are included for Visual Studio Code. The [PHP
+Sniffer](https://github.com/wongjn/vscode-php-sniffer) extension, if installed, will also make use
+of the coding standards defined in `.phpcs.xml`.
+
+### Local WordPress development server
+A development server can be configured using [`npm`](https://www.npmjs.com/get-npm):
 
 ```bash
 cd /path/to/alp/repository
