@@ -381,14 +381,14 @@ class SSL_ALP {
 			'ssl_alp_site_settings_section',
 			__( 'Site Settings', 'ssl-alp' ),
 			array( $this, 'site_settings_section_callback' ),
-			'ssl-alp-admin-options'
+			SSL_ALP_SITE_SETTINGS_PAGE
 		);
 
 		add_settings_section(
 			'ssl_alp_post_settings_section',
 			__( 'Post Settings', 'ssl-alp' ),
 			array( $this, 'post_settings_section_callback' ),
-			'ssl-alp-admin-options'
+			SSL_ALP_SITE_SETTINGS_PAGE
 		);
 
 		add_settings_section(

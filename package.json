@@ -1,0 +1,11 @@
+{
+	"name": "alp",
+	"private": true,
+	"dependencies": {},
+	"devDependencies": {
+		"@wordpress/env": "^2.1.0"
+	},
+	"scripts": {
+		"wp-env": "wp-env"
+	}
+}

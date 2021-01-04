@@ -114,9 +114,20 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 		 * Post meta settings field
 		 */
 		add_settings_field(
-			'ssl_alp_category_settings',
+			'ssl_alp_post_meta_settings',
 			__( 'Meta', 'ssl-alp' ),
 			array( $this, 'meta_settings_callback' ),
+			SSL_ALP_SITE_SETTINGS_PAGE,
+			'ssl_alp_post_settings_section'
+		);
+
+		/**
+		 * Default image link settings field
+		 */
+		add_settings_field(
+			'ssl_alp_default_image_link_settings',
+			__( 'Default image link', 'ssl-alp' ),
+			array( $this, 'default_image_link_settings_callback' ),
 			SSL_ALP_SITE_SETTINGS_PAGE,
 			'ssl_alp_post_settings_section'
 		);
@@ -125,7 +136,7 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 		 * Media types settings field
 		 */
 		add_settings_field(
-			'ssl_alp_category_settings',
+			'ssl_alp_media_types_settings',
 			__( 'Additional media types', 'ssl-alp' ),
 			array( $this, 'media_types_settings_callback' ),
 			SSL_ALP_NETWORK_SETTINGS_PAGE,
@@ -160,6 +171,9 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 
 		// Disable post trackbacks.
 		$loader->add_action( 'init', $this, 'disable_post_trackbacks' );
+
+		// Allow core `image_default_link_type` setting to be updated from plugin settings page.
+		$loader->add_filter( 'allowed_options', $this, 'allow_image_default_link_type_update' );
 	}
 
 	/**
@@ -190,6 +204,13 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 	 */
 	public function meta_settings_callback() {
 		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/meta-settings-display.php';
+	}
+
+	/**
+	 * Default image link settings partial.
+	 */
+	public function default_image_link_settings_callback() {
+		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/post/default-image-link-settings-display.php';
 	}
 
 	/**
@@ -493,5 +514,21 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 		}
 
 		remove_post_type_support( 'post', 'trackbacks' );
+	}
+
+	/**
+	 * Allow core `image_default_link_type` setting to be updated from the
+	 * plugin settings page.
+	 *
+	 * @global $option_page
+	 */
+	public function allow_image_default_link_type_update( $allowed_options ) {
+		global $option_page;
+
+		if ( SSL_ALP_SITE_SETTINGS_PAGE === $option_page ) {
+			$allowed_options[ SSL_ALP_SITE_SETTINGS_PAGE ][] = 'image_default_link_type';
+		}
+
+		return $allowed_options;
 	}
 }
