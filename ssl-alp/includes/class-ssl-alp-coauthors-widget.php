@@ -39,7 +39,7 @@ class SSL_ALP_Coauthors_Widget extends WP_Widget {
 		$title = ! empty( $instance['title'] ) ? $instance['title'] : esc_html__( 'Users' );
 
 		if ( ! empty( $title ) ) {
-			echo $args['before_title'] . apply_filters( 'widget_title', $title ) . $args['after_title'];
+			echo $args['before_title'] . esc_html( apply_filters( 'widget_title', $title ) ) . $args['after_title'];
 		}
 
 		// Show dropdown by default.

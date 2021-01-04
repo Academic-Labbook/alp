@@ -267,7 +267,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 		}
 
 		// Allow unlimited execution time.
-		ini_set( 'max_execution_time', 0 );
+		set_time_limit( 0 );
 
 		foreach ( array_keys( $this->supported_reference_post_types ) as $post_type ) {
 			$posts = get_posts(
@@ -293,7 +293,7 @@ class SSL_ALP_References extends SSL_ALP_Module {
 	 *
 	 * @param WP_Post $post Post ID or post object. Defaults to global $post.
 	 * @return boolean|null Whether cross-references are enabled, or null if the
-	 * 						cross-references system is disabled or the post type
+	 *                      cross-references system is disabled or the post type
 	 *                      is not found or not supported.
 	 */
 	public function crossreferences_hidden( $post ) {

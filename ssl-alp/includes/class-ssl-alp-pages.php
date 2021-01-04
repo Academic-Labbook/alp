@@ -45,8 +45,8 @@ class SSL_ALP_Pages extends SSL_ALP_Module {
 				'attributes'      => array(
 					'className' => array(
 						'type' => 'string',
-					)
-				)
+					),
+				),
 			)
 		);
 	}
@@ -121,7 +121,7 @@ class SSL_ALP_Pages extends SSL_ALP_Module {
 		$extra_classes = array( 'wp-block-ssl-alp-page-children' );
 
 		if ( array_key_exists( 'className', $attributes ) ) {
-			$classes = preg_split('/\s+/', $attributes['className'] );
+			$classes       = preg_split( '/\s+/', $attributes['className'] );
 			$extra_classes = array_merge( $extra_classes, $classes );
 		}
 

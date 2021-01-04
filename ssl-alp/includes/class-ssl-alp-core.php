@@ -49,7 +49,8 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 					// all blocks are registered by the time the script runs.
 					'wp-edit-post',
 				),
-				$this->get_version()
+				$this->get_version(),
+				false
 			);
 		}
 	}
@@ -405,7 +406,7 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 
 	/**
 	 * Handle when media type reported by PHP's finfo is different from the type inferred from the
-     * filename. This hook changes the media type reported by PHP to match the one defined by the
+	 * filename. This hook changes the media type reported by PHP to match the one defined by the
 	 * admin if the file extension is in the list of media types to allow uploads for.
 	 *
 	 * @param array  $fileinfo File data array (may be empty).
@@ -418,7 +419,7 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 			return $fileinfo;
 		}
 
-		$pieces = explode( '.' , $filename );
+		$pieces = explode( '.', $filename );
 		$ext    = strtolower( array_pop( $pieces ) );
 
 		$extra_media_types = $this->get_allowed_media_types();
@@ -520,6 +521,8 @@ class SSL_ALP_Core extends SSL_ALP_Module {
 	 * Allow core `image_default_link_type` setting to be updated from the
 	 * plugin settings page.
 	 *
+	 * @param array $allowed_options The allowed options for this option page.
+	 * @return array The updated allowed options.
 	 * @global $option_page
 	 */
 	public function allow_image_default_link_type_update( $allowed_options ) {

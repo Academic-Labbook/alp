@@ -191,7 +191,7 @@ class SSL_ALP_Terms extends SSL_ALP_Module {
 			$location = add_query_arg( 'post_type', $_REQUEST['post_type'], $location );
 		}
 
-		wp_redirect(
+		wp_safe_redirect(
 			add_query_arg(
 				'message',
 				$success ? 'ssl_alp_term_updated' : 'ssl_alp_term_error',
@@ -286,7 +286,10 @@ class SSL_ALP_Terms extends SSL_ALP_Module {
 		}
 
 		foreach ( array_keys( $this->get_actions( $taxonomy ) ) as $key ) {
-			echo "<div id='ssl-alp-term-management-action-$key' style='display:none'>\n";
+			echo sprintf(
+				'<div id="ssl-alp-term-management-action-%1$s" style="display:none">' . "\n",
+				esc_attr( $key )
+			);
 
 			call_user_func( array( $this, "input_{$key}" ), $taxonomy );
 

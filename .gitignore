@@ -3,3 +3,6 @@ node_modules/
 
 # wp-env local settings
 .wp-env.override.json
+
+# Composer
+vendor/

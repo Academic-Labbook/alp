@@ -123,18 +123,30 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 		require_once SSL_ALP_BASE_DIR . 'partials/admin/settings/site/inventory-settings-display.php';
 	}
 
+	/**
+	 * Enable override term link filter.
+	 */
 	public function enable_override_term_link() {
 		add_filter( 'term_link', array( $this, 'override_term_link' ), 10, 3 );
 	}
 
+	/**
+	 * Disable override term link filter.
+	 */
 	public function disable_override_term_link() {
 		remove_filter( 'term_link', array( $this, 'override_term_link' ), 10, 3 );
 	}
 
+	/**
+	 * Enable disallow insert term filter.
+	 */
 	public function enable_disallow_insert_term_filter() {
 		add_filter( 'pre_insert_term', array( $this, 'disallow_insert_term' ), 10, 2 );
 	}
 
+	/**
+	 * Disable disallow insert term filter.
+	 */
 	public function disable_disallow_insert_term_filter() {
 		remove_filter( 'pre_insert_term', array( $this, 'disallow_insert_term' ), 10, 2 );
 	}
@@ -475,11 +487,11 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 				'not_found'                  => __( 'No items found.', 'ssl-alp' ),
 				'no_terms'                   => __( 'No items', 'ssl-alp' ),
 			),
-			'capabilities' => array(
-				'manage_terms'  =>   'do_not_allow',
-				'edit_terms'    =>   'do_not_allow',
-				'delete_terms'  =>   'do_not_allow',
-				'assign_terms'  =>   'edit_posts', // Needed to allow assignment in block editor.
+			'capabilities'      => array(
+				'manage_terms' => 'do_not_allow',
+				'edit_terms'   => 'do_not_allow',
+				'delete_terms' => 'do_not_allow',
+				'assign_terms' => 'edit_posts', // Needed to allow assignment in block editor.
 			),
 			'public'            => true,
 			'show_in_menu'      => false, // Hide term edit page.
@@ -543,14 +555,14 @@ class SSL_ALP_Inventory extends SSL_ALP_Module {
 				esc_html( number_format_i18n( $term->count ) )
 			);
 		} else {
-			echo number_format_i18n( 0 );
+			echo esc_html( number_format_i18n( 0 ) );
 		}
 	}
 
 	/**
 	 * Override term links to point towards the inventory post page instead of the term archive.
 	 *
-	 * @param string $termlink Term link URL.
+	 * @param string $link     Term link URL.
 	 * @param object $term     Term object.
 	 * @param string $taxonomy Taxonomy slug.
 	 *
