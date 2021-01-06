@@ -228,7 +228,7 @@ class CrossReferencesTest extends WP_UnitTestCase {
 
 		$post = $this->factory->post->create_and_get(
 			array(
-				'post_content'	=>	'This contains an <a href="https://google.com/">external reference</a>.'
+				'post_content' => 'This contains an <a href="https://google.com/">external reference</a>.',
 			)
 		);
 
@@ -244,11 +244,11 @@ class CrossReferencesTest extends WP_UnitTestCase {
 
 		$invalid_post = $this->factory->post->create_and_get(
 			array(
-				'post_content'	=>	sprintf(
+				'post_content' => sprintf(
 					'Cross reference to <a href="%s">post 1</a>.',
 					get_permalink( $this->post_1 )
 				),
-				'post_type'     => 'invalid',
+				'post_type'    => 'invalid',
 			)
 		);
 

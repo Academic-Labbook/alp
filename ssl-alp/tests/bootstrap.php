@@ -22,6 +22,9 @@ function error_message( $message ) {
 // directory created by `composer install`.
 require_once dirname( __FILE__ ) . '/lib/autoload.php';
 
+// Set the test config path to the one provided by wp-env.
+//putenv( 'WP_PHPUNIT__TESTS_CONFIG=/var/www/html/phpunit-wp-config.php' );
+
 // Determine the tests directory (from a WP dev checkout).
 // Try the WP_TESTS_DIR environment variable first.
 $_tests_dir = getenv( 'WP_TESTS_DIR' );
