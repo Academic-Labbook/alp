@@ -235,6 +235,19 @@ Refer to the [`wp-env`
 documentation](https://developer.wordpress.org/block-editor/packages/packages-env/) for more
 information.
 
+#### Running tests
+Tests can be run with:
+
+```bash
+npx wp-env run phpunit 'phpunit -c /var/www/html/wp-content/plugins/ssl-alp/phpunit.xml'
+```
+
+or for testing on a network installation:
+
+```bash
+npx wp-env run phpunit 'phpunit -c /var/www/html/wp-content/plugins/ssl-alp/phpunit-multisite.xml'
+```
+
 ## Credits
 This plugin was entirely authored by [Sean Leavey](https://attackllama.com/), but in some cases
 code was adapted from other GPL licenced plugins. Features from the list of plugins below have
@@ -260,6 +273,7 @@ been pushed back to these plugins and WordPress itself:
 [18](https://github.com/WordPress/gutenberg/issues/13749),
 [19](https://core.trac.wordpress.org/ticket/46459)
 [20](https://github.com/WordPress/gutenberg/issues/20600)
+[21](https://core.trac.wordpress.org/ticket/52235)
 
 ### Co-Authors Plus
 Authors: Mohammad Jangda, Daniel Bachhuber, Automattic, Shepherd Interactive, Mark Jaquith
