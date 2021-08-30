@@ -4,7 +4,7 @@ Tags: logbook, coauthor, revisions, references, latex, tex, mathematics, wiki
 Requires at least: 5.6.0
 Tested up to: 5.6.0
 Requires PHP: 7.1.0
-Stable tag: 0.22.2
+Stable tag: 0.22.3
 License: GNU General Public License v3 or later
 License URI: LICENCE
 
@@ -78,6 +78,11 @@ with maximum control. Please see [this guide](https://alp.attackllama.com/docume
 on the ALP website.
 
 == Changelog ==
+
+= 0.22.3 =
+ - Stop overridden allowed upload file extensions with numbers from being
+   rejected.
+ - Remove unused CSS.
 
 = 0.22.2 =
  - Fix uninstall function query.
