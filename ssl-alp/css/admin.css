@@ -48,15 +48,6 @@ div.ssl-alp-tools-card {
     background: #fff;
 }
 
-/* Fix Gutenberg help text bug: https://github.com/WordPress/gutenberg/issues/10834 */
-.components-base-control .components-base-control__help {
-    margin-top: 0 !important;
-}
-.components-panel__row.ssl-alp-hide-revisions-panel,
-.components-panel__row.ssl-alp-hide-crossreferences-panel {
-    margin-top: 10px !important;
-}
-
 .ssl-alp-text-added {
     color: #006505;
 }

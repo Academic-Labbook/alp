@@ -16,11 +16,11 @@ if ( ! defined( 'WPINC' ) ) {
 class SSL_ALP_Core extends SSL_ALP_Module {
 	/**
 	 * Match media type in string.
-	 * https://regexr.com/4d6nq
+	 * https://regexr.com/64mhb
 	 *
 	 * @var string
 	 */
-	protected $media_type_regex = '/^([a-z|]+)(\s+[\w]+\/[\w\-\.\+]+)\h*(\h+\/\/\h*.*)?$/';
+	protected $media_type_regex = '/^([a-z0-9|]+)(\s+[\w]+\/[\w\-\.\+]+)\h*(\h+\/\/\h*.*)?$/';
 
 	/**
 	 * Register admin styles.

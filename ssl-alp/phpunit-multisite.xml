@@ -7,10 +7,12 @@
     convertNoticesToExceptions="true"
     convertWarningsToExceptions="true">
     <php>
+        <const name="WP_TESTS_DOMAIN" value="example.org" />
+		<const name="WP_TESTS_EMAIL" value="admin@example.org" />
         <const name="WP_TESTS_MULTISITE" value="1" />
     </php>
 	<testsuites>
-		<testsuite>
+		<testsuite name="unit">
 			<directory prefix="test-" suffix=".php">tests/unit</directory>
 		</testsuite>
 	</testsuites>
